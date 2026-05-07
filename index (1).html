@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alternativas de Oficinas · Colliers</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js"></script>
+<style>
+:root{--deep:#000759;--dark:#25408F;--mid:#1C54F4;--light:#4D93FF;--pale:#C3E6FF;--pg:#DBE5FF;--dg:#353E59;--mg:#56648F;--red:#ED1B34;--bg:#F0F4FF}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',Verdana,sans-serif;background:var(--bg);color:var(--deep);min-height:100vh}
+nav{background:var(--dark);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid var(--mid);position:sticky;top:0;z-index:100}
+.nb{display:flex;align-items:center;gap:12px}
+.nl{color:#fff;font-size:17px;font-weight:700}
+.nd{width:1px;height:18px;background:rgba(255,255,255,.3)}
+.ns{color:var(--pale);font-size:11px}
+.nr{display:flex;align-items:center;gap:10px}
+.nu{color:var(--pale);font-size:12px;display:none;align-items:center;gap:8px}
+.na{width:28px;height:28px;border-radius:50%;background:var(--mid);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.bo{background:transparent;border:1px solid rgba(255,255,255,.25);color:var(--pale);font-family:inherit;font-size:11px;padding:3px 10px;border-radius:3px;cursor:pointer}
+.tg{color:var(--pale);font-size:10px;font-style:italic}
+#ls{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 52px);padding:2rem}
+.lc{background:#fff;border-top:4px solid var(--dark);padding:2.5rem 2rem;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,7,89,.12)}
+.ll{font-size:28px;font-weight:700;color:var(--dark);margin-bottom:4px}
+.lb{height:3px;background:linear-gradient(90deg,var(--deep),var(--dark),var(--mid),var(--light),var(--pale));margin-bottom:1.5rem}
+.lc h1{font-size:18px;font-weight:700;color:var(--dark);margin-bottom:6px}
+.lc p{font-size:12px;color:var(--mg);margin-bottom:1.5rem;line-height:1.7}
+.bg{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px;background:var(--dark);color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:3px;cursor:pointer;transition:background .15s}
+.bg:hover{background:var(--deep)}
+.ln{margin-top:.75rem;font-size:10px;color:var(--mg)}
+#ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 52px)}
+.dc{background:#fff;border-top:4px solid var(--red);padding:2rem;max-width:380px;text-align:center}
+.dc h2{color:var(--red);margin-bottom:.5rem;font-size:18px}
+.dc p{font-size:12px;color:var(--mg);line-height:1.7}
+#as{display:none;max-width:1440px;margin:0 auto;padding:1.5rem 2rem}
+.ag{display:grid;grid-template-columns:290px 1fr;gap:1.5rem;align-items:start}
+.cp{background:#fff;border-top:3px solid var(--dark);box-shadow:0 2px 12px rgba(0,7,89,.08);overflow:hidden;position:sticky;top:68px}
+.ch{background:var(--dark);padding:.7rem 1rem;display:flex;align-items:center;gap:8px}
+.chd{width:8px;height:8px;border-radius:50%;background:var(--pale)}
+.cht{color:#fff;font-size:12px;font-weight:600}
+.chb{font-size:9px;background:var(--mid);color:#fff;padding:1px 6px;border-radius:2px}
+.cm{height:430px;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth}
+.cm::-webkit-scrollbar{width:4px}
+.cm::-webkit-scrollbar-thumb{background:var(--pg)}
+.msg{max-width:90%;padding:.5rem .75rem;font-size:12px;line-height:1.6;animation:fu .2s ease;white-space:pre-wrap}
+@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.mb{background:var(--pg);color:var(--deep);align-self:flex-start;border-left:2px solid var(--dark)}
+.mu{background:var(--dark);color:#fff;align-self:flex-end}
+.co{display:flex;flex-direction:column;gap:4px;margin-top:2px}
+.co button{background:#fff;border:1px solid var(--pg);color:var(--dark);font-family:inherit;font-size:11px;padding:5px 10px;cursor:pointer;text-align:left;transition:all .15s}
+.co button:hover{background:var(--pg)}
+.co button.sel{background:var(--dark);color:#fff}
+.cn{width:100%;background:var(--pg);color:var(--dark);border:none;font-family:inherit;font-size:11px;font-weight:600;padding:7px;cursor:pointer;border-top:1px solid var(--pg)}
+.cn:hover{background:var(--pale)}
+.rp{display:flex;flex-direction:column;gap:1.25rem}
+.tc{background:#fff;border-top:3px solid var(--dark);box-shadow:0 2px 12px rgba(0,7,89,.08);overflow:hidden}
+.th2{background:var(--dark);padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.tt{color:#fff;font-size:12px;font-weight:600}
+.sc{background:var(--mid);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead tr{background:var(--dark)}
+th{padding:8px 10px;text-align:left;color:#fff;font-weight:600;font-size:10px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
+th:last-child{border-right:none}
+td{padding:7px 10px;border-bottom:1px solid var(--pg);color:var(--dg);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.sr td{background:#EEF3FF}
+tr:hover td{background:#F5F7FF}
+.cc{text-align:center;width:32px}
+input[type=checkbox]{width:14px;height:14px;accent-color:var(--dark);cursor:pointer}
+.cb{display:inline-block;font-size:9px;padding:1px 5px;background:var(--pale);color:var(--dark);font-weight:700}
+.sv{font-weight:700;color:var(--mid)}
+.ph{width:60px;height:40px;background:var(--pg);display:flex;align-items:center;justify-content:center;font-size:14px}
+.et{text-align:center;padding:2rem;color:var(--mg);font-size:12px}
+.sb{background:var(--dark);padding:.75rem 1rem;display:none;align-items:center;justify-content:space-between}
+.sbl{color:#fff;font-size:12px}
+.sbl span{font-weight:700;color:var(--pale)}
+.sn{color:var(--pale);font-size:10px;margin-top:2px}
+.bp{background:var(--mid);color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:9px 22px;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
+.bp:hover{background:var(--deep)}
+.bp:disabled{opacity:.4;cursor:not-allowed}
+.kk{background:#fff;border-top:3px solid var(--mg);box-shadow:0 2px 12px rgba(0,7,89,.08);padding:1rem}
+.kt{font-size:10px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.kg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kf{display:flex;flex-direction:column;gap:4px}
+.kf label{font-size:10px;font-weight:600;color:var(--mg);text-transform:uppercase;letter-spacing:.05em}
+.kf input{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--pg);color:var(--deep)}
+.kf input:focus{outline:none;border-color:var(--mid)}
+.kr{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dg);cursor:pointer}
+.kr input{accent-color:var(--dark)}
+.sm{font-size:11px;color:var(--mg);text-align:center;margin-top:.5rem;min-height:16px}
+.sp{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+footer{text-align:center;padding:1.5rem;font-size:10px;color:var(--mg);margin-top:1rem;border-top:1px solid var(--pg)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nb">
+    <div class="nl">Colliers</div>
+    <div class="nd"></div>
+    <div class="ns">Generador de Alternativas</div>
+  </div>
+  <div class="nr">
+    <div class="tg">Accelerating success.</div>
+    <div class="nu" id="nu">
+      <div class="na" id="na">MA</div>
+      <span id="nn"></span>
+      <button class="bo" onclick="logout()">Salir</button>
+    </div>
+  </div>
+</nav>
+
+<div id="ls">
+  <div class="lc">
+    <div class="ll">Colliers</div>
+    <div class="lb"></div>
+    <h1>Generador de Alternativas</h1>
+    <p>Iniciá sesión con tu cuenta corporativa para acceder al sistema de búsqueda y generación de presentaciones.</p>
+    <button class="bg" onclick="loginGoogle()">
+      <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
+      Iniciar sesión con Google
+    </button>
+    <div class="ln">Solo cuentas @colliers.com tienen acceso</div>
+  </div>
+</div>
+
+<div id="ds" style="display:none">
+  <div class="dc">
+    <h2>Acceso denegado</h2>
+    <p>Esta herramienta es exclusiva para cuentas <strong>@colliers.com</strong>.<br>
+    Cuenta: <span id="de" style="font-weight:600"></span></p>
+    <button class="bg" onclick="logout()" style="margin-top:1.5rem">Volver</button>
+  </div>
+</div>
+
+<div id="as">
+  <div class="ag">
+    <div class="cp">
+      <div class="ch">
+        <div class="chd"></div>
+        <div class="cht">Asistente Colliers</div>
+        <div class="chb">BETA</div>
+      </div>
+      <div class="cm" id="cm"></div>
+      <button class="cn" onclick="nuevaBusqueda()">↺ Nueva búsqueda</button>
+    </div>
+    <div class="rp">
+      <div class="tc">
+        <div class="th2">
+          <div class="tt">Alternativas encontradas</div>
+          <div class="sc" id="sc">0 seleccionadas</div>
+        </div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th class="cc"><input type="checkbox" id="ca" onchange="toggleAll(this)"></th>
+                <th style="width:70px">Foto</th>
+                <th>Edificio</th>
+                <th>Submercado</th>
+                <th>Cat.</th>
+                <th>Sup. disp. m²</th>
+                <th>Planta m²</th>
+                <th>Cocheras</th>
+                <th>Asking Rent</th>
+                <th>Pisos dispon.</th>
+              </tr>
+            </thead>
+            <tbody id="tb">
+              <tr><td colspan="10" class="et">Usá el chat para buscar alternativas →</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sb" id="sb">
+        <div class="sbl">
+          <div><span id="sn">0</span> alternativas seleccionadas</div>
+          <div class="sn" id="sns"></div>
+        </div>
+        <button class="bp" id="bp" onclick="generarPPT()">Generar presentación PPT ↗</button>
+      </div>
+      <div class="kk">
+        <div class="kt">Personalizar presentación</div>
+        <div class="kg">
+          <div class="kf">
+            <label>Cliente / Informe</label>
+            <input type="text" id="kc" placeholder="Ej: Securitas · Mayo 2026">
+          </div>
+          <div class="kf">
+            <label>Contenido</label>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px">
+              <label class="kr"><input type="checkbox" id="it" checked> Tabla comparativa</label>
+              <label class="kr"><input type="checkbox" id="if" checked> Fichas individuales</label>
+            </div>
+          </div>
+        </div>
+        <div class="sm" id="sm"></div>
+      </div>
+    </div>
+  </div>
+  <footer>Colliers International Argentina · Uso interno · Generador de Alternativas</footer>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+const FC = {
+  apiKey:"AIzaSyDmV3KCBD0euDgtbw2nQ-ynw2aB_CDGq-A",
+  authDomain:"colliers-alternativas-1db71.firebaseapp.com",
+  projectId:"colliers-alternativas-1db71",
+  storageBucket:"colliers-alternativas-1db71.firebasestorage.app",
+  messagingSenderId:"272619762449",
+  appId:"1:272619762449:web:ce885bddd1aa1fb9b892b0"
+};
+const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=1012730079&single=true&output=csv";
+const DOM = "colliers.com";
+
+const auth = getAuth(initializeApp(FC));
+const prov = new GoogleAuthProvider();
+prov.setCustomParameters({hd:DOM});
+
+let user=null, props=[], filt=[], sel=new Set();
+
+onAuthStateChanged(auth, u => {
+  if (!u) { show("ls"); return; }
+  if (!u.email.endsWith("@"+DOM)) {
+    document.getElementById("de").textContent=u.email;
+    show("ds"); signOut(auth); return;
+  }
+  user=u;
+  const ini=(u.displayName||u.email).split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  document.getElementById("na").textContent=ini;
+  document.getElementById("nn").textContent=u.displayName?.split(" ")[0]||u.email;
+  document.getElementById("nu").style.display="flex";
+  show("as");
+  loadData().then(()=>startChat(u.displayName?.split(" ")[0]||"Broker"));
+});
+
+window.loginGoogle=async()=>{try{await signInWithPopup(auth,prov);}catch(e){}};
+window.logout=()=>{signOut(auth);document.getElementById("nu").style.display="none";};
+
+async function loadData(){
+  try{
+    const r=await fetch(CSV);
+    const csv=await r.text();
+    props=parseCSV(csv);
+  }catch(e){console.error(e);}
+}
+
+function parseCSV(csv){
+  const lines=csv.split("\n").filter(l=>l.trim());
+  if(lines.length<2)return[];
+  const hdrs=lines[0].split(",").map(h=>h.replace(/"/g,"").trim());
+  const c=h=>hdrs.indexOf(h);
+  return lines.slice(1).map(line=>{
+    const v=parseLine(line);
+    if(!v[c("Nombre Edificio")])return null;
+    if((v[c("Activo (SI/NO)")]||"SI").toUpperCase()==="NO")return null;
+    return{
+      nombre:v[c("Nombre Edificio")]||"–",
+      direccion:v[c("Dirección")]||"–",
+      submercado:v[c("Submercado")]||"–",
+      cat:v[c("Categoría")]||"–",
+      anio:v[c("Año Construcción")]||"–",
+      pisos:v[c("Pisos Totales")]||"–",
+      cocheras:v[c("Ratio Cocheras")]||"–",
+      supDisp:parseFloat((v[c("Superficie Disponible m²")]||"0").replace(/\./g,"").replace(",","."))||0,
+      pisosDisp:v[c("Pisos Disponibles")]||"–",
+      supPlanta:parseFloat((v[c("Sup. Promedio Planta m²")]||"0").replace(/\./g,"").replace(",","."))||0,
+      rent:v[c("Asking Rent USD/m²")]||"–",
+      comentarios:v[c("Comentarios / Amenities")]||"–",
+      foto:v[c("URL Foto")]||"",
+    };
+  }).filter(Boolean);
+}
+
+function parseLine(line){
+  const r=[];let cur="",inQ=false;
+  for(let i=0;i<line.length;i++){
+    if(line[i]==='"'){inQ=!inQ;continue;}
+    if(line[i]===","&&!inQ){r.push(cur.trim());cur="";continue;}
+    cur+=line[i];
+  }
+  r.push(cur.trim());return r;
+}
+
+const STEPS=[
+  {id:"zona",q:n=>`¡Hola ${n}! Estoy aquí para ayudarte a encontrar las mejores alternativas.\n¿En qué zona querés buscar?`,
+   opts:["Norte CABA","Norte GBA","Catalinas","Puerto Madero","Microcentro","Macrocentro","Macrocentro Sur","Todas las zonas"]},
+  {id:"sup",q:()=>"¿Qué superficie mínima necesitás?",
+   opts:["Hasta 1.000 m²","1.000 – 3.000 m²","3.000 – 8.000 m²","Más de 8.000 m²","Sin límite"]},
+  {id:"rent",q:()=>"¿Cuál es tu rango de Asking Rent?",
+   opts:["Hasta USD 15/m²","USD 15 – 22/m²","USD 22 – 28/m²","Más de USD 28/m²","Indiferente"]},
+  {id:"cat",q:()=>"¿Qué categoría de edificio buscás?",
+   opts:["A+ / A+ LEED","A","B+ o inferior","Indiferente"]},
+  {id:"cant",q:()=>"¿Cuántas opciones querés ver?",
+   opts:["3","5","7","10","Todas"]},
+];
+
+let step=0, resp={};
+
+function startChat(nombre){
+  step=0;resp={};
+  document.getElementById("cm").innerHTML="";
+  botMsg(STEPS[0].q(nombre),STEPS[0].opts);
+}
+window.nuevaBusqueda=()=>startChat(user?.displayName?.split(" ")[0]||"Broker");
+
+function botMsg(txt,opts){
+  const w=document.getElementById("cm");
+  const m=document.createElement("div");
+  m.className="msg mb";m.textContent=txt;w.appendChild(m);
+  if(opts){
+    const od=document.createElement("div");od.className="co";
+    opts.forEach(op=>{
+      const b=document.createElement("button");b.textContent=op;
+      b.onclick=()=>pick(op,od);od.appendChild(b);
+    });
+    w.appendChild(od);
+  }
+  w.scrollTop=w.scrollHeight;
+}
+
+function userMsg(txt){
+  const w=document.getElementById("cm");
+  const m=document.createElement("div");m.className="msg mu";m.textContent=txt;
+  w.appendChild(m);w.scrollTop=w.scrollHeight;
+}
+
+function pick(val,od){
+  od.querySelectorAll("button").forEach(b=>{b.classList.toggle("sel",b.textContent===val);b.disabled=true;});
+  userMsg(val);resp[STEPS[step].id]=val;step++;
+  setTimeout(()=>{
+    if(step<STEPS.length)botMsg(STEPS[step].q(),STEPS[step].opts);
+    else{botMsg("Buscando alternativas...");setTimeout(applyFilters,500);}
+  },300);
+}
+
+function applyFilters(){
+  const{zona,sup,rent,cat,cant}=resp;
+  let r=props.filter(p=>{
+    if(zona&&zona!=="Todas las zonas"&&!p.submercado.toLowerCase().includes(zona.toLowerCase().split(" ")[0]))return false;
+    if(sup==="Hasta 1.000 m²"&&p.supDisp>1000)return false;
+    if(sup==="1.000 – 3.000 m²"&&(p.supDisp<1000||p.supDisp>3000))return false;
+    if(sup==="3.000 – 8.000 m²"&&(p.supDisp<3000||p.supDisp>8000))return false;
+    if(sup==="Más de 8.000 m²"&&p.supDisp<8000)return false;
+    const rn=parseFloat(String(p.rent).split("–")[0].replace(",","."))||0;
+    if(rent==="Hasta USD 15/m²"&&rn>15)return false;
+    if(rent==="USD 15 – 22/m²"&&(rn<15||rn>22))return false;
+    if(rent==="USD 22 – 28/m²"&&(rn<22||rn>28))return false;
+    if(rent==="Más de USD 28/m²"&&rn<28)return false;
+    if(cat==="A+ / A+ LEED"&&!p.cat.includes("A+"))return false;
+    if(cat==="A"&&p.cat!=="A")return false;
+    if(cat==="B+ o inferior"&&!p.cat.startsWith("B"))return false;
+    return true;
+  });
+  const n=cant==="Todas"?999:parseInt(cant)||999;
+  if(n<999)r=r.slice(0,n);
+  filt=r;sel.clear();renderTable();
+  botMsg(r.length>0
+    ?`Encontré ${r.length} alternativa${r.length!==1?"s":""} que coinciden. Seleccioná las que te interesen y generá la presentación.`
+    :"No encontré propiedades con esos criterios. Hacé clic en Nueva búsqueda para ajustar.");
+}
+
+function renderTable(){
+  const tb=document.getElementById("tb");
+  if(!filt.length){tb.innerHTML='<tr><td colspan="10" class="et">Sin resultados</td></tr>';updBar();return;}
+  tb.innerHTML=filt.map((p,i)=>`
+    <tr id="r${i}" class="${sel.has(i)?"sr":""}">
+      <td class="cc"><input type="checkbox" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td>
+      <td>${p.foto?`<img src="${p.foto}" style="width:60px;height:40px;object-fit:cover" onerror="this.outerHTML='<div class=\\'ph\\'>🏢</div>'">`:'<div class="ph">🏢</div>'}</td>
+      <td style="font-weight:600;min-width:110px">${p.nombre}</td>
+      <td>${p.submercado}</td>
+      <td><span class="cb">${p.cat}</span></td>
+      <td class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR"):"–"}</td>
+      <td>${p.supPlanta?p.supPlanta.toLocaleString("es-AR"):"–"}</td>
+      <td>${p.cocheras}</td>
+      <td style="font-weight:600">USD ${p.rent}</td>
+      <td style="font-size:10px;color:var(--mg)">${p.pisosDisp}</td>
+    </tr>`).join("");
+  updBar();
+}
+
+window.toggleRow=(i,cb)=>{
+  if(cb.checked)sel.add(i);else sel.delete(i);
+  const r=document.getElementById("r"+i);
+  if(r)r.className=cb.checked?"sr":"";
+  updBar();
+};
+window.toggleAll=(cb)=>{
+  filt.forEach((_,i)=>{
+    if(cb.checked)sel.add(i);else sel.delete(i);
+    const r=document.getElementById("r"+i);
+    if(r){r.className=cb.checked?"sr":"";const ck=r.querySelector("input[type=checkbox]");if(ck)ck.checked=cb.checked;}
+  });updBar();
+};
+
+function updBar(){
+  const n=sel.size;
+  document.getElementById("sc").textContent=`${n} seleccionada${n!==1?"s":""}`;
+  document.getElementById("sb").style.display=n>0?"flex":"none";
+  document.getElementById("sn").textContent=n;
+  document.getElementById("sns").textContent=[...sel].map(i=>filt[i]?.nombre).filter(Boolean).join(", ");
+}
+
+window.generarPPT=async()=>{
+  const sp=[...sel].map(i=>filt[i]).filter(Boolean);
+  if(!sp.length)return;
+  const btn=document.getElementById("bp");
+  const msg=document.getElementById("sm");
+  const cliente=document.getElementById("kc").value.trim()||"Colliers International";
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generando…';
+  msg.textContent="Preparando presentación…";
+  try{
+    const pptx=new PptxGenJS();
+    pptx.layout="LAYOUT_WIDE";
+    const DARK="25408F",MID="1C54F4",PALE="C3E6FF",WHITE="FFFFFF",DEEP="000759";
+
+    // PORTADA
+    const s0=pptx.addSlide();
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:"66%",h:"100%",fill:{color:DARK}});
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:"66%",h:0.06,fill:{color:MID}});
+    s0.addText("Colliers",{x:0.5,y:0.4,w:5,h:0.9,fontSize:42,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s0.addText("Alternativas de Oficinas",{x:0.5,y:1.5,w:8,h:1,fontSize:30,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s0.addText(cliente,{x:0.5,y:2.6,w:7,h:0.5,fontSize:16,color:PALE,fontFace:"Open Sans"});
+    s0.addShape(pptx.ShapeType.rect,{x:0.5,y:3.25,w:2.8,h:0.55,fill:{color:MID}});
+    s0.addText(`${sp.length} alternativa${sp.length!==1?"s":""}`,{x:0.5,y:3.25,w:2.8,h:0.55,fontSize:13,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
+    s0.addText("Accelerating success.",{x:0.5,y:6.8,w:5,h:0.35,fontSize:10,italic:true,color:PALE,fontFace:"Open Sans"});
+
+    // TABLA COMPARATIVA
+    if(document.getElementById("it").checked){
+      const COLS=6;
+      const grupos=[];
+      for(let i=0;i<sp.length;i+=COLS)grupos.push(sp.slice(i,i+COLS));
+      const ROWS=[
+        ["Dirección","direccion"],["Submercado","submercado"],["Categoría","cat"],
+        ["Año","anio"],["Pisos","pisos"],["Cocheras","cocheras"],
+        ["Sup. disponible m²","supDisp"],["Pisos disponibles","pisosDisp"],
+        ["Sup. planta m²","supPlanta"],["Asking Rent","rent"],["Comentarios","comentarios"],
+      ];
+      for(const[gi,grupo] of grupos.entries()){
+        const ng=grupo.length;
+        const LW=1.45,CW=(13.33-LW)/ng;
+        const sl=pptx.addSlide();
+        sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:0.35,fill:{color:DARK}});
+        sl.addText("Alternativas de Oficinas",{x:0.2,y:0.04,w:7,h:0.27,fontSize:12,bold:true,color:WHITE,fontFace:"Open Sans"});
+        sl.addText("Colliers",{x:11.5,y:0.04,w:1.65,h:0.27,fontSize:12,bold:true,color:PALE,align:"right",fontFace:"Open Sans"});
+        if(grupos.length>1)sl.addText(`Pág. ${gi+1}/${grupos.length}`,{x:10,y:0.04,w:1.3,h:0.27,fontSize:9,color:PALE,align:"right",fontFace:"Open Sans"});
+        for(const[i,prop] of grupo.entries()){
+          const cx=LW+i*CW;
+          sl.addShape(pptx.ShapeType.rect,{x:cx,y:0.37,w:CW-0.02,h:1.0,fill:{color:"DBE5FF"}});
+          sl.addShape(pptx.ShapeType.rect,{x:cx,y:1.37,w:CW-0.02,h:0.3,fill:{color:DEEP}});
+          sl.addText(String(i+1+gi*COLS),{x:cx,y:1.37,w:CW-0.02,h:0.3,fontSize:12,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
+          sl.addShape(pptx.ShapeType.rect,{x:cx,y:1.67,w:CW-0.02,h:0.38,fill:{color:DARK}});
+          sl.addText(prop.nombre,{x:cx+0.04,y:1.67,w:CW-0.1,h:0.38,fontSize:7,bold:true,color:WHITE,align:"center",wrap:true,fontFace:"Open Sans"});
+        }
+        const TABLE_TOP=2.08,ROW_H=0.41;
+        for(const[ri,[lbl,key]] of ROWS.entries()){
+          const ry=TABLE_TOP+ri*ROW_H;
+          const bg=ri%2===0?"F4F7FF":WHITE;
+          sl.addShape(pptx.ShapeType.rect,{x:0,y:ry,w:LW,h:ROW_H,fill:{color:bg}});
+          sl.addText(lbl,{x:0.06,y:ry+0.06,w:LW-0.1,h:ROW_H-0.12,fontSize:7.5,bold:true,color:DARK,fontFace:"Open Sans"});
+          for(const[i,prop] of grupo.entries()){
+            const cx=LW+i*CW;
+            sl.addShape(pptx.ShapeType.rect,{x:cx,y:ry,w:CW-0.02,h:ROW_H,fill:{color:bg}});
+            let val=prop[key]||"–";
+            if(key==="supDisp"&&val)val=Number(val).toLocaleString("es-AR")+" m²";
+            if(key==="supPlanta"&&val)val=Number(val).toLocaleString("es-AR")+" m²";
+            const isDisp=key==="supDisp";
+            sl.addText(String(val),{x:cx+0.04,y:ry+0.05,w:CW-0.1,h:ROW_H-0.1,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:"center",wrap:true,fontFace:"Open Sans"});
+          }
+        }
+        sl.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+        sl.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+        sl.addText("colliers.com",{x:11.5,y:7.25,w:1.65,h:0.2,fontSize:7,bold:true,color:WHITE,align:"right",fontFace:"Open Sans"});
+      }
+    }
+
+    // FICHAS
+    if(document.getElementById("if").checked){
+      for(const[idx,prop] of sp.entries()){
+        const s=pptx.addSlide();
+        s.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:0.68,fill:{color:DARK}});
+        s.addShape(pptx.ShapeType.rect,{x:0,y:0.68,w:13.33,h:0.04,fill:{color:MID}});
+        s.addText(`${idx+1}.  ${prop.nombre}`,{x:0.25,y:0.1,w:9.5,h:0.5,fontSize:18,bold:true,color:WHITE,fontFace:"Open Sans"});
+        s.addText(prop.submercado,{x:10.5,y:0.1,w:2.6,h:0.5,fontSize:12,color:PALE,align:"right",fontFace:"Open Sans"});
+        const campos=[
+          ["Dirección",prop.direccion],["Categoría",prop.cat],
+          ["Año de construcción",String(prop.anio)],["Pisos totales",String(prop.pisos)],
+          ["Ratio cocheras",prop.cocheras],["Sup. disponible",`${prop.supDisp?Number(prop.supDisp).toLocaleString("es-AR"):"–"} m²`],
+          ["Pisos disponibles",prop.pisosDisp],["Sup. prom. planta",`${prop.supPlanta?Number(prop.supPlanta).toLocaleString("es-AR"):"–"} m²`],
+        ];
+        for(const[fi,[lbl,val]] of campos.entries()){
+          const fy=0.88+fi*0.52;
+          const bg=fi%2===0?"F4F7FF":WHITE;
+          s.addShape(pptx.ShapeType.rect,{x:0.25,y:fy,w:6.5,h:0.5,fill:{color:bg}});
+          s.addText(lbl,{x:0.35,y:fy+0.08,w:2.2,h:0.36,fontSize:8,color:"56648F",fontFace:"Open Sans"});
+          s.addText(val,{x:2.65,y:fy+0.06,w:4.0,h:0.42,fontSize:9,bold:true,color:"353E59",fontFace:"Open Sans"});
+        }
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:0.88,w:6.08,h:2.0,fill:{color:DARK}});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:2.88,w:6.08,h:0.04,fill:{color:MID}});
+        s.addText("Average Asking Rent",{x:7.0,y:1.0,w:6.08,h:0.38,fontSize:11,color:PALE,align:"center",fontFace:"Open Sans"});
+        s.addText(`USD ${prop.rent} /m²`,{x:7.0,y:1.4,w:6.08,h:1.0,fontSize:28,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
+        s.addText("+ IVA",{x:7.0,y:2.42,w:6.08,h:0.3,fontSize:10,color:PALE,align:"center",fontFace:"Open Sans"});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:3.55,fill:{color:WHITE}});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:0.38,fill:{color:"DBE5FF"}});
+        s.addText("Características y amenities",{x:7.15,y:3.14,w:5.8,h:0.3,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
+        s.addText(prop.comentarios,{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",wrap:true,fontFace:"Open Sans"});
+        s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+        s.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+        s.addText(`Alternativa ${idx+1} de ${sp.length}`,{x:11.2,y:7.25,w:1.9,h:0.2,fontSize:7,bold:true,color:WHITE,align:"right",fontFace:"Open Sans"});
+      }
+    }
+
+    const fecha=new Date().toISOString().slice(0,10);
+    await pptx.writeFile({fileName:`Alternativas_${cliente.replace(/[^a-z0-9]/gi,"_")}_${fecha}.pptx`});
+    msg.textContent=`✓ PPT descargado con ${sp.length} alternativas`;
+  }catch(e){
+    console.error(e);
+    msg.textContent="Error generando el PPT. Intentá de nuevo.";
+  }finally{
+    btn.disabled=false;btn.textContent="Generar presentación PPT ↗";
+  }
+};
+
+function show(id){
+  ["ls","ds","as"].forEach(s=>{
+    const el=document.getElementById(s);
+    if(el)el.style.display=s===id?(s==="ls"||s==="ds"?"flex":"block"):"none";
+  });
+}
+</script>
+</body>
+</html>
