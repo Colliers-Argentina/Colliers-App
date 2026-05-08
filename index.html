@@ -6,6 +6,7 @@
 <title>Alternativas de Oficinas · Colliers</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
 <style>
 :root{--deep:#000759;--dark:#25408F;--mid:#1C54F4;--light:#4D93FF;--pale:#C3E6FF;--pg:#DBE5FF;--dg:#353E59;--mg:#56648F;--red:#ED1B34;--bg:#F0F4FF}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -122,14 +123,14 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:var(--mg);margin-to
       <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
       Iniciar sesión con Google
     </button>
-    <div class="ln">Solo cuentas @colliers.com tienen acceso</div>
+    <div class="ln">Solo cuentas @gmail.com tienen acceso</div>
   </div>
 </div>
 
 <div id="ds" style="display:none">
   <div class="dc">
     <h2>Acceso denegado</h2>
-    <p>Esta herramienta es exclusiva para cuentas <strong>@colliers.com</strong>.<br>
+    <p>Esta herramienta es exclusiva para cuentas <strong>@gmail.com</strong>.<br>
     Cuenta: <span id="de" style="font-weight:600"></span></p>
     <button class="bg" onclick="logout()" style="margin-top:1.5rem">Volver</button>
   </div>
@@ -203,47 +204,69 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:var(--mg);margin-to
   <footer>Colliers International Argentina · Uso interno · Generador de Alternativas</footer>
 </div>
 
-<script type="module" id="mainscript">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-const FC = {
-  apiKey:"AIzaSyDmV3KCBD0euDgtbw2nQ-ynw2aB_CDGq-A",
-  authDomain:"colliers-alternativas-1db71.firebaseapp.com",
-  projectId:"colliers-alternativas-1db71",
-  storageBucket:"colliers-alternativas-1db71.firebasestorage.app",
-  messagingSenderId:"272619762449",
-  appId:"1:272619762449:web:ce885bddd1aa1fb9b892b0"
-};
+<script>
 const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=1012730079&single=true&output=csv";
 const DOM = "gmail.com";
-
-const auth = getAuth(initializeApp(FC));
-const prov = new GoogleAuthProvider();
-prov.setCustomParameters({hd:DOM});
+const CLIENT_ID = "312606519681-q1bkpeug6sonp48bc6842o02hs71uma2.apps.googleusercontent.com";
 
 let user=null, props=[], filt=[], sel=new Set();
 
-getRedirectResult(auth).catch(e=>console.error(e));
-onAuthStateChanged(auth, u => {
-  if (!u) { show("ls"); return; }
-  if (!u.email.endsWith("@"+DOM)) {
-    document.getElementById("de").textContent=u.email;
-    show("ds"); signOut(auth); return;
+function decodeJWT(token){
+  const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+
+function initGSI(){
+  google.accounts.id.initialize({
+    client_id:CLIENT_ID,
+    callback:handleCredentialResponse,
+    auto_select:false,
+    cancel_on_tap_outside:true
+  });
+  const saved=sessionStorage.getItem('gsi_user');
+  if(saved){
+    try{user=JSON.parse(saved);onUserLoggedIn();}catch(e){sessionStorage.removeItem('gsi_user');show('ls');}
+  }else{
+    show('ls');
   }
-  user=u;
-  const ini=(u.displayName||u.email).split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
-  document.getElementById("na").textContent=ini;
-  document.getElementById("nn").textContent=u.displayName?.split(" ")[0]||u.email;
-  document.getElementById("nu").style.display="flex";
-  show("as");
-  loadData().then(()=>startChat(u.displayName?.split(" ")[0]||"Broker"));
+}
+
+function handleCredentialResponse(response){
+  const payload=decodeJWT(response.credential);
+  if(!payload.email.endsWith('@'+DOM)){
+    document.getElementById('de').textContent=payload.email;
+    show('ds');
+    return;
+  }
+  user={email:payload.email,displayName:payload.name};
+  sessionStorage.setItem('gsi_user',JSON.stringify(user));
+  onUserLoggedIn();
+}
+
+function onUserLoggedIn(){
+  const ini=(user.displayName||user.email).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('na').textContent=ini;
+  document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
+  document.getElementById('nu').style.display='flex';
+  show('as');
+  loadData().then(()=>startChat((user.displayName||'').split(' ')[0]||'Broker'));
+}
+
+window.loginGoogle=()=>{google.accounts.id.prompt();};
+window.logout=()=>{
+  google.accounts.id.disableAutoSelect();
+  sessionStorage.removeItem('gsi_user');
+  user=null;
+  document.getElementById('nu').style.display='none';
+  show('ls');
+};
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('login-btn').addEventListener('click',()=>{google.accounts.id.prompt();});
 });
 
-window.loginGoogle=async()=>{try{await signInWithRedirect(auth,prov);}catch(e){console.error(e);}};
-window.logout=()=>{signOut(auth);document.getElementById("nu").style.display="none";};
-document.getElementById("login-btn").addEventListener("click", ()=>{signInWithRedirect(auth,prov).catch(e=>console.error(e));});
+window.onGoogleLibraryLoad=initGSI;
+if(typeof google!=='undefined'&&google.accounts)initGSI();
 
 async function loadData(){
   try{
