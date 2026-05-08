@@ -498,7 +498,11 @@ window.generarPPT=async()=>{
             if(key==="supDisp"&&val)val=Number(val).toLocaleString("es-AR")+" m²";
             if(key==="supPlanta"&&val)val=Number(val).toLocaleString("es-AR")+" m²";
             const isDisp=key==="supDisp";
-            sl.addText(String(val),{x:cx+0.04,y:ry+0.05,w:CW-0.1,h:ROW_H-0.1,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:"center",wrap:true,fontFace:"Open Sans"});
+            const isCom=key==="comentarios";
+            const textVal=isCom
+              ?String(val).split(',').map(s=>s.trim()).filter(Boolean).map(s=>({text:s,options:{bullet:true}}))
+              :String(val);
+            sl.addText(textVal,{x:cx+0.04,y:ry+0.05,w:CW-0.1,h:ROW_H-0.1,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:isCom?"left":"center",wrap:true,fontFace:"Open Sans"});
           }
         }
         sl.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
