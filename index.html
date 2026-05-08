@@ -2,278 +2,411 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Alternativas de Oficinas · Colliers</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <style>
-:root{--deep:#000759;--dark:#25408F;--mid:#1C54F4;--light:#4D93FF;--pale:#C3E6FF;--pg:#DBE5FF;--dg:#353E59;--mg:#56648F;--red:#ED1B34;--bg:#F0F4FF}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Open Sans',Verdana,sans-serif;background:var(--bg);color:var(--deep);min-height:100vh}
-nav{background:var(--dark);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid var(--mid);position:sticky;top:0;z-index:100}
-.nb{display:flex;align-items:center;gap:12px}
-.nl{color:#fff;font-size:17px;font-weight:700;display:flex;flex-direction:column;gap:3px}
-.nl::after{content:'';height:2px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF)}
-.nd{width:1px;height:18px;background:rgba(255,255,255,.3)}
-.ns{color:var(--pale);font-size:11px}
-.nr{display:flex;align-items:center;gap:10px}
-.nu{color:var(--pale);font-size:12px;display:none;align-items:center;gap:8px}
-.na{width:28px;height:28px;border-radius:50%;background:var(--mid);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.bo{background:transparent;border:1px solid rgba(255,255,255,.25);color:var(--pale);font-family:inherit;font-size:11px;padding:3px 10px;border-radius:3px;cursor:pointer}
-.tg{color:var(--pale);font-size:10px;font-style:italic}
-#ls{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 52px);padding:2rem}
-.lc{background:#fff;border-top:4px solid var(--dark);padding:2.5rem 2rem;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,7,89,.12)}
-.ll{font-size:28px;font-weight:700;color:var(--dark);margin-bottom:4px}
-.lb{height:3px;background:linear-gradient(90deg,var(--deep),var(--dark),var(--mid),var(--light),var(--pale));margin-bottom:1.5rem}
-.lc h1{font-size:18px;font-weight:700;color:var(--dark);margin-bottom:6px}
-.lc p{font-size:12px;color:var(--mg);margin-bottom:1.5rem;line-height:1.7}
-.bg{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px;background:var(--dark);color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:3px;cursor:pointer;transition:background .15s}
-.bg:hover{background:var(--deep)}
-.ln{margin-top:.75rem;font-size:10px;color:var(--mg)}
-#ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 52px)}
-.dc{background:#fff;border-top:4px solid var(--red);padding:2rem;max-width:380px;text-align:center}
-.dc h2{color:var(--red);margin-bottom:.5rem;font-size:18px}
-.dc p{font-size:12px;color:var(--mg);line-height:1.7}
-#as{display:none;max-width:1440px;margin:0 auto;padding:1.5rem 2rem}
-.ag{display:grid;grid-template-columns:290px 1fr;gap:1.5rem;align-items:start}
-.cp{background:#fff;border-top:3px solid var(--dark);box-shadow:0 2px 12px rgba(0,7,89,.08);overflow:hidden;position:sticky;top:68px;display:flex;flex-direction:column;max-height:calc(100vh - 80px)}
-.ch{background:var(--dark);padding:.7rem 1rem;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.chd{width:8px;height:8px;border-radius:50%;background:var(--pale)}
-.cht{color:#fff;font-size:12px;font-weight:600}
-.chb{font-size:9px;background:var(--mid);color:#fff;padding:1px 6px;border-radius:2px}
-.cm{height:280px;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth;flex-shrink:0}
-.cm::-webkit-scrollbar{width:4px}
-.cm::-webkit-scrollbar-thumb{background:var(--pg)}
-.msg{max-width:90%;padding:.5rem .75rem;font-size:12px;line-height:1.6;animation:fu .2s ease;white-space:pre-wrap}
-@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.mb{background:var(--pg);color:var(--deep);align-self:flex-start;border-left:2px solid var(--dark)}
-.mu{background:var(--dark);color:#fff;align-self:flex-end}
-.co{display:flex;flex-direction:column;gap:4px;margin-top:2px}
-.co button{background:#fff;border:1px solid var(--pg);color:var(--dark);font-family:inherit;font-size:11px;padding:5px 10px;cursor:pointer;text-align:left;transition:all .15s}
-.co button:hover{background:var(--pg)}
-.co button.sel{background:var(--dark);color:#fff}
-.co-ok{background:var(--mid)!important;color:#fff!important;font-weight:700!important;margin-top:4px;border-color:var(--mid)!important}
-.co-ok:hover{background:var(--deep)!important}
+body{font-family:'Open Sans',Verdana,sans-serif;background:#F0F4FF;color:#000759;min-height:100vh}
+
+/* NAV */
+nav{background:#25408F;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid #1C54F4;position:sticky;top:0;z-index:200}
+.nb{display:flex;align-items:center;gap:14px}
+.nlogo{display:flex;flex-direction:column;gap:2px}
+.nlogo-name{color:#fff;font-size:18px;font-weight:700;letter-spacing:-.5px}
+.nlogo-bar{height:2px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF)}
+.ndiv{width:1px;height:20px;background:rgba(255,255,255,.25)}
+.nsubt{color:#C3E6FF;font-size:11px}
+.nright{display:flex;align-items:center;gap:12px}
+.ntag{color:#C3E6FF;font-size:10px;font-style:italic;opacity:.8}
+.nu{display:none;align-items:center;gap:8px}
+.na{width:30px;height:30px;border-radius:50%;background:#1C54F4;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.3)}
+.nname{color:#C3E6FF;font-size:12px}
+.nbtn{background:transparent;border:1px solid rgba(255,255,255,.3);color:#C3E6FF;font-family:inherit;font-size:11px;padding:4px 12px;cursor:pointer;transition:all .15s;border-radius:2px}
+.nbtn:hover{background:rgba(255,255,255,.1)}
+
+/* LOGIN */
+#ls{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:2rem}
+.lbox{background:#fff;border-top:4px solid #25408F;padding:3rem 2.5rem;max-width:400px;width:100%;text-align:center;box-shadow:0 12px 50px rgba(0,7,89,.12)}
+.lbox-brand{font-size:32px;font-weight:700;color:#25408F;letter-spacing:-.5px;margin-bottom:6px}
+.lbox-bar{height:3px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF);margin-bottom:2rem}
+.lbox h1{font-size:19px;font-weight:700;color:#000759;margin-bottom:.5rem}
+.lbox p{font-size:12px;color:#56648F;line-height:1.8;margin-bottom:2rem}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s}
+.gbtn:hover{background:#000759}
+.lnote{margin-top:.75rem;font-size:10px;color:#56648F}
+
+/* DENIED */
+#ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 56px)}
+.dbox{background:#fff;border-top:4px solid #ED1B34;padding:2rem;max-width:380px;text-align:center;box-shadow:0 8px 30px rgba(0,7,89,.1)}
+.dbox h2{color:#ED1B34;margin-bottom:.5rem;font-size:18px}
+.dbox p{font-size:12px;color:#56648F;line-height:1.7}
+
+/* APP */
+#as{display:none}
+.app-wrap{max-width:1600px;margin:0 auto;padding:1.5rem 2rem}
+.app-grid{display:grid;grid-template-columns:310px 1fr;gap:1.5rem;align-items:start}
+
+/* ── STEP 1: LEFT PANEL (CHAT) ── */
+.side-panel{background:#fff;border-top:3px solid #25408F;box-shadow:0 4px 20px rgba(0,7,89,.1);position:sticky;top:70px;max-height:calc(100vh - 82px);display:flex;flex-direction:column;overflow:hidden}
+.panel-hd{background:#25408F;padding:.7rem 1rem;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:#C3E6FF;flex-shrink:0}
+.msg-row{display:flex;align-items:flex-start;gap:6px}
+.msg-row .msg-av{height:20px;object-fit:contain;flex-shrink:0;margin-top:3px;filter:brightness(0) invert(1);opacity:.85}
+.panel-title{color:#fff;font-size:13px;font-weight:700;flex:1}
+.panel-badge{font-size:8px;background:#1C54F4;color:#fff;padding:2px 7px;border-radius:2px;font-weight:700;letter-spacing:.05em}
+
+/* Chat messages */
+.cm{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth;min-height:180px}
+.cm::-webkit-scrollbar{width:3px}
+.cm::-webkit-scrollbar-thumb{background:#DBE5FF}
+.msg{max-width:88%;padding:.5rem .75rem;font-size:12px;line-height:1.6;animation:fadein .2s ease;white-space:pre-wrap}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.mb{background:#EEF3FF;color:#000759;align-self:flex-start;border-left:2px solid #25408F}
+.mu{background:#25408F;color:#fff;align-self:flex-end}
+.co{display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.co button{background:#fff;border:1px solid #DBE5FF;color:#25408F;font-family:inherit;font-size:11px;padding:5px 10px;cursor:pointer;text-align:left;transition:all .12s}
+.co button:hover{background:#DBE5FF}
+.co button.sel{background:#25408F;color:#fff;border-color:#25408F}
+.co-ok{background:#1C54F4!important;color:#fff!important;font-weight:700!important;margin-top:4px;border-color:#1C54F4!important}
+.co-ok:hover{background:#000759!important}
 .co-rrow{display:flex;gap:6px;margin-bottom:2px}
-.co-ri{font-family:inherit;font-size:11px;padding:4px 7px;border:1px solid var(--pg);color:var(--deep);flex:1;min-width:0}
-.co-ri:focus{outline:none;border-color:var(--mid)}
-.cat{width:100%;background:var(--pg);color:var(--dark);border:none;border-top:1px solid var(--pg);font-family:inherit;font-size:11px;padding:6px 10px;cursor:pointer;text-align:left;flex-shrink:0;transition:background .15s}
-.cat:hover,.cat.open{background:var(--pale)}
-.xf{display:none;overflow-y:auto;border-top:1px solid var(--pg)}
+.co-ri{font-family:inherit;font-size:11px;padding:4px 7px;border:1px solid #DBE5FF;color:#000759;flex:1;min-width:0}
+.co-ri:focus{outline:none;border-color:#1C54F4}
+
+/* Filter toggle */
+.cat{width:100%;background:#EEF3FF;color:#25408F;border:none;border-top:1px solid #DBE5FF;font-family:inherit;font-size:11px;font-weight:600;padding:7px 10px;cursor:pointer;text-align:left;flex-shrink:0;transition:background .15s}
+.cat:hover,.cat.open{background:#C3E6FF}
+.xf{display:none;overflow-y:auto;border-top:1px solid #DBE5FF;max-height:260px;flex-shrink:0}
 .xf.open{display:block}
-.cn{width:100%;background:var(--pg);color:var(--dark);border:none;font-family:inherit;font-size:11px;font-weight:600;padding:7px;cursor:pointer;border-top:1px solid var(--pg);flex-shrink:0}
-.cn:hover{background:var(--pale)}
 .fb{padding:.75rem;display:flex;flex-direction:column;gap:.85rem}
 .fg{display:flex;flex-direction:column;gap:5px}
-.fl{font-size:10px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.06em}
+.fl{font-size:10px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.06em}
 .fc{display:flex;flex-direction:column;gap:4px}
-.fk{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--dg);cursor:pointer}
-.fk input[type=checkbox]{accent-color:var(--dark);width:13px;height:13px;cursor:pointer}
-.fi{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--pg);color:var(--deep);width:100%}
-.fi:focus{outline:none;border-color:var(--mid)}
+.fk{display:flex;align-items:center;gap:7px;font-size:11px;color:#353E59;cursor:pointer}
+.fk input[type=checkbox]{accent-color:#25408F;width:13px;height:13px;cursor:pointer}
+.fi{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid #DBE5FF;color:#000759;width:100%}
+.fi:focus{outline:none;border-color:#1C54F4}
 .frow{display:flex;gap:8px}
 .frow .fi{flex:1;min-width:0}
-.fsel{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--pg);color:var(--deep);width:100%;background:#fff}
-.fsel:focus{outline:none;border-color:var(--mid)}
-.fa{padding:.75rem;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--pg)}
-.fbtn{background:var(--dark);color:#fff;font-family:inherit;font-size:12px;font-weight:600;padding:9px;border:none;cursor:pointer;width:100%;transition:background .15s}
-.fbtn:hover{background:var(--deep)}
-.fclr{background:transparent;color:var(--mg);font-family:inherit;font-size:11px;padding:6px;border:1px solid var(--pg);cursor:pointer;width:100%;transition:all .15s}
-.fclr:hover{background:var(--pg);color:var(--dark)}
-.rp{display:flex;flex-direction:column;gap:1.25rem}
-.tc{background:#fff;border-top:3px solid var(--dark);box-shadow:0 2px 12px rgba(0,7,89,.08);overflow:hidden}
-.th2{background:var(--dark);padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between}
-.tt{color:#fff;font-size:12px;font-weight:600}
-.sc{background:var(--mid);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
-.tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:11px}
-thead tr{background:var(--dark)}
-th{padding:8px 10px;text-align:left;color:#fff;font-weight:600;font-size:10px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
-th:last-child{border-right:none}
-td{padding:7px 10px;border-bottom:1px solid var(--pg);color:var(--dg);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr.sr td{background:#EEF3FF}
-tr:hover td{background:#F5F7FF}
-.cc{text-align:center;width:32px}
-input[type=checkbox]{width:14px;height:14px;accent-color:var(--dark);cursor:pointer}
-.cb{display:inline-block;font-size:9px;padding:1px 5px;background:var(--pale);color:var(--dark);font-weight:700}
-.sv{font-weight:700;color:var(--mid)}
-.ph{width:60px;height:40px;background:var(--pg);display:flex;align-items:center;justify-content:center;font-size:14px}
-.et{text-align:center;padding:2rem;color:var(--mg);font-size:12px}
-.sb{background:var(--dark);padding:.75rem 1rem;display:none;align-items:center;justify-content:space-between}
-.sbl{color:#fff;font-size:12px}
-.sbl span{font-weight:700;color:var(--pale)}
-.sn{color:var(--pale);font-size:10px;margin-top:2px}
-.bp{background:var(--mid);color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:9px 22px;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
-.bp:hover{background:var(--deep)}
+.fsel{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid #DBE5FF;color:#000759;width:100%;background:#fff}
+.fsel:focus{outline:none;border-color:#1C54F4}
+.fa{padding:.75rem;display:flex;flex-direction:column;gap:6px;border-top:1px solid #DBE5FF}
+
+/* Side panel actions */
+.side-actions{padding:.75rem;display:flex;flex-direction:column;gap:6px;border-top:1px solid #DBE5FF;flex-shrink:0}
+.btn-search{background:#1C54F4;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:10px;border:none;cursor:pointer;width:100%;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-search:hover{background:#000759}
+.btn-reset{background:transparent;color:#56648F;font-family:inherit;font-size:11px;padding:6px;border:1px solid #DBE5FF;cursor:pointer;width:100%;transition:all .15s}
+.btn-reset:hover{background:#EEF3FF;color:#25408F}
+
+/* ── RIGHT PANEL ── */
+.main-panel{display:flex;flex-direction:column;gap:1.5rem}
+
+/* Cards */
+.card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 14px rgba(0,7,89,.08);overflow:hidden}
+.card-hd{background:#25408F;padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.card-title{color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em}
+.card-hd-r{display:flex;align-items:center;gap:.75rem}
+.sel-all-lbl{display:flex;align-items:center;gap:6px;font-size:11px;color:#C3E6FF;cursor:pointer;user-select:none}
+.sel-all-lbl input{accent-color:#fff;cursor:pointer;width:13px;height:13px}
+.card-badge{color:#fff;background:#1C54F4;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px}
+
+/* ── STEP 2: COMPARISON TABLE ── */
+.table-outer{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ctable{border-collapse:collapse;width:max-content;min-width:100%;font-size:11px}
+
+/* Sticky label column */
+.lcell{background:#F0F4FF;font-size:10px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;white-space:nowrap;position:sticky;left:0;z-index:5;border-right:2px solid #C3E6FF;min-width:155px;vertical-align:middle}
+.lcell-top{background:#F0F4FF;position:sticky;left:0;z-index:6;border-right:2px solid #C3E6FF;min-width:155px}
+
+/* Photo row */
+.photo-row .lcell-top{background:#F0F4FF}
+.pcell{min-width:150px;max-width:220px;text-align:center;vertical-align:bottom;border-right:1px solid #DBE5FF;padding:0;position:relative}
+.pcell-inner{position:relative}
+.prop-img{width:100%;height:115px;object-fit:cover;display:block}
+.ph-img{width:100%;height:115px;background:#DBE5FF;display:flex;align-items:center;justify-content:center;font-size:28px}
+.col-cb{position:absolute;top:6px;left:6px;width:16px;height:16px;accent-color:#1C54F4;cursor:pointer;z-index:2}
+
+/* Number badge row */
+.nbadge-cell{background:#000759;text-align:center;padding:7px 4px;border-right:1px solid rgba(255,255,255,.15)}
+.nbadge{font-size:15px;font-weight:700;color:#fff}
+
+/* Building name row */
+.name-cell-td{background:#1C54F4;text-align:center;padding:8px 8px;font-size:11px;font-weight:700;color:#fff;line-height:1.3;border-right:1px solid rgba(255,255,255,.15)}
+
+/* Data cells */
+.dcell{padding:7px 10px;border-bottom:1px solid #EEF3FF;border-right:1px solid #EEF3FF;color:#353E59;text-align:center;vertical-align:middle;transition:background .1s}
+.row-even .dcell{background:#FAFBFF}
+.row-odd .dcell{background:#fff}
+
+/* Selected column highlight */
+.csel .pcell,.csel .dcell{background:#EAF0FF!important}
+.csel .nbadge-cell{background:#1C54F4!important}
+.csel .name-cell-td{background:#000759!important}
+
+.cb{display:inline-block;font-size:9px;padding:1px 6px;background:#DBE5FF;color:#25408F;font-weight:700}
+.sv{font-weight:700;color:#1C54F4;font-size:12px}
+.rent-v{font-weight:700;color:#25408F;font-size:12px}
+.acq-inp{width:80px;border:1px solid #DBE5FF;padding:3px 6px;font-family:inherit;font-size:11px;text-align:center;background:#FFFDF0;color:#000759}
+.acq-inp:focus{outline:none;border-color:#1C54F4}
+.et{text-align:center;padding:3rem 2rem;color:#56648F;font-size:13px}
+
+/* Selection bar */
+.sb{background:#25408F;padding:.75rem 1.25rem;display:none;align-items:center;justify-content:space-between;gap:1rem}
+.sb-info{color:#fff;font-size:12px}
+.sb-info strong{color:#C3E6FF}
+.sn-names{font-size:10px;color:#C3E6FF;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:450px}
+.bp{background:#1C54F4;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:10px 24px;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s;white-space:nowrap;flex-shrink:0}
+.bp:hover{background:#000759}
 .bp:disabled{opacity:.4;cursor:not-allowed}
-.kk{background:#fff;border-top:3px solid var(--mg);box-shadow:0 2px 12px rgba(0,7,89,.08);padding:1rem}
-.kt{font-size:10px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
-.kg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.kf{display:flex;flex-direction:column;gap:4px}
-.kf label{font-size:10px;font-weight:600;color:var(--mg);text-transform:uppercase;letter-spacing:.05em}
-.kf input{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--pg);color:var(--deep)}
-.kf input:focus{outline:none;border-color:var(--mid)}
-.kr{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dg);cursor:pointer}
-.kr input{accent-color:var(--dark)}
-.sm{font-size:11px;color:var(--mg);text-align:center;margin-top:.5rem;min-height:16px}
-.sp{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+.sp{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:4px}
 @keyframes spin{to{transform:rotate(360deg)}}
-footer{text-align:center;padding:1.5rem;font-size:10px;color:var(--mg);margin-top:1rem;border-top:1px solid var(--pg)}
+
+/* ── STEP 3: PERSONALIZATION ── */
+.pers-body{padding:1.25rem;display:grid;grid-template-columns:1.4fr 1.8fr 1fr 1fr;gap:1.5rem}
+@media(max-width:1100px){.pers-body{grid-template-columns:1fr 1fr}}
+.pers-col{display:flex;flex-direction:column;gap:.5rem}
+.pers-lbl{font-size:10px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.06em}
+.pers-input{font-family:inherit;font-size:12px;padding:6px 9px;border:1px solid #DBE5FF;color:#000759;width:100%}
+.pers-input:focus{outline:none;border-color:#1C54F4}
+.pers-sel{font-family:inherit;font-size:12px;padding:6px 9px;border:1px solid #DBE5FF;color:#000759;width:100%;background:#fff}
+.pers-sel:focus{outline:none;border-color:#1C54F4}
+.chk-group{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.chk-item{display:flex;align-items:center;gap:8px;font-size:11px;color:#353E59;cursor:pointer}
+.chk-item input{accent-color:#25408F;width:13px;height:13px;cursor:pointer}
+.color-row{display:flex;align-items:center;gap:8px}
+.color-inp{width:38px;height:30px;border:1px solid #DBE5FF;cursor:pointer;padding:0;background:none}
+.sm{padding:.4rem 1.25rem .9rem;font-size:11px;color:#56648F;min-height:28px}
+
+/* ── STEP 4: PPT PREVIEW ── */
+.preview-body{padding:1.25rem}
+.preview-grid{display:flex;flex-wrap:wrap;gap:1rem}
+.thumb-card{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.thumb-slide{width:160px;height:90px;border-radius:2px;overflow:hidden;box-shadow:0 2px 8px rgba(0,7,89,.15);flex-shrink:0}
+.thumb-cover-s{background:#25408F;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:10px;gap:3px}
+.tc-brand{color:#fff;font-size:11px;font-weight:700;font-family:'Open Sans',sans-serif}
+.tc-bar{height:1px;background:#1C54F4;width:100%;margin:1px 0}
+.tc-title{color:#C3E6FF;font-size:7px;font-family:'Open Sans',sans-serif}
+.thumb-table-s{background:#fff;width:100%;height:100%;display:flex;flex-direction:column;padding:5px;gap:2px}
+.tt-hdr{background:#25408F;height:8px;border-radius:1px}
+.tt-body{display:flex;flex:1;gap:2px}
+.tt-label-col{background:#EEF3FF;width:32px;border-radius:1px}
+.tt-data-cols{display:flex;flex:1;gap:2px}
+.tt-dcol{flex:1;background:#F0F4FF;border-radius:1px}
+.thumb-ficha-s{background:#fff;width:100%;height:100%;display:flex;flex-direction:column;padding:5px;gap:2px}
+.tf-hdr{background:#25408F;height:8px;border-radius:1px}
+.tf-img{background:#DBE5FF;height:22px;border-radius:1px}
+.tf-rows{display:flex;flex-direction:column;gap:2px;flex:1}
+.tf-row{background:#EEF3FF;flex:1;border-radius:1px}
+.thumb-name{font-size:10px;color:#56648F;text-align:center;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:1px solid #DBE5FF;margin-top:1rem}
 </style>
 </head>
 <body>
+
 <nav>
   <div class="nb">
-    <div class="nl">Colliers</div>
-    <div class="nd"></div>
-    <div class="ns">Generador de Alternativas</div>
+    <div class="nlogo">
+      <div class="nlogo-name">Colliers</div>
+      <div class="nlogo-bar"></div>
+    </div>
+    <div class="ndiv"></div>
+    <div class="nsubt">Generador de Alternativas</div>
   </div>
-  <div class="nr">
-    <div class="tg">Accelerating success.</div>
+  <div class="nright">
+    <div class="ntag">Accelerating success.</div>
     <div class="nu" id="nu">
       <div class="na" id="na">MA</div>
-      <span id="nn"></span>
-      <button class="bo" onclick="logout()">Salir</button>
+      <span class="nname" id="nn"></span>
+      <button class="nbtn" onclick="logout()">Salir</button>
     </div>
   </div>
 </nav>
 
+<!-- LOGIN -->
 <div id="ls">
-  <div class="lc">
-    <div class="ll">Colliers</div>
-    <div class="lb"></div>
+  <div class="lbox">
+    <div class="lbox-brand">Colliers</div>
+    <div class="lbox-bar"></div>
     <h1>Generador de Alternativas</h1>
     <p>Iniciá sesión con tu cuenta corporativa para acceder al sistema de búsqueda y generación de presentaciones.</p>
-    <button class="bg" id="login-btn">
+    <button class="gbtn" id="login-btn">
       <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
       Iniciar sesión con Google
     </button>
-    <div class="ln">Solo cuentas @gmail.com tienen acceso</div>
+    <div class="lnote">Solo cuentas @gmail.com tienen acceso</div>
   </div>
 </div>
 
-<div id="ds" style="display:none">
-  <div class="dc">
+<!-- DENIED -->
+<div id="ds">
+  <div class="dbox">
     <h2>Acceso denegado</h2>
     <p>Esta herramienta es exclusiva para cuentas <strong>@gmail.com</strong>.<br>
     Cuenta: <span id="de" style="font-weight:600"></span></p>
-    <button class="bg" onclick="logout()" style="margin-top:1.5rem">Volver</button>
+    <button class="gbtn" onclick="logout()" style="margin-top:1.5rem">Volver</button>
   </div>
 </div>
 
+<!-- APP -->
 <div id="as">
-  <div class="ag">
-    <div class="cp">
-      <div class="ch">
-        <div class="chd"></div>
-        <div class="cht">Asistente Colliers</div>
-        <div class="chb">BETA</div>
-      </div>
-      <div class="cm" id="cm"></div>
-      <button class="cat" id="cat-btn" onclick="toggleFilters()">⚙ Filtros avanzados</button>
-      <div class="xf" id="xf">
-        <div class="fb">
-          <div class="fg">
-            <div class="fl">Zona</div>
-            <div class="fc" id="zona-fc"><span style="font-size:11px;color:var(--mg)">Cargando...</span></div>
-          </div>
-          <div class="fg">
-            <div class="fl">Superficie disponible m²</div>
-            <div class="frow">
-              <input type="number" id="fsmn" class="fi" placeholder="Mínimo">
-              <input type="number" id="fsmx" class="fi" placeholder="Máximo">
+  <div class="app-wrap">
+    <div class="app-grid">
+
+      <!-- STEP 1: LEFT PANEL (CHAT) -->
+      <aside class="side-panel">
+        <div class="panel-hd">
+          <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:28px;object-fit:contain">
+          <div class="panel-title">Asistente Colliers</div>
+          <div class="panel-badge">BETA</div>
+        </div>
+        <div class="cm" id="cm"></div>
+
+        <!-- Advanced filters toggle -->
+        <button class="cat" id="cat-btn" onclick="toggleFilters()">&#9881; Filtros avanzados</button>
+        <div class="xf" id="xf">
+          <div class="fb">
+            <div class="fg">
+              <div class="fl">Zona</div>
+              <div class="fc" id="zona-fc"><span style="font-size:11px;color:#56648F">Cargando...</span></div>
+            </div>
+            <div class="fg">
+              <div class="fl">Superficie disponible m²</div>
+              <div class="frow">
+                <input type="number" id="fsmn" class="fi" placeholder="Mínimo">
+                <input type="number" id="fsmx" class="fi" placeholder="Máximo">
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fl">Asking Rent USD/m²</div>
+              <div class="frow">
+                <input type="number" id="frmn" class="fi" placeholder="Mínimo">
+                <input type="number" id="frmx" class="fi" placeholder="Máximo">
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fl">Categoría</div>
+              <div class="fc">
+                <label class="fk"><input type="checkbox" name="cat" value="A+ LEED Gold"> A+ LEED Gold</label>
+                <label class="fk"><input type="checkbox" name="cat" value="A+ LEED"> A+ LEED</label>
+                <label class="fk"><input type="checkbox" name="cat" value="A+"> A+</label>
+                <label class="fk"><input type="checkbox" name="cat" value="A"> A</label>
+                <label class="fk"><input type="checkbox" name="cat" value="B+"> B+</label>
+                <label class="fk"><input type="checkbox" name="cat" value="B"> B</label>
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fl">Cantidad de resultados</div>
+              <select id="fcant" class="fsel">
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="7">7</option>
+                <option value="10" selected>10</option>
+                <option value="0">Todos</option>
+              </select>
             </div>
           </div>
-          <div class="fg">
-            <div class="fl">Asking Rent USD/m²</div>
-            <div class="frow">
-              <input type="number" id="frmn" class="fi" placeholder="Mínimo">
-              <input type="number" id="frmx" class="fi" placeholder="Máximo">
+          <div class="fa">
+            <button class="btn-search" onclick="applyFilters()">Buscar alternativas</button>
+            <button class="btn-reset" onclick="clearFilters()">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <!-- Search actions -->
+        <div class="side-actions">
+          <button class="btn-search" onclick="applyFilters()">&#128269; Buscar alternativas</button>
+          <button class="btn-reset" onclick="nuevaBusqueda()">&#8634; Nueva búsqueda</button>
+        </div>
+      </aside>
+
+      <!-- RIGHT PANEL -->
+      <main class="main-panel">
+
+        <!-- STEP 2: COMPARISON TABLE -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Alternativas encontradas</div>
+            <div class="card-hd-r">
+              <label class="sel-all-lbl">
+                <input type="checkbox" id="ca" onchange="toggleAll(this)">
+                Seleccionar todo
+              </label>
+              <span class="card-badge" id="sc">0 seleccionadas</span>
             </div>
           </div>
-          <div class="fg">
-            <div class="fl">Categoría</div>
-            <div class="fc">
-              <label class="fk"><input type="checkbox" name="cat" value="A+ LEED Gold"> A+ LEED Gold</label>
-              <label class="fk"><input type="checkbox" name="cat" value="A+ LEED"> A+ LEED</label>
-              <label class="fk"><input type="checkbox" name="cat" value="A+"> A+</label>
-              <label class="fk"><input type="checkbox" name="cat" value="A"> A</label>
-              <label class="fk"><input type="checkbox" name="cat" value="B+"> B+</label>
-              <label class="fk"><input type="checkbox" name="cat" value="B"> B</label>
+          <div class="table-outer">
+            <div id="tb">
+              <div class="et">Usá el chat o los filtros para buscar alternativas de oficinas</div>
             </div>
           </div>
-          <div class="fg">
-            <div class="fl">Cantidad de resultados</div>
-            <select id="fcant" class="fsel">
-              <option value="3">3</option>
-              <option value="5">5</option>
-              <option value="7">7</option>
-              <option value="10" selected>10</option>
-              <option value="0">Todos</option>
-            </select>
+          <div class="sb" id="sb">
+            <div>
+              <div class="sb-info"><strong id="sn">0</strong> alternativas seleccionadas</div>
+              <div class="sn-names" id="sns"></div>
+            </div>
+            <button class="bp" id="bp" onclick="generarPPT()">&#128202; Generar presentación PPT ↗</button>
           </div>
         </div>
-        <div class="fa">
-          <button class="fbtn" onclick="applyFilters()">Buscar alternativas</button>
-          <button class="fclr" onclick="clearFilters()">Limpiar filtros</button>
-        </div>
-      </div>
-      <button class="cn" onclick="nuevaBusqueda()">↺ Nueva búsqueda</button>
-    </div>
-    <div class="rp">
-      <div class="tc">
-        <div class="th2">
-          <div class="tt">Alternativas encontradas</div>
-          <div class="sc" id="sc">0 seleccionadas</div>
-        </div>
-        <div class="tw">
-          <table>
-            <thead>
-              <tr>
-                <th class="cc"><input type="checkbox" id="ca" onchange="toggleAll(this)"></th>
-                <th style="width:70px">Foto</th>
-                <th>Edificio</th>
-                <th>Submercado</th>
-                <th>Cat.</th>
-                <th>Sup. disp. m²</th>
-                <th>Planta m²</th>
-                <th>Cocheras</th>
-                <th>Asking Rent</th>
-                <th>Pisos dispon.</th>
-              </tr>
-            </thead>
-            <tbody id="tb">
-              <tr><td colspan="10" class="et">Usá el chat o los filtros avanzados para buscar alternativas</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="sb" id="sb">
-        <div class="sbl">
-          <div><span id="sn">0</span> alternativas seleccionadas</div>
-          <div class="sn" id="sns"></div>
-        </div>
-        <button class="bp" id="bp" onclick="generarPPT()">Generar presentación PPT ↗</button>
-      </div>
-      <div class="kk">
-        <div class="kt">Personalizar presentación</div>
-        <div class="kg">
-          <div class="kf">
-            <label>Cliente / Informe</label>
-            <input type="text" id="kc" placeholder="Ej: Securitas · Mayo 2026">
+
+        <!-- STEP 3: PERSONALIZATION -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Personalizar presentación</div>
           </div>
-          <div class="kf">
-            <label>Contenido</label>
-            <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px">
-              <label class="kr"><input type="checkbox" id="it" checked> Tabla comparativa</label>
-              <label class="kr"><input type="checkbox" id="if" checked> Fichas individuales</label>
+          <div class="pers-body">
+            <div class="pers-col">
+              <div class="pers-lbl">Cliente / Informe</div>
+              <input type="text" id="kc" class="pers-input" placeholder="Ej: Securitas · Mayo 2026">
+            </div>
+            <div class="pers-col">
+              <div class="pers-lbl">Contenido</div>
+              <div class="chk-group">
+                <label class="chk-item"><input type="checkbox" id="it" checked> Tabla comparativa completa</label>
+                <label class="chk-item"><input type="checkbox" id="if" checked> Slides individuales por alternativa</label>
+                <label class="chk-item"><input type="checkbox" id="idet"> Detalle técnico</label>
+                <label class="chk-item"><input type="checkbox" id="icon"> Conclusiones y recomendación</label>
+              </div>
+            </div>
+            <div class="pers-col">
+              <div class="pers-lbl">Estilo</div>
+              <select class="pers-sel">
+                <option>Corporativo Premium</option>
+                <option>Moderno</option>
+                <option>Minimalista</option>
+              </select>
+              <div class="pers-lbl" style="margin-top:.75rem">Color principal</div>
+              <div class="color-row">
+                <input type="color" value="#1C54F4" class="color-inp">
+                <span style="font-size:11px;color:#56648F">#1C54F4</span>
+              </div>
+            </div>
+            <div class="pers-col">
+              <div class="pers-lbl">Orden de slides</div>
+              <select class="pers-sel">
+                <option>Por nombre</option>
+                <option>Por superficie</option>
+                <option>Por precio</option>
+              </select>
             </div>
           </div>
+          <div class="sm" id="sm"></div>
         </div>
-        <div class="sm" id="sm"></div>
-      </div>
+
+        <!-- STEP 4: PPT PREVIEW -->
+        <div class="card" id="preview-section" style="display:none">
+          <div class="card-hd">
+            <div class="card-title">Preview de la presentación</div>
+          </div>
+          <div class="preview-body">
+            <div class="preview-grid" id="preview-thumbs"></div>
+          </div>
+        </div>
+
+      </main>
     </div>
   </div>
   <footer>Colliers International Argentina · Uso interno · Generador de Alternativas</footer>
@@ -382,7 +515,7 @@ function parseCSV(csv){
 function parseLine(line){
   const r=[];let cur="",inQ=false;
   for(let i=0;i<line.length;i++){
-    if(line[i]==='"'){inQ=!inQ;continue;}
+    if(line[i]=='"'){inQ=!inQ;continue;}
     if(line[i]===","&&!inQ){r.push(cur.trim());cur="";continue;}
     cur+=line[i];
   }
@@ -411,17 +544,19 @@ async function imgToBase64(url){
 }
 
 const STEPS=[
-  {id:"zona",  type:"multi",  confirm:"Confirmar zona",
-   q:n=>`¡Hola ${n}! ¿En qué zona o zonas querés buscar?`,
-   opts:[]},
-  {id:"sup",   type:"range",  ph:["Mínimo m²","Máximo m²"],
+  {id:"zona",     type:"multi",  confirm:"Confirmar zona",
+   q:n=>`¡Hola ${n}! ¿En qué zona o zonas querés buscar?`, opts:[]},
+  {id:"sup",      type:"range",  ph:["Mínimo m²","Máximo m²"],
    q:()=>"¿Qué superficie necesitás? (m²)"},
-  {id:"rent",  type:"range",  ph:["Mínimo USD/m²","Máximo USD/m²"],
+  {id:"rent",     type:"range",  ph:["Mínimo USD/m²","Máximo USD/m²"],
    q:()=>"¿Cuál es el rango de Asking Rent? (USD/m²)"},
-  {id:"cat",   type:"multi",  confirm:"Confirmar categoría",
+  {id:"cocheras", type:"single",
+   q:()=>"¿Necesitás cocheras?",
+   opts:["Con cocheras","Sin preferencia"]},
+  {id:"cat",      type:"multi",  confirm:"Confirmar categoría",
    q:()=>"¿Qué categorías de edificio buscás?",
    opts:["A+ LEED Gold","A+ LEED","A+","A","B+","B"]},
-  {id:"cant",  type:"single",
+  {id:"cant",     type:"single",
    q:()=>"¿Cuántas opciones querés ver?",
    opts:["3","5","7","10","Todas"]},
 ];
@@ -442,8 +577,12 @@ window.nuevaBusqueda=()=>startChat((user?.displayName||'').split(' ')[0]||'Broke
 
 function botMsg(txt, stepDef){
   const w=document.getElementById("cm");
+  const row=document.createElement("div"); row.className="msg-row";
+  const av=document.createElement("img"); av.className="msg-av";
+  av.src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png";
   const m=document.createElement("div");
-  m.className="msg mb"; m.textContent=txt; w.appendChild(m);
+  m.className="msg mb"; m.textContent=txt;
+  row.appendChild(av); row.appendChild(m); w.appendChild(row);
   if(!stepDef){w.scrollTop=w.scrollHeight;return;}
 
   const od=document.createElement("div"); od.className="co"; od.dataset.sid=stepDef.id;
@@ -537,6 +676,8 @@ function chatToFilters(id,val){
   } else if(id==='rent'){
     const v=Array.isArray(val)?val:['',''];
     document.getElementById('frmn').value=v[0]||''; document.getElementById('frmx').value=v[1]||'';
+  } else if(id==='cocheras'){
+    // recorded in resp, used at filter time
   } else if(id==='cat'){
     const vals=Array.isArray(val)?val:[];
     document.querySelectorAll('input[name="cat"]').forEach(c=>{c.checked=vals.includes(c.value);});
@@ -561,6 +702,7 @@ function applyFilters(){
   const rentMax=parseFloat(document.getElementById('frmx').value)||Infinity;
   const cats=[...document.querySelectorAll('input[name="cat"]:checked')].map(c=>c.value);
   const cantVal=parseInt(document.getElementById('fcant').value)||0;
+  const needCocheras=resp.cocheras==="Con cocheras";
   let r=props.filter(p=>{
     if(zonas.length&&!zonas.some(z=>p.submercado===z))return false;
     const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
@@ -570,6 +712,7 @@ function applyFilters(){
     if(rentMin&&rn<rentMin)return false;
     if(rentMax<Infinity&&rn>rentMax)return false;
     if(cats.length&&!cats.some(c=>p.cat===c))return false;
+    if(needCocheras&&(p.cocheras==="–"||p.cocheras==="0"))return false;
     return true;
   });
   if(cantVal>0)r=r.slice(0,cantVal);
@@ -584,36 +727,92 @@ window.clearFilters=()=>{
 };
 
 function renderTable(){
-  const tb=document.getElementById("tb");
-  if(!filt.length){tb.innerHTML='<tr><td colspan="10" class="et">Sin resultados</td></tr>';updBar();return;}
-  tb.innerHTML=filt.map((p,i)=>`
-    <tr id="r${i}" class="${sel.has(i)?"sr":""}">
-      <td class="cc"><input type="checkbox" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td>
-      <td>${p.foto?`<img src="${p.foto}" style="width:60px;height:40px;object-fit:cover" onerror="this.outerHTML='<div class=\\'ph\\'>🏢</div>'">`:'<div class="ph">🏢</div>'}</td>
-      <td style="font-weight:600;min-width:110px">${p.nombre}</td>
-      <td>${p.submercado}</td>
-      <td><span class="cb">${p.cat}</span></td>
-      <td class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR"):"–"}</td>
-      <td>${p.supPlanta?p.supPlanta.toLocaleString("es-AR"):"–"}</td>
-      <td>${p.cocheras}</td>
-      <td style="font-weight:600">USD ${p.rent}</td>
-      <td style="font-size:10px;color:var(--mg)">${p.pisosDisp}</td>
-    </tr>`).join("");
+  const ct=document.getElementById("tb");
+  if(!filt.length){
+    ct.innerHTML='<div class="et">Sin resultados. Ajustá los filtros o usá el chat para buscar.</div>';
+    updBar();return;
+  }
+
+  const ROWS=[
+    {lbl:"Dirección",     fn:p=>p.direccion},
+    {lbl:"Submercado",    fn:p=>p.submercado},
+    {lbl:"Categoría",     fn:p=>`<span class="cb">${p.cat}</span>`},
+    {lbl:"Año",           fn:p=>p.anio},
+    {lbl:"Pisos totales", fn:p=>p.pisos},
+    {lbl:"Sup. disponible m²", fn:p=>`<span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span>`},
+    {lbl:"Cocheras",      fn:p=>p.cocheras},
+    {lbl:"Pisos disponibles", fn:p=>p.pisosDisp},
+    {lbl:"Sup. promedio m²",  fn:p=>p.supPlanta?p.supPlanta.toLocaleString("es-AR")+" m²":"–"},
+    {lbl:"Sup. a adquirir",   fn:(_,i)=>`<input type="text" class="acq-inp" id="acq-${i}" placeholder="Ingresar m²">`},
+    {lbl:"Asking rent USD/m²",fn:p=>`<span class="rent-v">USD ${p.rent}</span>`},
+    {lbl:"Comentarios",   fn:p=>p.comentarios||"–"},
+  ];
+
+  let h='<table class="ctable"><tbody>';
+
+  h+='<tr class="photo-row"><td class="lcell-top"></td>';
+  filt.forEach((p,i)=>{
+    h+=`<td class="pcell coli-${i}">
+      <div class="pcell-inner">
+        <input type="checkbox" class="col-cb" id="cb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)">
+        ${p.foto?`<img src="${p.foto}" class="prop-img" onerror="this.outerHTML='<div class=\\'ph-img\\'>🏘</div>'">`:'<div class="ph-img">🏘</div>'}
+      </div>
+    </td>`;
+  });
+  h+='</tr>';
+
+  h+='<tr class="num-row"><td class="lcell-top" style="background:#F0F4FF;border-right:2px solid #C3E6FF"></td>';
+  filt.forEach((_,i)=>{
+    h+=`<td class="nbadge-cell coli-${i}"><span class="nbadge">${i+1}</span></td>`;
+  });
+  h+='</tr>';
+
+  h+='<tr class="name-row"><td class="lcell-top" style="background:#F0F4FF;border-right:2px solid #C3E6FF"></td>';
+  filt.forEach((p,i)=>{
+    h+=`<td class="name-cell-td coli-${i}">${p.nombre}</td>`;
+  });
+  h+='</tr>';
+
+  ROWS.forEach(({lbl,fn},ri)=>{
+    h+=`<tr class="${ri%2===0?"row-even":"row-odd"}"><td class="lcell">${lbl}</td>`;
+    filt.forEach((p,i)=>{
+      h+=`<td class="dcell coli-${i}">${fn(p,i)}</td>`;
+    });
+    h+='</tr>';
+  });
+
+  h+='</tbody></table>';
+  ct.innerHTML=h;
+  sel.forEach(i=>_highlightCol(i,true));
   updBar();
+}
+
+function _highlightCol(i,on){
+  const pcell=document.querySelector(`.photo-row .coli-${i}`);
+  if(pcell)pcell.style.background=on?'#EAF0FF':'';
+  const nbcell=document.querySelector(`.num-row .coli-${i}`);
+  if(nbcell){nbcell.style.background=on?'#1C54F4':'#000759';}
+  const nmcell=document.querySelector(`.name-row .coli-${i}`);
+  if(nmcell){nmcell.style.background=on?'#000759':'#1C54F4';}
+  document.querySelectorAll(`.row-even .coli-${i},.row-odd .coli-${i}`).forEach(td=>{
+    td.style.background=on?'#EAF0FF':'';
+  });
+  const cb=document.getElementById(`cb-${i}`);
+  if(cb)cb.checked=on;
 }
 
 window.toggleRow=(i,cb)=>{
   if(cb.checked)sel.add(i);else sel.delete(i);
-  const r=document.getElementById("r"+i);
-  if(r)r.className=cb.checked?"sr":"";
+  _highlightCol(i,cb.checked);
   updBar();
 };
+
 window.toggleAll=(cb)=>{
   filt.forEach((_,i)=>{
     if(cb.checked)sel.add(i);else sel.delete(i);
-    const r=document.getElementById("r"+i);
-    if(r){r.className=cb.checked?"sr":"";const ck=r.querySelector("input[type=checkbox]");if(ck)ck.checked=cb.checked;}
-  });updBar();
+    _highlightCol(i,cb.checked);
+  });
+  updBar();
 };
 
 function updBar(){
@@ -622,6 +821,67 @@ function updBar(){
   document.getElementById("sb").style.display=n>0?"flex":"none";
   document.getElementById("sn").textContent=n;
   document.getElementById("sns").textContent=[...sel].map(i=>filt[i]?.nombre).filter(Boolean).join(", ");
+  updatePreview();
+}
+
+function updatePreview(){
+  const sp=[...sel].map(i=>filt[i]).filter(Boolean);
+  const sec=document.getElementById("preview-section");
+  if(!sp.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  const grid=document.getElementById("preview-thumbs");
+  let h='';
+
+  h+=`<div class="thumb-card">
+    <div class="thumb-slide">
+      <div class="thumb-cover-s">
+        <div class="tc-brand">Colliers</div>
+        <div class="tc-bar"></div>
+        <div class="tc-title">Alternativas de Oficinas</div>
+      </div>
+    </div>
+    <div class="thumb-name">Portada</div>
+  </div>`;
+
+  if(document.getElementById("it").checked){
+    const ng=Math.ceil(sp.length/6);
+    for(let g=0;g<ng;g++){
+      const cols=sp.slice(g*6,(g+1)*6);
+      h+=`<div class="thumb-card">
+        <div class="thumb-slide">
+          <div class="thumb-table-s">
+            <div class="tt-hdr"></div>
+            <div class="tt-body">
+              <div class="tt-label-col"></div>
+              <div class="tt-data-cols">${cols.map(()=>'<div class="tt-dcol"></div>').join('')}</div>
+            </div>
+          </div>
+        </div>
+        <div class="thumb-name">Tabla ${ng>1?`${g+1}/${ng}`:''}</div>
+      </div>`;
+    }
+  }
+
+  if(document.getElementById("if").checked){
+    sp.forEach((p,i)=>{
+      h+=`<div class="thumb-card">
+        <div class="thumb-slide">
+          <div class="thumb-ficha-s">
+            <div class="tf-hdr"></div>
+            <div class="tf-img"></div>
+            <div class="tf-rows">
+              <div class="tf-row"></div>
+              <div class="tf-row"></div>
+              <div class="tf-row"></div>
+            </div>
+          </div>
+        </div>
+        <div class="thumb-name">${i+1}. ${p.nombre}</div>
+      </div>`;
+    });
+  }
+
+  grid.innerHTML=h;
 }
 
 window.generarPPT=async()=>{
@@ -639,7 +899,6 @@ window.generarPPT=async()=>{
     pptx.layout="LAYOUT_WIDE";
     const DARK="25408F",MID="1C54F4",PALE="C3E6FF",WHITE="FFFFFF",DEEP="000759";
 
-    // PORTADA
     const s0=pptx.addSlide();
     s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:"66%",h:"100%",fill:{color:DARK}});
     s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:"66%",h:0.06,fill:{color:MID}});
@@ -650,7 +909,6 @@ window.generarPPT=async()=>{
     s0.addText(`${sp.length} alternativa${sp.length!==1?"s":""}`,{x:0.5,y:3.25,w:2.8,h:0.55,fontSize:13,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
     s0.addText("Accelerating success.",{x:0.5,y:6.8,w:5,h:0.35,fontSize:10,italic:true,color:PALE,fontFace:"Open Sans"});
 
-    // TABLA COMPARATIVA
     if(document.getElementById("it").checked){
       const COLS=6;
       const grupos=[];
@@ -707,7 +965,6 @@ window.generarPPT=async()=>{
       }
     }
 
-    // FICHAS
     if(document.getElementById("if").checked){
       for(const[idx,prop] of sp.entries()){
         const s=pptx.addSlide();
@@ -739,7 +996,7 @@ window.generarPPT=async()=>{
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
         const fb64=fotos[idx];
         if(fb64){s.addImage({data:fb64,x:0.25,y:5.1,w:6.5,h:2.0});}
-        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"});}
+        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"}); }
         const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
         s.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",align:'left',wrap:true,fontFace:'Open Sans'});
         s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
@@ -755,7 +1012,7 @@ window.generarPPT=async()=>{
     console.error(e);
     msg.textContent="Error generando el PPT. Intentá de nuevo.";
   }finally{
-    btn.disabled=false;btn.textContent="Generar presentación PPT ↗";
+    btn.disabled=false;btn.innerHTML="📊 Generar presentación PPT ↗";
   }
 };
 
