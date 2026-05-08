@@ -177,15 +177,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:var(--mg);margin-to
         <div class="fb">
           <div class="fg">
             <div class="fl">Zona</div>
-            <div class="fc">
-              <label class="fk"><input type="checkbox" name="zona" value="Norte CABA"> Norte CABA</label>
-              <label class="fk"><input type="checkbox" name="zona" value="Norte GBA"> Norte GBA</label>
-              <label class="fk"><input type="checkbox" name="zona" value="Catalinas"> Catalinas</label>
-              <label class="fk"><input type="checkbox" name="zona" value="Puerto Madero"> Puerto Madero</label>
-              <label class="fk"><input type="checkbox" name="zona" value="Microcentro"> Microcentro</label>
-              <label class="fk"><input type="checkbox" name="zona" value="Macrocentro"> Macrocentro</label>
-              <label class="fk"><input type="checkbox" name="zona" value="Macrocentro Sur"> Macrocentro Sur</label>
-            </div>
+            <div class="fc" id="zona-fc"><span style="font-size:11px;color:var(--mg)">Cargando...</span></div>
           </div>
           <div class="fg">
             <div class="fl">Superficie disponible m²</div>
@@ -356,6 +348,7 @@ async function loadData(){
     const r=await fetch(CSV);
     const csv=await r.text();
     props=parseCSV(csv);
+    populateZonas();
   }catch(e){console.error(e);}
 }
 
@@ -396,10 +389,32 @@ function parseLine(line){
   r.push(cur.trim());return r;
 }
 
+function populateZonas(){
+  const zonas=[...new Set(props.map(p=>p.submercado).filter(Boolean))].sort();
+  document.getElementById('zona-fc').innerHTML=zonas.map(z=>
+    `<label class="fk"><input type="checkbox" name="zona" value="${z}"> ${z}</label>`
+  ).join('');
+  STEPS[0].opts=zonas;
+}
+
+async function imgToBase64(url){
+  try{
+    const r=await fetch(url);
+    if(!r.ok)return null;
+    const blob=await r.blob();
+    return await new Promise(res=>{
+      const fr=new FileReader();
+      fr.onloadend=()=>res(fr.result);
+      fr.onerror=()=>res(null);
+      fr.readAsDataURL(blob);
+    });
+  }catch(e){return null;}
+}
+
 const STEPS=[
   {id:"zona",  type:"multi",  confirm:"Confirmar zona",
    q:n=>`¡Hola ${n}! ¿En qué zona o zonas querés buscar?`,
-   opts:["Norte CABA","Norte GBA","Catalinas","Puerto Madero","Microcentro","Macrocentro","Macrocentro Sur"]},
+   opts:[]},
   {id:"sup",   type:"range",  ph:["Mínimo m²","Máximo m²"],
    q:()=>"¿Qué superficie necesitás? (m²)"},
   {id:"rent",  type:"range",  ph:["Mínimo USD/m²","Máximo USD/m²"],
@@ -617,6 +632,9 @@ window.generarPPT=async()=>{
   const msg=document.getElementById("sm");
   const cliente=document.getElementById("kc").value.trim()||"Colliers International";
   btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generando…';
+  msg.textContent="Cargando imágenes…";
+  const imgCache={};
+  await Promise.all(sp.map(async p=>{if(p.foto)imgCache[p.foto]=await imgToBase64(p.foto);}));
   msg.textContent="Preparando presentación…";
   try{
     const pptx=new window.PptxGenJS();
@@ -655,7 +673,9 @@ window.generarPPT=async()=>{
         if(grupos.length>1)sl.addText(`Pág. ${gi+1}/${grupos.length}`,{x:10,y:0.04,w:1.3,h:0.27,fontSize:9,color:PALE,align:"right",fontFace:"Open Sans"});
         for(const[i,prop] of grupo.entries()){
           const cx=LW+i*CW;
-          sl.addShape(pptx.ShapeType.rect,{x:cx,y:0.37,w:CW-0.02,h:1.0,fill:{color:"DBE5FF"}});
+          const tb64=prop.foto&&imgCache[prop.foto];
+          if(tb64){sl.addImage({data:tb64,x:cx,y:0.37,w:CW-0.02,h:1.0});}
+          else{sl.addShape(pptx.ShapeType.rect,{x:cx,y:0.37,w:CW-0.02,h:1.0,fill:{color:"DBE5FF"}});}
           sl.addShape(pptx.ShapeType.rect,{x:cx,y:1.37,w:CW-0.02,h:0.3,fill:{color:DEEP}});
           sl.addText(String(i+1+gi*COLS),{x:cx,y:1.37,w:CW-0.02,h:0.3,fontSize:12,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
           sl.addShape(pptx.ShapeType.rect,{x:cx,y:1.67,w:CW-0.02,h:0.38,fill:{color:DARK}});
@@ -719,6 +739,9 @@ window.generarPPT=async()=>{
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:0.38,fill:{color:"DBE5FF"}});
         s.addText("Características y amenities",{x:7.15,y:3.14,w:5.8,h:0.3,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
+        const fb64=prop.foto&&imgCache[prop.foto];
+        if(fb64){s.addImage({data:fb64,x:0.25,y:5.1,w:6.5,h:2.0});}
+        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"});}
         const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
         s.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",align:'left',wrap:true,fontFace:'Open Sans'});
         s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
