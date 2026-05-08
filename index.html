@@ -37,24 +37,28 @@ nav{background:var(--dark);height:52px;display:flex;align-items:center;justify-c
 .dc p{font-size:12px;color:var(--mg);line-height:1.7}
 #as{display:none;max-width:1440px;margin:0 auto;padding:1.5rem 2rem}
 .ag{display:grid;grid-template-columns:290px 1fr;gap:1.5rem;align-items:start}
-.cp{background:#fff;border-top:3px solid var(--dark);box-shadow:0 2px 12px rgba(0,7,89,.08);overflow:hidden;position:sticky;top:68px}
-.ch{background:var(--dark);padding:.7rem 1rem;display:flex;align-items:center;gap:8px}
-.chd{width:8px;height:8px;border-radius:50%;background:var(--pale)}
-.cht{color:#fff;font-size:12px;font-weight:600}
-.chb{font-size:9px;background:var(--mid);color:#fff;padding:1px 6px;border-radius:2px}
-.cm{height:430px;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth}
-.cm::-webkit-scrollbar{width:4px}
-.cm::-webkit-scrollbar-thumb{background:var(--pg)}
-.msg{max-width:90%;padding:.5rem .75rem;font-size:12px;line-height:1.6;animation:fu .2s ease;white-space:pre-wrap}
-@keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.mb{background:var(--pg);color:var(--deep);align-self:flex-start;border-left:2px solid var(--dark)}
-.mu{background:var(--dark);color:#fff;align-self:flex-end}
-.co{display:flex;flex-direction:column;gap:4px;margin-top:2px}
-.co button{background:#fff;border:1px solid var(--pg);color:var(--dark);font-family:inherit;font-size:11px;padding:5px 10px;cursor:pointer;text-align:left;transition:all .15s}
-.co button:hover{background:var(--pg)}
-.co button.sel{background:var(--dark);color:#fff}
-.cn{width:100%;background:var(--pg);color:var(--dark);border:none;font-family:inherit;font-size:11px;font-weight:600;padding:7px;cursor:pointer;border-top:1px solid var(--pg)}
-.cn:hover{background:var(--pale)}
+.fp{background:#fff;border-top:3px solid var(--dark);box-shadow:0 2px 12px rgba(0,7,89,.08);overflow:hidden;position:sticky;top:68px}
+.fh{background:var(--dark);padding:.7rem 1rem;display:flex;align-items:center;gap:8px}
+.fht{color:#fff;font-size:12px;font-weight:600}
+.fb{padding:.75rem;display:flex;flex-direction:column;gap:.85rem;overflow-y:auto;max-height:calc(100vh - 200px)}
+.fb::-webkit-scrollbar{width:4px}
+.fb::-webkit-scrollbar-thumb{background:var(--pg)}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:10px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.06em}
+.fc{display:flex;flex-direction:column;gap:4px}
+.fk{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--dg);cursor:pointer}
+.fk input[type=checkbox]{accent-color:var(--dark);width:13px;height:13px;cursor:pointer}
+.fi{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--pg);color:var(--deep);width:100%}
+.fi:focus{outline:none;border-color:var(--mid)}
+.frow{display:flex;gap:8px}
+.frow .fi{flex:1;min-width:0}
+.fsel{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--pg);color:var(--deep);width:100%;background:#fff}
+.fsel:focus{outline:none;border-color:var(--mid)}
+.fa{padding:.75rem;display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--pg)}
+.fbtn{background:var(--dark);color:#fff;font-family:inherit;font-size:12px;font-weight:600;padding:9px;border:none;cursor:pointer;width:100%;transition:background .15s}
+.fbtn:hover{background:var(--deep)}
+.fclr{background:transparent;color:var(--mg);font-family:inherit;font-size:11px;padding:6px;border:1px solid var(--pg);cursor:pointer;width:100%;transition:all .15s}
+.fclr:hover{background:var(--pg);color:var(--dark)}
 .rp{display:flex;flex-direction:column;gap:1.25rem}
 .tc{background:#fff;border-top:3px solid var(--dark);box-shadow:0 2px 12px rgba(0,7,89,.08);overflow:hidden}
 .th2{background:var(--dark);padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between}
@@ -139,14 +143,61 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:var(--mg);margin-to
 
 <div id="as">
   <div class="ag">
-    <div class="cp">
-      <div class="ch">
-        <div class="chd"></div>
-        <div class="cht">Asistente Colliers</div>
-        <div class="chb">BETA</div>
+    <div class="fp">
+      <div class="fh"><div class="fht">Filtros de búsqueda</div></div>
+      <div class="fb">
+        <div class="fg">
+          <div class="fl">Zona</div>
+          <div class="fc">
+            <label class="fk"><input type="checkbox" name="zona" value="Norte CABA"> Norte CABA</label>
+            <label class="fk"><input type="checkbox" name="zona" value="Norte GBA"> Norte GBA</label>
+            <label class="fk"><input type="checkbox" name="zona" value="Catalinas"> Catalinas</label>
+            <label class="fk"><input type="checkbox" name="zona" value="Puerto Madero"> Puerto Madero</label>
+            <label class="fk"><input type="checkbox" name="zona" value="Microcentro"> Microcentro</label>
+            <label class="fk"><input type="checkbox" name="zona" value="Macrocentro"> Macrocentro</label>
+            <label class="fk"><input type="checkbox" name="zona" value="Macrocentro Sur"> Macrocentro Sur</label>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="fl">Superficie disponible m²</div>
+          <div class="frow">
+            <input type="number" id="fsmn" class="fi" placeholder="Mínimo">
+            <input type="number" id="fsmx" class="fi" placeholder="Máximo">
+          </div>
+        </div>
+        <div class="fg">
+          <div class="fl">Asking Rent USD/m²</div>
+          <div class="frow">
+            <input type="number" id="frmn" class="fi" placeholder="Mínimo">
+            <input type="number" id="frmx" class="fi" placeholder="Máximo">
+          </div>
+        </div>
+        <div class="fg">
+          <div class="fl">Categoría</div>
+          <div class="fc">
+            <label class="fk"><input type="checkbox" name="cat" value="A+ LEED Gold"> A+ LEED Gold</label>
+            <label class="fk"><input type="checkbox" name="cat" value="A+ LEED"> A+ LEED</label>
+            <label class="fk"><input type="checkbox" name="cat" value="A+"> A+</label>
+            <label class="fk"><input type="checkbox" name="cat" value="A"> A</label>
+            <label class="fk"><input type="checkbox" name="cat" value="B+"> B+</label>
+            <label class="fk"><input type="checkbox" name="cat" value="B"> B</label>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="fl">Cantidad de resultados</div>
+          <select id="fcant" class="fsel">
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="7">7</option>
+            <option value="10" selected>10</option>
+            <option value="0">Todos</option>
+          </select>
+        </div>
       </div>
-      <div class="cm" id="cm"></div>
-      <button class="cn" onclick="nuevaBusqueda()">↺ Nueva búsqueda</button>
+      <div class="fa">
+        <button class="fbtn" onclick="applyFilters()">Buscar alternativas</button>
+        <button class="fclr" onclick="clearFilters()">Limpiar filtros</button>
+      </div>
     </div>
     <div class="rp">
       <div class="tc">
@@ -171,7 +222,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:var(--mg);margin-to
               </tr>
             </thead>
             <tbody id="tb">
-              <tr><td colspan="10" class="et">Usá el chat para buscar alternativas →</td></tr>
+              <tr><td colspan="10" class="et">Aplicá los filtros y hacé clic en "Buscar alternativas"</td></tr>
             </tbody>
           </table>
         </div>
@@ -250,7 +301,7 @@ function onUserLoggedIn(){
   document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
   document.getElementById('nu').style.display='flex';
   show('as');
-  loadData().then(()=>startChat((user.displayName||'').split(' ')[0]||'Broker'));
+  loadData();
 }
 
 window.loginGoogle=()=>{google.accounts.id.prompt();};
@@ -314,84 +365,35 @@ function parseLine(line){
   r.push(cur.trim());return r;
 }
 
-const STEPS=[
-  {id:"zona",q:n=>`¡Hola ${n}! Estoy aquí para ayudarte a encontrar las mejores alternativas.\n¿En qué zona querés buscar?`,
-   opts:["Norte CABA","Norte GBA","Catalinas","Puerto Madero","Microcentro","Macrocentro","Macrocentro Sur","Todas las zonas"]},
-  {id:"sup",q:()=>"¿Qué superficie mínima necesitás?",
-   opts:["Hasta 1.000 m²","1.000 – 3.000 m²","3.000 – 8.000 m²","Más de 8.000 m²","Sin límite"]},
-  {id:"rent",q:()=>"¿Cuál es tu rango de Asking Rent?",
-   opts:["Hasta USD 15/m²","USD 15 – 22/m²","USD 22 – 28/m²","Más de USD 28/m²","Indiferente"]},
-  {id:"cat",q:()=>"¿Qué categoría de edificio buscás?",
-   opts:["A+ / A+ LEED","A","B+ o inferior","Indiferente"]},
-  {id:"cant",q:()=>"¿Cuántas opciones querés ver?",
-   opts:["3","5","7","10","Todas"]},
-];
-
-let step=0, resp={};
-
-function startChat(nombre){
-  step=0;resp={};
-  document.getElementById("cm").innerHTML="";
-  botMsg(STEPS[0].q(nombre),STEPS[0].opts);
-}
-window.nuevaBusqueda=()=>startChat(user?.displayName?.split(" ")[0]||"Broker");
-
-function botMsg(txt,opts){
-  const w=document.getElementById("cm");
-  const m=document.createElement("div");
-  m.className="msg mb";m.textContent=txt;w.appendChild(m);
-  if(opts){
-    const od=document.createElement("div");od.className="co";
-    opts.forEach(op=>{
-      const b=document.createElement("button");b.textContent=op;
-      b.onclick=()=>pick(op,od);od.appendChild(b);
-    });
-    w.appendChild(od);
-  }
-  w.scrollTop=w.scrollHeight;
-}
-
-function userMsg(txt){
-  const w=document.getElementById("cm");
-  const m=document.createElement("div");m.className="msg mu";m.textContent=txt;
-  w.appendChild(m);w.scrollTop=w.scrollHeight;
-}
-
-function pick(val,od){
-  od.querySelectorAll("button").forEach(b=>{b.classList.toggle("sel",b.textContent===val);b.disabled=true;});
-  userMsg(val);resp[STEPS[step].id]=val;step++;
-  setTimeout(()=>{
-    if(step<STEPS.length)botMsg(STEPS[step].q(),STEPS[step].opts);
-    else{botMsg("Buscando alternativas...");setTimeout(applyFilters,500);}
-  },300);
-}
-
 function applyFilters(){
-  const{zona,sup,rent,cat,cant}=resp;
+  const zonas=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
+  const supMin=parseFloat(document.getElementById('fsmn').value)||0;
+  const supMax=parseFloat(document.getElementById('fsmx').value)||Infinity;
+  const rentMin=parseFloat(document.getElementById('frmn').value)||0;
+  const rentMax=parseFloat(document.getElementById('frmx').value)||Infinity;
+  const cats=[...document.querySelectorAll('input[name="cat"]:checked')].map(c=>c.value);
+  const cantVal=parseInt(document.getElementById('fcant').value)||0;
   let r=props.filter(p=>{
-    if(zona&&zona!=="Todas las zonas"&&!p.submercado.toLowerCase().includes(zona.toLowerCase().split(" ")[0]))return false;
+    if(zonas.length&&!zonas.some(z=>p.submercado===z))return false;
     const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
-    if(sup==="Hasta 1.000 m²"&&supRef>1000)return false;
-    if(sup==="1.000 – 3.000 m²"&&(supRef<1000||supRef>3000))return false;
-    if(sup==="3.000 – 8.000 m²"&&(supRef<3000||supRef>8000))return false;
-    if(sup==="Más de 8.000 m²"&&supRef<8000)return false;
-    const rn=parseFloat(String(p.rent).split("–")[0].replace(",","."))||0;
-    if(rent==="Hasta USD 15/m²"&&rn>15)return false;
-    if(rent==="USD 15 – 22/m²"&&(rn<15||rn>22))return false;
-    if(rent==="USD 22 – 28/m²"&&(rn<22||rn>28))return false;
-    if(rent==="Más de USD 28/m²"&&rn<28)return false;
-    if(cat==="A+ / A+ LEED"&&!p.cat.includes("A+"))return false;
-    if(cat==="A"&&p.cat!=="A")return false;
-    if(cat==="B+ o inferior"&&!p.cat.startsWith("B"))return false;
+    if(supMin&&supRef<supMin)return false;
+    if(supMax<Infinity&&supRef>supMax)return false;
+    const rn=parseFloat(String(p.rent).split('–')[0].replace(',','.'))||0;
+    if(rentMin&&rn<rentMin)return false;
+    if(rentMax<Infinity&&rn>rentMax)return false;
+    if(cats.length&&!cats.some(c=>p.cat===c))return false;
     return true;
   });
-  const n=cant==="Todas"?999:parseInt(cant)||999;
-  if(n<999)r=r.slice(0,n);
+  if(cantVal>0)r=r.slice(0,cantVal);
   filt=r;sel.clear();renderTable();
-  botMsg(r.length>0
-    ?`Encontré ${r.length} alternativa${r.length!==1?"s":""} que coinciden. Seleccioná las que te interesen y generá la presentación.`
-    :"No encontré propiedades con esos criterios. Hacé clic en Nueva búsqueda para ajustar.");
 }
+
+window.clearFilters=()=>{
+  document.querySelectorAll('input[name="zona"],input[name="cat"]').forEach(c=>c.checked=false);
+  ['fsmn','fsmx','frmn','frmx'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fcant').value='10';
+  filt=[];sel.clear();renderTable();
+};
 
 function renderTable(){
   const tb=document.getElementById("tb");
