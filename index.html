@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alternativas de Oficinas · Colliers</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <style>
 :root{--deep:#000759;--dark:#25408F;--mid:#1C54F4;--light:#4D93FF;--pale:#C3E6FF;--pg:#DBE5FF;--dg:#353E59;--mg:#56648F;--red:#ED1B34;--bg:#F0F4FF}
@@ -369,7 +368,7 @@ function applyFilters(){
   const{zona,sup,rent,cat,cant}=resp;
   let r=props.filter(p=>{
     if(zona&&zona!=="Todas las zonas"&&!p.submercado.toLowerCase().includes(zona.toLowerCase().split(" ")[0]))return false;
-    const supRef=p.supPlanta||p.supDisp;
+    const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
     if(sup==="Hasta 1.000 m²"&&supRef>1000)return false;
     if(sup==="1.000 – 3.000 m²"&&(supRef<1000||supRef>3000))return false;
     if(sup==="3.000 – 8.000 m²"&&(supRef<3000||supRef>8000))return false;
@@ -442,6 +441,7 @@ window.generarPPT=async()=>{
   btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generando…';
   msg.textContent="Preparando presentación…";
   try{
+    const PptxGenJS=window.PptxGenJS||(await import('https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.es.js')).default;
     const pptx=new PptxGenJS();
     pptx.layout="LAYOUT_WIDE";
     const DARK="25408F",MID="1C54F4",PALE="C3E6FF",WHITE="FFFFFF",DEEP="000759";
