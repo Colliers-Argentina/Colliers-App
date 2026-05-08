@@ -114,6 +114,25 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .sel-all-lbl input{accent-color:#fff;cursor:pointer;width:13px;height:13px}
 .card-badge{color:#fff;background:#1C54F4;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px}
 
+/* View toggle tabs */
+.view-tabs{display:flex;gap:0;padding:0 .75rem;background:#F8FAFF;border-bottom:1px solid #DBE5FF}
+.view-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:#56648F;font-family:inherit;font-size:11px;font-weight:600;padding:8px 14px;cursor:pointer;transition:all .15s;margin-bottom:-1px}
+.view-tab:hover{color:#25408F}
+.view-tab.active{color:#1C54F4;border-bottom-color:#1C54F4}
+
+/* List view */
+.ltable{width:100%;border-collapse:collapse;font-size:11px}
+.ltable thead tr{background:#25408F}
+.ltable th{padding:8px 10px;text-align:left;color:#fff;font-weight:600;font-size:10px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
+.ltable th:last-child{border-right:none}
+.ltable td{padding:6px 10px;border-bottom:1px solid #EEF3FF;color:#353E59;vertical-align:middle}
+.ltable tr:hover td{background:#F5F7FF}
+.ltable tr.lsr td{background:#EEF3FF}
+.lcc{text-align:center;width:32px}
+.list-photo{width:40px;height:28px;object-fit:cover;display:block;border-radius:1px}
+.lph{width:40px;height:28px;background:#DBE5FF;display:flex;align-items:center;justify-content:center;font-size:14px;border-radius:1px}
+.lname{font-weight:600;min-width:120px;color:#000759}
+
 /* ── STEP 2: COMPARISON TABLE ── */
 .table-outer{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .ctable{border-collapse:collapse;width:max-content;min-width:100%;font-size:11px}
@@ -326,7 +345,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
       <!-- RIGHT PANEL -->
       <main class="main-panel">
 
-        <!-- STEP 2: COMPARISON TABLE -->
+        <!-- STEP 2: RESULTS -->
         <div class="card">
           <div class="card-hd">
             <div class="card-title">Alternativas encontradas</div>
@@ -337,6 +356,10 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
               </label>
               <span class="card-badge" id="sc">0 seleccionadas</span>
             </div>
+          </div>
+          <div class="view-tabs">
+            <button class="view-tab active" id="tab-list" onclick="setView('list')">&#9776; Lista</button>
+            <button class="view-tab" id="tab-comp" onclick="setView('comp')">&#8862; Comparativa</button>
           </div>
           <div class="table-outer">
             <div id="tb">
@@ -561,14 +584,17 @@ const STEPS=[
    opts:["3","5","7","10","Todas"]},
 ];
 
-let step=0, resp={};
+let step=0, resp={}, view='list';
 
 function startChat(nombre){
   step=0; resp={};
   document.querySelectorAll('input[name="zona"],input[name="cat"]').forEach(c=>c.checked=false);
   ['fsmn','fsmx','frmn','frmx'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fcant').value='10';
-  filt=[]; sel.clear(); renderTable();
+  filt=[]; sel.clear(); view='list';
+  document.getElementById('tab-list')?.classList.add('active');
+  document.getElementById('tab-comp')?.classList.remove('active');
+  renderTable();
   document.getElementById("cm").innerHTML="";
   botMsg(STEPS[0].q(nombre), STEPS[0]);
 }
@@ -726,7 +752,43 @@ window.clearFilters=()=>{
   filt=[];sel.clear();renderTable();
 };
 
+function setView(v){
+  view=v;
+  document.getElementById('tab-list').classList.toggle('active',v==='list');
+  document.getElementById('tab-comp').classList.toggle('active',v==='comp');
+  renderTable();
+}
+
 function renderTable(){
+  view==='list'?renderListView():renderCompView();
+}
+
+function renderListView(){
+  const ct=document.getElementById("tb");
+  if(!filt.length){
+    ct.innerHTML='<div class="et">Sin resultados. Ajustá los filtros o usá el chat para buscar.</div>';
+    updBar();return;
+  }
+  let h='<table class="ltable"><thead><tr>';
+  h+='<th class="lcc"></th><th>Foto</th><th>Edificio</th><th>Submercado</th><th>Cat.</th><th>Sup. disp. m²</th><th>Asking Rent</th>';
+  h+='</tr></thead><tbody>';
+  filt.forEach((p,i)=>{
+    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}"> 
+      <td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td>
+      <td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\\'lph\\'>🏘</div>'">`:'<div class="lph">🏘</div>'}</td>
+      <td class="lname">${p.nombre}</td>
+      <td>${p.submercado}</td>
+      <td><span class="cb">${p.cat}</span></td>
+      <td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span></td>
+      <td><span class="rent-v">USD ${p.rent}</span></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  ct.innerHTML=h;
+  updBar();
+}
+
+function renderCompView(){
   const ct=document.getElementById("tb");
   if(!filt.length){
     ct.innerHTML='<div class="et">Sin resultados. Ajustá los filtros o usá el chat para buscar.</div>';
@@ -788,12 +850,16 @@ function renderTable(){
 }
 
 function _highlightCol(i,on){
+  const lr=document.getElementById(`lr-${i}`);
+  if(lr)lr.className=on?'lsr':'';
+  const lcb=document.getElementById(`lcb-${i}`);
+  if(lcb)lcb.checked=on;
   const pcell=document.querySelector(`.photo-row .coli-${i}`);
   if(pcell)pcell.style.background=on?'#EAF0FF':'';
   const nbcell=document.querySelector(`.num-row .coli-${i}`);
-  if(nbcell){nbcell.style.background=on?'#1C54F4':'#000759';}
+  if(nbcell)nbcell.style.background=on?'#1C54F4':'#000759';
   const nmcell=document.querySelector(`.name-row .coli-${i}`);
-  if(nmcell){nmcell.style.background=on?'#000759':'#1C54F4';}
+  if(nmcell)nmcell.style.background=on?'#000759':'#1C54F4';
   document.querySelectorAll(`.row-even .coli-${i},.row-odd .coli-${i}`).forEach(td=>{
     td.style.background=on?'#EAF0FF':'';
   });
@@ -817,7 +883,7 @@ window.toggleAll=(cb)=>{
 
 function updBar(){
   const n=sel.size;
-  document.getElementById("sc").textContent=`${n} seleccionada${n!==1?"s":""}`;
+  document.getElementById("sc").textContent=`${n} seleccionada${n!==1?"s":""}` ;
   document.getElementById("sb").style.display=n>0?"flex":"none";
   document.getElementById("sn").textContent=n;
   document.getElementById("sns").textContent=[...sel].map(i=>filt[i]?.nombre).filter(Boolean).join(", ");
@@ -996,7 +1062,7 @@ window.generarPPT=async()=>{
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
         const fb64=fotos[idx];
         if(fb64){s.addImage({data:fb64,x:0.25,y:5.1,w:6.5,h:2.0});}
-        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"}); }
+        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"});}
         const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
         s.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",align:'left',wrap:true,fontFace:'Open Sans'});
         s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
