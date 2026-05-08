@@ -499,10 +499,12 @@ window.generarPPT=async()=>{
             if(key==="supPlanta"&&val)val=Number(val).toLocaleString("es-AR")+" m²";
             const isDisp=key==="supDisp";
             const isCom=key==="comentarios";
-            const textVal=isCom
-              ?String(val).split(',').map(s=>s.trim()).filter(Boolean).map(s=>({text:s,options:{bullet:true,fontSize:7}}))
-              :String(val);
-            sl.addText(textVal,{x:cx+0.04,y:ry+0.05,w:CW-0.1,h:ROW_H-0.1,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:isCom?"left":"center",wrap:true,fontFace:"Open Sans"});
+            if(isCom){
+              const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
+              sl.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:cx+0.04,y:ry+0.05,w:CW-0.1,h:ROW_H-0.1,fontSize:7,color:'353E59',align:'left',wrap:true,fontFace:'Open Sans'});
+            }else{
+              sl.addText(String(val),{x:cx+0.04,y:ry+0.05,w:CW-0.1,h:ROW_H-0.1,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:"center",wrap:true,fontFace:"Open Sans"});
+            }
           }
         }
         sl.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
@@ -541,10 +543,8 @@ window.generarPPT=async()=>{
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:0.38,fill:{color:"DBE5FF"}});
         s.addText("Características y amenities",{x:7.15,y:3.14,w:5.8,h:0.3,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
-        s.addText(
-          prop.comentarios.split(',').map(item=>item.trim()).filter(Boolean).map(item=>({text:item,options:{bullet:true}})),
-          {x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",fontFace:"Open Sans"}
-        );
+        const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
+        s.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",align:'left',wrap:true,fontFace:'Open Sans'});
         s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
         s.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
         s.addText(`Alternativa ${idx+1} de ${sp.length}`,{x:11.2,y:7.25,w:1.9,h:0.2,fontSize:7,bold:true,color:WHITE,align:"right",fontFace:"Open Sans"});
