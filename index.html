@@ -53,6 +53,8 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .side-panel{background:#fff;border-top:3px solid #25408F;box-shadow:0 4px 20px rgba(0,7,89,.1);position:sticky;top:70px;max-height:calc(100vh - 82px);display:flex;flex-direction:column;overflow:hidden}
 .panel-hd{background:#25408F;padding:.7rem 1rem;display:flex;align-items:center;gap:8px;flex-shrink:0}
 .panel-dot{width:8px;height:8px;border-radius:50%;background:#C3E6FF;flex-shrink:0}
+.msg-row{display:flex;align-items:flex-start;gap:6px}
+.msg-row .msg-av{height:20px;object-fit:contain;flex-shrink:0;margin-top:3px;filter:brightness(0) invert(1);opacity:.85}
 .panel-title{color:#fff;font-size:13px;font-weight:700;flex:1}
 .panel-badge{font-size:8px;background:#1C54F4;color:#fff;padding:2px 7px;border-radius:2px;font-weight:700;letter-spacing:.05em}
 
@@ -258,7 +260,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
       <!-- STEP 1: LEFT PANEL (CHAT) -->
       <aside class="side-panel">
         <div class="panel-hd">
-          <div class="panel-dot"></div>
+          <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:28px;object-fit:contain">
           <div class="panel-title">Asistente Colliers</div>
           <div class="panel-badge">BETA</div>
         </div>
@@ -575,8 +577,12 @@ window.nuevaBusqueda=()=>startChat((user?.displayName||'').split(' ')[0]||'Broke
 
 function botMsg(txt, stepDef){
   const w=document.getElementById("cm");
+  const row=document.createElement("div"); row.className="msg-row";
+  const av=document.createElement("img"); av.className="msg-av";
+  av.src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png";
   const m=document.createElement("div");
-  m.className="msg mb"; m.textContent=txt; w.appendChild(m);
+  m.className="msg mb"; m.textContent=txt;
+  row.appendChild(av); row.appendChild(m); w.appendChild(row);
   if(!stepDef){w.scrollTop=w.scrollHeight;return;}
 
   const od=document.createElement("div"); od.className="co"; od.dataset.sid=stepDef.id;
