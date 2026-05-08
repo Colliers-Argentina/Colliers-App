@@ -13,7 +13,8 @@
 body{font-family:'Open Sans',Verdana,sans-serif;background:var(--bg);color:var(--deep);min-height:100vh}
 nav{background:var(--dark);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid var(--mid);position:sticky;top:0;z-index:100}
 .nb{display:flex;align-items:center;gap:12px}
-.nl{color:#fff;font-size:17px;font-weight:700}
+.nl{color:#fff;font-size:17px;font-weight:700;display:flex;flex-direction:column;gap:3px}
+.nl::after{content:'';height:2px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF)}
 .nd{width:1px;height:18px;background:rgba(255,255,255,.3)}
 .ns{color:var(--pale);font-size:11px}
 .nr{display:flex;align-items:center;gap:10px}
@@ -536,7 +537,10 @@ window.generarPPT=async()=>{
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:0.38,fill:{color:"DBE5FF"}});
         s.addText("Características y amenities",{x:7.15,y:3.14,w:5.8,h:0.3,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
-        s.addText(prop.comentarios,{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",wrap:true,fontFace:"Open Sans"});
+        s.addText(
+          prop.comentarios.split(',').map(item=>item.trim()).filter(Boolean).map(item=>({text:item,options:{bullet:true}})),
+          {x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",fontFace:"Open Sans"}
+        );
         s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
         s.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
         s.addText(`Alternativa ${idx+1} de ${sp.length}`,{x:11.2,y:7.25,w:1.9,h:0.2,fontSize:7,bold:true,color:WHITE,align:"right",fontFace:"Open Sans"});
