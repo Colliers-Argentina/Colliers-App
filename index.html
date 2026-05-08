@@ -500,7 +500,7 @@ window.generarPPT=async()=>{
             const isDisp=key==="supDisp";
             const isCom=key==="comentarios";
             const textVal=isCom
-              ?String(val).split(',').map(s=>s.trim()).filter(Boolean).map(s=>({text:s,options:{bullet:true}}))
+              ?String(val).split(',').map(s=>s.trim()).filter(Boolean).map(s=>({text:s,options:{bullet:true,fontSize:7}}))
               :String(val);
             sl.addText(textVal,{x:cx+0.04,y:ry+0.05,w:CW-0.1,h:ROW_H-0.1,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:isCom?"left":"center",wrap:true,fontFace:"Open Sans"});
           }
