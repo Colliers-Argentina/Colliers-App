@@ -369,10 +369,11 @@ function applyFilters(){
   const{zona,sup,rent,cat,cant}=resp;
   let r=props.filter(p=>{
     if(zona&&zona!=="Todas las zonas"&&!p.submercado.toLowerCase().includes(zona.toLowerCase().split(" ")[0]))return false;
-    if(sup==="Hasta 1.000 m²"&&p.supDisp>1000)return false;
-    if(sup==="1.000 – 3.000 m²"&&(p.supDisp<1000||p.supDisp>3000))return false;
-    if(sup==="3.000 – 8.000 m²"&&(p.supDisp<3000||p.supDisp>8000))return false;
-    if(sup==="Más de 8.000 m²"&&p.supDisp<8000)return false;
+    const supRef=p.supPlanta||p.supDisp;
+    if(sup==="Hasta 1.000 m²"&&supRef>1000)return false;
+    if(sup==="1.000 – 3.000 m²"&&(supRef<1000||supRef>3000))return false;
+    if(sup==="3.000 – 8.000 m²"&&(supRef<3000||supRef>8000))return false;
+    if(sup==="Más de 8.000 m²"&&supRef<8000)return false;
     const rn=parseFloat(String(p.rent).split("–")[0].replace(",","."))||0;
     if(rent==="Hasta USD 15/m²"&&rn>15)return false;
     if(rent==="USD 15 – 22/m²"&&(rn<15||rn>22))return false;
