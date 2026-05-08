@@ -53,6 +53,11 @@ nav{background:var(--dark);height:52px;display:flex;align-items:center;justify-c
 .co button{background:#fff;border:1px solid var(--pg);color:var(--dark);font-family:inherit;font-size:11px;padding:5px 10px;cursor:pointer;text-align:left;transition:all .15s}
 .co button:hover{background:var(--pg)}
 .co button.sel{background:var(--dark);color:#fff}
+.co-ok{background:var(--mid)!important;color:#fff!important;font-weight:700!important;margin-top:4px;border-color:var(--mid)!important}
+.co-ok:hover{background:var(--deep)!important}
+.co-rrow{display:flex;gap:6px;margin-bottom:2px}
+.co-ri{font-family:inherit;font-size:11px;padding:4px 7px;border:1px solid var(--pg);color:var(--deep);flex:1;min-width:0}
+.co-ri:focus{outline:none;border-color:var(--mid)}
 .cat{width:100%;background:var(--pg);color:var(--dark);border:none;border-top:1px solid var(--pg);font-family:inherit;font-size:11px;padding:6px 10px;cursor:pointer;text-align:left;flex-shrink:0;transition:background .15s}
 .cat:hover,.cat.open{background:var(--pale)}
 .xf{display:none;overflow-y:auto;border-top:1px solid var(--pg)}
@@ -392,79 +397,138 @@ function parseLine(line){
 }
 
 const STEPS=[
-  {id:"zona",q:n=>`¡Hola ${n}! Estoy aquí para ayudarte a encontrar las mejores alternativas.\n¿En qué zona querés buscar?`,
-   opts:["Norte CABA","Norte GBA","Catalinas","Puerto Madero","Microcentro","Macrocentro","Macrocentro Sur","Todas las zonas"]},
-  {id:"sup",q:()=>"¿Qué superficie mínima necesitás?",
-   opts:["Hasta 1.000 m²","1.000 – 3.000 m²","3.000 – 8.000 m²","Más de 8.000 m²","Sin límite"]},
-  {id:"rent",q:()=>"¿Cuál es tu rango de Asking Rent?",
-   opts:["Hasta USD 15/m²","USD 15 – 22/m²","USD 22 – 28/m²","Más de USD 28/m²","Indiferente"]},
-  {id:"cat",q:()=>"¿Qué categoría de edificio buscás?",
-   opts:["A+ / A+ LEED","A","B+ o inferior","Indiferente"]},
-  {id:"cant",q:()=>"¿Cuántas opciones querés ver?",
+  {id:"zona",  type:"multi",  confirm:"Confirmar zona",
+   q:n=>`¡Hola ${n}! ¿En qué zona o zonas querés buscar?`,
+   opts:["Norte CABA","Norte GBA","Catalinas","Puerto Madero","Microcentro","Macrocentro","Macrocentro Sur"]},
+  {id:"sup",   type:"range",  ph:["Mínimo m²","Máximo m²"],
+   q:()=>"¿Qué superficie necesitás? (m²)"},
+  {id:"rent",  type:"range",  ph:["Mínimo USD/m²","Máximo USD/m²"],
+   q:()=>"¿Cuál es el rango de Asking Rent? (USD/m²)"},
+  {id:"cat",   type:"multi",  confirm:"Confirmar categoría",
+   q:()=>"¿Qué categorías de edificio buscás?",
+   opts:["A+ LEED Gold","A+ LEED","A+","A","B+","B"]},
+  {id:"cant",  type:"single",
+   q:()=>"¿Cuántas opciones querés ver?",
    opts:["3","5","7","10","Todas"]},
 ];
 
 let step=0, resp={};
 
 function startChat(nombre){
-  step=0;resp={};
+  step=0; resp={};
+  document.querySelectorAll('input[name="zona"],input[name="cat"]').forEach(c=>c.checked=false);
+  ['fsmn','fsmx','frmn','frmx'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fcant').value='10';
+  filt=[]; sel.clear(); renderTable();
   document.getElementById("cm").innerHTML="";
-  botMsg(STEPS[0].q(nombre),STEPS[0].opts);
+  botMsg(STEPS[0].q(nombre), STEPS[0]);
 }
+
 window.nuevaBusqueda=()=>startChat((user?.displayName||'').split(' ')[0]||'Broker');
 
-function botMsg(txt,opts){
+function botMsg(txt, stepDef){
   const w=document.getElementById("cm");
   const m=document.createElement("div");
-  m.className="msg mb";m.textContent=txt;w.appendChild(m);
-  if(opts){
-    const od=document.createElement("div");od.className="co";
-    opts.forEach(op=>{
-      const b=document.createElement("button");b.textContent=op;
-      b.onclick=()=>pick(op,od);od.appendChild(b);
+  m.className="msg mb"; m.textContent=txt; w.appendChild(m);
+  if(!stepDef){w.scrollTop=w.scrollHeight;return;}
+
+  const od=document.createElement("div"); od.className="co"; od.dataset.sid=stepDef.id;
+
+  if(stepDef.type==='single'){
+    stepDef.opts.forEach(op=>{
+      const b=document.createElement("button"); b.textContent=op;
+      if(resp[stepDef.id]===op) b.classList.add("sel");
+      b.onclick=()=>pickSingle(op,od,stepDef.id);
+      od.appendChild(b);
     });
-    w.appendChild(od);
+  } else if(stepDef.type==='multi'){
+    stepDef.opts.forEach(op=>{
+      const b=document.createElement("button"); b.textContent=op;
+      const cur=resp[stepDef.id]||[];
+      if(cur.includes(op)) b.classList.add("sel");
+      b.onclick=()=>b.classList.toggle("sel");
+      od.appendChild(b);
+    });
+    const ok=document.createElement("button"); ok.className="co-ok";
+    ok.textContent=stepDef.confirm||"Confirmar →";
+    ok.onclick=()=>confirmMulti(od,stepDef.id);
+    od.appendChild(ok);
+  } else if(stepDef.type==='range'){
+    const row=document.createElement("div"); row.className="co-rrow";
+    const mn=document.createElement("input"); mn.type="number"; mn.placeholder=stepDef.ph[0]; mn.className="co-ri";
+    const mx=document.createElement("input"); mx.type="number"; mx.placeholder=stepDef.ph[1]; mx.className="co-ri";
+    const cur=resp[stepDef.id]||['',''];
+    mn.value=cur[0]||''; mx.value=cur[1]||'';
+    row.appendChild(mn); row.appendChild(mx); od.appendChild(row);
+    const ok=document.createElement("button"); ok.className="co-ok";
+    ok.textContent="Confirmar →";
+    ok.onclick=()=>confirmRange(od,stepDef.id,mn,mx);
+    od.appendChild(ok);
   }
-  w.scrollTop=w.scrollHeight;
+
+  w.appendChild(od); w.scrollTop=w.scrollHeight;
 }
 
 function userMsg(txt){
   const w=document.getElementById("cm");
-  const m=document.createElement("div");m.className="msg mu";m.textContent=txt;
-  w.appendChild(m);w.scrollTop=w.scrollHeight;
+  const m=document.createElement("div"); m.className="msg mu"; m.textContent=txt;
+  w.appendChild(m); w.scrollTop=w.scrollHeight;
 }
+
+function pickSingle(val,od,id){
+  od.querySelectorAll("button:not(.co-ok)").forEach(b=>b.classList.toggle("sel",b.textContent===val));
+  const isNew=!(id in resp);
+  resp[id]=val; chatToFilters(id,val);
+  if(isNew){ userMsg(val); advanceStep(id); }
+  else if(allAnswered()){ applyFilters(); }
+}
+
+function confirmMulti(od,id){
+  const vals=[...od.querySelectorAll("button:not(.co-ok).sel")].map(b=>b.textContent);
+  const isNew=!(id in resp);
+  resp[id]=vals; chatToFilters(id,vals);
+  if(isNew){
+    userMsg(vals.length?vals.join(', '):'Todas las zonas');
+    advanceStep(id);
+  } else if(allAnswered()){ applyFilters(); }
+}
+
+function confirmRange(od,id,mn,mx){
+  const val=[mn.value,mx.value];
+  const isNew=!(id in resp);
+  resp[id]=val; chatToFilters(id,val);
+  const lbl=[val[0]?`desde ${val[0]}`:'',val[1]?`hasta ${val[1]}`:''].filter(Boolean).join(' ')||'Sin límite';
+  if(isNew){ userMsg(lbl); advanceStep(id); }
+  else if(allAnswered()){ applyFilters(); }
+}
+
+function advanceStep(id){
+  const idx=STEPS.findIndex(s=>s.id===id);
+  step=idx+1;
+  setTimeout(()=>{
+    if(step<STEPS.length) botMsg(STEPS[step].q(),STEPS[step]);
+    else{ botMsg("Buscando alternativas..."); setTimeout(applyFilters,500); }
+  },300);
+}
+
+function allAnswered(){ return STEPS.every(s=>s.id in resp); }
 
 function chatToFilters(id,val){
   if(id==='zona'){
-    document.querySelectorAll('input[name="zona"]').forEach(c=>{c.checked=val!=='Todas las zonas'&&c.value===val;});
+    const vals=Array.isArray(val)?val:[];
+    document.querySelectorAll('input[name="zona"]').forEach(c=>{c.checked=vals.includes(c.value);});
   } else if(id==='sup'){
-    const map={'Hasta 1.000 m²':['','1000'],'1.000 – 3.000 m²':['1000','3000'],'3.000 – 8.000 m²':['3000','8000'],'Más de 8.000 m²':['8000',''],'Sin límite':['','']};
-    const v=map[val]||['',''];
-    document.getElementById('fsmn').value=v[0];document.getElementById('fsmx').value=v[1];
+    const v=Array.isArray(val)?val:['',''];
+    document.getElementById('fsmn').value=v[0]||''; document.getElementById('fsmx').value=v[1]||'';
   } else if(id==='rent'){
-    const map={'Hasta USD 15/m²':['','15'],'USD 15 – 22/m²':['15','22'],'USD 22 – 28/m²':['22','28'],'Más de USD 28/m²':['28',''],'Indiferente':['','']};
-    const v=map[val]||['',''];
-    document.getElementById('frmn').value=v[0];document.getElementById('frmx').value=v[1];
+    const v=Array.isArray(val)?val:['',''];
+    document.getElementById('frmn').value=v[0]||''; document.getElementById('frmx').value=v[1]||'';
   } else if(id==='cat'){
-    const map={'A+ / A+ LEED':['A+ LEED Gold','A+ LEED','A+'],'A':['A'],'B+ o inferior':['B+','B'],'Indiferente':[]};
-    const allowed=map[val]||[];
-    document.querySelectorAll('input[name="cat"]').forEach(c=>{c.checked=allowed.includes(c.value);});
+    const vals=Array.isArray(val)?val:[];
+    document.querySelectorAll('input[name="cat"]').forEach(c=>{c.checked=vals.includes(c.value);});
   } else if(id==='cant'){
-    document.getElementById('fcant').value=val==='Todas'?'0':val;
+    document.getElementById('fcant').value=val==='Todas'?'0':(val||'10');
   }
-}
-
-function pick(val,od){
-  od.querySelectorAll("button").forEach(b=>{b.classList.toggle("sel",b.textContent===val);b.disabled=true;});
-  userMsg(val);
-  const id=STEPS[step].id;
-  resp[id]=val;
-  chatToFilters(id,val);
-  step++;
-  setTimeout(()=>{
-    if(step<STEPS.length)botMsg(STEPS[step].q(),STEPS[step].opts);
-    else{botMsg("Buscando alternativas...");setTimeout(applyFilters,500);}
-  },300);
 }
 
 window.toggleFilters=()=>{
