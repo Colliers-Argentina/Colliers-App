@@ -546,7 +546,7 @@ function parseCSV(csv){
       supPlanta:parseFloat((v[c("Sup. Promedio Planta m²")]||"0").replace(/\./g,"").replace(",","."))||0,
       rent:v[c("Asking Rent USD/m²")]||"–",
       comentarios:v[c("Comentarios / Amenities")]||"–",
-      foto:v[c("URL Foto")]||,
+      foto:v[c("URL Foto")]||"",
     };
   }).filter(Boolean);
 }
