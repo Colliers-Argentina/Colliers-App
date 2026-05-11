@@ -928,9 +928,10 @@ window.generarPPT=async()=>{
   ];
   const portadaURL=portadas[Math.floor(Math.random()*portadas.length)];
   const fotos=await Promise.all(sp.map(p=>p.foto?imgToBase64(p.foto):Promise.resolve(null)));
-  const [logoB64,portadaB64]=await Promise.all([
+  const [logoB64,portadaB64,mapaB64]=await Promise.all([
     imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png"),
-    imgToBase64(portadaURL)
+    imgToBase64(portadaURL),
+    imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/mapa-mercado.png")
   ]);
   msg.textContent="Preparando presentación…";
   try{
@@ -955,6 +956,27 @@ window.generarPPT=async()=>{
     s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
     if(logoB64){s0.addImage({data:logoB64,x:11.1,y:0.1,w:2.0,h:0.85});}
     else{s0.addText("Colliers",{x:10.3,y:0.1,w:2.8,h:0.8,fontSize:18,bold:true,color:DARK,align:"right",fontFace:"Open Sans"});}
+
+    // OVERVIEW DE MERCADO
+    const overviewData={edificios:'162',inventario:'2.015.770 m²',supDisponible:'292.297 m²',vacancia:'14,50%',askingRent:'22,57 USD/m²',fecha:'Q1 2026'};
+    const s1=pptx.addSlide();
+    s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+    s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.1,fill:{color:DARK}});
+    s1.addText("Resumen informe de mercado "+overviewData.fecha,{x:0.3,y:0.08,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s1.addText("General Data",{x:0.3,y:0.65,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
+    if(logoB64){s1.addImage({data:logoB64,x:11.1,y:0.1,w:2.0,h:0.85});}
+    if(mapaB64){s1.addImage({data:mapaB64,x:0,y:1.1,w:5.5,h:6.1});}
+    else{s1.addShape(pptx.ShapeType.rect,{x:0,y:1.1,w:5.5,h:6.1,fill:{color:"DBE5FF"}});}
+    const ovItems=[["Edificios",overviewData.edificios],["Inventario",overviewData.inventario],["Sup. Disponible",overviewData.supDisponible],["Vacancia",overviewData.vacancia],["Asking Rent promedio",overviewData.askingRent]];
+    const RX=5.9,RW=7.1;
+    ovItems.forEach(([lbl,val],i)=>{
+      const iy=1.3+i*1.0;
+      if(i>0)s1.addShape(pptx.ShapeType.rect,{x:RX,y:iy-0.1,w:RW,h:0.015,fill:{color:"DBE5FF"}});
+      s1.addText(lbl,{x:RX,y:iy,w:RW,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
+      s1.addText(val,{x:RX,y:iy+0.38,w:RW,h:0.45,fontSize:16,color:"353E59",fontFace:"Open Sans"});
+    });
+    s1.addShape(pptx.ShapeType.rect,{x:7.8,y:6.65,w:5.2,h:0.6,fill:{color:MID}});
+    s1.addText("Para más información →",{x:7.8,y:6.65,w:5.2,h:0.6,fontSize:13,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:"https://colliersar.my.canva.site/reporte-de-oficinas-q1-2026",tooltip:"Ver reporte completo"}});
 
     // TABLA COMPARATIVA
     if(document.getElementById("it").checked){
