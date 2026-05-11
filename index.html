@@ -540,7 +540,7 @@ function parseCSV(csv){
 function parseLine(line){
   const r=[];let cur="",inQ=false;
   for(let i=0;i<line.length;i++){
-    if(line[i]=='"'){inQ=!inQ;continue;}
+    if(line[i]==="\""){inQ=!inQ;continue;}
     if(line[i]===","&&!inQ){r.push(cur.trim());cur="";continue;}
     cur+=line[i];
   }
@@ -781,15 +781,7 @@ function renderListView(){
   h+='<th class="lcc"></th><th>Foto</th><th>Edificio</th><th>Submercado</th><th>Cat.</th><th>Sup. disp. m²</th><th>Asking Rent</th>';
   h+='</tr></thead><tbody>';
   filt.forEach((p,i)=>{
-    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}">
-      <td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td>
-      <td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\'lph\'>🏢</div>'">`:'<div class="lph">🏢</div>'}</td>
-      <td class="lname">${p.nombre}</td>
-      <td>${p.submercado}</td>
-      <td><span class="cb">${p.cat}</span></td>
-      <td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span></td>
-      <td><span class="rent-v">USD ${p.rent}</span></td>
-    </tr>`;
+    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}"><td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td><td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\'lph\'>🏢</div>'">`:'<div class="lph">🏢</div>'}</td><td class="lname">${p.nombre}</td><td>${p.submercado}</td><td><span class="cb">${p.cat}</span></td><td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span></td><td><span class="rent-v">USD ${p.rent}</span></td></tr>`;
   });
   h+='</tbody></table>';
   ct.innerHTML=h;
@@ -822,12 +814,7 @@ function renderCompView(){
 
   h+='<tr class="photo-row"><td class="lcell-top"></td>';
   filt.forEach((p,i)=>{
-    h+=`<td class="pcell coli-${i}">
-      <div class="pcell-inner">
-        <input type="checkbox" class="col-cb" id="cb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)">
-        ${p.foto?`<img src="${p.foto}" class="prop-img" onerror="this.outerHTML='<div class=\'ph-img\'>🏢</div>'">`:'<div class="ph-img">🏢</div>'}
-      </div>
-    </td>`;
+    h+=`<td class="pcell coli-${i}"><div class="pcell-inner"><input type="checkbox" class="col-cb" id="cb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)">${p.foto?`<img src="${p.foto}" class="prop-img" onerror="this.outerHTML='<div class=\'ph-img\'>🏢</div>'">`:'<div class="ph-img">🏢</div>'}</div></td>`;
   });
   h+='</tr>';
 
@@ -858,12 +845,10 @@ function renderCompView(){
 }
 
 function _highlightCol(i,on){
-  // List view
   const lr=document.getElementById(`lr-${i}`);
   if(lr)lr.className=on?'lsr':'';
   const lcb=document.getElementById(`lcb-${i}`);
   if(lcb)lcb.checked=on;
-  // Comp view
   const pcell=document.querySelector(`.photo-row .coli-${i}`);
   if(pcell)pcell.style.background=on?'#EAF0FF':'';
   const nbcell=document.querySelector(`.num-row .coli-${i}`);
@@ -908,55 +893,19 @@ function updatePreview(){
   const grid=document.getElementById("preview-thumbs");
   let h='';
 
-  // Cover slide
-  h+=`<div class="thumb-card">
-    <div class="thumb-slide">
-      <div class="thumb-cover-s">
-        <div class="tc-brand">Colliers</div>
-        <div class="tc-bar"></div>
-        <div class="tc-title">Alternativas de Oficinas</div>
-      </div>
-    </div>
-    <div class="thumb-name">Portada</div>
-  </div>`;
+  h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-cover-s"><div class="tc-brand">Colliers</div><div class="tc-bar"></div><div class="tc-title">Alternativas de Oficinas</div></div></div><div class="thumb-name">Portada</div></div>`;
 
-  // Table comparison slides
   if(document.getElementById("it").checked){
     const ng=Math.ceil(sp.length/6);
     for(let g=0;g<ng;g++){
       const cols=sp.slice(g*6,(g+1)*6);
-      h+=`<div class="thumb-card">
-        <div class="thumb-slide">
-          <div class="thumb-table-s">
-            <div class="tt-hdr"></div>
-            <div class="tt-body">
-              <div class="tt-label-col"></div>
-              <div class="tt-data-cols">${cols.map(()=>'<div class="tt-dcol"></div>').join('')}</div>
-            </div>
-          </div>
-        </div>
-        <div class="thumb-name">Tabla ${ng>1?`${g+1}/${ng}`:''}</div>
-      </div>`;
+      h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-table-s"><div class="tt-hdr"></div><div class="tt-body"><div class="tt-label-col"></div><div class="tt-data-cols">${cols.map(()=>'<div class="tt-dcol"></div>').join('')}</div></div></div></div><div class="thumb-name">Tabla ${ng>1?`${g+1}/${ng}`:''}</div></div>`;
     }
   }
 
-  // Individual ficha slides
   if(document.getElementById("if").checked){
     sp.forEach((p,i)=>{
-      h+=`<div class="thumb-card">
-        <div class="thumb-slide">
-          <div class="thumb-ficha-s">
-            <div class="tf-hdr"></div>
-            <div class="tf-img"></div>
-            <div class="tf-rows">
-              <div class="tf-row"></div>
-              <div class="tf-row"></div>
-              <div class="tf-row"></div>
-            </div>
-          </div>
-        </div>
-        <div class="thumb-name">${i+1}. ${p.nombre}</div>
-      </div>`;
+      h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-ficha-s"><div class="tf-hdr"></div><div class="tf-img"></div><div class="tf-rows"><div class="tf-row"></div><div class="tf-row"></div><div class="tf-row"></div></div></div></div><div class="thumb-name">${i+1}. ${p.nombre}</div></div>`;
     });
   }
 
@@ -993,23 +942,18 @@ window.generarPPT=async()=>{
 
     // PORTADA
     const s0=pptx.addSlide();
-    // Fondo: foto aleatoria o gris claro si no carga
     if(portadaB64){s0.addImage({data:portadaB64,x:0,y:0,w:13.33,h:7.5});}
     else{s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});}
-    // Bloque azul izquierdo
-    s0.addShape(pptx.ShapeType.rect,{x:0,y:1.5,w:5.5,h:3.2,fill:{color:MID}});
-    s0.addText("Informe de Alternativas",{x:0.3,y:1.7,w:5.0,h:1.3,fontSize:26,bold:true,color:WHITE,fontFace:"Open Sans"});
-    s0.addText(cliente,{x:0.3,y:3.1,w:5.0,h:0.65,fontSize:15,italic:true,color:WHITE,fontFace:"Open Sans"});
-    // Bloque blanco debajo del azul
-    s0.addShape(pptx.ShapeType.rect,{x:0,y:4.7,w:5.5,h:1.5,fill:{color:WHITE}});
-    s0.addText(fechaStr,{x:0.3,y:4.85,w:5.0,h:0.38,fontSize:13,bold:true,color:DARK,fontFace:"Open Sans"});
-    s0.addText(`Preparado para: ${prepPara}`,{x:0.3,y:5.27,w:5.0,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
-    s0.addText("Preparado por: Colliers Argentina",{x:0.3,y:5.65,w:5.0,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
-    // "Accelerating success." abajo a la izquierda sobre fondo oscuro
-    s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:5.5,h:0.6,fill:{color:DEEP}});
-    s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.0,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Open Sans"});
-    // Logo Colliers esquina superior derecha
-    if(logoB64){s0.addImage({data:logoB64,x:11.8,y:0.15,w:1.2,h:0.5});}
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:1.2,w:5.8,h:3.8,fill:{color:MID}});
+    s0.addText("Informe de Alternativas",{x:0.3,y:1.4,w:5.4,h:1.5,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s0.addText(cliente,{x:0.3,y:3.3,w:5.4,h:0.65,fontSize:16,italic:true,color:WHITE,fontFace:"Merriweather"});
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:5.0,w:5.8,h:1.5,fill:{color:WHITE}});
+    s0.addText(fechaStr,{x:0.3,y:5.1,w:5.4,h:0.38,fontSize:13,bold:true,color:DARK,fontFace:"Open Sans"});
+    s0.addText(`Preparado para: ${prepPara}`,{x:0.3,y:5.52,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
+    s0.addText("Preparado por: Colliers Argentina",{x:0.3,y:5.9,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:5.8,h:0.6,fill:{color:DEEP}});
+    s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
+    if(logoB64){s0.addImage({data:logoB64,x:11.5,y:0.1,w:1.5,h:0.6});}
     else{s0.addText("Colliers",{x:10.3,y:0.1,w:2.8,h:0.8,fontSize:18,bold:true,color:DARK,align:"right",fontFace:"Open Sans"});}
 
     // TABLA COMPARATIVA
