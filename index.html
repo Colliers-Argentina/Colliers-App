@@ -553,17 +553,23 @@ function populateZonas(){
   STEPS[0].opts=zonas;
 }
 
-async function imgToBase64(url){
-  try{
-    const resp=await fetch(url);
-    const blob=await resp.blob();
-    return new Promise((res,rej)=>{
-      const reader=new FileReader();
-      reader.onloadend=()=>res(reader.result);
-      reader.onerror=rej;
-      reader.readAsDataURL(blob);
-    });
-  }catch(e){return null;}
+async function imgToBase64(url) {
+  if (!url) return null;
+  const urls = [url, `https://corsproxy.io/?${encodeURIComponent(url)}`];
+  for (const u of urls) {
+    try {
+      const resp = await fetch(u, {mode:'cors'});
+      if (!resp.ok) continue;
+      const blob = await resp.blob();
+      return await new Promise((res,rej) => {
+        const r = new FileReader();
+        r.onloadend = () => res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(blob);
+      });
+    } catch(e) { continue; }
+  }
+  return null;
 }
 
 const STEPS=[
