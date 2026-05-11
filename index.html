@@ -384,6 +384,8 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
             <div class="pers-col">
               <div class="pers-lbl">Cliente / Informe</div>
               <input type="text" id="kc" class="pers-input" placeholder="Ej: Securitas · Mayo 2026">
+              <div class="pers-lbl" style="margin-top:.5rem">Preparado para</div>
+              <input type="text" id="kp" class="pers-input" placeholder="Ej: Securitas SA">
             </div>
             <div class="pers-col">
               <div class="pers-lbl">Contenido</div>
@@ -967,25 +969,38 @@ window.generarPPT=async()=>{
   const btn=document.getElementById("bp");
   const msg=document.getElementById("sm");
   const cliente=document.getElementById("kc").value.trim()||"Colliers International";
+  const prepPara=document.getElementById("kp").value.trim()||cliente;
   btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generando…';
   msg.textContent="Cargando imágenes…";
   const fotos=await Promise.all(sp.map(p=>p.foto?imgToBase64(p.foto):Promise.resolve(null)));
+  const logoB64=await imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png");
   msg.textContent="Preparando presentación…";
   try{
     const pptx=new window.PptxGenJS();
     pptx.layout="LAYOUT_WIDE";
     const DARK="25408F",MID="1C54F4",PALE="C3E6FF",WHITE="FFFFFF",DEEP="000759";
+    const meses=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    const fechaStr=`${meses[new Date().getMonth()]} ${new Date().getFullYear()}`;
 
     // PORTADA
     const s0=pptx.addSlide();
-    s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:"66%",h:"100%",fill:{color:DARK}});
-    s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:"66%",h:0.06,fill:{color:MID}});
-    s0.addText("Colliers",{x:0.5,y:0.4,w:5,h:0.9,fontSize:42,bold:true,color:WHITE,fontFace:"Open Sans"});
-    s0.addText("Alternativas de Oficinas",{x:0.5,y:1.5,w:8,h:1,fontSize:30,bold:true,color:WHITE,fontFace:"Open Sans"});
-    s0.addText(cliente,{x:0.5,y:2.6,w:7,h:0.5,fontSize:16,color:PALE,fontFace:"Open Sans"});
-    s0.addShape(pptx.ShapeType.rect,{x:0.5,y:3.25,w:2.8,h:0.55,fill:{color:MID}});
-    s0.addText(`${sp.length} alternativa${sp.length!==1?"s":""}`,{x:0.5,y:3.25,w:2.8,h:0.55,fontSize:13,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
-    s0.addText("Accelerating success.",{x:0.5,y:6.8,w:5,h:0.35,fontSize:10,italic:true,color:PALE,fontFace:"Open Sans"});
+    // Fondo gris claro (toda la slide)
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});
+    // Bloque azul izquierdo (60% ancho, zona media)
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:2.0,w:8,h:2.6,fill:{color:MID}});
+    s0.addText("Informe de Alternativas",{x:0.4,y:2.25,w:7.2,h:1.1,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s0.addText(cliente,{x:0.4,y:3.4,w:7.2,h:0.65,fontSize:16,italic:true,color:WHITE,fontFace:"Open Sans"});
+    // Bloque blanco debajo del azul
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:4.6,w:8,h:2.3,fill:{color:WHITE}});
+    s0.addText(fechaStr,{x:0.4,y:4.8,w:7.2,h:0.45,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
+    s0.addText(`Preparado para: ${prepPara}`,{x:0.4,y:5.3,w:7.2,h:0.4,fontSize:11,color:"353E59",fontFace:"Open Sans"});
+    s0.addText("Preparado por: Colliers Argentina",{x:0.4,y:5.75,w:7.2,h:0.4,fontSize:11,color:"353E59",fontFace:"Open Sans"});
+    // Franja oscura inferior izquierda: "Accelerating success."
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:8,h:0.6,fill:{color:DEEP}});
+    s0.addText("Accelerating success.",{x:0.4,y:6.9,w:7.2,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Open Sans"});
+    // Logo Colliers esquina superior derecha
+    if(logoB64){s0.addImage({data:logoB64,x:10.8,y:0.2,w:2.2,h:0.6});}
+    else{s0.addText("Colliers",{x:10.3,y:0.1,w:2.8,h:0.8,fontSize:18,bold:true,color:DARK,align:"right",fontFace:"Open Sans"});}
 
     // TABLA COMPARATIVA
     if(document.getElementById("it").checked){
