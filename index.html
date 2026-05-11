@@ -532,7 +532,7 @@ function parseCSV(csv){
       supPlanta:parseFloat((v[c("Sup. Promedio Planta m²")]||"0").replace(/\./g,"").replace(",","."))||0,
       rent:v[c("Asking Rent USD/m²")]||"–",
       comentarios:v[c("Comentarios / Amenities")]||"–",
-      foto:v[c("URL Foto")]||"",
+      foto:v[c("URL Foto")]||,
     };
   }).filter(Boolean);
 }
@@ -953,7 +953,7 @@ window.generarPPT=async()=>{
     s0.addText("Preparado por: Colliers Argentina",{x:0.3,y:5.9,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
     s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:5.8,h:0.6,fill:{color:DEEP}});
     s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
-    if(logoB64){s0.addImage({data:logoB64,x:11.5,y:0.1,w:1.5,h:0.6});}
+    if(logoB64){s0.addImage({data:logoB64,x:11.1,y:0.1,w:2.0,h:0.85});}
     else{s0.addText("Colliers",{x:10.3,y:0.1,w:2.8,h:0.8,fontSize:18,bold:true,color:DARK,align:"right",fontFace:"Open Sans"});}
 
     // TABLA COMPARATIVA
