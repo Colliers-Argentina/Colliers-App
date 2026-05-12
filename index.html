@@ -660,11 +660,10 @@ let _logoB64=null;
 async function addLogo(slide,grande=false){
   if(!_logoB64)_logoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png');
   if(_logoB64){
-    const w=grande?2.6:2.0;
-    const h=grande?1.0:0.77;
+    const w=1.67,h=0.95;
     const x=13.33-w-0.1;
-    const y=0.05;
-    slide.addImage({data:_logoB64,x,y,w,h,sizing:{type:'contain',w,h}});
+    const y=0.08;
+    slide.addImage({data:_logoB64,x,y,w,h});
   }
 }
 
