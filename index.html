@@ -7,6 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Open Sans',Verdana,sans-serif;background:#F0F4FF;color:#000759;min-height:100vh}
@@ -241,10 +244,22 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
     <div class="nu" id="nu">
       <div class="na" id="na">MA</div>
       <span class="nname" id="nn"></span>
+      <button class="nbtn" id="admin-btn" onclick="toggleAdmin()" style="display:none">Ver registros</button>
       <button class="nbtn" onclick="logout()">Salir</button>
     </div>
   </div>
 </nav>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:#F0F4FF;z-index:150;overflow-y:auto;padding:2rem">
+  <div style="max-width:1400px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+      <h2 style="color:#25408F;font-size:20px;font-weight:700">Registros de descargas PPT</h2>
+      <button onclick="toggleAdmin()" style="background:#25408F;border:none;color:#fff;font-family:inherit;font-size:12px;padding:6px 16px;cursor:pointer">✕ Cerrar</button>
+    </div>
+    <div id="admin-table-wrap"><p style="color:#56648F;font-size:13px">Cargando...</p></div>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div id="ls">
@@ -384,7 +399,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
             <div class="pers-col">
               <div class="pers-lbl">Cliente / Informe</div>
               <input type="text" id="kc" class="pers-input" placeholder="Ej: Securitas · Mayo 2026">
-              <div class="pers-lbl" style="margin-top:.5rem">Preparado para</div>
+              <div class="pers-lbl" style="margin-top:.5rem">Preparado para <span style="color:#ED1B34">*</span></div>
               <input type="text" id="kp" class="pers-input" placeholder="Ej: Securitas SA">
             </div>
             <div class="pers-col">
@@ -394,6 +409,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
                 <label class="chk-item"><input type="checkbox" id="if" checked> Slides individuales por alternativa</label>
                 <label class="chk-item"><input type="checkbox" id="idet"> Detalle técnico</label>
                 <label class="chk-item"><input type="checkbox" id="icon"> Conclusiones y recomendación</label>
+                <label class="chk-item"><input type="checkbox" id="iai"> Conclusiones y recomendación IA</label>
               </div>
             </div>
             <div class="pers-col">
@@ -441,8 +457,22 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=1012730079&single=true&output=csv";
 const DOM = "gmail.com";
 const CLIENT_ID = "312606519681-q1bkpeug6sonp48bc6842o02hs71uma2.apps.googleusercontent.com";
+const ANTHROPIC_API_KEY = ""; // completar con clave Anthropic
+const GOOGLE_MAPS_KEY = ""; // completar con clave Google Maps Static API
+const EMAILJS_SERVICE_ID = ""; // completar
+const EMAILJS_TEMPLATE_ID = ""; // completar
+const EMAILJS_PUBLIC_KEY = ""; // completar
+const FIREBASE_CONFIG = {}; // completar con config de Firebase
 
-let user=null, props=[], filt=[], sel=new Set();
+let db = null;
+try{
+  if(Object.keys(FIREBASE_CONFIG).length){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore();
+  }
+}catch(e){console.warn("Firebase no configurado:",e);}
+
+let user=null, props=[], filt=[], sel=new Set(), overviewData={};
 
 function decodeJWT(token){
   const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
@@ -482,7 +512,8 @@ function onUserLoggedIn(){
   document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
   document.getElementById('nu').style.display='flex';
   show('as');
-  loadData().then(()=>startChat((user.displayName||'').split(' ')[0]||'Broker'));
+  if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
+  Promise.all([loadData(),cargarOverview()]).then(()=>startChat((user.displayName||'').split(' ')[0]||'Broker'));
 }
 
 window.loginGoogle=()=>{google.accounts.id.prompt();};
@@ -510,6 +541,26 @@ async function loadData(){
   }catch(e){console.error(e);}
 }
 
+async function cargarOverview(){
+  const OVERVIEW_CSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=824813475&single=true&output=csv";
+  try{
+    const r=await fetch(OVERVIEW_CSV);
+    const csv=await r.text();
+    console.log("Overview CSV raw:",csv);
+    const lines=csv.split("\n").filter(l=>l.trim());
+    overviewData={};
+    lines.forEach(line=>{
+      const cols=parseLine(line);
+      if(cols.length>=2&&cols[0]){
+        const key=cols[0].replace(/"/g,"").trim();
+        const val=cols[1].replace(/"/g,"").trim();
+        overviewData[key]=val;
+      }
+    });
+    console.log("Overview parsed:",JSON.stringify(overviewData));
+  }catch(e){console.error("Overview CSV error:",e);}
+}
+
 function parseCSV(csv){
   const lines=csv.split("\n").filter(l=>l.trim());
   if(lines.length<2)return[];
@@ -530,6 +581,7 @@ function parseCSV(csv){
       supDisp:parseFloat((v[c("Superficie Disponible m²")]||"0").replace(/\./g,"").replace(",","."))||0,
       pisosDisp:v[c("Pisos Disponibles")]||"–",
       supPlanta:parseFloat((v[c("Sup. Promedio Planta m²")]||"0").replace(/\./g,"").replace(",","."))||0,
+      supMinima:parseFloat((v[c("Sup. Mínima Divisible m²")]||"0").replace(/\./g,"").replace(",","."))||0,
       rent:v[c("Asking Rent USD/m²")]||"–",
       comentarios:v[c("Comentarios / Amenities")]||"–",
       foto:v[c("URL Foto")]||"",
@@ -540,7 +592,7 @@ function parseCSV(csv){
 function parseLine(line){
   const r=[];let cur="",inQ=false;
   for(let i=0;i<line.length;i++){
-    if(line[i]==='"'){inQ=!inQ;continue;}
+    if(line[i]==="\""){inQ=!inQ;continue;}
     if(line[i]===","&&!inQ){r.push(cur.trim());cur="";continue;}
     cur+=line[i];
   }
@@ -576,9 +628,9 @@ async function imgToBase64(url) {
 
 const STEPS=[
   {id:"zona",     type:"multi",  confirm:"Confirmar zona",
-   q:n=>`¡Hola ${n}! ¿En qué zona o zonas querés buscar?`, opts:[]},
+   q:n=>`¡Hola ${n}! ¿En qué zona o zonas querés buscar? <span style="color:#ED1B34;font-size:10px;font-weight:700;">* obligatorio</span>`, opts:[]},
   {id:"sup",      type:"range",  ph:["Mínimo m²","Máximo m²"],
-   q:()=>"¿Qué superficie necesitás? (m²)"},
+   q:()=>`¿Qué superficie necesitás? (m²) <span style="color:#ED1B34;font-size:10px;font-weight:700;">* obligatorio</span>`},
   {id:"rent",     type:"range",  ph:["Mínimo USD/m²","Máximo USD/m²"],
    q:()=>"¿Cuál es el rango de Asking Rent? (USD/m²)"},
   {id:"cocheras", type:"single",
@@ -615,7 +667,7 @@ function botMsg(txt, stepDef){
   const av=document.createElement("img"); av.className="msg-av";
   av.src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png";
   const m=document.createElement("div");
-  m.className="msg mb"; m.textContent=txt;
+  m.className="msg mb"; m.innerHTML=txt;
   row.appendChild(av); row.appendChild(m); w.appendChild(row);
   if(!stepDef){w.scrollTop=w.scrollHeight;return;}
 
@@ -740,7 +792,7 @@ function applyFilters(){
   let r=props.filter(p=>{
     if(zonas.length&&!zonas.some(z=>p.submercado===z))return false;
     const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
-    if(supMin&&supRef<supMin)return false;
+    if(supMin&&p.supDisp<supMin&&(p.supPlanta||0)<supMin&&(p.supMinima||0)<supMin)return false;
     if(supMax<Infinity&&supRef>supMax)return false;
     const rn=parseFloat(String(p.rent).split('–')[0].replace(',','.'))||0;
     if(rentMin&&rn<rentMin)return false;
@@ -781,15 +833,7 @@ function renderListView(){
   h+='<th class="lcc"></th><th>Foto</th><th>Edificio</th><th>Submercado</th><th>Cat.</th><th>Sup. disp. m²</th><th>Asking Rent</th>';
   h+='</tr></thead><tbody>';
   filt.forEach((p,i)=>{
-    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}">
-      <td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td>
-      <td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\\'lph\\'>🏢</div>'">`:'<div class="lph">🏢</div>'}</td>
-      <td class="lname">${p.nombre}</td>
-      <td>${p.submercado}</td>
-      <td><span class="cb">${p.cat}</span></td>
-      <td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span></td>
-      <td><span class="rent-v">USD ${p.rent}</span></td>
-    </tr>`;
+    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}"><td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td><td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\'lph\'>🏢</div>'">`:'<div class="lph">🏢</div>'}</td><td class="lname">${p.nombre}</td><td>${p.submercado}</td><td><span class="cb">${p.cat}</span></td><td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span></td><td><span class="rent-v">USD ${p.rent}</span></td></tr>`;
   });
   h+='</tbody></table>';
   ct.innerHTML=h;
@@ -822,12 +866,7 @@ function renderCompView(){
 
   h+='<tr class="photo-row"><td class="lcell-top"></td>';
   filt.forEach((p,i)=>{
-    h+=`<td class="pcell coli-${i}">
-      <div class="pcell-inner">
-        <input type="checkbox" class="col-cb" id="cb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)">
-        ${p.foto?`<img src="${p.foto}" class="prop-img" onerror="this.outerHTML='<div class=\\'ph-img\\'>🏢</div>'">`:'<div class="ph-img">🏢</div>'}
-      </div>
-    </td>`;
+    h+=`<td class="pcell coli-${i}"><div class="pcell-inner"><input type="checkbox" class="col-cb" id="cb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)">${p.foto?`<img src="${p.foto}" class="prop-img" onerror="this.outerHTML='<div class=\'ph-img\'>🏢</div>'">`:'<div class="ph-img">🏢</div>'}</div></td>`;
   });
   h+='</tr>';
 
@@ -858,12 +897,10 @@ function renderCompView(){
 }
 
 function _highlightCol(i,on){
-  // List view
   const lr=document.getElementById(`lr-${i}`);
   if(lr)lr.className=on?'lsr':'';
   const lcb=document.getElementById(`lcb-${i}`);
   if(lcb)lcb.checked=on;
-  // Comp view
   const pcell=document.querySelector(`.photo-row .coli-${i}`);
   if(pcell)pcell.style.background=on?'#EAF0FF':'';
   const nbcell=document.querySelector(`.num-row .coli-${i}`);
@@ -908,55 +945,19 @@ function updatePreview(){
   const grid=document.getElementById("preview-thumbs");
   let h='';
 
-  // Cover slide
-  h+=`<div class="thumb-card">
-    <div class="thumb-slide">
-      <div class="thumb-cover-s">
-        <div class="tc-brand">Colliers</div>
-        <div class="tc-bar"></div>
-        <div class="tc-title">Alternativas de Oficinas</div>
-      </div>
-    </div>
-    <div class="thumb-name">Portada</div>
-  </div>`;
+  h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-cover-s"><div class="tc-brand">Colliers</div><div class="tc-bar"></div><div class="tc-title">Alternativas de Oficinas</div></div></div><div class="thumb-name">Portada</div></div>`;
 
-  // Table comparison slides
   if(document.getElementById("it").checked){
     const ng=Math.ceil(sp.length/6);
     for(let g=0;g<ng;g++){
       const cols=sp.slice(g*6,(g+1)*6);
-      h+=`<div class="thumb-card">
-        <div class="thumb-slide">
-          <div class="thumb-table-s">
-            <div class="tt-hdr"></div>
-            <div class="tt-body">
-              <div class="tt-label-col"></div>
-              <div class="tt-data-cols">${cols.map(()=>'<div class="tt-dcol"></div>').join('')}</div>
-            </div>
-          </div>
-        </div>
-        <div class="thumb-name">Tabla ${ng>1?`${g+1}/${ng}`:''}</div>
-      </div>`;
+      h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-table-s"><div class="tt-hdr"></div><div class="tt-body"><div class="tt-label-col"></div><div class="tt-data-cols">${cols.map(()=>'<div class="tt-dcol"></div>').join('')}</div></div></div></div><div class="thumb-name">Tabla ${ng>1?`${g+1}/${ng}`:''}</div></div>`;
     }
   }
 
-  // Individual ficha slides
   if(document.getElementById("if").checked){
     sp.forEach((p,i)=>{
-      h+=`<div class="thumb-card">
-        <div class="thumb-slide">
-          <div class="thumb-ficha-s">
-            <div class="tf-hdr"></div>
-            <div class="tf-img"></div>
-            <div class="tf-rows">
-              <div class="tf-row"></div>
-              <div class="tf-row"></div>
-              <div class="tf-row"></div>
-            </div>
-          </div>
-        </div>
-        <div class="thumb-name">${i+1}. ${p.nombre}</div>
-      </div>`;
+      h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-ficha-s"><div class="tf-hdr"></div><div class="tf-img"></div><div class="tf-rows"><div class="tf-row"></div><div class="tf-row"></div><div class="tf-row"></div></div></div></div><div class="thumb-name">${i+1}. ${p.nombre}</div></div>`;
     });
   }
 
@@ -968,8 +969,13 @@ window.generarPPT=async()=>{
   if(!sp.length)return;
   const btn=document.getElementById("bp");
   const msg=document.getElementById("sm");
-  const cliente=document.getElementById("kc").value.trim()||"Colliers International";
-  const prepPara=document.getElementById("kp").value.trim()||cliente;
+  const cliente=document.getElementById("kc").value.trim()||"Colliers Internacional";
+  const kpVal=document.getElementById("kp").value.trim();
+  if(!('zona' in resp)){msg.style.color='#ED1B34';msg.textContent='⚠ Zona es obligatoria. Completá el chat primero.';return;}
+  if(!('sup' in resp)){msg.style.color='#ED1B34';msg.textContent='⚠ Superficie es obligatoria. Completá el chat primero.';return;}
+  if(!kpVal){msg.style.color='#ED1B34';msg.textContent='⚠ El campo "Preparado para" es obligatorio.';return;}
+  msg.style.color='';
+  const prepPara=kpVal;
   btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generando…';
   msg.textContent="Cargando imágenes…";
   const portadas=[
@@ -978,10 +984,18 @@ window.generarPPT=async()=>{
     'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%203.jpg'
   ];
   const portadaURL=portadas[Math.floor(Math.random()*portadas.length)];
+  const cierres=[
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Final%201.jpg',
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Final%202.jpg',
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Final%203.jpg'
+  ];
+  const cierreURL=cierres[Math.floor(Math.random()*cierres.length)];
   const fotos=await Promise.all(sp.map(p=>p.foto?imgToBase64(p.foto):Promise.resolve(null)));
-  const [logoB64,portadaB64]=await Promise.all([
+  const [logoB64,portadaB64,mapaB64,cierreB64]=await Promise.all([
     imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png"),
-    imgToBase64(portadaURL)
+    imgToBase64(portadaURL),
+    imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/mapa-mercado.png"),
+    imgToBase64(cierreURL)
   ]);
   msg.textContent="Preparando presentación…";
   try{
@@ -993,24 +1007,43 @@ window.generarPPT=async()=>{
 
     // PORTADA
     const s0=pptx.addSlide();
-    // Fondo: foto aleatoria o gris claro si no carga
     if(portadaB64){s0.addImage({data:portadaB64,x:0,y:0,w:13.33,h:7.5});}
     else{s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});}
-    // Bloque azul izquierdo
     s0.addShape(pptx.ShapeType.rect,{x:0,y:1.2,w:5.8,h:3.8,fill:{color:MID}});
     s0.addText("Informe de Alternativas",{x:0.3,y:1.4,w:5.4,h:1.5,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
     s0.addText(cliente,{x:0.3,y:3.3,w:5.4,h:0.65,fontSize:16,italic:true,color:WHITE,fontFace:"Merriweather"});
-    // Bloque blanco debajo del azul
     s0.addShape(pptx.ShapeType.rect,{x:0,y:5.0,w:5.8,h:1.5,fill:{color:WHITE}});
     s0.addText(fechaStr,{x:0.3,y:5.1,w:5.4,h:0.38,fontSize:13,bold:true,color:DARK,fontFace:"Open Sans"});
     s0.addText(`Preparado para: ${prepPara}`,{x:0.3,y:5.52,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
     s0.addText("Preparado por: Colliers Argentina",{x:0.3,y:5.9,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
-    // "Accelerating success." abajo a la izquierda sobre fondo oscuro
     s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:5.8,h:0.6,fill:{color:DEEP}});
     s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
-    // Logo Colliers esquina superior derecha
-    if(logoB64){s0.addImage({data:logoB64,x:11.5,y:0.1,w:1.5,h:0.6});}
+    if(logoB64){s0.addImage({data:logoB64,x:11.0,y:0.15,w:2.1,h:0.75,sizing:{type:"contain",w:2.1,h:0.75}});}
     else{s0.addText("Colliers",{x:10.3,y:0.1,w:2.8,h:0.8,fontSize:18,bold:true,color:DARK,align:"right",fontFace:"Open Sans"});}
+
+    // OVERVIEW DE MERCADO
+    const s1=pptx.addSlide();
+    s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+    s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
+    const ovTitulo="Resumen informe de mercado "+(overviewData['Fecha actualización']||'');
+    s1.addText(ovTitulo,{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s1.addText("General Data",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
+    if(logoB64){s1.addImage({data:logoB64,x:11.5,y:0.05,w:1.6,h:0.57,sizing:{type:"contain",w:1.6,h:0.57}});}
+    if(mapaB64){s1.addImage({data:mapaB64,x:0.2,y:1.3,w:5.8,h:5.2});}
+    else{s1.addShape(pptx.ShapeType.rect,{x:0.2,y:1.3,w:5.8,h:5.2,fill:{color:"DBE5FF"}});}
+    const ovBullets=[
+      {lbl:"Edificios",val:overviewData['Edificios']||'–'},
+      {lbl:"Inventario",val:(overviewData['Inventario m²']||'–')+" m²"},
+      {lbl:"Sup. Disponible",val:(overviewData['Sup. Disponible']||'–')+" m²"},
+      {lbl:"Vacancia",val:(overviewData['Vacancia %']||'–')+"%"},
+      {lbl:"Asking Rent prom",val:(overviewData['Asking Rent prom']||'–')+" USD/m²"},
+    ];
+    ovBullets.forEach(({lbl,val},i)=>{
+      const iy=2.0+i*0.7;
+      s1.addText([{text:"• "+lbl+":  ",options:{bold:true,color:DARK}},{text:val,options:{bold:false,color:"353E59"}}],{x:6,y:iy,w:7.0,h:0.55,fontSize:18,fontFace:"Open Sans",valign:"middle"});
+    });
+    s1.addShape(pptx.ShapeType.rect,{x:8.5,y:6.5,w:4.5,h:0.6,fill:{color:MID}});
+    s1.addText("Para más información →",{x:8.5,y:6.5,w:4.5,h:0.6,fontSize:13,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:"https://colliersar.my.canva.site/reporte-de-oficinas-q1-2026",tooltip:"Ver reporte completo"}});
 
     // TABLA COMPARATIVA
     if(document.getElementById("it").checked){
@@ -1094,14 +1127,14 @@ window.generarPPT=async()=>{
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:2.88,w:6.08,h:0.04,fill:{color:MID}});
         s.addText("Average Asking Rent",{x:7.0,y:1.0,w:6.08,h:0.38,fontSize:11,color:PALE,align:"center",fontFace:"Open Sans"});
         s.addText(`USD ${prop.rent} /m²`,{x:7.0,y:1.4,w:6.08,h:1.0,fontSize:28,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
-        s.addText("+ IVA",{x:7.0,y:2.42,w:6.08,h:0.3,fontSize:10,color:PALE,align:"center",fontFace:"Open Sans"});
+        s.addText("+IVA",{x:7.0,y:2.42,w:6.08,h:0.3,fontSize:10,color:PALE,align:"center",fontFace:"Open Sans"});
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:3.55,fill:{color:WHITE}});
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:0.38,fill:{color:"DBE5FF"}});
         s.addText("Características y amenities",{x:7.15,y:3.14,w:5.8,h:0.3,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
         s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
         const fb64=fotos[idx];
         if(fb64){s.addImage({data:fb64,x:0.25,y:5.1,w:6.5,h:2.0});}
-        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"});}
+        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"}); }
         const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
         s.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",align:'left',wrap:true,fontFace:'Open Sans'});
         s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
@@ -1110,9 +1143,105 @@ window.generarPPT=async()=>{
       }
     }
 
+    // SLIDE CONCLUSIONES IA
+    if(document.getElementById("iai")?.checked&&ANTHROPIC_API_KEY){
+      try{
+        msg.textContent="Generando análisis IA…";
+        const aiPrompt=`Analizá estas ${sp.length} alternativas de oficinas y generá 3 recomendaciones concretas: ${sp.map(p=>p.nombre+' '+p.submercado+' USD'+p.rent).join(', ')}`;
+        const aiResp=await fetch("https://api.anthropic.com/v1/messages",{
+          method:"POST",
+          headers:{"x-api-key":ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},
+          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:500,messages:[{role:"user",content:aiPrompt}]})
+        });
+        if(aiResp.ok){
+          const aiData=await aiResp.json();
+          const aiText=aiData.content?.[0]?.text||"Sin análisis disponible.";
+          const sAI=pptx.addSlide();
+          sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+          sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
+          sAI.addText("Conclusiones y Recomendaciones",{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+          sAI.addText("Análisis generado por IA · Colliers",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
+          if(logoB64){sAI.addImage({data:logoB64,x:11.5,y:0.05,w:1.6,h:0.57,sizing:{type:"contain",w:1.6,h:0.57}});}
+          const aiLines=aiText.split("\n").filter(l=>l.trim());
+          aiLines.forEach((line,i)=>{
+            const ly=1.5+i*0.85;
+            if(ly>6.5)return;
+            const isBullet=/^\d+\./.test(line.trim());
+            sAI.addText(line.trim(),{x:0.5,y:ly,w:12.3,h:0.75,fontSize:isBullet?14:12,bold:isBullet,color:isBullet?DARK:"353E59",fontFace:"Open Sans",wrap:true});
+          });
+          sAI.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+          sAI.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+        }
+      }catch(aiErr){console.error("AI slide error:",aiErr);}
+    }
+    // SLIDE MAPA DE UBICACIONES (penúltima)
+    const sMapa=pptx.addSlide();
+    sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+    sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.15,fill:{color:DARK}});
+    sMapa.addText("Alternativas · Ubicaciones",{x:0.3,y:0.1,w:10.5,h:0.55,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+    if(logoB64){sMapa.addImage({data:logoB64,x:11.5,y:0.05,w:1.6,h:0.57,sizing:{type:"contain",w:1.6,h:0.57}});}
+    sMapa.addText("Ubicaciones",{x:0.3,y:1.25,w:3.3,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
+    sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:1.63,w:3.3,h:0.04,fill:{color:MID}});
+    sp.forEach((p,i)=>{
+      const ly=1.78+i*0.55;
+      if(ly>5.8)return;
+      sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:ly,w:0.28,h:0.28,fill:{color:MID}});
+      sMapa.addText(String(i+1),{x:0.3,y:ly,w:0.28,h:0.28,fontSize:8,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans"});
+      sMapa.addText(p.nombre,{x:0.65,y:ly+0.01,w:2.9,h:0.26,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
+      if(p.direccion&&p.direccion!=='–'){sMapa.addText(p.direccion,{x:0.65,y:ly+0.28,w:2.9,h:0.22,fontSize:7,color:"56648F",fontFace:"Open Sans"});}
+    });
+    const mapaAddrs=sp.map(p=>p.direccion!=='–'?p.direccion:'').filter(Boolean);
+    const mapsQuery=mapaAddrs.map(d=>encodeURIComponent(d)).join('/');
+    const mapsUrl='https://www.google.com/maps/search/'+mapsQuery;
+    sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:6.3,w:3.3,h:0.5,fill:{color:MID}});
+    sMapa.addText("Ver en Google Maps →",{x:0.3,y:6.3,w:3.3,h:0.5,fontSize:10,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:mapsUrl,tooltip:"Ver en Google Maps"}});
+    // OpenStreetMap via Nominatim geocoding (sin API key)
+    {
+      let osmMapB64=null;
+      try{
+        const coords=await Promise.all(mapaAddrs.map(async addr=>{
+          try{
+            const nr=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(addr+', Buenos Aires, Argentina')+'&format=json&limit=1',{headers:{'User-Agent':'ColliersPPT/1.0'}});
+            const nd=await nr.json();
+            return nd[0]?parseFloat(nd[0].lat).toFixed(4)+','+parseFloat(nd[0].lon).toFixed(4)+',red-pushpin':null;
+          }catch(e){return null;}
+        }));
+        const validCoords=coords.filter(Boolean);
+        if(validCoords.length){
+          const osmUrl='https://staticmap.openstreetmap.de/staticmap.php?size=800x500&maptype=mapnik&'+validCoords.map(c=>'markers='+c).join('&');
+          osmMapB64=await imgToBase64(osmUrl);
+        }
+      }catch(e){console.error('OSM geocode error:',e);}
+      if(osmMapB64){sMapa.addImage({data:osmMapB64,x:3.8,y:1.2,w:9.2,h:5.8});}
+      else if(mapaB64){sMapa.addImage({data:mapaB64,x:3.8,y:1.2,w:9.2,h:5.8});}
+      else{sMapa.addShape(pptx.ShapeType.rect,{x:3.8,y:1.2,w:9.2,h:5.8,fill:{color:"C8D0E0"}});sMapa.addText("Mapa no disponible",{x:3.8,y:1.2,w:9.2,h:5.8,fontSize:14,color:"56648F",align:"center",valign:"middle",fontFace:"Open Sans"});}
+    }
+    sMapa.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+    sMapa.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+
+    // SLIDE CIERRE (última)
+    const sCierre=pptx.addSlide();
+    if(cierreB64){sCierre.addImage({data:cierreB64,x:0,y:0,w:13.33,h:7.5});}
+    else if(portadaB64){sCierre.addImage({data:portadaB64,x:0,y:0,w:13.33,h:7.5});}
+    else{sCierre.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});}
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:1.5,w:5.8,h:2.5,fill:{color:MID}});
+    sCierre.addText("Muchas gracias.",{x:0.3,y:1.65,w:5.2,h:1.0,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
+    sCierre.addText("Para más información\ncontactarse con:",{x:0.3,y:2.75,w:5.2,h:0.9,fontSize:13,italic:true,color:WHITE,fontFace:"Merriweather",wrap:true});
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:4.0,w:5.8,h:1.5,fill:{color:"4D93FF"}});
+    sCierre.addText(user?.displayName||'Colliers Argentina',{x:0.3,y:4.15,w:5.2,h:0.55,fontSize:16,bold:true,color:WHITE,fontFace:"Open Sans"});
+    const brokerEmail=user?.email||'';
+    if(brokerEmail){sCierre.addText(brokerEmail,{x:0.3,y:4.75,w:5.2,h:0.4,fontSize:12,color:WHITE,fontFace:"Open Sans",hyperlink:{url:`mailto:${brokerEmail}`,tooltip:"Enviar email"}});}
+    if(logoB64){sCierre.addImage({data:logoB64,x:11.0,y:0.15,w:2.1,h:0.75,sizing:{type:"contain",w:2.1,h:0.75}});}
+    const disclaimer='This document has been prepared by Colliers solely for advertising and general information purposes. Colliers makes no warranties of any kind, express or implied, in relation to the information, including, but not limited to, warranties of content, accuracy and reliability. Any interested party should make their own inquiries into the accuracy of the information. Colliers unequivocally excludes all inferred or implied terms, conditions and warranties arising from this document and excludes all liability for loss and damage arising therefrom. This publication is the intellectual property of Colliers and/or its licensors. ©2025 All rights reserved.';
+    sCierre.addText(disclaimer,{x:0.3,y:6.6,w:12.7,h:0.7,fontSize:7,color:"888888",fontFace:"Open Sans",wrap:true,valign:"top"});
+    sCierre.addText("Accelerating success.",{x:0.3,y:5.8,w:5.2,h:0.45,fontSize:12,italic:true,color:WHITE,fontFace:"Merriweather"});
+
     const fecha=new Date().toISOString().slice(0,10);
     await pptx.writeFile({fileName:`Alternativas_${cliente.replace(/[^a-z0-9]/gi,"_")}_${fecha}.pptx`});
     msg.textContent=`✓ PPT descargado con ${sp.length} alternativas`;
+    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString()};
+    registrarDescarga(dlData);
+    notificarDescarga(dlData);
   }catch(e){
     console.error(e);
     msg.textContent="Error generando el PPT. Intentá de nuevo.";
@@ -1120,6 +1249,78 @@ window.generarPPT=async()=>{
     btn.disabled=false;btn.innerHTML="📊 Generar presentación PPT ↗";
   }
 };
+
+window.toggleAdmin=()=>{
+  const panel=document.getElementById('admin-panel');
+  if(panel.style.display==='none'){panel.style.display='block';cargarRegistros();}
+  else{panel.style.display='none';}
+};
+
+async function cargarRegistros(){
+  const wrap=document.getElementById('admin-table-wrap');
+  wrap.innerHTML='<p style="color:#56648F;font-size:13px">Cargando...</p>';
+  if(!db){wrap.innerHTML='<p style="color:#ED1B34;font-size:12px">Firebase no configurado.</p>';return;}
+  try{
+    const snap=await db.collection('descargas').orderBy('fecha','desc').get();
+    if(snap.empty){wrap.innerHTML='<p style="color:#56648F;font-size:13px">Sin registros todavía.</p>';return;}
+    let h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;background:#fff;box-shadow:0 2px 8px rgba(0,7,89,.08)">';
+    h+='<thead><tr style="background:#25408F;color:#fff">';
+    ['Nombre','Email','Zona','M² buscados','Empresa','Fecha','Propiedades seleccionadas'].forEach(col=>{
+      h+=`<th style="padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap;font-size:11px">${col}</th>`;
+    });
+    h+='</tr></thead><tbody>';
+    snap.docs.forEach((doc,i)=>{
+      const d=doc.data();
+      const fecha=d.fecha?.toDate?.()?d.fecha.toDate().toLocaleString('es-AR'):(d.fecha||'–');
+      const bg=i%2===0?'#fff':'#F0F4FF';
+      h+=`<tr style="background:${bg}">`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF">${d.nombre||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;color:#1C54F4">${d.email||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF">${d.zona||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;text-align:center">${d.m2?d.m2+' m²':'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;font-weight:600">${d.empresa||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;white-space:nowrap;font-size:11px">${fecha}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;color:#353E59;font-size:11px">${(d.propiedades||[]).join(', ')}</td>`;
+      h+='</tr>';
+    });
+    h+='</tbody></table></div>';
+    wrap.innerHTML=h;
+  }catch(e){
+    console.error(e);
+    wrap.innerHTML='<p style="color:#ED1B34;font-size:12px">Error al cargar registros: '+e.message+'</p>';
+  }
+}
+
+function registrarDescarga(datos){
+  if(!db)return;
+  try{
+    db.collection("descargas").add({
+      nombre:datos.nombre,
+      email:datos.email,
+      zona:datos.zona,
+      m2:datos.m2,
+      empresa:datos.empresa,
+      fecha:firebase.firestore.FieldValue.serverTimestamp(),
+      propiedades:datos.propiedades
+    });
+  }catch(e){console.error("Firebase error:",e);}
+}
+
+function notificarDescarga(datos){
+  if(!EMAILJS_PUBLIC_KEY)return;
+  try{
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{
+      to_email:"matias.azaretto@colliers.com",
+      subject:`Nueva descarga PPT - ${datos.cliente}`,
+      usuario:datos.usuario,
+      fecha:datos.fecha,
+      cliente:datos.cliente,
+      propiedades:datos.propiedades.join(", "),
+      cantidad:datos.cantidad
+    });
+  }catch(e){console.error("EmailJS error:",e);}
+}
 
 function show(id){
   ["ls","ds","as"].forEach(s=>{
