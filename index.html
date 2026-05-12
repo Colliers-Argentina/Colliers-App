@@ -226,6 +226,16 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .thumb-name{font-size:10px;color:#56648F;text-align:center;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:1px solid #DBE5FF;margin-top:1rem}
+
+/* FEEDBACK */
+.fb-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 14px rgba(0,7,89,.08);margin-top:1.5rem;overflow:hidden}
+.star-row{display:flex;gap:8px;margin:6px 0}
+.star{font-size:30px;cursor:pointer;color:#DBE5FF;transition:color .1s;line-height:1;user-select:none}
+.star.active,.star:hover{color:#F5A623}
+.fb-textarea{font-family:inherit;font-size:12px;padding:8px;border:1px solid #DBE5FF;color:#000759;width:100%;resize:vertical;min-height:70px}
+.fb-textarea:focus{outline:none;border-color:#1C54F4}
+.fb-body{padding:1.25rem;display:flex;flex-direction:column;gap:.75rem}
+.fb-thanks{background:#EEF3FF;border-left:3px solid #1C54F4;padding:.75rem 1rem;font-size:13px;color:#25408F;display:none}
 </style>
 </head>
 <body>
@@ -447,6 +457,27 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
           </div>
         </div>
 
+        <!-- STEP 5: FEEDBACK -->
+        <div class="fb-card" id="feedback-section" style="display:none">
+          <div class="card-hd">
+            <div class="card-title">Feedback</div>
+          </div>
+          <div class="fb-body">
+            <div class="pers-lbl">¿Cómo fue tu experiencia?</div>
+            <div class="star-row" id="star-row">
+              <span class="star" data-v="1">&#9733;</span>
+              <span class="star" data-v="2">&#9733;</span>
+              <span class="star" data-v="3">&#9733;</span>
+              <span class="star" data-v="4">&#9733;</span>
+              <span class="star" data-v="5">&#9733;</span>
+            </div>
+            <div class="pers-lbl" style="margin-top:.25rem">Sugerencias o comentarios</div>
+            <textarea id="fb-comment" class="fb-textarea" placeholder="Escribí tu comentario aquí..."></textarea>
+            <button class="btn-search" onclick="enviarFeedback()" style="max-width:220px">Enviar feedback</button>
+            <div class="fb-thanks" id="fb-thanks">&#10003; ¡Gracias por tu feedback! Tu opinión nos ayuda a mejorar.</div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -542,23 +573,21 @@ async function loadData(){
 }
 
 async function cargarOverview(){
-  const OVERVIEW_CSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=824813475&single=true&output=csv";
   try{
-    const r=await fetch(OVERVIEW_CSV);
-    const csv=await r.text();
-    console.log("Overview CSV raw:",csv);
-    const lines=csv.split("\n").filter(l=>l.trim());
+    const r=await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=824813475&single=true&output=csv&t='+Date.now());
+    const txt=await r.text();
+    const lines=txt.replace(/\r/g,'').split('\n').filter(l=>l.trim());
     overviewData={};
-    lines.forEach(line=>{
-      const cols=parseLine(line);
-      if(cols.length>=2&&cols[0]){
-        const key=cols[0].replace(/"/g,"").trim();
-        const val=cols[1].replace(/"/g,"").trim();
-        overviewData[key]=val;
+    lines.slice(1).forEach(line=>{
+      const idx=line.indexOf(',');
+      if(idx>-1){
+        const k=line.substring(0,idx).replace(/"/g,'').trim();
+        const v=line.substring(idx+1).replace(/"/g,'').trim();
+        if(k)overviewData[k]=v;
       }
     });
-    console.log("Overview parsed:",JSON.stringify(overviewData));
-  }catch(e){console.error("Overview CSV error:",e);}
+    console.log('Overview OK:',overviewData);
+  }catch(e){console.error('Overview error:',e);}
 }
 
 function parseCSV(csv){
@@ -624,6 +653,15 @@ async function imgToBase64(url) {
     } catch(e) { continue; }
   }
   return null;
+}
+
+let _logoB64=null;
+async function addLogo(slide,grande=false){
+  if(!_logoB64)_logoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png');
+  if(_logoB64){
+    const w=grande?2.1:1.6,h=grande?0.75:0.57;
+    slide.addImage({data:_logoB64,x:13.33-w-0.2,y:0.1,w,h,sizing:{type:'contain',w,h}});
+  }
 }
 
 const STEPS=[
@@ -991,8 +1029,7 @@ window.generarPPT=async()=>{
   ];
   const cierreURL=cierres[Math.floor(Math.random()*cierres.length)];
   const fotos=await Promise.all(sp.map(p=>p.foto?imgToBase64(p.foto):Promise.resolve(null)));
-  const [logoB64,portadaB64,mapaB64,cierreB64]=await Promise.all([
-    imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png"),
+  const [portadaB64,mapaB64,cierreB64]=await Promise.all([
     imgToBase64(portadaURL),
     imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/mapa-mercado.png"),
     imgToBase64(cierreURL)
@@ -1018,8 +1055,7 @@ window.generarPPT=async()=>{
     s0.addText("Preparado por: Colliers Argentina",{x:0.3,y:5.9,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
     s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:5.8,h:0.6,fill:{color:DEEP}});
     s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
-    if(logoB64){s0.addImage({data:logoB64,x:11.0,y:0.15,w:2.1,h:0.75,sizing:{type:"contain",w:2.1,h:0.75}});}
-    else{s0.addText("Colliers",{x:10.3,y:0.1,w:2.8,h:0.8,fontSize:18,bold:true,color:DARK,align:"right",fontFace:"Open Sans"});}
+    await addLogo(s0,true);
 
     // OVERVIEW DE MERCADO
     const s1=pptx.addSlide();
@@ -1028,7 +1064,7 @@ window.generarPPT=async()=>{
     const ovTitulo="Resumen informe de mercado "+(overviewData['Fecha actualización']||'');
     s1.addText(ovTitulo,{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
     s1.addText("General Data",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
-    if(logoB64){s1.addImage({data:logoB64,x:11.5,y:0.05,w:1.6,h:0.57,sizing:{type:"contain",w:1.6,h:0.57}});}
+    await addLogo(s1,false);
     if(mapaB64){s1.addImage({data:mapaB64,x:0.2,y:1.3,w:5.8,h:5.2});}
     else{s1.addShape(pptx.ShapeType.rect,{x:0.2,y:1.3,w:5.8,h:5.2,fill:{color:"DBE5FF"}});}
     const ovBullets=[
@@ -1161,7 +1197,7 @@ window.generarPPT=async()=>{
           sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
           sAI.addText("Conclusiones y Recomendaciones",{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
           sAI.addText("Análisis generado por IA · Colliers",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
-          if(logoB64){sAI.addImage({data:logoB64,x:11.5,y:0.05,w:1.6,h:0.57,sizing:{type:"contain",w:1.6,h:0.57}});}
+          await addLogo(sAI,false);
           const aiLines=aiText.split("\n").filter(l=>l.trim());
           aiLines.forEach((line,i)=>{
             const ly=1.5+i*0.85;
@@ -1179,7 +1215,7 @@ window.generarPPT=async()=>{
     sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
     sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.15,fill:{color:DARK}});
     sMapa.addText("Alternativas · Ubicaciones",{x:0.3,y:0.1,w:10.5,h:0.55,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
-    if(logoB64){sMapa.addImage({data:logoB64,x:11.5,y:0.05,w:1.6,h:0.57,sizing:{type:"contain",w:1.6,h:0.57}});}
+    await addLogo(sMapa,false);
     sMapa.addText("Ubicaciones",{x:0.3,y:1.25,w:3.3,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
     sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:1.63,w:3.3,h:0.04,fill:{color:MID}});
     sp.forEach((p,i)=>{
@@ -1195,24 +1231,21 @@ window.generarPPT=async()=>{
     const mapsUrl='https://www.google.com/maps/search/'+mapsQuery;
     sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:6.3,w:3.3,h:0.5,fill:{color:MID}});
     sMapa.addText("Ver en Google Maps →",{x:0.3,y:6.3,w:3.3,h:0.5,fontSize:10,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:mapsUrl,tooltip:"Ver en Google Maps"}});
-    // OpenStreetMap via Nominatim geocoding (sin API key)
     {
-      let osmMapB64=null;
+      let mapaStaticB64=null;
       try{
-        const coords=await Promise.all(mapaAddrs.map(async addr=>{
-          try{
-            const nr=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(addr+', Buenos Aires, Argentina')+'&format=json&limit=1',{headers:{'User-Agent':'ColliersPPT/1.0'}});
-            const nd=await nr.json();
-            return nd[0]?parseFloat(nd[0].lat).toFixed(4)+','+parseFloat(nd[0].lon).toFixed(4)+',red-pushpin':null;
-          }catch(e){return null;}
-        }));
-        const validCoords=coords.filter(Boolean);
-        if(validCoords.length){
-          const osmUrl='https://staticmap.openstreetmap.de/staticmap.php?size=800x500&maptype=mapnik&'+validCoords.map(c=>'markers='+c).join('&');
-          osmMapB64=await imgToBase64(osmUrl);
+        if(GOOGLE_MAPS_KEY){
+          const gUrl='https://maps.googleapis.com/maps/api/staticmap?size=750x480&maptype=roadmap&zoom=12&center=Buenos+Aires,Argentina'+sp.map((p,i)=>'&markers=color:blue%7Clabel:'+(i+1)+'%7C'+encodeURIComponent(p.direccion+',Buenos Aires,Argentina')).join('')+'&key='+GOOGLE_MAPS_KEY;
+          mapaStaticB64=await imgToBase64(gUrl);
         }
-      }catch(e){console.error('OSM geocode error:',e);}
-      if(osmMapB64){sMapa.addImage({data:osmMapB64,x:3.8,y:1.2,w:9.2,h:5.8});}
+      }catch(e){}
+      if(!mapaStaticB64){
+        try{
+          const osmUrl='https://staticmap.openstreetmap.de/staticmap.php?size=750x480&zoom=12&center=-34.6,-58.4'+sp.map((p,i)=>'&markers='+encodeURIComponent(p.direccion)+',blue,'+(i+1)).join('');
+          mapaStaticB64=await imgToBase64(osmUrl);
+        }catch(e){console.error('OSM map error:',e);}
+      }
+      if(mapaStaticB64){sMapa.addImage({data:mapaStaticB64,x:3.8,y:1.2,w:9.2,h:5.8});}
       else if(mapaB64){sMapa.addImage({data:mapaB64,x:3.8,y:1.2,w:9.2,h:5.8});}
       else{sMapa.addShape(pptx.ShapeType.rect,{x:3.8,y:1.2,w:9.2,h:5.8,fill:{color:"C8D0E0"}});sMapa.addText("Mapa no disponible",{x:3.8,y:1.2,w:9.2,h:5.8,fontSize:14,color:"56648F",align:"center",valign:"middle",fontFace:"Open Sans"});}
     }
@@ -1231,7 +1264,7 @@ window.generarPPT=async()=>{
     sCierre.addText(user?.displayName||'Colliers Argentina',{x:0.3,y:4.15,w:5.2,h:0.55,fontSize:16,bold:true,color:WHITE,fontFace:"Open Sans"});
     const brokerEmail=user?.email||'';
     if(brokerEmail){sCierre.addText(brokerEmail,{x:0.3,y:4.75,w:5.2,h:0.4,fontSize:12,color:WHITE,fontFace:"Open Sans",hyperlink:{url:`mailto:${brokerEmail}`,tooltip:"Enviar email"}});}
-    if(logoB64){sCierre.addImage({data:logoB64,x:11.0,y:0.15,w:2.1,h:0.75,sizing:{type:"contain",w:2.1,h:0.75}});}
+    await addLogo(sCierre,true);
     const disclaimer='This document has been prepared by Colliers solely for advertising and general information purposes. Colliers makes no warranties of any kind, express or implied, in relation to the information, including, but not limited to, warranties of content, accuracy and reliability. Any interested party should make their own inquiries into the accuracy of the information. Colliers unequivocally excludes all inferred or implied terms, conditions and warranties arising from this document and excludes all liability for loss and damage arising therefrom. This publication is the intellectual property of Colliers and/or its licensors. ©2025 All rights reserved.';
     sCierre.addText(disclaimer,{x:0.3,y:6.6,w:12.7,h:0.7,fontSize:7,color:"888888",fontFace:"Open Sans",wrap:true,valign:"top"});
     sCierre.addText("Accelerating success.",{x:0.3,y:5.8,w:5.2,h:0.45,fontSize:12,italic:true,color:WHITE,fontFace:"Merriweather"});
@@ -1239,6 +1272,8 @@ window.generarPPT=async()=>{
     const fecha=new Date().toISOString().slice(0,10);
     await pptx.writeFile({fileName:`Alternativas_${cliente.replace(/[^a-z0-9]/gi,"_")}_${fecha}.pptx`});
     msg.textContent=`✓ PPT descargado con ${sp.length} alternativas`;
+    const fbSec=document.getElementById('feedback-section');
+    if(fbSec){fbSec.style.display='block';fbSec.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('fb-thanks').style.display='none';_fbStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
     const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString()};
     registrarDescarga(dlData);
     notificarDescarga(dlData);
@@ -1321,6 +1356,43 @@ function notificarDescarga(datos){
     });
   }catch(e){console.error("EmailJS error:",e);}
 }
+
+let _fbStars=0;
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('#star-row .star').forEach(s=>{
+    s.addEventListener('click',()=>{
+      _fbStars=parseInt(s.dataset.v);
+      document.querySelectorAll('#star-row .star').forEach((st,i)=>st.classList.toggle('active',i<_fbStars));
+    });
+    s.addEventListener('mouseenter',()=>{
+      const v=parseInt(s.dataset.v);
+      document.querySelectorAll('#star-row .star').forEach((st,i)=>st.classList.toggle('active',i<v));
+    });
+    s.addEventListener('mouseleave',()=>{
+      document.querySelectorAll('#star-row .star').forEach((st,i)=>st.classList.toggle('active',i<_fbStars));
+    });
+  });
+});
+
+window.enviarFeedback=async()=>{
+  const comment=document.getElementById('fb-comment')?.value.trim()||'';
+  if(!_fbStars){alert('Por favor seleccioná una calificación (estrellas).');return;}
+  if(db){
+    try{
+      await db.collection('feedback').add({
+        usuario:user?.displayName||'',
+        email:user?.email||'',
+        estrellas:_fbStars,
+        comentario:comment,
+        fecha:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }catch(e){console.error('Feedback Firestore error:',e);}
+  }
+  document.getElementById('fb-thanks').style.display='block';
+  document.getElementById('fb-comment').value='';
+  _fbStars=0;
+  document.querySelectorAll('#star-row .star').forEach(s=>s.classList.remove('active'));
+};
 
 function show(id){
   ["ls","ds","as"].forEach(s=>{
