@@ -662,7 +662,7 @@ async function addLogo(slide,grande=false){
   if(_logoB64){
     const w=grande?2.2:1.7,h=grande?0.78:0.6;
     const x=13.33-w-0.15,y=0.08;
-    slide.addImage({data:_logoB64,x,y,w:grande?2.2:1.7,h:grande?0.55:0.42});
+    slide.addImage({data:_logoB64,x,y,w,h});
   }
 }
 
