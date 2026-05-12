@@ -629,7 +629,8 @@ function parseLine(line){
 }
 
 function populateZonas(){
-  const zonas=[...new Set(props.map(p=>p.submercado).filter(Boolean))].sort();
+  const fallback=['Norte CABA','Norte GBA','Catalinas','Puerto Madero','Microcentro','Macrocentro','Macrocentro Sur','Plaza Roma','Retiro','Sur CABA'];
+  const zonas=props.length>0?[...new Set(props.map(p=>p.submercado).filter(Boolean))].sort():fallback;
   document.getElementById('zona-fc').innerHTML=zonas.map(z=>
     `<label class="fk"><input type="checkbox" name="zona" value="${z}"> ${z}</label>`
   ).join('');
