@@ -564,12 +564,24 @@ window.onGoogleLibraryLoad=initGSI;
 if(typeof google!=='undefined'&&google.accounts)initGSI();
 
 async function loadData(){
-  try{
-    const r=await fetch(CSV);
-    const csv=await r.text();
-    props=parseCSV(csv);
-    populateZonas();
-  }catch(e){console.error(e);}
+  const proxies=[
+    'https://corsproxy.io/?'+encodeURIComponent(CSV),
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(CSV),
+    CSV,
+  ];
+  for(const url of proxies){
+    try{
+      const r=await fetch(url);
+      if(!r.ok)continue;
+      const csv=await r.text();
+      if(!csv.trim())continue;
+      props=parseCSV(csv);
+      populateZonas();
+      console.log('Data OK via',url.substring(0,40));
+      return;
+    }catch(e){console.warn('loadData proxy failed:',url.substring(0,40),e.message);}
+  }
+  console.error('loadData: all proxies failed');
 }
 
 async function cargarOverview(){
