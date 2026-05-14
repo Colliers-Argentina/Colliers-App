@@ -1081,66 +1081,126 @@ window.generarPPT=async()=>{
 
     // TABLA COMPARATIVA
     if(document.getElementById("it").checked){
+      // ── Constantes de layout ─────────────────────────────────────────────
+      const SLIDE_W=13.33,SLIDE_H=7.5;
       const MAX_COLS=6;
-      const grupos=[];
-      for(let i=0;i<sp.length;i+=MAX_COLS)grupos.push(sp.slice(i,i+MAX_COLS));
+      const LW=1.45;                        // label column — fijo siempre
+      const CW=(SLIDE_W-LW)/MAX_COLS;       // 1.98" — fijo siempre, nunca cambia
+      const GAP=0.03;                       // separador visual entre celdas
+      const PAD=0.06;                       // padding interno de texto
+      const IMG_Y=0.37,IMG_H=1.00;
+      const NUM_Y=IMG_Y+IMG_H,NUM_H=0.30;
+      const NAM_Y=NUM_Y+NUM_H,NAM_H=0.38;
+      const TABLE_TOP=NAM_Y+NAM_H;         // ~2.05"
+      const ROW_H=0.41;
       const ROWS=[
         ["Dirección","direccion"],["Submercado","submercado"],["Categoría","cat"],
         ["Año","anio"],["Pisos","pisos"],["Cocheras","cocheras"],
         ["Sup. disponible m²","supDisp"],["Pisos disponibles","pisosDisp"],
         ["Sup. planta m²","supPlanta"],["Asking Rent","rent"],["Comentarios","comentarios"],
       ];
-      const SLIDE_W=13.33;
-      const LW=1.45;
-      // Ancho fijo de columna: el mismo que en el layout estándar de 6 columnas
-      const COLUMN_WIDTH=(SLIDE_W-LW)/MAX_COLS;
-      const TABLE_TOP=2.08,ROW_H=0.41;
+
+      // ── Pre-crop de imágenes con Canvas (cover real, sin stretch) ─────────
+      // PptxGenJS genera stretch OOXML con sizing:cover; pre-recortamos en browser.
+      const DPI=200;
+      const PX_W=Math.round(CW*DPI);   // px objetivo por columna
+      const PX_H=Math.round(IMG_H*DPI);
+      async function cropImg(b64){
+        return new Promise(res=>{
+          const img=new Image();
+          img.onload=()=>{
+            const scale=Math.max(PX_W/img.naturalWidth,PX_H/img.naturalHeight);
+            const sw=Math.round(PX_W/scale);
+            const sh=Math.round(PX_H/scale);
+            const sx=Math.round((img.naturalWidth-sw)/2);
+            const sy=Math.round((img.naturalHeight-sh)/2);
+            const c=document.createElement('canvas');
+            c.width=PX_W; c.height=PX_H;
+            c.getContext('2d').drawImage(img,sx,sy,sw,sh,0,0,PX_W,PX_H);
+            res(c.toDataURL('image/jpeg',0.85));
+          };
+          img.onerror=()=>res(null);
+          img.src=b64;
+        });
+      }
+
+      // ── Paginado: grupos de MAX_COLS alternativas ─────────────────────────
+      const grupos=[];
+      for(let i=0;i<sp.length;i+=MAX_COLS)grupos.push(sp.slice(i,i+MAX_COLS));
+
+      // ── Render de cada slide ──────────────────────────────────────────────
       for(const[gi,grupo] of grupos.entries()){
         const ng=grupo.length;
-        // La tabla completa (label + datos) se centra en el slide
-        const tableWidth=LW+COLUMN_WIDTH*ng;
-        const startX=(SLIDE_W-tableWidth)/2; // x donde arranca la columna de labels
+        // La tabla completa (label + datos) se centra como unidad rígida
+        const ox=(SLIDE_W-(LW+CW*ng))/2;   // x del label column
+        const dx=i=>ox+LW+i*CW;            // x de cada data column
+        const cw=CW-GAP;                    // ancho de celda (mismo siempre)
         const sl=pptx.addSlide();
-        sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:SLIDE_W,h:7.5,fill:{color:WHITE}});
+
+        // Layer 1: fondo blanco
+        sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:SLIDE_W,h:SLIDE_H,fill:{color:WHITE}});
+
+        // Layer 2: header
         sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:SLIDE_W,h:0.35,fill:{color:DARK}});
-        sl.addText("Alternativas de Oficinas",{x:0.2,y:0.04,w:7,h:0.27,fontSize:12,bold:true,color:WHITE,fontFace:"Open Sans"});
-        if(grupos.length>1)sl.addText(`Pág. ${gi+1}/${grupos.length}`,{x:10,y:0.04,w:1.3,h:0.27,fontSize:9,color:PALE,align:"right",fontFace:"Open Sans"});
+        sl.addText("Alternativas de Oficinas",{x:0.2,y:0.04,w:7,h:0.27,fontSize:12,bold:true,color:WHITE,fontFace:"Open Sans",shrinkText:true});
+        if(grupos.length>1)sl.addText(`Pág. ${gi+1}/${grupos.length}`,{x:10,y:0.04,w:1.3,h:0.27,fontSize:9,color:PALE,align:"right",fontFace:"Open Sans",shrinkText:true});
+
+        // Layer 3: foto + número + nombre por columna
         for(const[i,prop] of grupo.entries()){
-          const cx=startX+LW+i*COLUMN_WIDTH;
-          const tb64=fotos[gi*MAX_COLS+i];
-          if(tb64){
-            sl.addImage({data:tb64,x:cx,y:0.37,w:COLUMN_WIDTH-0.04,h:1.0,sizing:{type:'cover',w:COLUMN_WIDTH-0.04,h:1.0}});
+          const cx=dx(i);
+
+          // foto — pre-cropped, sin sizing, sin stretch
+          const rawB64=fotos[gi*MAX_COLS+i];
+          if(rawB64){
+            const cropped=await cropImg(rawB64);
+            if(cropped){
+              sl.addImage({data:cropped,x:cx,y:IMG_Y,w:cw,h:IMG_H});
+            }else{
+              sl.addShape(pptx.ShapeType.rect,{x:cx,y:IMG_Y,w:cw,h:IMG_H,fill:{color:"DBE5FF"}});
+            }
           }else{
-            sl.addShape(pptx.ShapeType.rect,{x:cx,y:0.37,w:COLUMN_WIDTH-0.04,h:1.0,fill:{color:"DBE5FF"}});
+            sl.addShape(pptx.ShapeType.rect,{x:cx,y:IMG_Y,w:cw,h:IMG_H,fill:{color:"DBE5FF"}});
           }
-          sl.addShape(pptx.ShapeType.rect,{x:cx,y:1.37,w:COLUMN_WIDTH-0.04,h:0.3,fill:{color:DEEP}});
-          sl.addText(String(i+1+gi*MAX_COLS),{x:cx,y:1.37,w:COLUMN_WIDTH-0.04,h:0.3,fontSize:12,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
-          sl.addShape(pptx.ShapeType.rect,{x:cx,y:1.67,w:COLUMN_WIDTH-0.04,h:0.38,fill:{color:DARK}});
-          sl.addText(prop.nombre,{x:cx+0.04,y:1.67,w:COLUMN_WIDTH-0.1,h:0.38,fontSize:7,bold:true,color:WHITE,align:"center",wrap:true,fontFace:"Open Sans"});
+
+          // badge número
+          sl.addShape(pptx.ShapeType.rect,{x:cx,y:NUM_Y,w:cw,h:NUM_H,fill:{color:DEEP}});
+          sl.addText(String(i+1+gi*MAX_COLS),{x:cx,y:NUM_Y,w:cw,h:NUM_H,fontSize:12,bold:true,color:WHITE,align:"center",fontFace:"Open Sans",shrinkText:true});
+
+          // nombre
+          sl.addShape(pptx.ShapeType.rect,{x:cx,y:NAM_Y,w:cw,h:NAM_H,fill:{color:DARK}});
+          sl.addText(prop.nombre,{x:cx+PAD,y:NAM_Y,w:cw-PAD*2,h:NAM_H,fontSize:7,bold:true,color:WHITE,align:"center",wrap:true,fontFace:"Open Sans",shrinkText:true});
         }
+
+        // Layer 4: filas de datos
         for(const[ri,[lbl,key]] of ROWS.entries()){
           const ry=TABLE_TOP+ri*ROW_H;
           const bg=ri%2===0?"F4F7FF":WHITE;
-          sl.addShape(pptx.ShapeType.rect,{x:startX,y:ry,w:LW,h:ROW_H,fill:{color:bg}});
-          sl.addText(lbl,{x:startX+0.06,y:ry+0.06,w:LW-0.1,h:ROW_H-0.12,fontSize:7.5,bold:true,color:DARK,fontFace:"Open Sans"});
+
+          // label column
+          sl.addShape(pptx.ShapeType.rect,{x:ox,y:ry,w:LW,h:ROW_H,fill:{color:bg}});
+          sl.addText(lbl,{x:ox+PAD,y:ry+PAD,w:LW-PAD*2,h:ROW_H-PAD*2,fontSize:7.5,bold:true,color:DARK,fontFace:"Open Sans",shrinkText:true});
+
+          // data columns
           for(const[i,prop] of grupo.entries()){
-            const cx=startX+LW+i*COLUMN_WIDTH;
-            sl.addShape(pptx.ShapeType.rect,{x:cx,y:ry,w:COLUMN_WIDTH-0.04,h:ROW_H,fill:{color:bg}});
+            const cx=dx(i);
+            sl.addShape(pptx.ShapeType.rect,{x:cx,y:ry,w:cw,h:ROW_H,fill:{color:bg}});
             let val=prop[key]||"–";
-            if(key==="supDisp"&&val)val=Number(val).toLocaleString("es-AR")+" m²";
-            if(key==="supPlanta"&&val)val=Number(val).toLocaleString("es-AR")+" m²";
+            if(key==="supDisp"&&prop[key])val=Number(prop[key]).toLocaleString("es-AR")+" m²";
+            if(key==="supPlanta"&&prop[key])val=Number(prop[key]).toLocaleString("es-AR")+" m²";
             const isDisp=key==="supDisp";
             const isCom=key==="comentarios";
             if(isCom){
               const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
-              sl.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:cx+0.04,y:ry+0.05,w:COLUMN_WIDTH-0.1,h:ROW_H-0.1,fontSize:7,color:'353E59',align:'left',wrap:true,fontFace:'Open Sans'});
+              sl.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:cx+PAD,y:ry+PAD,w:cw-PAD*2,h:ROW_H-PAD*2,fontSize:7,color:'353E59',align:'left',wrap:true,fontFace:'Open Sans',shrinkText:true});
             }else{
-              sl.addText(String(val),{x:cx+0.04,y:ry+0.05,w:COLUMN_WIDTH-0.1,h:ROW_H-0.1,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:"center",wrap:true,fontFace:"Open Sans"});
+              sl.addText(String(val),{x:cx+PAD,y:ry+PAD,w:cw-PAD*2,h:ROW_H-PAD*2,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:"center",wrap:true,fontFace:"Open Sans",shrinkText:true});
             }
           }
         }
+
+        // Layer 5: footer
         sl.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:SLIDE_W,h:0.28,fill:{color:DARK}});
-        sl.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+        sl.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans",shrinkText:true});
       }
     }
 
