@@ -1131,11 +1131,9 @@ window.generarPPT=async()=>{
       // ── Render de cada slide ──────────────────────────────────────────────
       for(const[gi,grupo] of grupos.entries()){
         const ng=grupo.length;
-        const ox=(SLIDE_W-(LW+CW*ng))/2;
-        const dx=i=>ox+LW+i*CW;
-        const cw=CW-GAP;
-        // DEBUG — verificación de layout en consola
-        console.log(`[TABLA DEBUG] slide ${gi+1} | alternativas: ${ng} | CW=${CW.toFixed(4)}" | cw=${cw.toFixed(4)}" | ox=${ox.toFixed(4)}" | col0_x=${dx(0).toFixed(4)}" | col0_end=${(dx(0)+cw).toFixed(4)}" | tableW=${(LW+CW*ng).toFixed(4)}"`);
+        const ox=0;                         // tabla alineada al margen izquierdo
+        const dx=i=>LW+i*CW;
+        const cw=CW-GAP;                    // ancho de celda — fijo siempre
         const sl=pptx.addSlide();
 
         // Layer 1: fondo blanco
