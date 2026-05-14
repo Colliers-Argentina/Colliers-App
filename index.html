@@ -1326,17 +1326,24 @@ window.generarPPT=async()=>{
     sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:6.3,w:3.3,h:0.5,fill:{color:MID}});
     sMapa.addText("Ver en Google Maps →",{x:0.3,y:6.3,w:3.3,h:0.5,fontSize:10,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:mapsUrl,tooltip:"Ver en Google Maps"}});
     {
-      let mapaStaticB64=null;
-      try{
-        if(GOOGLE_MAPS_KEY){
-          const gUrl='https://maps.googleapis.com/maps/api/staticmap?size=750x480&maptype=roadmap&zoom=12&center=Buenos+Aires,Argentina'+sp.map((p,i)=>'&markers=color:blue%7Clabel:'+(i+1)+'%7C'+encodeURIComponent(p.direccion+',Buenos Aires,Argentina')).join('')+'&key='+GOOGLE_MAPS_KEY;
-          mapaStaticB64=await imgToBase64(gUrl);
-        }
-      }catch(e){}
-      if(!mapaStaticB64){
+      const getCoords=async(direccion)=>{
         try{
-          const osmUrl='https://staticmap.openstreetmap.de/staticmap.php?size=750x480&zoom=12&center=-34.6,-58.4'+sp.map((p,i)=>'&markers='+encodeURIComponent(p.direccion)+',blue,'+(i+1)).join('');
-          mapaStaticB64=await imgToBase64(osmUrl);
+          const url='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(direccion+', Buenos Aires, Argentina')+'&format=json&limit=1';
+          const resp=await fetch(url,{headers:{'Accept-Language':'es','User-Agent':'ColliersApp/1.0'}});
+          if(!resp.ok)return null;
+          const data=await resp.json();
+          if(!data||!data[0])return null;
+          return{lat:parseFloat(data[0].lat),lon:parseFloat(data[0].lon)};
+        }catch(e){return null;}
+      };
+      const coords=await Promise.all(sp.map(p=>p.direccion&&p.direccion!=='–'?getCoords(p.direccion):Promise.resolve(null)));
+      let mapaStaticB64=null;
+      const validCoords=coords.filter(Boolean);
+      if(validCoords.length){
+        try{
+          const markers=validCoords.map(c=>`${c.lat},${c.lon},ol-marker-red`).join('|');
+          const mapaURL=`https://staticmap.openstreetmap.de/staticmap.php?center=-34.6,-58.45&zoom=12&size=800x500&maptype=mapnik&markers=${markers}`;
+          mapaStaticB64=await imgToBase64(mapaURL);
         }catch(e){console.error('OSM map error:',e);}
       }
       if(mapaStaticB64){sMapa.addImage({data:mapaStaticB64,x:3.8,y:1.2,w:9.2,h:5.8});}
