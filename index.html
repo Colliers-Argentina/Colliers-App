@@ -573,21 +573,32 @@ async function loadData(){
 }
 
 async function cargarOverview(){
-  try{
-    const base='https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=824813475&single=true&output=csv';
-    const url='https://corsproxy.io/?'+encodeURIComponent(base);
-    const txt=await(await fetch(url)).text();
-    overviewData={};
-    txt.replace(/\r/g,'').split('\n').slice(1).forEach(line=>{
-      const idx=line.indexOf(',');
-      if(idx>0){
-        const k=line.substring(0,idx).replace(/"/g,'').trim();
-        const v=line.substring(idx+1).replace(/"/g,'').trim();
-        if(k)overviewData[k]=v;
-      }
-    });
-    console.log('Overview:',JSON.stringify(overviewData));
-  }catch(e){console.error('Overview error:',e);}
+  const base='https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=824813475&single=true&output=csv';
+  const proxies=[
+    'https://corsproxy.io/?'+encodeURIComponent(base),
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(base),
+    base,
+  ];
+  for(const url of proxies){
+    try{
+      const resp=await fetch(url);
+      if(!resp.ok)continue;
+      const txt=await resp.text();
+      if(!txt.trim())continue;
+      overviewData={};
+      txt.replace(/\r/g,'').split('\n').slice(1).forEach(line=>{
+        const idx=line.indexOf(',');
+        if(idx>0){
+          const k=line.substring(0,idx).replace(/"/g,'').trim();
+          const v=line.substring(idx+1).replace(/"/g,'').trim();
+          if(k)overviewData[k]=v;
+        }
+      });
+      console.log('Overview OK via',url.substring(0,40),JSON.stringify(overviewData));
+      return;
+    }catch(e){console.warn('Overview proxy failed:',url.substring(0,40),e.message);}
+  }
+  console.error('Overview: all proxies failed');
 }
 
 function parseCSV(csv){
@@ -1018,7 +1029,7 @@ window.generarPPT=async()=>{
   msg.textContent="Cargando imágenes…";
   const portadas=[
     'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%201.jpg',
-    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%202.png',
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%202.jpg',
     'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%203.jpg'
   ];
   const portadaURL=portadas[Math.floor(Math.random()*portadas.length)];
