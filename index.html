@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Alternativas de Oficinas · Colliers</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',Verdana,sans-serif;background:#F0F4FF;color:#000759;min-height:100vh}
+
+/* NAV */
+nav{background:#25408F;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid #1C54F4;position:sticky;top:0;z-index:200}
+.nb{display:flex;align-items:center;gap:14px}
+.nlogo{display:flex;flex-direction:column;gap:2px}
+.nlogo-name{color:#fff;font-size:18px;font-weight:700;letter-spacing:-.5px}
+.nlogo-bar{height:2px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF)}
+.ndiv{width:1px;height:20px;background:rgba(255,255,255,.25)}
+.nsubt{color:#C3E6FF;font-size:11px}
+.nright{display:flex;align-items:center;gap:12px}
+.ntag{color:#C3E6FF;font-size:10px;font-style:italic;opacity:.8}
+.nu{display:none;align-items:center;gap:8px}
+.na{width:30px;height:30px;border-radius:50%;background:#1C54F4;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.3)}
+.nname{color:#C3E6FF;font-size:12px}
+.nbtn{background:transparent;border:1px solid rgba(255,255,255,.3);color:#C3E6FF;font-family:inherit;font-size:11px;padding:4px 12px;cursor:pointer;transition:all .15s;border-radius:2px}
+.nbtn:hover{background:rgba(255,255,255,.1)}
+
+/* LOGIN */
+#ls{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:2rem}
+.lbox{background:#fff;border-top:4px solid #25408F;padding:3rem 2.5rem;max-width:400px;width:100%;text-align:center;box-shadow:0 12px 50px rgba(0,7,89,.12)}
+.lbox-brand{font-size:32px;font-weight:700;color:#25408F;letter-spacing:-.5px;margin-bottom:6px}
+.lbox-bar{height:3px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF);margin-bottom:2rem}
+.lbox h1{font-size:19px;font-weight:700;color:#000759;margin-bottom:.5rem}
+.lbox p{font-size:12px;color:#56648F;line-height:1.8;margin-bottom:2rem}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s}
+.gbtn:hover{background:#000759}
+.lnote{margin-top:.75rem;font-size:10px;color:#56648F}
+
+/* DENIED */
+#ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 56px)}
+.dbox{background:#fff;border-top:4px solid #ED1B34;padding:2rem;max-width:380px;text-align:center;box-shadow:0 8px 30px rgba(0,7,89,.1)}
+.dbox h2{color:#ED1B34;margin-bottom:.5rem;font-size:18px}
+.dbox p{font-size:12px;color:#56648F;line-height:1.7}
+
+/* APP */
+#as{display:none}
+.app-wrap{max-width:1600px;margin:0 auto;padding:1.5rem 2rem}
+.app-grid{display:grid;grid-template-columns:310px 1fr;gap:1.5rem;align-items:start}
+
+/* ── STEP 1: LEFT PANEL (CHAT) ── */
+.side-panel{background:#fff;border-top:3px solid #25408F;box-shadow:0 4px 20px rgba(0,7,89,.1);position:sticky;top:70px;max-height:calc(100vh - 82px);display:flex;flex-direction:column;overflow:hidden}
+.panel-hd{background:#25408F;padding:.7rem 1rem;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:#C3E6FF;flex-shrink:0}
+.msg-row{display:flex;align-items:flex-start;gap:6px}
+.msg-row .msg-av{height:20px;object-fit:contain;flex-shrink:0;margin-top:3px;filter:brightness(0) invert(1);opacity:.85}
+.panel-title{color:#fff;font-size:13px;font-weight:700;flex:1}
+.panel-badge{font-size:8px;background:#1C54F4;color:#fff;padding:2px 7px;border-radius:2px;font-weight:700;letter-spacing:.05em}
+
+/* Chat messages */
+.cm{flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth;min-height:180px}
+.cm::-webkit-scrollbar{width:3px}
+.cm::-webkit-scrollbar-thumb{background:#DBE5FF}
+.msg{max-width:88%;padding:.5rem .75rem;font-size:12px;line-height:1.6;animation:fadein .2s ease;white-space:pre-wrap}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.mb{background:#EEF3FF;color:#000759;align-self:flex-start;border-left:2px solid #25408F}
+.mu{background:#25408F;color:#fff;align-self:flex-end}
+.co{display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.co button{background:#fff;border:1px solid #DBE5FF;color:#25408F;font-family:inherit;font-size:11px;padding:5px 10px;cursor:pointer;text-align:left;transition:all .12s}
+.co button:hover{background:#DBE5FF}
+.co button.sel{background:#25408F;color:#fff;border-color:#25408F}
+.co-ok{background:#1C54F4!important;color:#fff!important;font-weight:700!important;margin-top:4px;border-color:#1C54F4!important}
+.co-ok:hover{background:#000759!important}
+.co-rrow{display:flex;gap:6px;margin-bottom:2px}
+.co-ri{font-family:inherit;font-size:11px;padding:4px 7px;border:1px solid #DBE5FF;color:#000759;flex:1;min-width:0}
+.co-ri:focus{outline:none;border-color:#1C54F4}
+
+/* Filter toggle */
+.cat{width:100%;background:#EEF3FF;color:#25408F;border:none;border-top:1px solid #DBE5FF;font-family:inherit;font-size:11px;font-weight:600;padding:7px 10px;cursor:pointer;text-align:left;flex-shrink:0;transition:background .15s}
+.cat:hover,.cat.open{background:#C3E6FF}
+.xf{display:none;overflow-y:auto;border-top:1px solid #DBE5FF;max-height:260px;flex-shrink:0}
+.xf.open{display:block}
+.fb{padding:.75rem;display:flex;flex-direction:column;gap:.85rem}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:10px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.06em}
+.fc{display:flex;flex-direction:column;gap:4px}
+.fk{display:flex;align-items:center;gap:7px;font-size:11px;color:#353E59;cursor:pointer}
+.fk input[type=checkbox]{accent-color:#25408F;width:13px;height:13px;cursor:pointer}
+.fi{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid #DBE5FF;color:#000759;width:100%}
+.fi:focus{outline:none;border-color:#1C54F4}
+.frow{display:flex;gap:8px}
+.frow .fi{flex:1;min-width:0}
+.fsel{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid #DBE5FF;color:#000759;width:100%;background:#fff}
+.fsel:focus{outline:none;border-color:#1C54F4}
+.fa{padding:.75rem;display:flex;flex-direction:column;gap:6px;border-top:1px solid #DBE5FF}
+
+/* Side panel actions */
+.side-actions{padding:.75rem;display:flex;flex-direction:column;gap:6px;border-top:1px solid #DBE5FF;flex-shrink:0}
+.btn-search{background:#1C54F4;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:10px;border:none;cursor:pointer;width:100%;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-search:hover{background:#000759}
+.btn-reset{background:transparent;color:#56648F;font-family:inherit;font-size:11px;padding:6px;border:1px solid #DBE5FF;cursor:pointer;width:100%;transition:all .15s}
+.btn-reset:hover{background:#EEF3FF;color:#25408F}
+
+/* ── RIGHT PANEL ── */
+.main-panel{display:flex;flex-direction:column;gap:1.5rem}
+
+/* Cards */
+.card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 14px rgba(0,7,89,.08);overflow:hidden}
+.card-hd{background:#25408F;padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.card-title{color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em}
+.card-hd-r{display:flex;align-items:center;gap:.75rem}
+.sel-all-lbl{display:flex;align-items:center;gap:6px;font-size:11px;color:#C3E6FF;cursor:pointer;user-select:none}
+.sel-all-lbl input{accent-color:#fff;cursor:pointer;width:13px;height:13px}
+.card-badge{color:#fff;background:#1C54F4;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px}
+
+/* ── STEP 2: COMPARISON TABLE ── */
+.table-outer{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ctable{border-collapse:collapse;width:max-content;min-width:100%;font-size:11px}
+
+/* Sticky label column */
+.lcell{background:#F0F4FF;font-size:10px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;white-space:nowrap;position:sticky;left:0;z-index:5;border-right:2px solid #C3E6FF;min-width:155px;vertical-align:middle}
+.lcell-top{background:#F0F4FF;position:sticky;left:0;z-index:6;border-right:2px solid #C3E6FF;min-width:155px}
+
+/* Photo row */
+.photo-row .lcell-top{background:#F0F4FF}
+.pcell{min-width:150px;max-width:220px;text-align:center;vertical-align:bottom;border-right:1px solid #DBE5FF;padding:0;position:relative}
+.pcell-inner{position:relative}
+.prop-img{width:100%;height:115px;object-fit:cover;display:block}
+.ph-img{width:100%;height:115px;background:#DBE5FF;display:flex;align-items:center;justify-content:center;font-size:28px}
+.col-cb{position:absolute;top:6px;left:6px;width:16px;height:16px;accent-color:#1C54F4;cursor:pointer;z-index:2}
+
+/* Number badge row */
+.nbadge-cell{background:#000759;text-align:center;padding:7px 4px;border-right:1px solid rgba(255,255,255,.15)}
+.nbadge{font-size:15px;font-weight:700;color:#fff}
+
+/* Building name row */
+.name-cell-td{background:#1C54F4;text-align:center;padding:8px 8px;font-size:11px;font-weight:700;color:#fff;line-height:1.3;border-right:1px solid rgba(255,255,255,.15)}
+
+/* Data cells */
+.dcell{padding:7px 10px;border-bottom:1px solid #EEF3FF;border-right:1px solid #EEF3FF;color:#353E59;text-align:center;vertical-align:middle;transition:background .1s}
+.row-even .dcell{background:#FAFBFF}
+.row-odd .dcell{background:#fff}
+
+/* Selected column highlight */
+.csel .pcell,.csel .dcell{background:#EAF0FF!important}
+.csel .nbadge-cell{background:#1C54F4!important}
+.csel .name-cell-td{background:#000759!important}
+
+.cb{display:inline-block;font-size:9px;padding:1px 6px;background:#DBE5FF;color:#25408F;font-weight:700}
+.sv{font-weight:700;color:#1C54F4;font-size:12px}
+.rent-v{font-weight:700;color:#25408F;font-size:12px}
+.acq-inp{width:80px;border:1px solid #DBE5FF;padding:3px 6px;font-family:inherit;font-size:11px;text-align:center;background:#FFFDF0;color:#000759}
+.acq-inp:focus{outline:none;border-color:#1C54F4}
+.et{text-align:center;padding:3rem 2rem;color:#56648F;font-size:13px}
+
+/* View toggle tabs */
+.view-tabs{display:flex;gap:0;padding:0 .75rem;background:#F8FAFF;border-bottom:1px solid #DBE5FF}
+.view-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:#56648F;font-family:inherit;font-size:11px;font-weight:600;padding:8px 14px;cursor:pointer;transition:all .15s;margin-bottom:-1px}
+.view-tab:hover{color:#25408F}
+.view-tab.active{color:#1C54F4;border-bottom-color:#1C54F4}
+
+/* List view */
+.ltable{width:100%;border-collapse:collapse;font-size:11px}
+.ltable thead tr{background:#25408F}
+.ltable th{padding:8px 10px;text-align:left;color:#fff;font-weight:600;font-size:10px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
+.ltable th:last-child{border-right:none}
+.ltable td{padding:6px 10px;border-bottom:1px solid #EEF3FF;color:#353E59;vertical-align:middle}
+.ltable tr:hover td{background:#F5F7FF}
+.ltable tr.lsr td{background:#EEF3FF}
+.lcc{text-align:center;width:32px}
+.list-photo{width:40px;height:28px;object-fit:cover;display:block;border-radius:1px}
+.lph{width:40px;height:28px;background:#DBE5FF;display:flex;align-items:center;justify-content:center;font-size:14px;border-radius:1px}
+.lname{font-weight:600;min-width:120px;color:#000759}
+
+/* Selection bar */
+.sb{background:#25408F;padding:.75rem 1.25rem;display:none;align-items:center;justify-content:space-between;gap:1rem}
+.sb-info{color:#fff;font-size:12px}
+.sb-info strong{color:#C3E6FF}
+.sn-names{font-size:10px;color:#C3E6FF;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:450px}
+.bp{background:#1C54F4;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:10px 24px;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s;white-space:nowrap;flex-shrink:0}
+.bp:hover{background:#000759}
+.bp:disabled{opacity:.4;cursor:not-allowed}
+.sp{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── STEP 3: PERSONALIZATION ── */
+.pers-body{padding:1.25rem;display:grid;grid-template-columns:1.4fr 1.8fr 1fr 1fr;gap:1.5rem}
+@media(max-width:1100px){.pers-body{grid-template-columns:1fr 1fr}}
+.pers-col{display:flex;flex-direction:column;gap:.5rem}
+.pers-lbl{font-size:10px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.06em}
+.pers-input{font-family:inherit;font-size:12px;padding:6px 9px;border:1px solid #DBE5FF;color:#000759;width:100%}
+.pers-input:focus{outline:none;border-color:#1C54F4}
+.pers-sel{font-family:inherit;font-size:12px;padding:6px 9px;border:1px solid #DBE5FF;color:#000759;width:100%;background:#fff}
+.pers-sel:focus{outline:none;border-color:#1C54F4}
+.chk-group{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.chk-item{display:flex;align-items:center;gap:8px;font-size:11px;color:#353E59;cursor:pointer}
+.chk-item input{accent-color:#25408F;width:13px;height:13px;cursor:pointer}
+.color-row{display:flex;align-items:center;gap:8px}
+.color-inp{width:38px;height:30px;border:1px solid #DBE5FF;cursor:pointer;padding:0;background:none}
+.sm{padding:.4rem 1.25rem .9rem;font-size:11px;color:#56648F;min-height:28px}
+
+/* ── STEP 4: PPT PREVIEW ── */
+.preview-body{padding:1.25rem}
+.preview-grid{display:flex;flex-wrap:wrap;gap:1rem}
+.thumb-card{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.thumb-slide{width:160px;height:90px;border-radius:2px;overflow:hidden;box-shadow:0 2px 8px rgba(0,7,89,.15);flex-shrink:0}
+.thumb-cover-s{background:#25408F;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:10px;gap:3px}
+.tc-brand{color:#fff;font-size:11px;font-weight:700;font-family:'Open Sans',sans-serif}
+.tc-bar{height:1px;background:#1C54F4;width:100%;margin:1px 0}
+.tc-title{color:#C3E6FF;font-size:7px;font-family:'Open Sans',sans-serif}
+.thumb-table-s{background:#fff;width:100%;height:100%;display:flex;flex-direction:column;padding:5px;gap:2px}
+.tt-hdr{background:#25408F;height:8px;border-radius:1px}
+.tt-body{display:flex;flex:1;gap:2px}
+.tt-label-col{background:#EEF3FF;width:32px;border-radius:1px}
+.tt-data-cols{display:flex;flex:1;gap:2px}
+.tt-dcol{flex:1;background:#F0F4FF;border-radius:1px}
+.thumb-ficha-s{background:#fff;width:100%;height:100%;display:flex;flex-direction:column;padding:5px;gap:2px}
+.tf-hdr{background:#25408F;height:8px;border-radius:1px}
+.tf-img{background:#DBE5FF;height:22px;border-radius:1px}
+.tf-rows{display:flex;flex-direction:column;gap:2px;flex:1}
+.tf-row{background:#EEF3FF;flex:1;border-radius:1px}
+.thumb-name{font-size:10px;color:#56648F;text-align:center;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:1px solid #DBE5FF;margin-top:1rem}
+
+/* FEEDBACK */
+.fb-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 14px rgba(0,7,89,.08);margin-top:1.5rem;overflow:hidden}
+.star-row{display:flex;gap:8px;margin:6px 0}
+.star{font-size:30px;cursor:pointer;color:#DBE5FF;transition:color .1s;line-height:1;user-select:none}
+.star.active,.star:hover{color:#F5A623}
+.fb-textarea{font-family:inherit;font-size:12px;padding:8px;border:1px solid #DBE5FF;color:#000759;width:100%;resize:vertical;min-height:70px}
+.fb-textarea:focus{outline:none;border-color:#1C54F4}
+.fb-body{padding:1.25rem;display:flex;flex-direction:column;gap:.75rem}
+.fb-thanks{background:#EEF3FF;border-left:3px solid #1C54F4;padding:.75rem 1rem;font-size:13px;color:#25408F;display:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nb">
+    <div class="nlogo">
+      <div class="nlogo-name">Colliers</div>
+      <div class="nlogo-bar"></div>
+    </div>
+    <div class="ndiv"></div>
+    <div class="nsubt">Generador de Alternativas</div>
+  </div>
+  <div class="nright">
+    <div class="ntag">Accelerating success.</div>
+    <div class="nu" id="nu">
+      <div class="na" id="na">MA</div>
+      <span class="nname" id="nn"></span>
+      <button class="nbtn" id="admin-btn" onclick="toggleAdmin()" style="display:none">Ver registros</button>
+      <button class="nbtn" onclick="logout()">Salir</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:#F0F4FF;z-index:150;overflow-y:auto;padding:2rem">
+  <div style="max-width:1400px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+      <h2 style="color:#25408F;font-size:20px;font-weight:700">Registros de descargas PPT</h2>
+      <button onclick="toggleAdmin()" style="background:#25408F;border:none;color:#fff;font-family:inherit;font-size:12px;padding:6px 16px;cursor:pointer">✕ Cerrar</button>
+    </div>
+    <div id="admin-table-wrap"><p style="color:#56648F;font-size:13px">Cargando...</p></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="ls">
+  <div class="lbox">
+    <div class="lbox-brand">Colliers</div>
+    <div class="lbox-bar"></div>
+    <h1>Generador de Alternativas</h1>
+    <p>Iniciá sesión con tu cuenta corporativa para acceder al sistema de búsqueda y generación de presentaciones.</p>
+    <button class="gbtn" id="login-btn">
+      <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
+      Iniciar sesión con Google
+    </button>
+    <div class="lnote">Solo cuentas @gmail.com tienen acceso</div>
+  </div>
+</div>
+
+<!-- DENIED -->
+<div id="ds">
+  <div class="dbox">
+    <h2>Acceso denegado</h2>
+    <p>Esta herramienta es exclusiva para cuentas <strong>@gmail.com</strong>.<br>
+    Cuenta: <span id="de" style="font-weight:600"></span></p>
+    <button class="gbtn" onclick="logout()" style="margin-top:1.5rem">Volver</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="as">
+  <div class="app-wrap">
+    <div class="app-grid">
+
+      <!-- STEP 1: LEFT PANEL (CHAT) -->
+      <aside class="side-panel">
+        <div class="panel-hd">
+          <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:28px;object-fit:contain">
+          <div class="panel-title">Asistente Colliers</div>
+          <div class="panel-badge">BETA</div>
+        </div>
+        <div class="cm" id="cm"></div>
+
+        <!-- Advanced filters toggle -->
+        <button class="cat" id="cat-btn" onclick="toggleFilters()">⚙ Filtros avanzados</button>
+        <div class="xf" id="xf">
+          <div class="fb">
+            <div class="fg">
+              <div class="fl">Zona</div>
+              <div class="fc" id="zona-fc"><span style="font-size:11px;color:#56648F">Cargando...</span></div>
+            </div>
+            <div class="fg">
+              <div class="fl">Superficie disponible m²</div>
+              <div class="frow">
+                <input type="number" id="fsmn" class="fi" placeholder="Mínimo">
+                <input type="number" id="fsmx" class="fi" placeholder="Máximo">
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fl">Asking Rent USD/m²</div>
+              <div class="frow">
+                <input type="number" id="frmn" class="fi" placeholder="Mínimo">
+                <input type="number" id="frmx" class="fi" placeholder="Máximo">
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fl">Categoría</div>
+              <div class="fc">
+                <label class="fk"><input type="checkbox" name="cat" value="A+ LEED Gold"> A+ LEED Gold</label>
+                <label class="fk"><input type="checkbox" name="cat" value="A+ LEED"> A+ LEED</label>
+                <label class="fk"><input type="checkbox" name="cat" value="A+"> A+</label>
+                <label class="fk"><input type="checkbox" name="cat" value="A"> A</label>
+                <label class="fk"><input type="checkbox" name="cat" value="B+"> B+</label>
+                <label class="fk"><input type="checkbox" name="cat" value="B"> B</label>
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fl">Cantidad de resultados</div>
+              <select id="fcant" class="fsel">
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="7">7</option>
+                <option value="10" selected>10</option>
+                <option value="0">Todos</option>
+              </select>
+            </div>
+          </div>
+          <div class="fa">
+            <button class="btn-search" onclick="applyFilters()">Buscar alternativas</button>
+            <button class="btn-reset" onclick="clearFilters()">Limpiar filtros</button>
+          </div>
+        </div>
+
+        <!-- Search actions -->
+        <div class="side-actions">
+          <button class="btn-search" onclick="applyFilters()">🔍 Buscar alternativas</button>
+          <button class="btn-reset" onclick="nuevaBusqueda()">↺ Nueva búsqueda</button>
+        </div>
+      </aside>
+
+      <!-- RIGHT PANEL -->
+      <main class="main-panel">
+
+        <!-- STEP 2: COMPARISON TABLE -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Alternativas encontradas</div>
+            <div class="card-hd-r">
+              <label class="sel-all-lbl">
+                <input type="checkbox" id="ca" onchange="toggleAll(this)">
+                Seleccionar todo
+              </label>
+              <span class="card-badge" id="sc">0 seleccionadas</span>
+            </div>
+          </div>
+          <div class="view-tabs">
+            <button class="view-tab active" id="tab-list" onclick="setView('list')">☰ Lista</button>
+            <button class="view-tab" id="tab-comp" onclick="setView('comp')">⊞ Comparativa</button>
+          </div>
+          <div class="table-outer">
+            <div id="tb">
+              <div class="et">Usá el chat o los filtros para buscar alternativas de oficinas</div>
+            </div>
+          </div>
+          <div class="sb" id="sb">
+            <div>
+              <div class="sb-info"><strong id="sn">0</strong> alternativas seleccionadas</div>
+              <div class="sn-names" id="sns"></div>
+            </div>
+            <button class="bp" id="bp" onclick="generarPPT()">📊 Generar presentación PPT ↗</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: PERSONALIZATION -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Personalizar presentación</div>
+          </div>
+          <div class="pers-body">
+            <div class="pers-col">
+              <div class="pers-lbl">Cliente / Informe</div>
+              <input type="text" id="kc" class="pers-input" placeholder="Ej: Securitas · Mayo 2026">
+              <div class="pers-lbl" style="margin-top:.5rem">Preparado para <span style="color:#ED1B34">*</span></div>
+              <input type="text" id="kp" class="pers-input" placeholder="Ej: Securitas SA">
+            </div>
+            <div class="pers-col">
+              <div class="pers-lbl">Contenido</div>
+              <div class="chk-group">
+                <label class="chk-item"><input type="checkbox" id="it" checked> Tabla comparativa completa</label>
+                <label class="chk-item"><input type="checkbox" id="if" checked> Slides individuales por alternativa</label>
+                <label class="chk-item"><input type="checkbox" id="idet"> Detalle técnico</label>
+                <label class="chk-item"><input type="checkbox" id="icon"> Conclusiones y recomendación</label>
+                <label class="chk-item"><input type="checkbox" id="iai"> Conclusiones y recomendación IA</label>
+              </div>
+            </div>
+            <div class="pers-col">
+              <div class="pers-lbl">Estilo</div>
+              <select class="pers-sel">
+                <option>Corporativo Premium</option>
+                <option>Moderno</option>
+                <option>Minimalista</option>
+              </select>
+              <div class="pers-lbl" style="margin-top:.75rem">Color principal</div>
+              <div class="color-row">
+                <input type="color" value="#1C54F4" class="color-inp">
+                <span style="font-size:11px;color:#56648F">#1C54F4</span>
+              </div>
+            </div>
+            <div class="pers-col">
+              <div class="pers-lbl">Orden de slides</div>
+              <select class="pers-sel">
+                <option>Por nombre</option>
+                <option>Por superficie</option>
+                <option>Por precio</option>
+              </select>
+            </div>
+          </div>
+          <div class="sm" id="sm"></div>
+        </div>
+
+        <!-- STEP 4: PPT PREVIEW -->
+        <div class="card" id="preview-section" style="display:none">
+          <div class="card-hd">
+            <div class="card-title">Preview de la presentación</div>
+          </div>
+          <div class="preview-body">
+            <div class="preview-grid" id="preview-thumbs"></div>
+          </div>
+        </div>
+
+        <!-- STEP 5: FEEDBACK -->
+        <div class="fb-card" id="feedback-section" style="display:none">
+          <div class="card-hd">
+            <div class="card-title">Feedback</div>
+          </div>
+          <div class="fb-body">
+            <div class="pers-lbl">¿Cómo fue tu experiencia?</div>
+            <div class="star-row" id="star-row">
+              <span class="star" data-v="1">&#9733;</span>
+              <span class="star" data-v="2">&#9733;</span>
+              <span class="star" data-v="3">&#9733;</span>
+              <span class="star" data-v="4">&#9733;</span>
+              <span class="star" data-v="5">&#9733;</span>
+            </div>
+            <div class="pers-lbl" style="margin-top:.25rem">Sugerencias o comentarios</div>
+            <textarea id="fb-comment" class="fb-textarea" placeholder="Escribí tu comentario aquí..."></textarea>
+            <button class="btn-search" onclick="enviarFeedback()" style="max-width:220px">Enviar feedback</button>
+            <div class="fb-thanks" id="fb-thanks">&#10003; ¡Gracias por tu feedback! Tu opinión nos ayuda a mejorar.</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+  <footer>Colliers International Argentina · Uso interno · Generador de Alternativas</footer>
+</div>
+
+<script>
+const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=1012730079&single=true&output=csv";
+const DOM = "gmail.com";
+const CLIENT_ID = "312606519681-q1bkpeug6sonp48bc6842o02hs71uma2.apps.googleusercontent.com";
+const ANTHROPIC_API_KEY = ""; // completar con clave Anthropic
+const GOOGLE_MAPS_KEY = ""; // completar con clave Google Maps Static API
+const EMAILJS_SERVICE_ID = ""; // completar
+const EMAILJS_TEMPLATE_ID = ""; // completar
+const EMAILJS_PUBLIC_KEY = ""; // completar
+const FIREBASE_CONFIG = {}; // completar con config de Firebase
+
+let db = null;
+try{
+  if(Object.keys(FIREBASE_CONFIG).length){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore();
+  }
+}catch(e){console.warn("Firebase no configurado:",e);}
+
+let user=null, props=[], filt=[], sel=new Set(), overviewData={};
+
+function decodeJWT(token){
+  const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+
+function initGSI(){
+  google.accounts.id.initialize({
+    client_id:CLIENT_ID,
+    callback:handleCredentialResponse,
+    auto_select:false,
+    cancel_on_tap_outside:true
+  });
+  const saved=sessionStorage.getItem('gsi_user');
+  if(saved){
+    try{user=JSON.parse(saved);onUserLoggedIn();}catch(e){sessionStorage.removeItem('gsi_user');show('ls');}
+  }else{
+    show('ls');
+  }
+}
+
+function handleCredentialResponse(response){
+  const payload=decodeJWT(response.credential);
+  if(!payload.email.endsWith('@'+DOM)){
+    document.getElementById('de').textContent=payload.email;
+    show('ds');
+    return;
+  }
+  user={email:payload.email,displayName:payload.name};
+  sessionStorage.setItem('gsi_user',JSON.stringify(user));
+  onUserLoggedIn();
+}
+
+function onUserLoggedIn(){
+  const ini=(user.displayName||user.email).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('na').textContent=ini;
+  document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
+  document.getElementById('nu').style.display='flex';
+  show('as');
+  if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
+  Promise.all([loadData(),cargarOverview()]).then(()=>startChat((user.displayName||'').split(' ')[0]||'Broker'));
+}
+
+window.loginGoogle=()=>{google.accounts.id.prompt();};
+window.logout=()=>{
+  google.accounts.id.disableAutoSelect();
+  sessionStorage.removeItem('gsi_user');
+  user=null;
+  document.getElementById('nu').style.display='none';
+  show('ls');
+};
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('login-btn').addEventListener('click',()=>{google.accounts.id.prompt();});
+});
+
+window.onGoogleLibraryLoad=initGSI;
+if(typeof google!=='undefined'&&google.accounts)initGSI();
+
+async function loadData(){
+  try{
+    const r=await fetch(CSV);
+    const csv=await r.text();
+    props=parseCSV(csv);
+    populateZonas();
+  }catch(e){console.error(e);}
+}
+
+async function cargarOverview(){
+  try{
+    const base='https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=824813475&single=true&output=csv';
+    const url='https://corsproxy.io/?'+encodeURIComponent(base);
+    const txt=await(await fetch(url)).text();
+    overviewData={};
+    txt.replace(/\r/g,'').split('\n').slice(1).forEach(line=>{
+      const idx=line.indexOf(',');
+      if(idx>0){
+        const k=line.substring(0,idx).replace(/"/g,'').trim();
+        const v=line.substring(idx+1).replace(/"/g,'').trim();
+        if(k)overviewData[k]=v;
+      }
+    });
+    console.log('Overview:',JSON.stringify(overviewData));
+  }catch(e){console.error('Overview error:',e);}
+}
+
+function parseCSV(csv){
+  const lines=csv.split("\n").filter(l=>l.trim());
+  if(lines.length<2)return[];
+  const hdrs=lines[0].split(",").map(h=>h.replace(/"/g,"").trim());
+  const c=h=>hdrs.indexOf(h);
+  return lines.slice(1).map(line=>{
+    const v=parseLine(line);
+    if(!v[c("Nombre Edificio")])return null;
+    if((v[c("Activo (SI/NO)")]||"SI").toUpperCase()==="NO")return null;
+    return{
+      nombre:v[c("Nombre Edificio")]||"–",
+      direccion:v[c("Dirección")]||"–",
+      submercado:v[c("Submercado")]||"–",
+      cat:v[c("Categoría")]||"–",
+      anio:v[c("Año Construcción")]||"–",
+      pisos:v[c("Pisos Totales")]||"–",
+      cocheras:v[c("Ratio Cocheras")]||"–",
+      supDisp:parseFloat((v[c("Superficie Disponible m²")]||"0").replace(/\./g,"").replace(",","."))||0,
+      pisosDisp:v[c("Pisos Disponibles")]||"–",
+      supPlanta:parseFloat((v[c("Sup. Promedio Planta m²")]||"0").replace(/\./g,"").replace(",","."))||0,
+      supMinima:parseFloat((v[c("Sup. Mínima Divisible m²")]||"0").replace(/\./g,"").replace(",","."))||0,
+      rent:v[c("Asking Rent USD/m²")]||"–",
+      comentarios:v[c("Comentarios / Amenities")]||"–",
+      foto:v[c("URL Foto")]||"",
+    };
+  }).filter(Boolean);
+}
+
+function parseLine(line){
+  const r=[];let cur="",inQ=false;
+  for(let i=0;i<line.length;i++){
+    if(line[i]==="\""){inQ=!inQ;continue;}
+    if(line[i]===","&&!inQ){r.push(cur.trim());cur="";continue;}
+    cur+=line[i];
+  }
+  r.push(cur.trim());return r;
+}
+
+function populateZonas(){
+  const fallback=['Norte CABA','Norte GBA','Catalinas','Puerto Madero','Microcentro','Macrocentro','Macrocentro Sur','Plaza Roma','Retiro','Sur CABA'];
+  const zonas=props.length>0?[...new Set(props.map(p=>p.submercado).filter(Boolean))].sort():fallback;
+  document.getElementById('zona-fc').innerHTML=zonas.map(z=>
+    `<label class="fk"><input type="checkbox" name="zona" value="${z}"> ${z}</label>`
+  ).join('');
+  STEPS[0].opts=zonas;
+}
+
+async function imgToBase64(url) {
+  if (!url) return null;
+  const urls = [url, `https://corsproxy.io/?${encodeURIComponent(url)}`];
+  for (const u of urls) {
+    try {
+      const resp = await fetch(u, {mode:'cors'});
+      if (!resp.ok) continue;
+      const blob = await resp.blob();
+      return await new Promise((res,rej) => {
+        const r = new FileReader();
+        r.onloadend = () => res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(blob);
+      });
+    } catch(e) { continue; }
+  }
+  return null;
+}
+
+let _logoB64=null;
+async function addLogo(slide,grande=false){
+  if(!_logoB64)_logoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png');
+  if(_logoB64){
+    slide.addImage({data:_logoB64,x:11.3,y:0.02,w:1.9,h:0.62});
+  }
+}
+
+const STEPS=[
+  {id:"zona",     type:"multi",  confirm:"Confirmar zona",
+   q:n=>`¡Hola ${n}! ¿En qué zona o zonas querés buscar? <span style="color:#ED1B34;font-size:10px;font-weight:700;">* obligatorio</span>`, opts:[]},
+  {id:"sup",      type:"range",  ph:["Mínimo m²","Máximo m²"],
+   q:()=>`¿Qué superficie necesitás? (m²) <span style="color:#ED1B34;font-size:10px;font-weight:700;">* obligatorio</span>`},
+  {id:"rent",     type:"range",  ph:["Mínimo USD/m²","Máximo USD/m²"],
+   q:()=>"¿Cuál es el rango de Asking Rent? (USD/m²)"},
+  {id:"cocheras", type:"single",
+   q:()=>"¿Necesitás cocheras?",
+   opts:["Con cocheras","Sin preferencia"]},
+  {id:"cat",      type:"multi",  confirm:"Confirmar categoría",
+   q:()=>"¿Qué categorías de edificio buscás?",
+   opts:["A+ LEED Gold","A+ LEED","A+","A","B+","B"]},
+  {id:"cant",     type:"single",
+   q:()=>"¿Cuántas opciones querés ver?",
+   opts:["3","5","7","10","Todas"]},
+];
+
+let step=0, resp={}, view='list';
+
+function startChat(nombre){
+  step=0; resp={};
+  document.querySelectorAll('input[name="zona"],input[name="cat"]').forEach(c=>c.checked=false);
+  ['fsmn','fsmx','frmn','frmx'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fcant').value='10';
+  filt=[]; sel.clear(); view='list';
+  document.getElementById('tab-list')?.classList.add('active');
+  document.getElementById('tab-comp')?.classList.remove('active');
+  renderTable();
+  document.getElementById("cm").innerHTML="";
+  botMsg(STEPS[0].q(nombre), STEPS[0]);
+}
+
+window.nuevaBusqueda=()=>startChat((user?.displayName||'').split(' ')[0]||'Broker');
+
+function botMsg(txt, stepDef){
+  const w=document.getElementById("cm");
+  const row=document.createElement("div"); row.className="msg-row";
+  const av=document.createElement("img"); av.className="msg-av";
+  av.src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png";
+  const m=document.createElement("div");
+  m.className="msg mb"; m.innerHTML=txt;
+  row.appendChild(av); row.appendChild(m); w.appendChild(row);
+  if(!stepDef){w.scrollTop=w.scrollHeight;return;}
+
+  const od=document.createElement("div"); od.className="co"; od.dataset.sid=stepDef.id;
+
+  if(stepDef.type==='single'){
+    stepDef.opts.forEach(op=>{
+      const b=document.createElement("button"); b.textContent=op;
+      if(resp[stepDef.id]===op) b.classList.add("sel");
+      b.onclick=()=>pickSingle(op,od,stepDef.id);
+      od.appendChild(b);
+    });
+  } else if(stepDef.type==='multi'){
+    stepDef.opts.forEach(op=>{
+      const b=document.createElement("button"); b.textContent=op;
+      const cur=resp[stepDef.id]||[];
+      if(cur.includes(op)) b.classList.add("sel");
+      b.onclick=()=>b.classList.toggle("sel");
+      od.appendChild(b);
+    });
+    const ok=document.createElement("button"); ok.className="co-ok";
+    ok.textContent=stepDef.confirm||"Confirmar →";
+    ok.onclick=()=>confirmMulti(od,stepDef.id);
+    od.appendChild(ok);
+  } else if(stepDef.type==='range'){
+    const row=document.createElement("div"); row.className="co-rrow";
+    const mn=document.createElement("input"); mn.type="number"; mn.placeholder=stepDef.ph[0]; mn.className="co-ri";
+    const mx=document.createElement("input"); mx.type="number"; mx.placeholder=stepDef.ph[1]; mx.className="co-ri";
+    const cur=resp[stepDef.id]||['',''];
+    mn.value=cur[0]||''; mx.value=cur[1]||'';
+    row.appendChild(mn); row.appendChild(mx); od.appendChild(row);
+    const ok=document.createElement("button"); ok.className="co-ok";
+    ok.textContent="Confirmar →";
+    ok.onclick=()=>confirmRange(od,stepDef.id,mn,mx);
+    od.appendChild(ok);
+  }
+
+  w.appendChild(od); w.scrollTop=w.scrollHeight;
+}
+
+function userMsg(txt){
+  const w=document.getElementById("cm");
+  const m=document.createElement("div"); m.className="msg mu"; m.textContent=txt;
+  w.appendChild(m); w.scrollTop=w.scrollHeight;
+}
+
+function pickSingle(val,od,id){
+  od.querySelectorAll("button:not(.co-ok)").forEach(b=>b.classList.toggle("sel",b.textContent===val));
+  const isNew=!(id in resp);
+  resp[id]=val; chatToFilters(id,val);
+  if(isNew){ userMsg(val); advanceStep(id); }
+  else if(allAnswered()){ applyFilters(); }
+}
+
+function confirmMulti(od,id){
+  const vals=[...od.querySelectorAll("button:not(.co-ok).sel")].map(b=>b.textContent);
+  const isNew=!(id in resp);
+  resp[id]=vals; chatToFilters(id,vals);
+  if(isNew){
+    userMsg(vals.length?vals.join(', '):'Todas las zonas');
+    advanceStep(id);
+  } else if(allAnswered()){ applyFilters(); }
+}
+
+function confirmRange(od,id,mn,mx){
+  const val=[mn.value,mx.value];
+  const isNew=!(id in resp);
+  resp[id]=val; chatToFilters(id,val);
+  const lbl=[val[0]?`desde ${val[0]}`:'',val[1]?`hasta ${val[1]}`:''].filter(Boolean).join(' ')||'Sin límite';
+  if(isNew){ userMsg(lbl); advanceStep(id); }
+  else if(allAnswered()){ applyFilters(); }
+}
+
+function advanceStep(id){
+  const idx=STEPS.findIndex(s=>s.id===id);
+  step=idx+1;
+  setTimeout(()=>{
+    if(step<STEPS.length) botMsg(STEPS[step].q(),STEPS[step]);
+    else{ botMsg("Buscando alternativas..."); setTimeout(applyFilters,500); }
+  },300);
+}
+
+function allAnswered(){ return STEPS.every(s=>s.id in resp); }
+
+function chatToFilters(id,val){
+  if(id==='zona'){
+    const vals=Array.isArray(val)?val:[];
+    document.querySelectorAll('input[name="zona"]').forEach(c=>{c.checked=vals.includes(c.value);});
+  } else if(id==='sup'){
+    const v=Array.isArray(val)?val:['',''];
+    document.getElementById('fsmn').value=v[0]||''; document.getElementById('fsmx').value=v[1]||'';
+  } else if(id==='rent'){
+    const v=Array.isArray(val)?val:['',''];
+    document.getElementById('frmn').value=v[0]||''; document.getElementById('frmx').value=v[1]||'';
+  } else if(id==='cocheras'){
+    // recorded in resp, used at filter time
+  } else if(id==='cat'){
+    const vals=Array.isArray(val)?val:[];
+    document.querySelectorAll('input[name="cat"]').forEach(c=>{c.checked=vals.includes(c.value);});
+  } else if(id==='cant'){
+    document.getElementById('fcant').value=val==='Todas'?'0':(val||'10');
+  }
+}
+
+window.toggleFilters=()=>{
+  const xf=document.getElementById('xf');
+  const btn=document.getElementById('cat-btn');
+  const open=xf.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  btn.textContent=open?'⚙ Filtros avanzados ▲':'⚙ Filtros avanzados';
+};
+
+function applyFilters(){
+  const zonas=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
+  const supMin=parseFloat(document.getElementById('fsmn').value)||0;
+  const supMax=parseFloat(document.getElementById('fsmx').value)||Infinity;
+  const rentMin=parseFloat(document.getElementById('frmn').value)||0;
+  const rentMax=parseFloat(document.getElementById('frmx').value)||Infinity;
+  const cats=[...document.querySelectorAll('input[name="cat"]:checked')].map(c=>c.value);
+  const cantVal=parseInt(document.getElementById('fcant').value)||0;
+  const needCocheras=resp.cocheras==="Con cocheras";
+  let r=props.filter(p=>{
+    if(zonas.length&&!zonas.some(z=>p.submercado===z))return false;
+    const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
+    if(supMin&&p.supDisp<supMin&&(p.supPlanta||0)<supMin&&(p.supMinima||0)<supMin)return false;
+    if(supMax<Infinity&&supRef>supMax)return false;
+    const rn=parseFloat(String(p.rent).split('–')[0].replace(',','.'))||0;
+    if(rentMin&&rn<rentMin)return false;
+    if(rentMax<Infinity&&rn>rentMax)return false;
+    if(cats.length&&!cats.some(c=>p.cat===c))return false;
+    if(needCocheras&&(p.cocheras==="–"||p.cocheras==="0"))return false;
+    return true;
+  });
+  if(cantVal>0)r=r.slice(0,cantVal);
+  filt=r;sel.clear();renderTable();
+}
+
+window.clearFilters=()=>{
+  document.querySelectorAll('input[name="zona"],input[name="cat"]').forEach(c=>c.checked=false);
+  ['fsmn','fsmx','frmn','frmx'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fcant').value='10';
+  filt=[];sel.clear();renderTable();
+};
+
+function setView(v){
+  view=v;
+  document.getElementById('tab-list').classList.toggle('active',v==='list');
+  document.getElementById('tab-comp').classList.toggle('active',v==='comp');
+  renderTable();
+}
+
+function renderTable(){
+  view==='list'?renderListView():renderCompView();
+}
+
+function renderListView(){
+  const ct=document.getElementById("tb");
+  if(!filt.length){
+    ct.innerHTML='<div class="et">Sin resultados. Ajustá los filtros o usá el chat para buscar.</div>';
+    updBar();return;
+  }
+  let h='<table class="ltable"><thead><tr>';
+  h+='<th class="lcc"></th><th>Foto</th><th>Edificio</th><th>Submercado</th><th>Cat.</th><th>Sup. disp. m²</th><th>Asking Rent</th>';
+  h+='</tr></thead><tbody>';
+  filt.forEach((p,i)=>{
+    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}"><td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td><td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\'lph\'>🏢</div>'">`:'<div class="lph">🏢</div>'}</td><td class="lname">${p.nombre}</td><td>${p.submercado}</td><td><span class="cb">${p.cat}</span></td><td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span></td><td><span class="rent-v">USD ${p.rent}</span></td></tr>`;
+  });
+  h+='</tbody></table>';
+  ct.innerHTML=h;
+  updBar();
+}
+
+function renderCompView(){
+  const ct=document.getElementById("tb");
+  if(!filt.length){
+    ct.innerHTML='<div class="et">Sin resultados. Ajustá los filtros o usá el chat para buscar.</div>';
+    updBar();return;
+  }
+
+  const ROWS=[
+    {lbl:"Dirección",     fn:p=>p.direccion},
+    {lbl:"Submercado",    fn:p=>p.submercado},
+    {lbl:"Categoría",     fn:p=>`<span class="cb">${p.cat}</span>`},
+    {lbl:"Año",           fn:p=>p.anio},
+    {lbl:"Pisos totales", fn:p=>p.pisos},
+    {lbl:"Sup. disponible m²", fn:p=>`<span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span>`},
+    {lbl:"Cocheras",      fn:p=>p.cocheras},
+    {lbl:"Pisos disponibles", fn:p=>p.pisosDisp},
+    {lbl:"Sup. promedio m²",  fn:p=>p.supPlanta?p.supPlanta.toLocaleString("es-AR")+" m²":"–"},
+    {lbl:"Sup. a adquirir",   fn:(_,i)=>`<input type="text" class="acq-inp" id="acq-${i}" placeholder="Ingresar m²">`},
+    {lbl:"Asking rent USD/m²",fn:p=>`<span class="rent-v">USD ${p.rent}</span>`},
+    {lbl:"Comentarios",   fn:p=>p.comentarios||"–"},
+  ];
+
+  let h='<table class="ctable"><tbody>';
+
+  h+='<tr class="photo-row"><td class="lcell-top"></td>';
+  filt.forEach((p,i)=>{
+    h+=`<td class="pcell coli-${i}"><div class="pcell-inner"><input type="checkbox" class="col-cb" id="cb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)">${p.foto?`<img src="${p.foto}" class="prop-img" onerror="this.outerHTML='<div class=\'ph-img\'>🏢</div>'">`:'<div class="ph-img">🏢</div>'}</div></td>`;
+  });
+  h+='</tr>';
+
+  h+='<tr class="num-row"><td class="lcell-top" style="background:#F0F4FF;border-right:2px solid #C3E6FF"></td>';
+  filt.forEach((_,i)=>{
+    h+=`<td class="nbadge-cell coli-${i}"><span class="nbadge">${i+1}</span></td>`;
+  });
+  h+='</tr>';
+
+  h+='<tr class="name-row"><td class="lcell-top" style="background:#F0F4FF;border-right:2px solid #C3E6FF"></td>';
+  filt.forEach((p,i)=>{
+    h+=`<td class="name-cell-td coli-${i}">${p.nombre}</td>`;
+  });
+  h+='</tr>';
+
+  ROWS.forEach(({lbl,fn},ri)=>{
+    h+=`<tr class="${ri%2===0?"row-even":"row-odd"}"><td class="lcell">${lbl}</td>`;
+    filt.forEach((p,i)=>{
+      h+=`<td class="dcell coli-${i}">${fn(p,i)}</td>`;
+    });
+    h+='</tr>';
+  });
+
+  h+='</tbody></table>';
+  ct.innerHTML=h;
+  sel.forEach(i=>_highlightCol(i,true));
+  updBar();
+}
+
+function _highlightCol(i,on){
+  const lr=document.getElementById(`lr-${i}`);
+  if(lr)lr.className=on?'lsr':'';
+  const lcb=document.getElementById(`lcb-${i}`);
+  if(lcb)lcb.checked=on;
+  const pcell=document.querySelector(`.photo-row .coli-${i}`);
+  if(pcell)pcell.style.background=on?'#EAF0FF':'';
+  const nbcell=document.querySelector(`.num-row .coli-${i}`);
+  if(nbcell)nbcell.style.background=on?'#1C54F4':'#000759';
+  const nmcell=document.querySelector(`.name-row .coli-${i}`);
+  if(nmcell)nmcell.style.background=on?'#000759':'#1C54F4';
+  document.querySelectorAll(`.row-even .coli-${i},.row-odd .coli-${i}`).forEach(td=>{
+    td.style.background=on?'#EAF0FF':'';
+  });
+  const cb=document.getElementById(`cb-${i}`);
+  if(cb)cb.checked=on;
+}
+
+window.toggleRow=(i,cb)=>{
+  if(cb.checked)sel.add(i);else sel.delete(i);
+  _highlightCol(i,cb.checked);
+  updBar();
+};
+
+window.toggleAll=(cb)=>{
+  filt.forEach((_,i)=>{
+    if(cb.checked)sel.add(i);else sel.delete(i);
+    _highlightCol(i,cb.checked);
+  });
+  updBar();
+};
+
+function updBar(){
+  const n=sel.size;
+  document.getElementById("sc").textContent=`${n} seleccionada${n!==1?"s":""}`;
+  document.getElementById("sb").style.display=n>0?"flex":"none";
+  document.getElementById("sn").textContent=n;
+  document.getElementById("sns").textContent=[...sel].map(i=>filt[i]?.nombre).filter(Boolean).join(", ");
+  updatePreview();
+}
+
+function updatePreview(){
+  const sp=[...sel].map(i=>filt[i]).filter(Boolean);
+  const sec=document.getElementById("preview-section");
+  if(!sp.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  const grid=document.getElementById("preview-thumbs");
+  let h='';
+
+  h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-cover-s"><div class="tc-brand">Colliers</div><div class="tc-bar"></div><div class="tc-title">Alternativas de Oficinas</div></div></div><div class="thumb-name">Portada</div></div>`;
+
+  if(document.getElementById("it").checked){
+    const ng=Math.ceil(sp.length/6);
+    for(let g=0;g<ng;g++){
+      const cols=sp.slice(g*6,(g+1)*6);
+      h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-table-s"><div class="tt-hdr"></div><div class="tt-body"><div class="tt-label-col"></div><div class="tt-data-cols">${cols.map(()=>'<div class="tt-dcol"></div>').join('')}</div></div></div></div><div class="thumb-name">Tabla ${ng>1?`${g+1}/${ng}`:''}</div></div>`;
+    }
+  }
+
+  if(document.getElementById("if").checked){
+    sp.forEach((p,i)=>{
+      h+=`<div class="thumb-card"><div class="thumb-slide"><div class="thumb-ficha-s"><div class="tf-hdr"></div><div class="tf-img"></div><div class="tf-rows"><div class="tf-row"></div><div class="tf-row"></div><div class="tf-row"></div></div></div></div><div class="thumb-name">${i+1}. ${p.nombre}</div></div>`;
+    });
+  }
+
+  grid.innerHTML=h;
+}
+
+window.generarPPT=async()=>{
+  const sp=[...sel].map(i=>filt[i]).filter(Boolean);
+  if(!sp.length)return;
+  const btn=document.getElementById("bp");
+  const msg=document.getElementById("sm");
+  const cliente=document.getElementById("kc").value.trim()||"Colliers Internacional";
+  const kpVal=document.getElementById("kp").value.trim();
+  if(!('zona' in resp)){msg.style.color='#ED1B34';msg.textContent='⚠ Zona es obligatoria. Completá el chat primero.';return;}
+  if(!('sup' in resp)){msg.style.color='#ED1B34';msg.textContent='⚠ Superficie es obligatoria. Completá el chat primero.';return;}
+  if(!kpVal){msg.style.color='#ED1B34';msg.textContent='⚠ El campo "Preparado para" es obligatorio.';return;}
+  msg.style.color='';
+  const prepPara=kpVal;
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generando…';
+  msg.textContent="Cargando imágenes…";
+  const portadas=[
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%201.jpg',
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%202.png',
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%203.jpg'
+  ];
+  const portadaURL=portadas[Math.floor(Math.random()*portadas.length)];
+  const cierres=[
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Final%201.png',
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Final%202.png',
+    'https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Final%203.jpg'
+  ];
+  const cierreURL=cierres[Math.floor(Math.random()*cierres.length)];
+  const fotos=await Promise.all(sp.map(p=>p.foto?imgToBase64(p.foto):Promise.resolve(null)));
+  const [portadaB64,mapaB64,cierreB64]=await Promise.all([
+    imgToBase64(portadaURL),
+    imgToBase64("https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/mapa-mercado.png"),
+    imgToBase64(cierreURL)
+  ]);
+  msg.textContent="Preparando presentación…";
+  try{
+    const pptx=new window.PptxGenJS();
+    pptx.layout="LAYOUT_WIDE";
+    const DARK="25408F",MID="1C54F4",PALE="C3E6FF",WHITE="FFFFFF",DEEP="000759";
+    const meses=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    const fechaStr=`${meses[new Date().getMonth()]} ${new Date().getFullYear()}`;
+
+    // PORTADA
+    const s0=pptx.addSlide();
+    if(portadaB64){s0.addImage({data:portadaB64,x:0,y:0,w:13.33,h:7.5});}
+    else{s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});}
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:1.2,w:5.8,h:3.8,fill:{color:MID}});
+    s0.addText("Informe de Alternativas",{x:0.3,y:1.4,w:5.4,h:1.5,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s0.addText(cliente,{x:0.3,y:3.3,w:5.4,h:0.65,fontSize:16,italic:true,color:WHITE,fontFace:"Merriweather"});
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:5.0,w:5.8,h:1.5,fill:{color:WHITE}});
+    s0.addText(fechaStr,{x:0.3,y:5.1,w:5.4,h:0.38,fontSize:13,bold:true,color:DARK,fontFace:"Open Sans"});
+    s0.addText(`Preparado para: ${prepPara}`,{x:0.3,y:5.52,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
+    s0.addText("Preparado por: Colliers Argentina",{x:0.3,y:5.9,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
+    s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:5.8,h:0.6,fill:{color:DEEP}});
+    s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
+
+    // OVERVIEW DE MERCADO
+    const s1=pptx.addSlide();
+    s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+    s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
+    const ovTitulo="Resumen informe de mercado "+(overviewData['Fecha actualización']||'');
+    s1.addText(ovTitulo,{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s1.addText("General Data",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
+    if(mapaB64){s1.addImage({data:mapaB64,x:0.2,y:1.3,w:5.8,h:5.2});}
+    else{s1.addShape(pptx.ShapeType.rect,{x:0.2,y:1.3,w:5.8,h:5.2,fill:{color:"DBE5FF"}});}
+    const ovBullets=[
+      {lbl:"Edificios",val:overviewData['Edificios']||'–'},
+      {lbl:"Inventario",val:(overviewData['Inventario m²']||'–')+" m²"},
+      {lbl:"Sup. Disponible",val:(overviewData['Sup. Disponible']||'–')+" m²"},
+      {lbl:"Vacancia",val:(overviewData['Vacancia %']||'–')+"%"},
+      {lbl:"Asking Rent prom",val:(overviewData['Asking Rent prom']||'–')+" USD/m²"},
+    ];
+    ovBullets.forEach(({lbl,val},i)=>{
+      const iy=2.0+i*0.7;
+      s1.addText([{text:"• "+lbl+":  ",options:{bold:true,color:DARK}},{text:val,options:{bold:false,color:"353E59"}}],{x:6,y:iy,w:7.0,h:0.55,fontSize:18,fontFace:"Open Sans",valign:"middle"});
+    });
+    s1.addShape(pptx.ShapeType.rect,{x:8.5,y:6.5,w:4.5,h:0.6,fill:{color:MID}});
+    s1.addText("Para más información →",{x:8.5,y:6.5,w:4.5,h:0.6,fontSize:13,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:"https://colliersar.my.canva.site/reporte-de-oficinas-q1-2026",tooltip:"Ver reporte completo"}});
+
+    // TABLA COMPARATIVA
+    if(document.getElementById("it").checked){
+      // ── Constantes de layout ─────────────────────────────────────────────
+      const SLIDE_W=13.33,SLIDE_H=7.5;
+      const MAX_COLS=6;
+      const LW=1.45;                        // label column — fijo siempre
+      const CW=(SLIDE_W-LW)/MAX_COLS;       // 1.98" — fijo siempre, nunca cambia
+      const GAP=0.03;                       // separador visual entre celdas
+      const PAD=0.06;                       // padding interno de texto
+      const IMG_Y=0.37,IMG_H=1.00;
+      const NUM_Y=IMG_Y+IMG_H,NUM_H=0.30;
+      const NAM_Y=NUM_Y+NUM_H,NAM_H=0.38;
+      const TABLE_TOP=NAM_Y+NAM_H;         // ~2.05"
+      const ROW_H=0.41;
+      const ROWS=[
+        ["Dirección","direccion"],["Submercado","submercado"],["Categoría","cat"],
+        ["Año","anio"],["Pisos","pisos"],["Cocheras","cocheras"],
+        ["Sup. disponible m²","supDisp"],["Pisos disponibles","pisosDisp"],
+        ["Sup. planta m²","supPlanta"],["Asking Rent","rent"],["Comentarios","comentarios"],
+      ];
+
+      // ── Pre-crop de imágenes con Canvas (cover real, sin stretch) ─────────
+      // PptxGenJS genera stretch OOXML con sizing:cover; pre-recortamos en browser.
+      const DPI=200;
+      const PX_W=Math.round(CW*DPI);   // px objetivo por columna
+      const PX_H=Math.round(IMG_H*DPI);
+      async function cropImg(b64){
+        return new Promise(res=>{
+          const img=new Image();
+          img.onload=()=>{
+            const scale=Math.max(PX_W/img.naturalWidth,PX_H/img.naturalHeight);
+            const sw=Math.round(PX_W/scale);
+            const sh=Math.round(PX_H/scale);
+            const sx=Math.round((img.naturalWidth-sw)/2);
+            const sy=Math.round((img.naturalHeight-sh)/2);
+            const c=document.createElement('canvas');
+            c.width=PX_W; c.height=PX_H;
+            c.getContext('2d').drawImage(img,sx,sy,sw,sh,0,0,PX_W,PX_H);
+            res(c.toDataURL('image/jpeg',0.85));
+          };
+          img.onerror=()=>res(null);
+          img.src=b64;
+        });
+      }
+
+      // ── Paginado: grupos de MAX_COLS alternativas ─────────────────────────
+      const grupos=[];
+      for(let i=0;i<sp.length;i+=MAX_COLS)grupos.push(sp.slice(i,i+MAX_COLS));
+
+      // ── Render de cada slide ──────────────────────────────────────────────
+      for(const[gi,grupo] of grupos.entries()){
+        const ng=grupo.length;
+        const ox=(SLIDE_W-(LW+CW*ng))/2;
+        const dx=i=>ox+LW+i*CW;
+        const cw=CW-GAP;
+        // DEBUG — verificación de layout en consola
+        console.log(`[TABLA DEBUG] slide ${gi+1} | alternativas: ${ng} | CW=${CW.toFixed(4)}" | cw=${cw.toFixed(4)}" | ox=${ox.toFixed(4)}" | col0_x=${dx(0).toFixed(4)}" | col0_end=${(dx(0)+cw).toFixed(4)}" | tableW=${(LW+CW*ng).toFixed(4)}"`);
+        const sl=pptx.addSlide();
+
+        // Layer 1: fondo blanco
+        sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:SLIDE_W,h:SLIDE_H,fill:{color:WHITE}});
+
+        // Layer 2: header
+        sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:SLIDE_W,h:0.35,fill:{color:DARK}});
+        sl.addText("Alternativas de Oficinas",{x:0.2,y:0.04,w:7,h:0.27,fontSize:12,bold:true,color:WHITE,fontFace:"Open Sans",shrinkText:true});
+        if(grupos.length>1)sl.addText(`Pág. ${gi+1}/${grupos.length}`,{x:10,y:0.04,w:1.3,h:0.27,fontSize:9,color:PALE,align:"right",fontFace:"Open Sans",shrinkText:true});
+
+        // Layer 3: foto + número + nombre por columna
+        for(const[i,prop] of grupo.entries()){
+          const cx=dx(i);
+
+          // foto — pre-cropped, sin sizing, sin stretch
+          const rawB64=fotos[gi*MAX_COLS+i];
+          if(rawB64){
+            const cropped=await cropImg(rawB64);
+            if(cropped){
+              sl.addImage({data:cropped,x:cx,y:IMG_Y,w:cw,h:IMG_H});
+            }else{
+              sl.addShape(pptx.ShapeType.rect,{x:cx,y:IMG_Y,w:cw,h:IMG_H,fill:{color:"DBE5FF"}});
+            }
+          }else{
+            sl.addShape(pptx.ShapeType.rect,{x:cx,y:IMG_Y,w:cw,h:IMG_H,fill:{color:"DBE5FF"}});
+          }
+
+          // badge número
+          sl.addShape(pptx.ShapeType.rect,{x:cx,y:NUM_Y,w:cw,h:NUM_H,fill:{color:DEEP}});
+          sl.addText(String(i+1+gi*MAX_COLS),{x:cx,y:NUM_Y,w:cw,h:NUM_H,fontSize:12,bold:true,color:WHITE,align:"center",fontFace:"Open Sans",shrinkText:true});
+
+          // nombre
+          sl.addShape(pptx.ShapeType.rect,{x:cx,y:NAM_Y,w:cw,h:NAM_H,fill:{color:DARK}});
+          sl.addText(prop.nombre,{x:cx+PAD,y:NAM_Y,w:cw-PAD*2,h:NAM_H,fontSize:7,bold:true,color:WHITE,align:"center",wrap:true,fontFace:"Open Sans",shrinkText:true});
+        }
+
+        // Layer 4: filas de datos
+        for(const[ri,[lbl,key]] of ROWS.entries()){
+          const ry=TABLE_TOP+ri*ROW_H;
+          const bg=ri%2===0?"F4F7FF":WHITE;
+
+          // label column
+          sl.addShape(pptx.ShapeType.rect,{x:ox,y:ry,w:LW,h:ROW_H,fill:{color:bg}});
+          sl.addText(lbl,{x:ox+PAD,y:ry+PAD,w:LW-PAD*2,h:ROW_H-PAD*2,fontSize:7.5,bold:true,color:DARK,fontFace:"Open Sans",shrinkText:true});
+
+          // data columns
+          for(const[i,prop] of grupo.entries()){
+            const cx=dx(i);
+            sl.addShape(pptx.ShapeType.rect,{x:cx,y:ry,w:cw,h:ROW_H,fill:{color:bg}});
+            let val=prop[key]||"–";
+            if(key==="supDisp"&&prop[key])val=Number(prop[key]).toLocaleString("es-AR")+" m²";
+            if(key==="supPlanta"&&prop[key])val=Number(prop[key]).toLocaleString("es-AR")+" m²";
+            const isDisp=key==="supDisp";
+            const isCom=key==="comentarios";
+            if(isCom){
+              const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
+              sl.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:cx+PAD,y:ry+PAD,w:cw-PAD*2,h:ROW_H-PAD*2,fontSize:7,color:'353E59',align:'left',wrap:true,fontFace:'Open Sans',shrinkText:true});
+            }else{
+              sl.addText(String(val),{x:cx+PAD,y:ry+PAD,w:cw-PAD*2,h:ROW_H-PAD*2,fontSize:isDisp?9:7.5,bold:isDisp,color:isDisp?MID:"353E59",align:"center",wrap:true,fontFace:"Open Sans",shrinkText:true});
+            }
+          }
+        }
+
+        // Layer 5: footer
+        sl.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:SLIDE_W,h:0.28,fill:{color:DARK}});
+        sl.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans",shrinkText:true});
+      }
+    }
+
+    // FICHAS INDIVIDUALES
+    if(document.getElementById("if").checked){
+      for(const[idx,prop] of sp.entries()){
+        const s=pptx.addSlide();
+        s.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:0.68,fill:{color:DARK}});
+        s.addShape(pptx.ShapeType.rect,{x:0,y:0.68,w:13.33,h:0.04,fill:{color:MID}});
+        s.addText(`${idx+1}.  ${prop.nombre}`,{x:0.25,y:0.1,w:9.5,h:0.5,fontSize:18,bold:true,color:WHITE,fontFace:"Open Sans"});
+        s.addText(prop.submercado,{x:10.5,y:0.1,w:2.6,h:0.5,fontSize:12,color:PALE,align:"right",fontFace:"Open Sans"});
+        const campos=[
+          ["Dirección",prop.direccion],["Categoría",prop.cat],
+          ["Año de construcción",String(prop.anio)],["Pisos totales",String(prop.pisos)],
+          ["Ratio cocheras",prop.cocheras],["Sup. disponible",`${prop.supDisp?Number(prop.supDisp).toLocaleString("es-AR"):"–"} m²`],
+          ["Pisos disponibles",prop.pisosDisp],["Sup. prom. planta",`${prop.supPlanta?Number(prop.supPlanta).toLocaleString("es-AR"):"–"} m²`],
+        ];
+        for(const[fi,[lbl,val]] of campos.entries()){
+          const fy=0.88+fi*0.52;
+          const bg=fi%2===0?"F4F7FF":WHITE;
+          s.addShape(pptx.ShapeType.rect,{x:0.25,y:fy,w:6.5,h:0.5,fill:{color:bg}});
+          s.addText(lbl,{x:0.35,y:fy+0.08,w:2.2,h:0.36,fontSize:8,color:"56648F",fontFace:"Open Sans"});
+          s.addText(val,{x:2.65,y:fy+0.06,w:4.0,h:0.42,fontSize:9,bold:true,color:"353E59",fontFace:"Open Sans"});
+        }
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:0.88,w:6.08,h:2.0,fill:{color:DARK}});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:2.88,w:6.08,h:0.04,fill:{color:MID}});
+        s.addText("Average Asking Rent",{x:7.0,y:1.0,w:6.08,h:0.38,fontSize:11,color:PALE,align:"center",fontFace:"Open Sans"});
+        s.addText(`USD ${prop.rent} /m²`,{x:7.0,y:1.4,w:6.08,h:1.0,fontSize:28,bold:true,color:WHITE,align:"center",fontFace:"Open Sans"});
+        s.addText("+IVA",{x:7.0,y:2.42,w:6.08,h:0.3,fontSize:10,color:PALE,align:"center",fontFace:"Open Sans"});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:3.55,fill:{color:WHITE}});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.1,w:6.08,h:0.38,fill:{color:"DBE5FF"}});
+        s.addText("Características y amenities",{x:7.15,y:3.14,w:5.8,h:0.3,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
+        s.addShape(pptx.ShapeType.rect,{x:7.0,y:3.48,w:6.08,h:0.03,fill:{color:MID}});
+        const fb64=fotos[idx];
+        if(fb64){s.addImage({data:fb64,x:0.25,y:5.1,w:6.5,h:2.0});}
+        else{s.addShape(pptx.ShapeType.rect,{x:0.25,y:5.1,w:6.5,h:2.0,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:0.25,y:5.1,w:6.5,h:2.0,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"}); }
+        const bullets=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean);
+        s.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:7.15,y:3.56,w:5.8,h:2.9,fontSize:9,color:"353E59",align:'left',wrap:true,fontFace:'Open Sans'});
+        s.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+        s.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+        s.addText(`Alternativa ${idx+1} de ${sp.length}`,{x:11.2,y:7.25,w:1.9,h:0.2,fontSize:7,bold:true,color:WHITE,align:"right",fontFace:"Open Sans"});
+      }
+    }
+
+    // SLIDE CONCLUSIONES IA
+    if(document.getElementById("iai")?.checked&&ANTHROPIC_API_KEY){
+      try{
+        msg.textContent="Generando análisis IA…";
+        const aiPrompt=`Analizá estas ${sp.length} alternativas de oficinas y generá 3 recomendaciones concretas: ${sp.map(p=>p.nombre+' '+p.submercado+' USD'+p.rent).join(', ')}`;
+        const aiResp=await fetch("https://api.anthropic.com/v1/messages",{
+          method:"POST",
+          headers:{"x-api-key":ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","content-type":"application/json","anthropic-dangerous-direct-browser-access":"true"},
+          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:500,messages:[{role:"user",content:aiPrompt}]})
+        });
+        if(aiResp.ok){
+          const aiData=await aiResp.json();
+          const aiText=aiData.content?.[0]?.text||"Sin análisis disponible.";
+          const sAI=pptx.addSlide();
+          sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+          sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
+          sAI.addText("Conclusiones y Recomendaciones",{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+          sAI.addText("Análisis generado por IA · Colliers",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
+          const aiLines=aiText.split("\n").filter(l=>l.trim());
+          aiLines.forEach((line,i)=>{
+            const ly=1.5+i*0.85;
+            if(ly>6.5)return;
+            const isBullet=/^\d+\./.test(line.trim());
+            sAI.addText(line.trim(),{x:0.5,y:ly,w:12.3,h:0.75,fontSize:isBullet?14:12,bold:isBullet,color:isBullet?DARK:"353E59",fontFace:"Open Sans",wrap:true});
+          });
+          sAI.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+          sAI.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+        }
+      }catch(aiErr){console.error("AI slide error:",aiErr);}
+    }else if(document.getElementById("iai")?.checked&&!ANTHROPIC_API_KEY){
+      const sAI=pptx.addSlide();
+      sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+      sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
+      sAI.addText("Conclusiones y Recomendaciones",{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+      sAI.addText("Para activar esta función contactá al administrador.",{x:1.5,y:3.0,w:10.3,h:1.0,fontSize:16,color:"56648F",align:"center",valign:"middle",fontFace:"Open Sans",italic:true});
+      sAI.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+      sAI.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+    }
+    // SLIDE MAPA DE UBICACIONES (penúltima)
+    const sMapa=pptx.addSlide();
+    sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
+    sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.15,fill:{color:DARK}});
+    sMapa.addText("Alternativas · Ubicaciones",{x:0.3,y:0.1,w:10.5,h:0.55,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+    sMapa.addText("Ubicaciones",{x:0.3,y:1.25,w:3.3,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
+    sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:1.63,w:3.3,h:0.04,fill:{color:MID}});
+    sp.forEach((p,i)=>{
+      const ly=1.78+i*0.55;
+      if(ly>5.8)return;
+      sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:ly,w:0.28,h:0.28,fill:{color:MID}});
+      sMapa.addText(String(i+1),{x:0.3,y:ly,w:0.28,h:0.28,fontSize:8,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans"});
+      sMapa.addText(p.nombre,{x:0.65,y:ly+0.01,w:2.9,h:0.26,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
+      if(p.direccion&&p.direccion!=='–'){sMapa.addText(p.direccion,{x:0.65,y:ly+0.28,w:2.9,h:0.22,fontSize:7,color:"56648F",fontFace:"Open Sans"});}
+    });
+    const mapaAddrs=sp.map(p=>p.direccion!=='–'?p.direccion:'').filter(Boolean);
+    const mapsQuery=mapaAddrs.map(d=>encodeURIComponent(d)).join('/');
+    const mapsUrl='https://www.google.com/maps/search/'+mapsQuery;
+    sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:6.3,w:3.3,h:0.5,fill:{color:MID}});
+    sMapa.addText("Ver en Google Maps →",{x:0.3,y:6.3,w:3.3,h:0.5,fontSize:10,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:mapsUrl,tooltip:"Ver en Google Maps"}});
+    {
+      let mapaStaticB64=null;
+      try{
+        if(GOOGLE_MAPS_KEY){
+          const gUrl='https://maps.googleapis.com/maps/api/staticmap?size=750x480&maptype=roadmap&zoom=12&center=Buenos+Aires,Argentina'+sp.map((p,i)=>'&markers=color:blue%7Clabel:'+(i+1)+'%7C'+encodeURIComponent(p.direccion+',Buenos Aires,Argentina')).join('')+'&key='+GOOGLE_MAPS_KEY;
+          mapaStaticB64=await imgToBase64(gUrl);
+        }
+      }catch(e){}
+      if(!mapaStaticB64){
+        try{
+          const osmUrl='https://staticmap.openstreetmap.de/staticmap.php?size=750x480&zoom=12&center=-34.6,-58.4'+sp.map((p,i)=>'&markers='+encodeURIComponent(p.direccion)+',blue,'+(i+1)).join('');
+          mapaStaticB64=await imgToBase64(osmUrl);
+        }catch(e){console.error('OSM map error:',e);}
+      }
+      if(mapaStaticB64){sMapa.addImage({data:mapaStaticB64,x:3.8,y:1.2,w:9.2,h:5.8});}
+      else{
+        const mapaRepoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/mapa-mercado.png');
+        if(mapaRepoB64){sMapa.addImage({data:mapaRepoB64,x:3.8,y:1.2,w:9.2,h:5.8,sizing:{type:'contain',w:9.2,h:5.8}});}
+        else{sMapa.addShape(pptx.ShapeType.rect,{x:3.8,y:1.2,w:9.2,h:5.8,fill:{color:"DBE5FF"}});sMapa.addText("Mapa no disponible",{x:3.8,y:3.8,w:9.2,h:0.5,align:"center",color:"56648F",fontSize:14,fontFace:"Open Sans"});}
+      }
+    }
+    sMapa.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
+    sMapa.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+
+    // SLIDE CIERRE (última)
+    const sCierre=pptx.addSlide();
+    if(cierreB64){sCierre.addImage({data:cierreB64,x:0,y:0,w:13.33,h:7.5});}
+    else if(portadaB64){sCierre.addImage({data:portadaB64,x:0,y:0,w:13.33,h:7.5});}
+    else{sCierre.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});}
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:1.5,w:5.8,h:2.5,fill:{color:MID}});
+    sCierre.addText("Muchas gracias.",{x:0.3,y:1.65,w:5.2,h:1.0,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
+    sCierre.addText("Para más información\ncontactarse con:",{x:0.3,y:2.75,w:5.2,h:0.9,fontSize:13,italic:true,color:WHITE,fontFace:"Merriweather",wrap:true});
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:4.0,w:5.8,h:1.5,fill:{color:"4D93FF"}});
+    sCierre.addText(user?.displayName||'Colliers Argentina',{x:0.3,y:4.15,w:5.2,h:0.55,fontSize:16,bold:true,color:WHITE,fontFace:"Open Sans"});
+    const brokerEmail=user?.email||'';
+    if(brokerEmail){sCierre.addText(brokerEmail,{x:0.3,y:4.75,w:5.2,h:0.4,fontSize:12,color:WHITE,fontFace:"Open Sans",hyperlink:{url:`mailto:${brokerEmail}`,tooltip:"Enviar email"}});}
+    const disclaimer='This document has been prepared by Colliers solely for advertising and general information purposes. Colliers makes no warranties of any kind, express or implied, in relation to the information, including, but not limited to, warranties of content, accuracy and reliability. Any interested party should make their own inquiries into the accuracy of the information. Colliers unequivocally excludes all inferred or implied terms, conditions and warranties arising from this document and excludes all liability for loss and damage arising therefrom. This publication is the intellectual property of Colliers and/or its licensors. ©2025 All rights reserved.';
+    sCierre.addText(disclaimer,{x:0.3,y:6.6,w:12.7,h:0.7,fontSize:7,color:"888888",fontFace:"Open Sans",wrap:true,valign:"top"});
+    sCierre.addText("Accelerating success.",{x:0.3,y:5.8,w:5.2,h:0.45,fontSize:12,italic:true,color:WHITE,fontFace:"Merriweather"});
+
+    const fecha=new Date().toISOString().slice(0,10);
+    await pptx.writeFile({fileName:`Alternativas_${cliente.replace(/[^a-z0-9]/gi,"_")}_${fecha}.pptx`});
+    msg.textContent=`✓ PPT descargado con ${sp.length} alternativas`;
+    const fbSec=document.getElementById('feedback-section');
+    if(fbSec){fbSec.style.display='block';fbSec.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('fb-thanks').style.display='none';_fbStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
+    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString()};
+    registrarDescarga(dlData);
+    notificarDescarga(dlData);
+  }catch(e){
+    console.error(e);
+    msg.textContent="Error generando el PPT. Intentá de nuevo.";
+  }finally{
+    btn.disabled=false;btn.innerHTML="📊 Generar presentación PPT ↗";
+  }
+};
+
+window.toggleAdmin=()=>{
+  const panel=document.getElementById('admin-panel');
+  if(panel.style.display==='none'){panel.style.display='block';cargarRegistros();}
+  else{panel.style.display='none';}
+};
+
+async function cargarRegistros(){
+  const wrap=document.getElementById('admin-table-wrap');
+  wrap.innerHTML='<p style="color:#56648F;font-size:13px">Cargando...</p>';
+  if(!db){wrap.innerHTML='<p style="color:#ED1B34;font-size:12px">Firebase no configurado.</p>';return;}
+  try{
+    const snap=await db.collection('descargas').orderBy('fecha','desc').get();
+    if(snap.empty){wrap.innerHTML='<p style="color:#56648F;font-size:13px">Sin registros todavía.</p>';return;}
+    let h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;background:#fff;box-shadow:0 2px 8px rgba(0,7,89,.08)">';
+    h+='<thead><tr style="background:#25408F;color:#fff">';
+    ['Nombre','Email','Zona','M² buscados','Empresa','Fecha','Propiedades seleccionadas'].forEach(col=>{
+      h+=`<th style="padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap;font-size:11px">${col}</th>`;
+    });
+    h+='</tr></thead><tbody>';
+    snap.docs.forEach((doc,i)=>{
+      const d=doc.data();
+      const fecha=d.fecha?.toDate?.()?d.fecha.toDate().toLocaleString('es-AR'):(d.fecha||'–');
+      const bg=i%2===0?'#fff':'#F0F4FF';
+      h+=`<tr style="background:${bg}">`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF">${d.nombre||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;color:#1C54F4">${d.email||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF">${d.zona||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;text-align:center">${d.m2?d.m2+' m²':'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;font-weight:600">${d.empresa||'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;white-space:nowrap;font-size:11px">${fecha}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;color:#353E59;font-size:11px">${(d.propiedades||[]).join(', ')}</td>`;
+      h+='</tr>';
+    });
+    h+='</tbody></table></div>';
+    wrap.innerHTML=h;
+  }catch(e){
+    console.error(e);
+    wrap.innerHTML='<p style="color:#ED1B34;font-size:12px">Error al cargar registros: '+e.message+'</p>';
+  }
+}
+
+function registrarDescarga(datos){
+  if(!db)return;
+  try{
+    db.collection("descargas").add({
+      nombre:datos.nombre,
+      email:datos.email,
+      zona:datos.zona,
+      m2:datos.m2,
+      empresa:datos.empresa,
+      fecha:firebase.firestore.FieldValue.serverTimestamp(),
+      propiedades:datos.propiedades
+    });
+  }catch(e){console.error("Firebase error:",e);}
+}
+
+function notificarDescarga(datos){
+  if(!EMAILJS_PUBLIC_KEY)return;
+  try{
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{
+      to_email:"matias.azaretto@colliers.com",
+      subject:`Nueva descarga PPT - ${datos.cliente}`,
+      usuario:datos.usuario,
+      fecha:datos.fecha,
+      cliente:datos.cliente,
+      propiedades:datos.propiedades.join(", "),
+      cantidad:datos.cantidad
+    });
+  }catch(e){console.error("EmailJS error:",e);}
+}
+
+let _fbStars=0;
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('#star-row .star').forEach(s=>{
+    s.addEventListener('click',()=>{
+      _fbStars=parseInt(s.dataset.v);
+      document.querySelectorAll('#star-row .star').forEach((st,i)=>st.classList.toggle('active',i<_fbStars));
+    });
+    s.addEventListener('mouseenter',()=>{
+      const v=parseInt(s.dataset.v);
+      document.querySelectorAll('#star-row .star').forEach((st,i)=>st.classList.toggle('active',i<v));
+    });
+    s.addEventListener('mouseleave',()=>{
+      document.querySelectorAll('#star-row .star').forEach((st,i)=>st.classList.toggle('active',i<_fbStars));
+    });
+  });
+});
+
+window.enviarFeedback=async()=>{
+  const comment=document.getElementById('fb-comment')?.value.trim()||'';
+  if(!_fbStars){alert('Por favor seleccioná una calificación (estrellas).');return;}
+  if(db){
+    try{
+      await db.collection('feedback').add({
+        usuario:user?.displayName||'',
+        email:user?.email||'',
+        estrellas:_fbStars,
+        comentario:comment,
+        fecha:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }catch(e){console.error('Feedback Firestore error:',e);}
+  }
+  document.getElementById('fb-thanks').style.display='block';
+  document.getElementById('fb-comment').value='';
+  _fbStars=0;
+  document.querySelectorAll('#star-row .star').forEach(s=>s.classList.remove('active'));
+};
+
+function show(id){
+  ["ls","ds","as"].forEach(s=>{
+    const el=document.getElementById(s);
+    if(el)el.style.display=s===id?(s==="ls"||s==="ds"?"flex":"block"):"none";
+  });
+}
+</script>
+</body>
+</html>
