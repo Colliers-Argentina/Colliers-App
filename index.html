@@ -504,6 +504,7 @@ try{
 }catch(e){console.warn("Firebase no configurado:",e);}
 
 let user=null, props=[], filt=[], sel=new Set(), overviewData={};
+const ZONAS_DEFAULT=['Catalinas','Macrocentro','Macrocentro Sur','Microcentro','Norte CABA','Norte GBA','Plaza Roma','Puerto Madero','Retiro','Sur CABA'];
 
 function decodeJWT(token){
   const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
@@ -544,7 +545,9 @@ function onUserLoggedIn(){
   document.getElementById('nu').style.display='flex';
   show('as');
   if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
-  Promise.all([loadData(),cargarOverview()]).then(()=>startChat((user.displayName||'').split(' ')[0]||'Broker'));
+  populateZonas();
+  startChat((user.displayName||'').split(' ')[0]||'Broker');
+  Promise.all([loadData(),cargarOverview()]);
 }
 
 window.loginGoogle=()=>{google.accounts.id.prompt();};
@@ -652,8 +655,7 @@ function parseLine(line){
 }
 
 function populateZonas(){
-  const fallback=['Norte CABA','Norte GBA','Catalinas','Puerto Madero','Microcentro','Macrocentro','Macrocentro Sur','Plaza Roma','Retiro','Sur CABA'];
-  const zonas=props.length>0?[...new Set(props.map(p=>p.submercado).filter(Boolean))].sort():fallback;
+  const zonas=props.length>0?[...new Set(props.map(p=>p.submercado).filter(Boolean))].sort():[...ZONAS_DEFAULT];
   document.getElementById('zona-fc').innerHTML=zonas.map(z=>
     `<label class="fk"><input type="checkbox" name="zona" value="${z}"> ${z}</label>`
   ).join('');
