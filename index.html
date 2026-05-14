@@ -1309,31 +1309,73 @@ window.generarPPT=async()=>{
     sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:6.3,w:3.3,h:0.5,fill:{color:MID}});
     sMapa.addText("Ver en Google Maps →",{x:0.3,y:6.3,w:3.3,h:0.5,fontSize:10,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:mapsUrl,tooltip:"Ver en Google Maps"}});
     {
-      const getCoords=async(direccion)=>{
+      // Geocode via Nominatim (browser-only, no backend needed)
+      const getCoords=async dir=>{
         try{
-          const url='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(direccion+', Buenos Aires, Argentina')+'&format=json&limit=1';
-          const resp=await fetch(url,{headers:{'Accept-Language':'es','User-Agent':'ColliersApp/1.0'}});
-          if(!resp.ok)return null;
-          const data=await resp.json();
-          if(!data||!data[0])return null;
-          return{lat:parseFloat(data[0].lat),lon:parseFloat(data[0].lon)};
+          const r=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(dir+', Buenos Aires, Argentina')+'&format=json&limit=1',{headers:{'Accept-Language':'es'}});
+          if(!r.ok)return null;
+          const d=await r.json();
+          return d&&d[0]?{lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)}:null;
         }catch(e){return null;}
       };
-      const coords=await Promise.all(sp.map(p=>p.direccion&&p.direccion!=='–'?getCoords(p.direccion):Promise.resolve(null)));
-      let mapaStaticB64=null;
-      const validCoords=coords.filter(Boolean);
-      if(validCoords.length){
-        try{
-          const markers=validCoords.map(c=>`${c.lat},${c.lon},ol-marker-red`).join('|');
-          const mapaURL=`https://staticmap.openstreetmap.de/staticmap.php?center=-34.6,-58.45&zoom=12&size=800x500&maptype=mapnik&markers=${markers}`;
-          mapaStaticB64=await imgToBase64(mapaURL);
-        }catch(e){console.error('OSM map error:',e);}
+      const pinCoords=await Promise.all(sp.map(p=>p.direccion&&p.direccion!=='–'?getCoords(p.direccion):Promise.resolve(null)));
+
+      // Build map image using OSM tiles on Canvas — no external static map service needed
+      async function buildTileMap(pins){
+        const zoom=13, W=750, H=480;
+        const valid=pins.filter(Boolean);
+        const clat=valid.length?valid.reduce((s,c)=>s+c.lat,0)/valid.length:-34.6037;
+        const clon=valid.length?valid.reduce((s,c)=>s+c.lon,0)/valid.length:-58.3816;
+        const lon2x=lon=>(lon+180)/360*Math.pow(2,zoom);
+        const lat2y=lat=>{const r=lat*Math.PI/180;return(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,zoom);};
+        const cx=lon2x(clon),cy=lat2y(clat);
+        const canvas=document.createElement('canvas');
+        canvas.width=W;canvas.height=H;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#dde8f0';ctx.fillRect(0,0,W,H);
+        const subs=['a','b','c'];let si=0;
+        const loads=[];
+        for(let ty=Math.floor(cy-H/2/256);ty<=Math.ceil(cy+H/2/256);ty++){
+          for(let tx=Math.floor(cx-W/2/256);tx<=Math.ceil(cx+W/2/256);tx++){
+            const px=Math.round((tx-cx)*256+W/2),py=Math.round((ty-cy)*256+H/2);
+            const sub=subs[si++%3];
+            loads.push(new Promise(res=>{
+              const img=new Image();img.crossOrigin='anonymous';
+              img.onload=()=>{ctx.drawImage(img,px,py,256,256);res();};
+              img.onerror=()=>res();
+              img.src=`https://${sub}.tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`;
+            }));
+          }
+        }
+        await Promise.all(loads);
+        // Draw numbered pins
+        pins.forEach((c,i)=>{
+          if(!c)return;
+          const px=Math.round((lon2x(c.lon)-cx)*256+W/2);
+          const py=Math.round((lat2y(c.lat)-cy)*256+H/2);
+          if(px<10||px>W-10||py<10||py>H-10)return;
+          ctx.beginPath();ctx.arc(px,py,11,0,Math.PI*2);
+          ctx.fillStyle='#ED1B34';ctx.fill();
+          ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+          ctx.fillStyle='#fff';ctx.font='bold 10px Arial';
+          ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.fillText(String(i+1),px,py);
+        });
+        // OSM attribution
+        ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillRect(W-175,H-15,175,15);
+        ctx.fillStyle='#444';ctx.font='8px Arial';ctx.textAlign='right';ctx.textBaseline='top';
+        ctx.fillText('© OpenStreetMap contributors',W-3,H-14);
+        return canvas.toDataURL('image/jpeg',0.87);
       }
-      if(mapaStaticB64){sMapa.addImage({data:mapaStaticB64,x:3.8,y:1.2,w:9.2,h:5.8});}
-      else{
-        const mapaRepoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/mapa-mercado.png');
-        if(mapaRepoB64){sMapa.addImage({data:mapaRepoB64,x:3.8,y:1.2,w:9.2,h:5.8,sizing:{type:'contain',w:9.2,h:5.8}});}
-        else{sMapa.addShape(pptx.ShapeType.rect,{x:3.8,y:1.2,w:9.2,h:5.8,fill:{color:"DBE5FF"}});sMapa.addText("Mapa no disponible",{x:3.8,y:3.8,w:9.2,h:0.5,align:"center",color:"56648F",fontSize:14,fontFace:"Open Sans"});}
+
+      try{
+        const mapaCanvasB64=await buildTileMap(pinCoords);
+        sMapa.addImage({data:mapaCanvasB64,x:3.8,y:1.2,w:9.2,h:5.8});
+      }catch(e){
+        console.error('Map canvas error:',e);
+        const fb=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/mapa-mercado.png');
+        if(fb){sMapa.addImage({data:fb,x:3.8,y:1.2,w:9.2,h:5.8});}
+        else{sMapa.addShape(pptx.ShapeType.rect,{x:3.8,y:1.2,w:9.2,h:5.8,fill:{color:"DBE5FF"}});}
       }
     }
     sMapa.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
