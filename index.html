@@ -1298,16 +1298,11 @@ window.generarPPT=async()=>{
     sp.forEach((p,i)=>{
       const ly=1.78+i*0.55;
       if(ly>5.8)return;
-      sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:ly,w:0.28,h:0.28,fill:{color:MID}});
+      sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:ly,w:0.28,h:0.28,fill:{color:DARK}});
       sMapa.addText(String(i+1),{x:0.3,y:ly,w:0.28,h:0.28,fontSize:8,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans"});
       sMapa.addText(p.nombre,{x:0.65,y:ly+0.01,w:2.9,h:0.26,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
       if(p.direccion&&p.direccion!=='–'){sMapa.addText(p.direccion,{x:0.65,y:ly+0.28,w:2.9,h:0.22,fontSize:7,color:"56648F",fontFace:"Open Sans"});}
     });
-    const mapaAddrs=sp.map(p=>p.direccion!=='–'?p.direccion:'').filter(Boolean);
-    const mapsQuery=mapaAddrs.map(d=>encodeURIComponent(d)).join('/');
-    const mapsUrl='https://www.google.com/maps/search/'+mapsQuery;
-    sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:6.3,w:3.3,h:0.5,fill:{color:MID}});
-    sMapa.addText("Ver en Google Maps →",{x:0.3,y:6.3,w:3.3,h:0.5,fontSize:10,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:mapsUrl,tooltip:"Ver en Google Maps"}});
     {
       // Geocode via Nominatim (browser-only, no backend needed)
       const getCoords=async dir=>{
@@ -1320,14 +1315,28 @@ window.generarPPT=async()=>{
       };
       const pinCoords=await Promise.all(sp.map(p=>p.direccion&&p.direccion!=='–'?getCoords(p.direccion):Promise.resolve(null)));
 
-      // Build map image using OSM tiles on Canvas — no external static map service needed
+      // Build map: OSM tiles on Canvas, auto-zoom to fit all pins, corporate blue markers
       async function buildTileMap(pins){
-        const zoom=13, W=750, H=480;
+        const W=750, H=480, PAD=55;
         const valid=pins.filter(Boolean);
         const clat=valid.length?valid.reduce((s,c)=>s+c.lat,0)/valid.length:-34.6037;
         const clon=valid.length?valid.reduce((s,c)=>s+c.lon,0)/valid.length:-58.3816;
-        const lon2x=lon=>(lon+180)/360*Math.pow(2,zoom);
-        const lat2y=lat=>{const r=lat*Math.PI/180;return(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,zoom);};
+        // Auto-zoom: find highest zoom where all pins fit with PAD padding
+        const makeFns=z=>{
+          const n=Math.pow(2,z);
+          const lon2x=lon=>(lon+180)/360*n;
+          const lat2y=lat=>{const r=lat*Math.PI/180;return(1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n;};
+          return{lon2x,lat2y};
+        };
+        let zoom=14;
+        for(let z=14;z>=9;z--){
+          const{lon2x,lat2y}=makeFns(z);
+          const cx=lon2x(clon),cy=lat2y(clat);
+          const fits=valid.every(c=>Math.abs((lon2x(c.lon)-cx)*256)<W/2-PAD&&Math.abs((lat2y(c.lat)-cy)*256)<H/2-PAD);
+          if(fits){zoom=z;break;}
+          zoom=z;
+        }
+        const{lon2x,lat2y}=makeFns(zoom);
         const cx=lon2x(clon),cy=lat2y(clat);
         const canvas=document.createElement('canvas');
         canvas.width=W;canvas.height=H;
@@ -1338,32 +1347,31 @@ window.generarPPT=async()=>{
         for(let ty=Math.floor(cy-H/2/256);ty<=Math.ceil(cy+H/2/256);ty++){
           for(let tx=Math.floor(cx-W/2/256);tx<=Math.ceil(cx+W/2/256);tx++){
             const px=Math.round((tx-cx)*256+W/2),py=Math.round((ty-cy)*256+H/2);
-            const sub=subs[si++%3];
             loads.push(new Promise(res=>{
               const img=new Image();img.crossOrigin='anonymous';
               img.onload=()=>{ctx.drawImage(img,px,py,256,256);res();};
               img.onerror=()=>res();
-              img.src=`https://${sub}.tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`;
+              img.src=`https://${subs[si++%3]}.tile.openstreetmap.org/${zoom}/${tx}/${ty}.png`;
             }));
           }
         }
         await Promise.all(loads);
-        // Draw numbered pins
+        // Numbered pins — corporate blue #25408F
         pins.forEach((c,i)=>{
           if(!c)return;
           const px=Math.round((lon2x(c.lon)-cx)*256+W/2);
           const py=Math.round((lat2y(c.lat)-cy)*256+H/2);
-          if(px<10||px>W-10||py<10||py>H-10)return;
-          ctx.beginPath();ctx.arc(px,py,11,0,Math.PI*2);
-          ctx.fillStyle='#ED1B34';ctx.fill();
-          ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
-          ctx.fillStyle='#fff';ctx.font='bold 10px Arial';
+          if(px<14||px>W-14||py<14||py>H-14)return;
+          ctx.beginPath();ctx.arc(px,py,13,0,Math.PI*2);
+          ctx.fillStyle='#25408F';ctx.fill();
+          ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+          ctx.fillStyle='#fff';ctx.font='bold 11px Arial';
           ctx.textAlign='center';ctx.textBaseline='middle';
           ctx.fillText(String(i+1),px,py);
         });
         // OSM attribution
-        ctx.fillStyle='rgba(255,255,255,0.75)';ctx.fillRect(W-175,H-15,175,15);
-        ctx.fillStyle='#444';ctx.font='8px Arial';ctx.textAlign='right';ctx.textBaseline='top';
+        ctx.fillStyle='rgba(255,255,255,0.78)';ctx.fillRect(W-178,H-15,178,15);
+        ctx.fillStyle='#555';ctx.font='8px Arial';ctx.textAlign='right';ctx.textBaseline='top';
         ctx.fillText('© OpenStreetMap contributors',W-3,H-14);
         return canvas.toDataURL('image/jpeg',0.87);
       }
