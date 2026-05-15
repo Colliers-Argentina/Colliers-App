@@ -1296,12 +1296,16 @@ window.generarPPT=async()=>{
     sMapa.addText("Ubicaciones",{x:0.3,y:1.25,w:3.3,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
     sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:1.63,w:3.3,h:0.04,fill:{color:MID}});
     sp.forEach((p,i)=>{
-      const ly=1.78+i*0.55;
-      if(ly>5.8)return;
-      sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:ly,w:0.28,h:0.28,fill:{color:DARK}});
-      sMapa.addText(String(i+1),{x:0.3,y:ly,w:0.28,h:0.28,fontSize:8,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans"});
-      sMapa.addText(p.nombre,{x:0.65,y:ly+0.01,w:2.9,h:0.26,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
-      if(p.direccion&&p.direccion!=='–'){sMapa.addText(p.direccion,{x:0.65,y:ly+0.28,w:2.9,h:0.22,fontSize:7,color:"56648F",fontFace:"Open Sans"});}
+      const availH=7.1-1.78;
+      const rowH=Math.min(0.55,availH/Math.max(sp.length,1));
+      const badgeH=Math.min(0.28,rowH*0.52);
+      const nameFSize=rowH>=0.45?9:8;
+      const addrFSize=rowH>=0.45?7:6;
+      const ly=1.78+i*rowH;
+      sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:ly,w:badgeH,h:badgeH,fill:{color:DARK}});
+      sMapa.addText(String(i+1),{x:0.3,y:ly,w:badgeH,h:badgeH,fontSize:7,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans"});
+      sMapa.addText(p.nombre,{x:0.65,y:ly+0.01,w:2.9,h:rowH*0.48,fontSize:nameFSize,bold:true,color:DARK,fontFace:"Open Sans",shrinkText:true});
+      if(p.direccion&&p.direccion!=='–'){sMapa.addText(p.direccion,{x:0.65,y:ly+rowH*0.50,w:2.9,h:rowH*0.42,fontSize:addrFSize,color:"56648F",fontFace:"Open Sans",shrinkText:true});}
     });
     {
       // Geocode via Nominatim (browser-only, no backend needed)
