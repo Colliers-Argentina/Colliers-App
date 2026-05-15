@@ -1422,7 +1422,7 @@ window.generarPPT=async()=>{
     msg.textContent=`✓ PPT descargado con ${sp.length} alternativas`;
     const fbSec=document.getElementById('feedback-section');
     if(fbSec){fbSec.style.display='block';fbSec.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('fb-thanks').style.display='none';_fbStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
-    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString()};
+    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString(),usuario:user?.displayName||user?.email||'desconocido',zonas:resp.zona||'',cliente:document.getElementById('kp')?.value||'',cantidad_alternativas:sp.length};
     registrarDescarga(dlData);
     notificarDescarga(dlData);
   }catch(e){
@@ -1484,7 +1484,11 @@ function registrarDescarga(datos){
       m2:datos.m2,
       empresa:datos.empresa,
       fecha:firebase.firestore.FieldValue.serverTimestamp(),
-      propiedades:datos.propiedades
+      propiedades:datos.propiedades,
+      usuario:datos.usuario,
+      zonas:datos.zonas,
+      cliente:datos.cliente,
+      cantidad_alternativas:datos.cantidad_alternativas
     });
   }catch(e){console.error("Firebase error:",e);}
 }
