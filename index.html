@@ -1433,7 +1433,7 @@ window.generarPPT=async()=>{
     const fbSec=document.getElementById('feedback-section');
     if(fbSec){fbSec.style.display='block';fbSec.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('fb-thanks').style.display='none';_fbStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
     const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString(),usuario:user?.displayName||user?.email||'desconocido',zonas:resp.zona||'',cliente:document.getElementById('kp')?.value||'',cantidad_alternativas:sp.length};
-    registrarDescarga(dlData);
+    registrarDescarga(dlData).catch(e=>console.error('registrarDescarga:',e));
     notificarDescarga(dlData);
   }catch(e){
     console.error(e);
@@ -1484,13 +1484,21 @@ async function cargarRegistros(){
   }
 }
 
-function registrarDescarga(datos){
+async function registrarDescarga(datos){
   if(!db)return;
+  const fechaId=new Date().toISOString().slice(0,10);
+  const clienteRaw=(document.getElementById('kp')?.value||'sin_cliente').trim();
+  const cliente=clienteRaw.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')||'sin_cliente';
+  const brokerRaw=user?.displayName||user?.email||'broker';
+  const broker=brokerRaw.split(' ')[0].replace(/[^a-zA-Z0-9]/g,'');
+  const baseId=`${fechaId}_${cliente}_${broker}`;
+  let docId=baseId;
+  let suffix=2;
+  while((await db.collection('descargas').doc(docId).get()).exists){
+    docId=`${baseId}_${suffix++}`;
+  }
   try{
-    const fechaId=new Date().toISOString().slice(0,10);
-    const clienteId=(document.getElementById('kp')?.value||'').replace(/[^a-zA-Z0-9]/g,'_')||'sin_cliente';
-    const docId=`${fechaId}_${clienteId}_${user?.displayName?.split(' ')[0]||'broker'}`;
-    db.collection("descargas").doc(docId).set({
+    await db.collection('descargas').doc(docId).set({
       nombre:datos.nombre,
       email:datos.email,
       zona:datos.zona,
@@ -1503,7 +1511,10 @@ function registrarDescarga(datos){
       cliente:datos.cliente,
       cantidad_alternativas:datos.cantidad_alternativas
     });
-  }catch(e){console.error("Firebase error:",e);}
+    console.log('Descarga registrada:',docId);
+  }catch(e){
+    console.error('Error guardando descarga:',e);
+  }
 }
 
 function notificarDescarga(datos){
