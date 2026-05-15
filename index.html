@@ -1477,7 +1477,10 @@ async function cargarRegistros(){
 function registrarDescarga(datos){
   if(!db)return;
   try{
-    db.collection("descargas").add({
+    const fechaId=new Date().toISOString().slice(0,10);
+    const clienteId=(document.getElementById('kp')?.value||'').replace(/[^a-zA-Z0-9]/g,'_')||'sin_cliente';
+    const docId=`${fechaId}_${clienteId}_${user?.displayName?.split(' ')[0]||'broker'}`;
+    db.collection("descargas").doc(docId).set({
       nombre:datos.nombre,
       email:datos.email,
       zona:datos.zona,
