@@ -31,15 +31,15 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .nbtn:hover{background:rgba(255,255,255,.1)}
 
 /* LOGIN */
-#ls{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:2rem}
-.lbox{background:#fff;border-top:4px solid #25408F;padding:3rem 2.5rem;max-width:400px;width:100%;text-align:center;box-shadow:0 12px 50px rgba(0,7,89,.12)}
-.lbox-brand{font-size:32px;font-weight:700;color:#25408F;letter-spacing:-.5px;margin-bottom:6px}
-.lbox-bar{height:3px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF);margin-bottom:2rem}
-.lbox h1{font-size:19px;font-weight:700;color:#000759;margin-bottom:.5rem}
+#ls{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:#000759;background-image:url('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%201.jpg');background-size:cover;background-position:center;position:relative}
+#ls::before{content:'';position:absolute;inset:0;background:rgba(0,7,89,.72)}
+.lbox{position:relative;background:#fff;padding:3rem 2.5rem;max-width:380px;width:100%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.4);border-radius:6px}
+.login-logo{width:220px;max-width:100%;height:auto;display:block;margin:0 auto 1.5rem;object-fit:contain}
+.lbox h1{font-size:20px;font-weight:700;color:#25408F;margin-bottom:.5rem}
 .lbox p{font-size:12px;color:#56648F;line-height:1.8;margin-bottom:2rem}
-.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s;border-radius:4px}
 .gbtn:hover{background:#000759}
-.lnote{margin-top:.75rem;font-size:10px;color:#56648F}
+.lnote{margin-top:.75rem;font-size:10px;color:#8a96b8}
 
 /* DENIED */
 #ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 56px)}
@@ -227,6 +227,15 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 
 footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:1px solid #DBE5FF;margin-top:1rem}
 
+/* AI RECOMMENDATIONS */
+.rec-btn{background:#25408F;color:#fff;border:none;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border-radius:4px;transition:background .15s}
+.rec-btn:hover{background:#000759}
+.rec-btn:disabled{opacity:.6;cursor:not-allowed}
+.rec-card{background:#F0F4FF;border-left:4px solid #25408F;padding:1rem 1.25rem;margin-top:1rem;border-radius:0 4px 4px 0;font-size:13px;line-height:1.8;color:#1a1a2e}
+.rec-card strong{color:#25408F}
+.rec-card .rec-bullets{margin:.4rem 0 0 1rem;padding:0;list-style:disc}
+.rec-card .rec-bullets li{margin-bottom:.2rem}
+
 /* FEEDBACK */
 .fb-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 14px rgba(0,7,89,.08);margin-top:1.5rem;overflow:hidden}
 .star-row{display:flex;gap:8px;margin:6px 0}
@@ -274,8 +283,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 <!-- LOGIN -->
 <div id="ls">
   <div class="lbox">
-    <div class="lbox-brand">Colliers</div>
-    <div class="lbox-bar"></div>
+    <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" alt="Colliers" class="login-logo">
     <h1>Generador de Alternativas</h1>
     <p>Iniciá sesión con tu cuenta corporativa para acceder al sistema de búsqueda y generación de presentaciones.</p>
     <button class="gbtn" id="login-btn">
@@ -445,6 +453,17 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
             </div>
           </div>
           <div class="sm" id="sm"></div>
+        </div>
+
+        <!-- STEP 3.5: AI RECOMMENDATIONS -->
+        <div class="card" id="ai-rec-section">
+          <div class="card-hd">
+            <div class="card-title">Recomendaciones del Asistente Colliers</div>
+          </div>
+          <div style="padding:1rem 1.5rem 1.5rem">
+            <button class="rec-btn" onclick="obtenerRecomendacion()">✨ Obtener recomendación</button>
+            <div id="rec-result" style="display:none"></div>
+          </div>
         </div>
 
         <!-- STEP 4: PPT PREVIEW -->
@@ -1034,6 +1053,48 @@ function updatePreview(){
   grid.innerHTML=h;
 }
 
+window.obtenerRecomendacion=async()=>{
+  const sp=[...sel].map(i=>filt[i]).filter(Boolean);
+  const btn=document.querySelector('.rec-btn');
+  const result=document.getElementById('rec-result');
+  if(!sp.length){result.innerHTML='<div class="rec-card">Seleccioná al menos una alternativa primero.</div>';result.style.display='block';return;}
+  if(!ANTHROPIC_API_KEY){result.innerHTML='<div class="rec-card">Para activar esta función, configurá tu API key de Anthropic</div>';result.style.display='block';return;}
+  btn.disabled=true;btn.textContent='⏳ Analizando...';result.style.display='none';
+  const lista=sp.map((p,i)=>`${i+1}. ${p.nombre} | ${p.submercado||''} | USD ${p.rent||'–'}/m² | Sup. disponible: ${p.supDisp?p.supDisp.toLocaleString('es-AR')+' m²':'–'} | Dirección: ${p.direccion||'–'}`).join('\n');
+  const prompt=`Sos un experto en real estate corporativo de Buenos Aires. Analizá estas ${sp.length} alternativas de oficinas y recomendá la mejor para el cliente considerando precio, superficie, ubicación y amenities.\n\nAlternativas:\n${lista}\n\nRespondé en español con este formato exacto:\n**Edificio recomendado**: [nombre]\n**Razón principal**: [1 oración]\n**Análisis**:\n• [punto 1]\n• [punto 2]\n• [punto 3]\n\nSé conciso y directo.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})
+    });
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const data=await r.json();
+    const text=data.content?.[0]?.text||'Sin respuesta';
+    const lines=text.split('\n').filter(l=>l.trim());
+    let html='';
+    const bullets=[];
+    let inBullets=false;
+    for(const line of lines){
+      const t=line.trim();
+      if(t.startsWith('•')||t.startsWith('-')){bullets.push(`<li>${t.replace(/^[•\-]\s*/,'').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</li>`);inBullets=true;}
+      else{
+        if(inBullets&&bullets.length){html+=`<ul class="rec-bullets">${bullets.join('')}</ul>`;bullets.length=0;inBullets=false;}
+        html+=`<p style="margin:.3rem 0">${t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</p>`;
+      }
+    }
+    if(bullets.length)html+=`<ul class="rec-bullets">${bullets.join('')}</ul>`;
+    result.innerHTML=`<div class="rec-card">${html}</div>`;
+    result.style.display='block';
+  }catch(e){
+    console.error('Anthropic error:',e);
+    result.innerHTML='<div class="rec-card">Para activar esta función, configurá tu API key de Anthropic</div>';
+    result.style.display='block';
+  }finally{
+    btn.disabled=false;btn.textContent='✨ Obtener recomendación';
+  }
+};
+
 window.generarPPT=async()=>{
   const sp=[...sel].map(i=>filt[i]).filter(Boolean);
   if(!sp.length)return;
@@ -1122,8 +1183,8 @@ window.generarPPT=async()=>{
       const ROWS=[
         ["Dirección","direccion"],["Submercado","submercado"],["Categoría","cat"],
         ["Año","anio"],["Pisos","pisos"],["Cocheras","cocheras"],
-        ["Sup. disponible m²","supDisp"],["Pisos disponibles","pisosDisp"],
-        ["Sup. planta m²","supPlanta"],["Asking Rent","rent"],["Comentarios","comentarios"],
+        ["Superficie Disponible (m²)","supDisp"],["Pisos disponibles","pisosDisp"],
+        ["Sup. Planta Promedio (m²)","supPlanta"],["Sup. A adquirir (m²)","__empty__"],["Asking Rent (USD/m²)","rent"],["Comentarios","comentarios"],
       ];
       const DPI=200;
       const PX_W=Math.round(CW*DPI), PX_H=Math.round(IMG_H*DPI);
@@ -1183,7 +1244,7 @@ window.generarPPT=async()=>{
           const bg=ri%2===0?"F4F7FF":WHITE;
           const lc={text:lbl,options:{bold:true,color:DARK,align:"left",valign:"middle",fill:{color:bg},fontSize:7.5,fontFace:"Open Sans",border:NB}};
           const dc=grupo.map(prop=>{
-            let val=prop[key]||"–";
+            let val=key==="__empty__"?"":prop[key]||"–";
             if((key==="supDisp"||key==="supPlanta")&&prop[key])val=Number(prop[key]).toLocaleString("es-AR")+" m²";
             const isDisp=key==="supDisp", isCom=key==="comentarios";
             if(isCom){val=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean).map(b=>`• ${b}`).join('\n');}
@@ -1211,12 +1272,12 @@ window.generarPPT=async()=>{
         ["Categoría",p=>p.cat,false],
         ["Año",p=>String(p.anio),false],
         ["Pisos",p=>String(p.pisos),false],
-        ["Superficie rentable",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
         ["Cocheras",p=>p.cocheras,false],
-        ["Superficie disponible",p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
+        ["Superficie Disponible (m²)",p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
         ["Pisos disponibles",p=>p.pisosDisp,false],
-        ["Asking Rent",p=>`USD ${p.rent}/m²`,false],
-        ["Planta promedio",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
+        ["Sup. Planta Promedio (m²)",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
+        ["Sup. A adquirir (m²)",p=>'',false],
+        ["Asking Rent (USD/m²)",p=>`USD ${p.rent}/m²`,false],
       ];
       for(const[idx,prop] of sp.entries()){
         const s=pptx.addSlide();
@@ -1295,14 +1356,28 @@ window.generarPPT=async()=>{
     sMapa.addText("Alternativas · Ubicaciones",{x:0.3,y:0.1,w:10.5,h:0.55,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
     sMapa.addText("Ubicaciones",{x:0.3,y:1.25,w:3.3,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
     sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:1.63,w:3.3,h:0.04,fill:{color:MID}});
-    sp.forEach((p,i)=>{
-      const ly=1.78+i*0.55;
-      if(ly>5.8)return;
-      sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:ly,w:0.28,h:0.28,fill:{color:DARK}});
-      sMapa.addText(String(i+1),{x:0.3,y:ly,w:0.28,h:0.28,fontSize:8,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans"});
-      sMapa.addText(p.nombre,{x:0.65,y:ly+0.01,w:2.9,h:0.26,fontSize:9,bold:true,color:DARK,fontFace:"Open Sans"});
-      if(p.direccion&&p.direccion!=='–'){sMapa.addText(p.direccion,{x:0.65,y:ly+0.28,w:2.9,h:0.22,fontSize:7,color:"56648F",fontFace:"Open Sans"});}
-    });
+    {
+      const availH=7.1-1.78;
+      const n=sp.length;
+      const twoCols=n>8;
+      const half=twoCols?Math.ceil(n/2):n;
+      const rowH=Math.min(0.50,availH/half);
+      const badgeH=Math.min(0.24,rowH*0.52);
+      const nameFSize=rowH>=0.42?9:8;
+      const addrFSize=rowH>=0.42?7:6;
+      sp.forEach((p,i)=>{
+        const col=twoCols&&i>=half?1:0;
+        const row=col===1?i-half:i;
+        const bx=col===0?0.10:1.98;
+        const tx=col===0?0.38:2.26;
+        const tw=1.48;
+        const ly=1.78+row*rowH;
+        sMapa.addShape(pptx.ShapeType.rect,{x:bx,y:ly,w:badgeH,h:badgeH,fill:{color:DARK}});
+        sMapa.addText(String(i+1),{x:bx,y:ly,w:badgeH,h:badgeH,fontSize:6,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans"});
+        sMapa.addText(p.nombre,{x:tx,y:ly+0.01,w:tw,h:rowH*0.48,fontSize:nameFSize,bold:true,color:DARK,fontFace:"Open Sans",shrinkText:true});
+        if(p.direccion&&p.direccion!=='–'){sMapa.addText(p.direccion,{x:tx,y:ly+rowH*0.50,w:tw,h:rowH*0.42,fontSize:addrFSize,color:"56648F",fontFace:"Open Sans",shrinkText:true});}
+      });
+    }
     {
       // Geocode via Nominatim (browser-only, no backend needed)
       const getCoords=async dir=>{
@@ -1418,8 +1493,8 @@ window.generarPPT=async()=>{
     msg.textContent=`✓ PPT descargado con ${sp.length} alternativas`;
     const fbSec=document.getElementById('feedback-section');
     if(fbSec){fbSec.style.display='block';fbSec.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('fb-thanks').style.display='none';_fbStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
-    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString()};
-    registrarDescarga(dlData);
+    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString(),usuario:user?.displayName||user?.email||'desconocido',zonas:resp.zona||'',cliente:document.getElementById('kp')?.value||'',cantidad_alternativas:sp.length};
+    registrarDescarga(dlData).catch(e=>console.error('registrarDescarga:',e));
     notificarDescarga(dlData);
   }catch(e){
     console.error(e);
@@ -1470,19 +1545,37 @@ async function cargarRegistros(){
   }
 }
 
-function registrarDescarga(datos){
+async function registrarDescarga(datos){
   if(!db)return;
+  const fechaId=new Date().toISOString().slice(0,10);
+  const clienteRaw=(document.getElementById('kp')?.value||'sin_cliente').trim();
+  const cliente=clienteRaw.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'')||'sin_cliente';
+  const brokerRaw=user?.displayName||user?.email||'broker';
+  const broker=brokerRaw.split(' ')[0].replace(/[^a-zA-Z0-9]/g,'');
+  const baseId=`${fechaId}_${cliente}_${broker}`;
+  let docId=baseId;
+  let suffix=2;
+  while((await db.collection('descargas').doc(docId).get()).exists){
+    docId=`${baseId}_${suffix++}`;
+  }
   try{
-    db.collection("descargas").add({
+    await db.collection('descargas').doc(docId).set({
       nombre:datos.nombre,
       email:datos.email,
       zona:datos.zona,
       m2:datos.m2,
       empresa:datos.empresa,
       fecha:firebase.firestore.FieldValue.serverTimestamp(),
-      propiedades:datos.propiedades
+      propiedades:datos.propiedades,
+      usuario:datos.usuario,
+      zonas:datos.zonas,
+      cliente:datos.cliente,
+      cantidad_alternativas:datos.cantidad_alternativas
     });
-  }catch(e){console.error("Firebase error:",e);}
+    console.log('Descarga registrada:',docId);
+  }catch(e){
+    console.error('Error guardando descarga:',e);
+  }
 }
 
 function notificarDescarga(datos){
