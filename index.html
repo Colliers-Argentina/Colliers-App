@@ -153,6 +153,7 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .cb{display:inline-block;font-size:9px;padding:1px 6px;background:#DBE5FF;color:#25408F;font-weight:700}
 .sv{font-weight:700;color:#1C54F4;font-size:12px}
 .rent-v{font-weight:700;color:#25408F;font-size:12px}
+.subdiv-badge{display:inline-block;margin-top:3px;font-size:9px;background:#C3E6FF;color:#25408F;padding:1px 5px;border-radius:2px;white-space:nowrap}
 .acq-inp{width:80px;border:1px solid #DBE5FF;padding:3px 6px;font-family:inherit;font-size:11px;text-align:center;background:#FFFDF0;color:#000759}
 .acq-inp:focus{outline:none;border-color:#1C54F4}
 .et{text-align:center;padding:3rem 2rem;color:#56648F;font-size:13px}
@@ -922,7 +923,7 @@ function renderListView(){
   h+='<th class="lcc"></th><th>Foto</th><th>Edificio</th><th>Submercado</th><th>Cat.</th><th>Sup. disp. m²</th><th>Asking Rent</th>';
   h+='</tr></thead><tbody>';
   filt.forEach((p,i)=>{
-    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}"><td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td><td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\'lph\'>🏢</div>'">`:'<div class="lph">🏢</div>'}</td><td class="lname">${p.nombre}</td><td>${p.submercado}</td><td><span class="cb">${p.cat}</span></td><td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span></td><td><span class="rent-v">USD ${p.rent}</span></td></tr>`;
+    h+=`<tr id="lr-${i}" class="${sel.has(i)?"lsr":""}"><td class="lcc"><input type="checkbox" id="lcb-${i}" ${sel.has(i)?"checked":""} onchange="toggleRow(${i},this)"></td><td>${p.foto?`<img src="${p.foto}" class="list-photo" onerror="this.outerHTML='<div class=\'lph\'>🏢</div>'">`:'<div class="lph">🏢</div>'}</td><td class="lname">${p.nombre}</td><td>${p.submercado}</td><td><span class="cb">${p.cat}</span></td><td><span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span>${p.supMinima>0?`<br><span class="subdiv-badge">✂ Subdivisible desde ${p.supMinima.toLocaleString("es-AR")} m²</span>`:''}</td><td><span class="rent-v">USD ${p.rent}</span></td></tr>`;
   });
   h+='</tbody></table>';
   ct.innerHTML=h;
@@ -942,7 +943,7 @@ function renderCompView(){
     {lbl:"Categoría",     fn:p=>`<span class="cb">${p.cat}</span>`},
     {lbl:"Año",           fn:p=>p.anio},
     {lbl:"Pisos totales", fn:p=>p.pisos},
-    {lbl:"Sup. disponible m²", fn:p=>`<span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span>`},
+    {lbl:"Sup. disponible m²", fn:p=>`<span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span>${p.supMinima>0?`<br><span class="subdiv-badge">✂ Subdivisible desde ${p.supMinima.toLocaleString("es-AR")} m²</span>`:''}`},
     {lbl:"Cocheras",      fn:p=>p.cocheras},
     {lbl:"Pisos disponibles", fn:p=>p.pisosDisp},
     {lbl:"Sup. promedio m²",  fn:p=>p.supPlanta?p.supPlanta.toLocaleString("es-AR")+" m²":"–"},
