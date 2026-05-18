@@ -1184,7 +1184,7 @@ window.generarPPT=async()=>{
         ["Dirección","direccion"],["Submercado","submercado"],["Categoría","cat"],
         ["Año","anio"],["Pisos","pisos"],["Cocheras","cocheras"],
         ["Sup. disponible m²","supDisp"],["Pisos disponibles","pisosDisp"],
-        ["Sup. planta m²","supPlanta"],["Asking Rent","rent"],["Comentarios","comentarios"],
+        ["Sup. planta m²","supPlanta"],["Sup. a adquirir (m²)","__empty__"],["Asking Rent","rent"],["Comentarios","comentarios"],
       ];
       const DPI=200;
       const PX_W=Math.round(CW*DPI), PX_H=Math.round(IMG_H*DPI);
@@ -1244,7 +1244,7 @@ window.generarPPT=async()=>{
           const bg=ri%2===0?"F4F7FF":WHITE;
           const lc={text:lbl,options:{bold:true,color:DARK,align:"left",valign:"middle",fill:{color:bg},fontSize:7.5,fontFace:"Open Sans",border:NB}};
           const dc=grupo.map(prop=>{
-            let val=prop[key]||"–";
+            let val=key==="__empty__"?"":prop[key]||"–";
             if((key==="supDisp"||key==="supPlanta")&&prop[key])val=Number(prop[key]).toLocaleString("es-AR")+" m²";
             const isDisp=key==="supDisp", isCom=key==="comentarios";
             if(isCom){val=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean).map(b=>`• ${b}`).join('\n');}
@@ -1276,6 +1276,7 @@ window.generarPPT=async()=>{
         ["Cocheras",p=>p.cocheras,false],
         ["Superficie disponible",p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
         ["Pisos disponibles",p=>p.pisosDisp,false],
+        ["Sup. a adquirir (m²)",p=>'',false],
         ["Asking Rent",p=>`USD ${p.rent}/m²`,false],
         ["Planta promedio",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
       ];
