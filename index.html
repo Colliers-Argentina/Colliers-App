@@ -1183,8 +1183,8 @@ window.generarPPT=async()=>{
       const ROWS=[
         ["Dirección","direccion"],["Submercado","submercado"],["Categoría","cat"],
         ["Año","anio"],["Pisos","pisos"],["Cocheras","cocheras"],
-        ["Sup. disponible m²","supDisp"],["Pisos disponibles","pisosDisp"],
-        ["Sup. planta m²","supPlanta"],["Sup. a adquirir (m²)","__empty__"],["Asking Rent","rent"],["Comentarios","comentarios"],
+        ["Superficie Disponible (m²)","supDisp"],["Pisos disponibles","pisosDisp"],
+        ["Sup. Planta Promedio (m²)","supPlanta"],["Sup. A adquirir (m²)","__empty__"],["Asking Rent (USD/m²)","rent"],["Comentarios","comentarios"],
       ];
       const DPI=200;
       const PX_W=Math.round(CW*DPI), PX_H=Math.round(IMG_H*DPI);
@@ -1272,13 +1272,12 @@ window.generarPPT=async()=>{
         ["Categoría",p=>p.cat,false],
         ["Año",p=>String(p.anio),false],
         ["Pisos",p=>String(p.pisos),false],
-        ["Superficie rentable",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
         ["Cocheras",p=>p.cocheras,false],
-        ["Superficie disponible",p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
+        ["Superficie Disponible (m²)",p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
         ["Pisos disponibles",p=>p.pisosDisp,false],
-        ["Sup. a adquirir (m²)",p=>'',false],
-        ["Asking Rent",p=>`USD ${p.rent}/m²`,false],
-        ["Planta promedio",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
+        ["Sup. Planta Promedio (m²)",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
+        ["Sup. A adquirir (m²)",p=>'',false],
+        ["Asking Rent (USD/m²)",p=>`USD ${p.rent}/m²`,false],
       ];
       for(const[idx,prop] of sp.entries()){
         const s=pptx.addSlide();
