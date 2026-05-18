@@ -31,15 +31,16 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .nbtn:hover{background:rgba(255,255,255,.1)}
 
 /* LOGIN */
-#ls{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:2rem}
-.lbox{background:#fff;border-top:4px solid #25408F;padding:3rem 2.5rem;max-width:400px;width:100%;text-align:center;box-shadow:0 12px 50px rgba(0,7,89,.12)}
-.lbox-brand{font-size:32px;font-weight:700;color:#25408F;letter-spacing:-.5px;margin-bottom:6px}
-.lbox-bar{height:3px;background:linear-gradient(90deg,#000759,#25408F,#1C54F4,#4D93FF,#C3E6FF);margin-bottom:2rem}
-.lbox h1{font-size:19px;font-weight:700;color:#000759;margin-bottom:.5rem}
+#ls{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:#000759;background-image:url('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%201.jpg');background-size:cover;background-position:center;position:relative}
+#ls::before{content:'';position:absolute;inset:0;background:rgba(0,7,89,.72)}
+.lbox{position:relative;background:#fff;padding:3rem 2.5rem;max-width:380px;width:100%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.4);border-radius:6px}
+.lbox-brand{display:none}
+.lbox-bar{display:none}
+.lbox h1{font-size:20px;font-weight:700;color:#25408F;margin-bottom:.5rem}
 .lbox p{font-size:12px;color:#56648F;line-height:1.8;margin-bottom:2rem}
-.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s;border-radius:4px}
 .gbtn:hover{background:#000759}
-.lnote{margin-top:.75rem;font-size:10px;color:#56648F}
+.lnote{margin-top:.75rem;font-size:10px;color:#8a96b8}
 
 /* DENIED */
 #ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 56px)}
@@ -274,8 +275,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 <!-- LOGIN -->
 <div id="ls">
   <div class="lbox">
-    <div class="lbox-brand">Colliers</div>
-    <div class="lbox-bar"></div>
+    <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:80px;object-fit:contain;margin-bottom:1.5rem">
     <h1>Generador de Alternativas</h1>
     <p>Iniciá sesión con tu cuenta corporativa para acceder al sistema de búsqueda y generación de presentaciones.</p>
     <button class="gbtn" id="login-btn">
