@@ -981,7 +981,7 @@ function applyFilters(){
   console.log('DEBUG filtros:', {zonasCheck:[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value), respZona:resp.zona, zonas:[...new Set([...[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value),...(Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]))])]});
   const zonasCheck=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
   const zonasChat=Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]);
-  const zonas=[...new Set([...zonasCheck,...zonasChat])];
+  const zonas=zonasCheck.length>0?zonasCheck:zonasChat;
   const supMin=parseFloat(document.getElementById('fsmn').value)||0;
   const supMax=parseFloat(document.getElementById('fsmx').value)||Infinity;
   const rentMin=parseFloat(document.getElementById('frmn').value)||0;
