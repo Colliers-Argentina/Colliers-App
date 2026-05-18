@@ -978,6 +978,7 @@ window.toggleFilters=()=>{
 };
 
 function applyFilters(){
+  console.log('DEBUG filtros:', {zonasCheck:[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value), respZona:resp.zona, zonas:[...new Set([...[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value),...(Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]))])]});
   const zonasCheck=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
   const zonasChat=Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]);
   const zonas=[...new Set([...zonasCheck,...zonasChat])];
