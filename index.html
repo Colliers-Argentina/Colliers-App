@@ -616,12 +616,36 @@ function decodeJWT(token){
   return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
 }
 
+let _tokenClient=null;
+
+function handlePayload(payload){
+  if(!payload.email||!payload.email.endsWith('@'+DOM)){
+    document.getElementById('de').textContent=payload.email||'desconocido';
+    show('ds');
+    return;
+  }
+  user={email:payload.email,displayName:payload.name||payload.email};
+  sessionStorage.setItem('gsi_user',JSON.stringify(user));
+  onUserLoggedIn();
+}
+
 function initGSI(){
   google.accounts.id.initialize({
     client_id:CLIENT_ID,
-    callback:handleCredentialResponse,
+    callback:(response)=>handlePayload(decodeJWT(response.credential)),
     auto_select:false,
     cancel_on_tap_outside:true
+  });
+  _tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:CLIENT_ID,
+    scope:'openid email profile',
+    callback:async(resp)=>{
+      if(resp.error){console.error('Token error:',resp);return;}
+      try{
+        const r=await fetch('https://openidconnect.googleapis.com/v1/userinfo',{headers:{Authorization:'Bearer '+resp.access_token}});
+        handlePayload(await r.json());
+      }catch(e){console.error('userinfo fetch error:',e);}
+    }
   });
   const saved=sessionStorage.getItem('gsi_user');
   if(saved){
@@ -632,15 +656,7 @@ function initGSI(){
 }
 
 function handleCredentialResponse(response){
-  const payload=decodeJWT(response.credential);
-  if(!payload.email.endsWith('@'+DOM)){
-    document.getElementById('de').textContent=payload.email;
-    show('ds');
-    return;
-  }
-  user={email:payload.email,displayName:payload.name};
-  sessionStorage.setItem('gsi_user',JSON.stringify(user));
-  onUserLoggedIn();
+  handlePayload(decodeJWT(response.credential));
 }
 
 function onUserLoggedIn(){
@@ -655,9 +671,15 @@ function onUserLoggedIn(){
   Promise.all([loadData(),cargarOverview()]);
 }
 
-window.loginGoogle=()=>{google.accounts.id.prompt();};
+window.loginGoogle=()=>{
+  if(_tokenClient)_tokenClient.requestAccessToken({prompt:'select_account'});
+  else if(typeof google!=='undefined'&&google.accounts)google.accounts.id.prompt();
+};
 window.logout=()=>{
-  google.accounts.id.disableAutoSelect();
+  if(typeof google!=='undefined'&&google.accounts){
+    google.accounts.id.disableAutoSelect();
+    if(_tokenClient)google.accounts.oauth2.revoke(user?.email||'',()=>{});
+  }
   sessionStorage.removeItem('gsi_user');
   user=null;
   document.getElementById('nu').style.display='none';
@@ -667,7 +689,7 @@ window.logout=()=>{
 document.addEventListener('DOMContentLoaded',()=>{
   const btn=document.getElementById('login-btn');
   if(btn)btn.addEventListener('click',()=>{
-    console.log('login-btn DOMContentLoaded listener fired');
+    if(_tokenClient){_tokenClient.requestAccessToken({prompt:'select_account'});return;}
     if(typeof google!=='undefined'&&google.accounts)google.accounts.id.prompt();
   });
 });
