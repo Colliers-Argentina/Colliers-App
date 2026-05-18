@@ -886,7 +886,10 @@ function applyFilters(){
     if(zonas.length&&!zonas.some(z=>p.submercado===z))return false;
     const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
     if(supMin&&p.supDisp<supMin&&(p.supPlanta||0)<supMin&&(p.supMinima||0)<supMin)return false;
-    if(supMax<Infinity&&supRef>supMax)return false;
+    if(supMax<Infinity){
+      const supRefMax=p.supMinima>0?p.supMinima:(p.supPlanta>0?p.supPlanta:p.supDisp);
+      if(supRefMax>supMax)return false;
+    }
     const rn=parseFloat(String(p.rent).split('–')[0].replace(',','.'))||0;
     if(rentMin&&rn<rentMin)return false;
     if(rentMax<Infinity&&rn>rentMax)return false;
