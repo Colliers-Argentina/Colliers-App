@@ -31,15 +31,44 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .nbtn:hover{background:rgba(255,255,255,.1)}
 
 /* LOGIN */
-#ls{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:#000759;background-image:url('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%201.jpg');background-size:cover;background-position:center;position:relative}
-#ls::before{content:'';position:absolute;inset:0;background:rgba(0,7,89,.72)}
-.lbox{position:relative;background:#fff;padding:3rem 2.5rem;max-width:380px;width:100%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.4);border-radius:6px}
-.login-logo{width:220px;max-width:100%;height:auto;display:block;margin:0 auto 1.5rem;object-fit:contain}
-.lbox h1{font-size:20px;font-weight:700;color:#25408F;margin-bottom:.5rem}
-.lbox p{font-size:12px;color:#56648F;line-height:1.8;margin-bottom:2rem}
-.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s;border-radius:4px}
-.gbtn:hover{background:#000759}
-.lnote{margin-top:.75rem;font-size:10px;color:#8a96b8}
+.login-page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;font-family:'Open Sans',Verdana,sans-serif}
+.lp-left{background:#000759;display:flex;flex-direction:column;justify-content:space-between;padding:2.5rem;position:relative;overflow:hidden}
+.lp-circle{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.06)}
+.lp-top{position:relative;z-index:1;display:flex;flex-direction:column;gap:2rem}
+.lp-logo-box{background:#fff;border-radius:6px;padding:.4rem .75rem;display:inline-flex;flex-direction:column;width:fit-content}
+.lp-bars{display:flex;gap:2px;margin-top:3px}
+.lp-hero h1{font-size:26px;font-weight:700;color:#fff;line-height:1.25;margin-bottom:.75rem}
+.lp-hero h1 span{color:#4D93FF}
+.lp-hero p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7}
+.lp-feats{display:flex;flex-direction:column;gap:.5rem;position:relative;z-index:1}
+.lp-feat{display:flex;align-items:flex-start;gap:.65rem}
+.lp-feat-icon{width:28px;height:28px;border-radius:5px;background:rgba(77,147,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.lp-feat-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5}
+.lp-feat-text strong{color:#fff;display:block}
+.lp-bottom{position:relative;z-index:1}
+.lp-stats{display:flex;gap:1.5rem;margin-bottom:1.25rem}
+.lp-stat-num{font-size:22px;font-weight:700;color:#fff}
+.lp-stat-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+.lp-stat-sep{width:1px;background:rgba(255,255,255,.15)}
+.lp-tagline{font-size:11px;color:rgba(255,255,255,.35);font-style:italic;border-top:0.5px solid rgba(255,255,255,.1);padding-top:.75rem}
+.lp-right{background:#F4F6FB;display:flex;align-items:center;justify-content:center;padding:2.5rem}
+.lp-card{background:#fff;border-radius:12px;border:0.5px solid #D8E2F0;padding:2.5rem 2rem;width:100%;max-width:350px}
+.lp-card-top{text-align:center;margin-bottom:2rem}
+.lp-card-top img{height:44px;object-fit:contain;margin-bottom:1.25rem}
+.lp-keyline{height:3px;width:48px;margin:.75rem auto;border-radius:2px;background:linear-gradient(90deg,#25408F,#4D93FF,#C3E6FF)}
+.lp-card-top h2{font-size:19px;font-weight:700;color:#000759;margin-bottom:.35rem}
+.lp-card-top p{font-size:12px;color:#7B8BBD;line-height:1.6}
+.lp-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:6px;cursor:pointer;margin-bottom:.75rem}
+.lp-btn:hover{background:#000759}
+.lp-note{text-align:center;font-size:11px;color:#ACBBE8}
+.lp-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0}
+.lp-divider-line{flex:1;height:0.5px;background:#E0E8F5}
+.lp-divider-text{font-size:10px;color:#ACBBE8;white-space:nowrap}
+.lp-pills{display:flex;flex-direction:column;gap:.5rem}
+.lp-pill{display:flex;align-items:center;gap:.5rem;background:#F4F6FB;border-radius:5px;padding:.45rem .65rem;font-size:11px;color:#353E59}
+.lp-pill-dot{width:6px;height:6px;border-radius:50%;background:#25408F;flex-shrink:0}
+.lp-footer{text-align:center;margin-top:1.5rem;font-size:10px;color:#ACBBE8}
+.lp-footer strong{color:#25408F}
 
 /* DENIED */
 #ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 56px)}
@@ -282,16 +311,64 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 </div>
 
 <!-- LOGIN -->
-<div id="ls">
-  <div class="lbox">
-    <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" alt="Colliers" class="login-logo">
-    <h1>Generador de Alternativas</h1>
-    <p>Iniciá sesión con tu cuenta corporativa para acceder al sistema de búsqueda y generación de presentaciones.</p>
-    <button class="gbtn" id="login-btn">
-      <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
-      Iniciar sesión con Google
-    </button>
-    <div class="lnote">Solo cuentas @gmail.com tienen acceso</div>
+<div class="login-page" id="ls">
+  <div class="lp-left">
+    <div class="lp-circle" style="top:-80px;right:-80px;width:320px;height:320px"></div>
+    <div class="lp-circle" style="top:-40px;right:-40px;width:200px;height:200px;border-color:rgba(255,255,255,.08)"></div>
+    <div class="lp-circle" style="bottom:-100px;left:-60px;width:280px;height:280px"></div>
+    <div class="lp-top">
+      <div class="lp-logo-box">
+        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:32px;object-fit:contain">
+        <div class="lp-bars">
+          <div style="height:3px;width:34px;background:#FFD400;border-radius:1px"></div>
+          <div style="height:3px;width:24px;background:#00BFFF;border-radius:1px"></div>
+          <div style="height:3px;width:16px;background:#ED1B34;border-radius:1px"></div>
+        </div>
+      </div>
+      <div class="lp-hero">
+        <h1>Generador de<br><span>Alternativas</span><br>de Oficinas</h1>
+        <p>La herramienta interna de Colliers Argentina para buscar, filtrar y presentar alternativas de oficinas de forma profesional.</p>
+      </div>
+    </div>
+    <div class="lp-feats">
+      <div class="lp-feat"><div class="lp-feat-icon">💬</div><div class="lp-feat-text"><strong>Chat guiado inteligente</strong>Filtrá por zona, superficie, precio y categoría</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">📊</div><div class="lp-feat-text"><strong>PPT profesional en segundos</strong>Portada, tabla comparativa, fichas y mapa</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">✨</div><div class="lp-feat-text"><strong>Recomendaciones con IA</strong>El asistente sugiere la mejor alternativa</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">🔄</div><div class="lp-feat-text"><strong>Datos siempre actualizados</strong>Conectado en tiempo real al Google Sheet</div></div>
+    </div>
+    <div class="lp-bottom">
+      <div class="lp-stats">
+        <div><div class="lp-stat-num">26+</div><div class="lp-stat-label">Edificios activos</div></div>
+        <div class="lp-stat-sep"></div>
+        <div><div class="lp-stat-num">PPT</div><div class="lp-stat-label">En segundos</div></div>
+        <div class="lp-stat-sep"></div>
+        <div><div class="lp-stat-num">IA</div><div class="lp-stat-label">Asistente integrado</div></div>
+      </div>
+      <div class="lp-tagline">Accelerating success.</div>
+    </div>
+  </div>
+  <div class="lp-right">
+    <div class="lp-card">
+      <div class="lp-card-top">
+        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png">
+        <div class="lp-keyline"></div>
+        <h2>Bienvenido</h2>
+        <p>Iniciá sesión con tu cuenta<br>corporativa para acceder</p>
+      </div>
+      <button class="lp-btn" id="login-btn">
+        <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
+        Iniciar sesión con Google
+      </button>
+      <div class="lp-note">Acceso exclusivo para el equipo Colliers</div>
+      <div class="lp-divider"><div class="lp-divider-line"></div><div class="lp-divider-text">Incluye acceso a</div><div class="lp-divider-line"></div></div>
+      <div class="lp-pills">
+        <div class="lp-pill"><div class="lp-pill-dot"></div>26+ edificios activos en Buenos Aires</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Generación de PPT con estilo Colliers</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Panel de registros para administradores</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Feedback y seguimiento de informes</div>
+      </div>
+      <div class="lp-footer"><strong>Colliers International Argentina</strong><br>Uso interno · colliers.com</div>
+    </div>
   </div>
 </div>
 
