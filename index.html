@@ -606,6 +606,7 @@ async function loadData(){
       const csv=await r.text();
       if(!csv.trim())continue;
       props=parseCSV(csv);
+      window._props=props;
       populateZonas();
       console.log('Data OK via',url.substring(0,40));
       return;
