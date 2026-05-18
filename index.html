@@ -15,7 +15,7 @@
 body{font-family:'Open Sans',Verdana,sans-serif;background:#F0F4FF;color:#000759;min-height:100vh}
 
 /* NAV */
-nav{background:#25408F;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid #1C54F4;position:sticky;top:0;z-index:200}
+nav{background:#25408F;height:56px;display:none;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid #1C54F4;position:sticky;top:0;z-index:200}
 .nb{display:flex;align-items:center;gap:14px}
 .nlogo{display:flex;flex-direction:column;gap:2px}
 .nlogo-name{color:#fff;font-size:18px;font-weight:700;letter-spacing:-.5px}
@@ -281,7 +281,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 </head>
 <body>
 
-<nav>
+<nav id="main-nav">
   <div class="nb">
     <div class="nlogo">
       <div class="nlogo-name">Colliers</div>
@@ -1746,6 +1746,8 @@ function show(id){
     const el=document.getElementById(s);
     if(el)el.style.display=s===id?(s==="ls"?"grid":s==="ds"?"flex":"block"):"none";
   });
+  const nav=document.getElementById('main-nav');
+  if(nav)nav.style.display=id==="as"?"flex":"none";
 }
 </script>
 </body>
