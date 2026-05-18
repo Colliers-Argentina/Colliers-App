@@ -54,7 +54,8 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .lp-right{background:#F4F6FB;display:flex;align-items:center;justify-content:center;padding:3rem}
 .lp-card{background:#fff;border-radius:16px;border:0.5px solid #D8E2F0;padding:3rem 2.5rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,7,89,.08)}
 .lp-card-top{text-align:center;margin-bottom:2.25rem}
-.lp-card-top img{height:48px;object-fit:contain;margin-bottom:1.25rem}
+.lp-logo{width:180px;height:auto;display:block;object-fit:contain;background:transparent}
+.lp-card-top .lp-logo{margin:0 auto 1.25rem}
 .lp-keyline{height:3px;width:56px;margin:.85rem auto;border-radius:2px;background:linear-gradient(90deg,#25408F,#4D93FF,#C3E6FF)}
 .lp-card-top h2{font-size:22px;font-weight:700;color:#000759;margin-bottom:.4rem}
 .lp-card-top p{font-size:13px;color:#7B8BBD;line-height:1.65}
@@ -318,14 +319,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
     <div class="lp-circle" style="top:-40px;right:-40px;width:200px;height:200px;border-color:rgba(255,255,255,.08)"></div>
     <div class="lp-circle" style="bottom:-100px;left:-60px;width:280px;height:280px"></div>
     <div class="lp-top">
-      <div class="lp-logo-box">
-        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:40px;object-fit:contain;filter:brightness(0) invert(1)">
-        <div class="lp-bars">
-          <div style="height:3px;width:34px;background:#FFD400;border-radius:1px"></div>
-          <div style="height:3px;width:24px;background:#00BFFF;border-radius:1px"></div>
-          <div style="height:3px;width:16px;background:#ED1B34;border-radius:1px"></div>
-        </div>
-      </div>
+      <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers" class="lp-logo" style="filter:brightness(0) invert(1)">
       <div class="lp-hero">
         <h1>Generador de<br><span>Alternativas</span><br>de Oficinas</h1>
         <p>La herramienta interna de Colliers Argentina para buscar, filtrar y presentar alternativas de oficinas de forma profesional.</p>
@@ -351,7 +345,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
   <div class="lp-right">
     <div class="lp-card">
       <div class="lp-card-top">
-        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png">
+        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers" class="lp-logo">
         <div class="lp-keyline"></div>
         <h2>Bienvenido</h2>
         <p>Iniciá sesión con tu cuenta<br>corporativa para acceder</p>
@@ -978,7 +972,10 @@ window.toggleFilters=()=>{
 };
 
 function applyFilters(){
-  const zonas=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
+  console.log('DEBUG filtros:', {zonasCheck:[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value), respZona:resp.zona, zonas:[...new Set([...[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value),...(Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]))])]});
+  const zonasCheck=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
+  const zonasChat=Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]);
+  const zonas=zonasCheck.length>0?zonasCheck:zonasChat;
   const supMin=parseFloat(document.getElementById('fsmn').value)||0;
   const supMax=parseFloat(document.getElementById('fsmx').value)||Infinity;
   const rentMin=parseFloat(document.getElementById('frmn').value)||0;
