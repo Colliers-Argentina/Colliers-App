@@ -34,8 +34,7 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 #ls{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:#000759;background-image:url('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/Portada%201.jpg');background-size:cover;background-position:center;position:relative}
 #ls::before{content:'';position:absolute;inset:0;background:rgba(0,7,89,.72)}
 .lbox{position:relative;background:#fff;padding:3rem 2.5rem;max-width:380px;width:100%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.4);border-radius:6px}
-.lbox-brand{display:none}
-.lbox-bar{display:none}
+.login-logo{width:220px;max-width:100%;height:auto;display:block;margin:0 auto 1.5rem;object-fit:contain}
 .lbox h1{font-size:20px;font-weight:700;color:#25408F;margin-bottom:.5rem}
 .lbox p{font-size:12px;color:#56648F;line-height:1.8;margin-bottom:2rem}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:background .15s;border-radius:4px}
@@ -275,7 +274,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 <!-- LOGIN -->
 <div id="ls">
   <div class="lbox">
-    <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="width:220px;max-width:100%;height:auto;object-fit:contain;display:block;margin:0 auto 1.5rem">
+    <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" alt="Colliers" class="login-logo">
     <h1>Generador de Alternativas</h1>
     <p>Iniciá sesión con tu cuenta corporativa para acceder al sistema de búsqueda y generación de presentaciones.</p>
     <button class="gbtn" id="login-btn">
