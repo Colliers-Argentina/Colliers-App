@@ -653,7 +653,7 @@ function parseCSV(csv){
     const v=parseLine(line);
     if(!v[c("Nombre Edificio")])return null;
     if((v[c("Activo (SI/NO)")]||"SI").toUpperCase()==="NO")return null;
-    return{
+    const obj={
       nombre:v[c("Nombre Edificio")]||"–",
       direccion:v[c("Dirección")]||"–",
       submercado:v[c("Submercado")]||"–",
@@ -665,12 +665,12 @@ function parseCSV(csv){
       pisosDisp:v[c("Pisos Disponibles")]||"–",
       supPlanta:parseFloat(((v[c("Sup. Promedio Planta (m²)")]||v[c("Sup. Promedio Planta m²")])||"0").replace(/\./g,"").replace(",","."))||0,
       supMinima: parseFloat(((v[c("Sup. Mínima Divisible m²")]||v[c("Sup. Mínima Divisible (m²)")]||"0")).replace(/[^\d,\.]/g,"").replace(",",".")) || 0,
-      // debug temporal
-      ...(v[c("Nombre Edificio")]?.includes("Mirabilia")&&console.log("Mirabilia supMinima raw:",v[c("Sup. Mínima Divisible m²")],"→",parseFloat(((v[c("Sup. Mínima Divisible m²")]||v[c("Sup. Mínima Divisible (m²)")]||"0")).replace(/[^\d,\.]/g,"").replace(",","."))))||{},
       rent:v[c("Asking Rent (USD/m²)")]||v[c("Asking Rent USD/m²")]||"–",
       comentarios:v[c("Comentarios / Amenities")]||"–",
       foto:v[c("URL Foto")]||"",
     };
+    if(obj.nombre&&obj.nombre.includes('Mirabilia'))console.log('Mirabilia parsed:',JSON.stringify(obj));
+    return obj;
   }).filter(Boolean);
 }
 
