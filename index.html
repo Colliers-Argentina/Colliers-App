@@ -227,6 +227,15 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 
 footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:1px solid #DBE5FF;margin-top:1rem}
 
+/* AI RECOMMENDATIONS */
+.rec-btn{background:#25408F;color:#fff;border:none;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border-radius:4px;transition:background .15s}
+.rec-btn:hover{background:#000759}
+.rec-btn:disabled{opacity:.6;cursor:not-allowed}
+.rec-card{background:#F0F4FF;border-left:4px solid #25408F;padding:1rem 1.25rem;margin-top:1rem;border-radius:0 4px 4px 0;font-size:13px;line-height:1.8;color:#1a1a2e}
+.rec-card strong{color:#25408F}
+.rec-card .rec-bullets{margin:.4rem 0 0 1rem;padding:0;list-style:disc}
+.rec-card .rec-bullets li{margin-bottom:.2rem}
+
 /* FEEDBACK */
 .fb-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 14px rgba(0,7,89,.08);margin-top:1.5rem;overflow:hidden}
 .star-row{display:flex;gap:8px;margin:6px 0}
@@ -444,6 +453,17 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
             </div>
           </div>
           <div class="sm" id="sm"></div>
+        </div>
+
+        <!-- STEP 3.5: AI RECOMMENDATIONS -->
+        <div class="card" id="ai-rec-section">
+          <div class="card-hd">
+            <div class="card-title">Recomendaciones del Asistente Colliers</div>
+          </div>
+          <div style="padding:1rem 1.5rem 1.5rem">
+            <button class="rec-btn" onclick="obtenerRecomendacion()">✨ Obtener recomendación</button>
+            <div id="rec-result" style="display:none"></div>
+          </div>
         </div>
 
         <!-- STEP 4: PPT PREVIEW -->
@@ -1032,6 +1052,48 @@ function updatePreview(){
 
   grid.innerHTML=h;
 }
+
+window.obtenerRecomendacion=async()=>{
+  const sp=[...sel].map(i=>filt[i]).filter(Boolean);
+  const btn=document.querySelector('.rec-btn');
+  const result=document.getElementById('rec-result');
+  if(!sp.length){result.innerHTML='<div class="rec-card">Seleccioná al menos una alternativa primero.</div>';result.style.display='block';return;}
+  if(!ANTHROPIC_API_KEY){result.innerHTML='<div class="rec-card">Para activar esta función, configurá tu API key de Anthropic</div>';result.style.display='block';return;}
+  btn.disabled=true;btn.textContent='⏳ Analizando...';result.style.display='none';
+  const lista=sp.map((p,i)=>`${i+1}. ${p.nombre} | ${p.submercado||''} | USD ${p.rent||'–'}/m² | Sup. disponible: ${p.supDisp?p.supDisp.toLocaleString('es-AR')+' m²':'–'} | Dirección: ${p.direccion||'–'}`).join('\n');
+  const prompt=`Sos un experto en real estate corporativo de Buenos Aires. Analizá estas ${sp.length} alternativas de oficinas y recomendá la mejor para el cliente considerando precio, superficie, ubicación y amenities.\n\nAlternativas:\n${lista}\n\nRespondé en español con este formato exacto:\n**Edificio recomendado**: [nombre]\n**Razón principal**: [1 oración]\n**Análisis**:\n• [punto 1]\n• [punto 2]\n• [punto 3]\n\nSé conciso y directo.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})
+    });
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const data=await r.json();
+    const text=data.content?.[0]?.text||'Sin respuesta';
+    const lines=text.split('\n').filter(l=>l.trim());
+    let html='';
+    const bullets=[];
+    let inBullets=false;
+    for(const line of lines){
+      const t=line.trim();
+      if(t.startsWith('•')||t.startsWith('-')){bullets.push(`<li>${t.replace(/^[•\-]\s*/,'').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</li>`);inBullets=true;}
+      else{
+        if(inBullets&&bullets.length){html+=`<ul class="rec-bullets">${bullets.join('')}</ul>`;bullets.length=0;inBullets=false;}
+        html+=`<p style="margin:.3rem 0">${t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</p>`;
+      }
+    }
+    if(bullets.length)html+=`<ul class="rec-bullets">${bullets.join('')}</ul>`;
+    result.innerHTML=`<div class="rec-card">${html}</div>`;
+    result.style.display='block';
+  }catch(e){
+    console.error('Anthropic error:',e);
+    result.innerHTML='<div class="rec-card">Para activar esta función, configurá tu API key de Anthropic</div>';
+    result.style.display='block';
+  }finally{
+    btn.disabled=false;btn.textContent='✨ Obtener recomendación';
+  }
+};
 
 window.generarPPT=async()=>{
   const sp=[...sel].map(i=>filt[i]).filter(Boolean);
