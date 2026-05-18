@@ -978,7 +978,9 @@ window.toggleFilters=()=>{
 };
 
 function applyFilters(){
-  const zonas=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
+  const zonasCheck=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
+  const zonasChat=Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]);
+  const zonas=[...new Set([...zonasCheck,...zonasChat])];
   const supMin=parseFloat(document.getElementById('fsmn').value)||0;
   const supMax=parseFloat(document.getElementById('fsmx').value)||Infinity;
   const rentMin=parseFloat(document.getElementById('frmn').value)||0;
