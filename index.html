@@ -1721,7 +1721,7 @@ window.enviarFeedback=async()=>{
 function show(id){
   ["ls","ds","as"].forEach(s=>{
     const el=document.getElementById(s);
-    if(el)el.style.display=s===id?(s==="ls"||s==="ds"?"flex":"block"):"none";
+    if(el)el.style.display=s===id?(s==="ls"?"grid":s==="ds"?"flex":"block"):"none";
   });
 }
 </script>
