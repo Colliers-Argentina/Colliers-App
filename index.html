@@ -31,44 +31,45 @@ nav{background:#25408F;height:56px;display:flex;align-items:center;justify-conte
 .nbtn:hover{background:rgba(255,255,255,.1)}
 
 /* LOGIN */
-.login-page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;font-family:'Open Sans',Verdana,sans-serif}
-.lp-left{background:#000759;display:flex;flex-direction:column;justify-content:space-between;padding:2.5rem;position:relative;overflow:hidden}
+.login-page{display:grid;grid-template-columns:3fr 2fr;min-height:100vh;font-family:'Open Sans',Verdana,sans-serif}
+.lp-left{background:#000759;display:flex;flex-direction:column;justify-content:space-between;padding:3rem 3.5rem;position:relative;overflow:hidden}
 .lp-circle{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.06)}
-.lp-top{position:relative;z-index:1;display:flex;flex-direction:column;gap:2rem}
-.lp-logo-box{background:#fff;border-radius:6px;padding:.4rem .75rem;display:inline-flex;flex-direction:column;width:fit-content}
-.lp-bars{display:flex;gap:2px;margin-top:3px}
-.lp-hero h1{font-size:26px;font-weight:700;color:#fff;line-height:1.25;margin-bottom:.75rem}
+.lp-top{position:relative;z-index:1;display:flex;flex-direction:column;gap:2.5rem}
+.lp-logo-box{display:inline-flex;flex-direction:column;width:fit-content}
+.lp-bars{display:flex;gap:3px;margin-top:6px}
+.lp-hero h1{font-size:36px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:1rem}
 .lp-hero h1 span{color:#4D93FF}
-.lp-hero p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7}
-.lp-feats{display:flex;flex-direction:column;gap:.5rem;position:relative;z-index:1}
-.lp-feat{display:flex;align-items:flex-start;gap:.65rem}
-.lp-feat-icon{width:28px;height:28px;border-radius:5px;background:rgba(77,147,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.lp-feat-text{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5}
-.lp-feat-text strong{color:#fff;display:block}
+.lp-hero p{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;max-width:440px}
+.lp-feats{display:flex;flex-direction:column;gap:.75rem;position:relative;z-index:1}
+.lp-feat{display:flex;align-items:flex-start;gap:.8rem}
+.lp-feat-icon{width:34px;height:34px;border-radius:7px;background:rgba(77,147,255,.18);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.lp-feat-text{font-size:13px;color:rgba(255,255,255,.7);line-height:1.55}
+.lp-feat-text strong{color:#fff;display:block;margin-bottom:1px}
 .lp-bottom{position:relative;z-index:1}
-.lp-stats{display:flex;gap:1.5rem;margin-bottom:1.25rem}
-.lp-stat-num{font-size:22px;font-weight:700;color:#fff}
-.lp-stat-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+.lp-stats{display:flex;gap:2rem;margin-bottom:1.5rem}
+.lp-stat-num{font-size:26px;font-weight:700;color:#fff}
+.lp-stat-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;letter-spacing:.03em}
 .lp-stat-sep{width:1px;background:rgba(255,255,255,.15)}
-.lp-tagline{font-size:11px;color:rgba(255,255,255,.35);font-style:italic;border-top:0.5px solid rgba(255,255,255,.1);padding-top:.75rem}
-.lp-right{background:#F4F6FB;display:flex;align-items:center;justify-content:center;padding:2.5rem}
-.lp-card{background:#fff;border-radius:12px;border:0.5px solid #D8E2F0;padding:2.5rem 2rem;width:100%;max-width:350px}
-.lp-card-top{text-align:center;margin-bottom:2rem}
-.lp-card-top img{height:44px;object-fit:contain;margin-bottom:1.25rem}
-.lp-keyline{height:3px;width:48px;margin:.75rem auto;border-radius:2px;background:linear-gradient(90deg,#25408F,#4D93FF,#C3E6FF)}
-.lp-card-top h2{font-size:19px;font-weight:700;color:#000759;margin-bottom:.35rem}
-.lp-card-top p{font-size:12px;color:#7B8BBD;line-height:1.6}
-.lp-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:6px;cursor:pointer;margin-bottom:.75rem}
+.lp-tagline{font-size:12px;color:rgba(255,255,255,.35);font-style:italic;border-top:0.5px solid rgba(255,255,255,.1);padding-top:1rem}
+.lp-right{background:#F4F6FB;display:flex;align-items:center;justify-content:center;padding:3rem}
+.lp-card{background:#fff;border-radius:16px;border:0.5px solid #D8E2F0;padding:3rem 2.5rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,7,89,.08)}
+.lp-card-top{text-align:center;margin-bottom:2.25rem}
+.lp-card-top img{height:48px;object-fit:contain;margin-bottom:1.25rem}
+.lp-keyline{height:3px;width:56px;margin:.85rem auto;border-radius:2px;background:linear-gradient(90deg,#25408F,#4D93FF,#C3E6FF)}
+.lp-card-top h2{font-size:22px;font-weight:700;color:#000759;margin-bottom:.4rem}
+.lp-card-top p{font-size:13px;color:#7B8BBD;line-height:1.65}
+.lp-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:8px;cursor:pointer;margin-bottom:.85rem;transition:background .15s}
 .lp-btn:hover{background:#000759}
 .lp-note{text-align:center;font-size:11px;color:#ACBBE8}
-.lp-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0}
+.lp-divider{display:flex;align-items:center;gap:.75rem;margin:1.5rem 0}
 .lp-divider-line{flex:1;height:0.5px;background:#E0E8F5}
 .lp-divider-text{font-size:10px;color:#ACBBE8;white-space:nowrap}
 .lp-pills{display:flex;flex-direction:column;gap:.5rem}
-.lp-pill{display:flex;align-items:center;gap:.5rem;background:#F4F6FB;border-radius:5px;padding:.45rem .65rem;font-size:11px;color:#353E59}
+.lp-pill{display:flex;align-items:center;gap:.6rem;background:#F4F6FB;border-radius:6px;padding:.5rem .75rem;font-size:11.5px;color:#353E59}
 .lp-pill-dot{width:6px;height:6px;border-radius:50%;background:#25408F;flex-shrink:0}
-.lp-footer{text-align:center;margin-top:1.5rem;font-size:10px;color:#ACBBE8}
+.lp-footer{text-align:center;margin-top:1.75rem;font-size:10px;color:#ACBBE8}
 .lp-footer strong{color:#25408F}
+@media(max-width:768px){.login-page{grid-template-columns:1fr}.lp-left{display:none}.lp-right{min-height:100vh}}
 
 /* DENIED */
 #ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 56px)}
@@ -318,7 +319,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
     <div class="lp-circle" style="bottom:-100px;left:-60px;width:280px;height:280px"></div>
     <div class="lp-top">
       <div class="lp-logo-box">
-        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:32px;object-fit:contain">
+        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png" style="height:40px;object-fit:contain;filter:brightness(0) invert(1)">
         <div class="lp-bars">
           <div style="height:3px;width:34px;background:#FFD400;border-radius:1px"></div>
           <div style="height:3px;width:24px;background:#00BFFF;border-radius:1px"></div>
