@@ -1341,12 +1341,12 @@ window.generarPPT=async()=>{
         // ONE addTable() — all rows, all columns, single native PPT table object
         const NB={pt:0};
         const numRow=[
-          {text:"",options:{fill:{color:DEEP},border:NB}},
-          ...grupo.map((p,i)=>({text:String(i+1+gi*MAX_COLS),options:{bold:true,color:WHITE,align:"center",valign:"middle",fill:{color:DEEP},fontSize:12,fontFace:"Open Sans",border:NB}}))
+          {text:"",options:{fill:{color:MID},border:NB}},
+          ...grupo.map((p,i)=>({text:String(i+1+gi*MAX_COLS),options:{bold:true,color:WHITE,align:"center",valign:"middle",fill:{color:MID},fontSize:12,fontFace:"Open Sans",border:NB}}))
         ];
         const namRow=[
-          {text:"",options:{fill:{color:DARK},border:NB}},
-          ...grupo.map(p=>({text:p.nombre,options:{bold:true,color:WHITE,align:"center",valign:"middle",fill:{color:DARK},fontSize:7,fontFace:"Open Sans",wrap:true,border:NB}}))
+          {text:"",options:{fill:{color:MID},border:NB}},
+          ...grupo.map(p=>({text:p.nombre,options:{bold:true,color:WHITE,align:"center",valign:"middle",fill:{color:MID},fontSize:7,fontFace:"Open Sans",wrap:true,border:NB}}))
         ];
         const dataRows=ROWS.map(([lbl,key],ri)=>{
           const bg=ri%2===0?"F4F7FF":WHITE;
