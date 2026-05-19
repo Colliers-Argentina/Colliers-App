@@ -108,7 +108,7 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .panel-hd{background:#25408F;padding:.7rem 1rem;display:flex;align-items:center;gap:8px;flex-shrink:0}
 .panel-dot{width:8px;height:8px;border-radius:50%;background:#C3E6FF;flex-shrink:0}
 .msg-row{display:flex;align-items:flex-start;gap:6px}
-.msg-row .msg-av{height:20px;object-fit:contain;flex-shrink:0;margin-top:3px;filter:brightness(0) invert(1);opacity:.85}
+.msg-row .msg-av{width:28px;height:auto;object-fit:contain;flex-shrink:0;margin-top:3px;background:transparent;border:none;display:block}
 .panel-title{color:#fff;font-size:13px;font-weight:700;flex:1}
 .panel-badge{font-size:8px;background:#1C54F4;color:#fff;padding:2px 7px;border-radius:2px;font-weight:700;letter-spacing:.05em}
 
@@ -297,8 +297,8 @@ body.dark .chat-opt.selected,body.dark .chat-opt.sel{background:rgba(77,147,255,
 body.dark .co button{background:rgba(255,255,255,.07)!important;border:0.5px solid rgba(255,255,255,.13)!important;color:rgba(255,255,255,.75)!important}
 body.dark .co button:hover{background:rgba(255,255,255,.15)!important}
 body.dark .co button.sel{background:rgba(77,147,255,.3)!important;border-color:#4D93FF!important;color:#fff!important;font-weight:700!important;box-shadow:0 0 6px rgba(77,147,255,.3)!important}
-body.dark .co-ok{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important;border-color:#4D93FF!important;color:#fff!important;font-weight:700!important;box-shadow:0 4px 12px rgba(28,84,244,.35)!important;transition:all .15s!important}
-body.dark .co-ok:hover{background:linear-gradient(90deg,#000759,#1C54F4)!important;box-shadow:0 6px 18px rgba(28,84,244,.5)!important;transform:translateY(-1px)}
+body.dark .co-ok{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important;border:1px solid rgba(255,255,255,.15)!important;color:#fff!important;font-weight:700!important;box-shadow:0 6px 20px rgba(28,84,244,.35)!important;transition:all .2s ease!important}
+body.dark .co-ok:hover{box-shadow:0 10px 28px rgba(28,84,244,.45)!important;transform:translateY(-1px);filter:brightness(1.05)}
 body.dark .cat{background:rgba(255,255,255,.07)!important;color:rgba(255,255,255,.75)!important;border-top:1px solid rgba(255,255,255,.1)!important}
 body.dark .fl{color:rgba(255,255,255,.45)!important}
 body.dark .fk{color:rgba(255,255,255,.7)!important}
@@ -1008,7 +1008,7 @@ function botMsg(txt, stepDef){
   const w=document.getElementById("cm");
   const row=document.createElement("div"); row.className="msg-row";
   const av=document.createElement("img"); av.className="msg-av";
-  av.src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png";
+  av.src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png";
   const m=document.createElement("div");
   m.className="msg mb"; m.innerHTML=txt;
   row.appendChild(av); row.appendChild(m); w.appendChild(row);
