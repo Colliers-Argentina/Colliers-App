@@ -277,6 +277,37 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 .fb-textarea:focus{outline:none;border-color:#1C54F4}
 .fb-body{padding:1.25rem;display:flex;flex-direction:column;gap:.75rem}
 .fb-thanks{background:#EEF3FF;border-left:3px solid #1C54F4;padding:.75rem 1rem;font-size:13px;color:#25408F;display:none}
+
+/* ===== DARK MODE ===== */
+#theme-toggle{background:transparent;border:1px solid rgba(255,255,255,.3);color:#C3E6FF;font-family:inherit;font-size:14px;padding:4px 10px;cursor:pointer;transition:all .15s;border-radius:2px;line-height:1}
+#theme-toggle:hover{background:rgba(255,255,255,.1)}
+
+body.dark { background: linear-gradient(135deg, #000759 0%, #25408F 50%, #1C54F4 100%) !important; }
+body.dark nav { background: rgba(0,7,89,.6) !important; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.1) !important; }
+body.dark .chat-panel { background: linear-gradient(160deg, #1a3070 0%, #000d3d 100%) !important; border: 1px solid rgba(77,147,255,.2) !important; }
+body.dark .chat-header { background: rgba(255,255,255,.08) !important; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.07) !important; }
+body.dark .msg-bot { background: rgba(255,255,255,.09) !important; border: 0.5px solid rgba(255,255,255,.1) !important; border-radius: 8px; color: #fff !important; }
+body.dark .msg-user { background: rgba(77,147,255,.25) !important; border: 0.5px solid rgba(77,147,255,.4) !important; color: #C3E6FF !important; }
+body.dark .chat-opt { background: rgba(255,255,255,.07) !important; border-color: rgba(255,255,255,.13) !important; color: rgba(255,255,255,.75) !important; }
+body.dark .chat-opt.selected, body.dark .chat-opt.sel { background: rgba(77,147,255,.18) !important; border-color: rgba(77,147,255,.5) !important; color: #C3E6FF !important; }
+body.dark .table-card, body.dark .tc, body.dark .card { background: rgba(255,255,255,.08) !important; backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.12) !important; }
+body.dark table thead tr { background: rgba(0,7,89,.5) !important; }
+body.dark table th { color: rgba(255,255,255,.7) !important; }
+body.dark table td { color: #fff !important; border-bottom-color: rgba(255,255,255,.06) !important; }
+body.dark table tr:hover td { background: rgba(255,255,255,.05) !important; }
+body.dark .selected-bar, body.dark .sb { background: rgba(0,7,89,.7) !important; backdrop-filter: blur(12px); border: 1px solid rgba(77,147,255,.25) !important; }
+body.dark .btn-gen-ppt, body.dark .bp { background: linear-gradient(90deg, #1C54F4, #4D93FF) !important; box-shadow: 0 4px 15px rgba(28,84,244,.4) !important; }
+body.dark .config-card, body.dark .kk, body.dark .cfg-card { background: rgba(255,255,255,.06) !important; backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.1) !important; }
+body.dark .cfg-f label, body.dark .kf label, body.dark .config-title, body.dark .kt { color: rgba(255,255,255,.45) !important; }
+body.dark .cfg-input, body.dark .kf input, body.dark .kf select { background: rgba(255,255,255,.08) !important; border-color: rgba(255,255,255,.15) !important; color: #fff !important; }
+body.dark .chk-row, body.dark .kr { color: rgba(255,255,255,.7) !important; }
+body.dark .status-msg, body.dark .sm { color: rgba(255,255,255,.4) !important; }
+body.dark .prop-name { color: #fff !important; }
+body.dark .prop-zone { color: rgba(255,255,255,.5) !important; }
+body.dark .sup-val, body.dark .sv { color: #4D93FF !important; }
+body.dark .rent-v, body.dark td[style*='font-weight:600'] { color: #C3E6FF !important; }
+body.dark .card-header, body.dark .th2, body.dark .gcard-h { background: rgba(0,7,89,.5) !important; }
+body.dark footer { border-top-color: rgba(255,255,255,.1) !important; color: rgba(255,255,255,.3) !important; }
 </style>
 </head>
 <body>
@@ -291,6 +322,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
     <div class="nsubt">Generador de Alternativas</div>
   </div>
   <div class="nright">
+    <button id="theme-toggle" onclick="toggleTheme()" title="Cambiar modo">🌙</button>
     <div class="ntag">Accelerating success.</div>
     <div class="nu" id="nu">
       <div class="na" id="na">MA</div>
@@ -1751,4 +1783,22 @@ function show(id){
 }
 </script>
 </body>
+
+<script>
+(function(){
+  var saved = localStorage.getItem('colliers-theme');
+  if(saved === 'dark'){
+    document.body.classList.add('dark');
+    var btn = document.getElementById('theme-toggle');
+    if(btn) btn.textContent = '☀️';
+  }
+})();
+
+window.toggleTheme = function(){
+  var isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('colliers-theme', isDark ? 'dark' : 'light');
+  var btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = isDark ? '☀️' : '🌙';
+};
+</script>
 </html>
