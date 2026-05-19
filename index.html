@@ -6,6 +6,7 @@
 <title>Alternativas de Oficinas · Colliers</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -296,7 +297,8 @@ body.dark .chat-opt.selected,body.dark .chat-opt.sel{background:rgba(77,147,255,
 body.dark .co button{background:rgba(255,255,255,.07)!important;border:0.5px solid rgba(255,255,255,.13)!important;color:rgba(255,255,255,.75)!important}
 body.dark .co button:hover{background:rgba(255,255,255,.15)!important}
 body.dark .co button.sel{background:rgba(77,147,255,.3)!important;border-color:#4D93FF!important;color:#fff!important;font-weight:700!important;box-shadow:0 0 6px rgba(77,147,255,.3)!important}
-body.dark .co-ok{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important;border-color:#4D93FF!important;color:#fff!important}
+body.dark .co-ok{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important;border-color:#4D93FF!important;color:#fff!important;font-weight:700!important;box-shadow:0 4px 12px rgba(28,84,244,.35)!important;transition:all .15s!important}
+body.dark .co-ok:hover{background:linear-gradient(90deg,#000759,#1C54F4)!important;box-shadow:0 6px 18px rgba(28,84,244,.5)!important;transform:translateY(-1px)}
 body.dark .cat{background:rgba(255,255,255,.07)!important;color:rgba(255,255,255,.75)!important;border-top:1px solid rgba(255,255,255,.1)!important}
 body.dark .fl{color:rgba(255,255,255,.45)!important}
 body.dark .fk{color:rgba(255,255,255,.7)!important}
@@ -333,6 +335,56 @@ body.dark footer{border-top-color:rgba(255,255,255,.1)!important;color:rgba(255,
 body.dark .sv{color:#4D93FF!important}
 body.dark .rent-v{color:#C3E6FF!important}
 body.dark .cb{background:rgba(255,255,255,.15)!important;color:#C3E6FF!important}
+
+/* ===== ANALYTICS ===== */
+#analytics-panel{background:#F0F4FF}
+body.dark #analytics-panel{background:linear-gradient(135deg,#000d3d 0%,#0a1a5e 100%)}
+.an-wrap{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem}
+.an-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.an-title{color:#25408F;font-size:22px;font-weight:700}
+.an-subtitle{color:#7B8BBD;font-size:12px;margin-top:3px}
+body.dark .an-title{color:#C3E6FF}
+body.dark .an-subtitle{color:rgba(195,230,255,.5)}
+.an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:960px){.an-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.an-kpis{grid-template-columns:1fr}}
+.kpi-card{background:#fff;border-top:3px solid #25408F;padding:1.25rem 1.5rem;box-shadow:0 2px 12px rgba(0,7,89,.07)}
+body.dark .kpi-card{background:rgba(255,255,255,.07);backdrop-filter:blur(12px);border-top:3px solid #1C54F4;box-shadow:none}
+.kpi-label{font-size:10px;font-weight:700;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+.kpi-val{font-size:34px;font-weight:700;color:#000759;line-height:1}
+.kpi-sub{font-size:11px;color:#56648F;margin-top:.35rem}
+body.dark .kpi-label{color:rgba(195,230,255,.45)}
+body.dark .kpi-val{color:#C3E6FF}
+body.dark .kpi-sub{color:rgba(255,255,255,.35)}
+.an-grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:900px){.an-grid2{grid-template-columns:1fr}}
+.an-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 12px rgba(0,7,89,.07);overflow:hidden}
+body.dark .an-card{background:rgba(255,255,255,.07);backdrop-filter:blur(12px);border-top:3px solid #1C54F4;border-left:1px solid rgba(77,147,255,.15);border-right:1px solid rgba(77,147,255,.15);border-bottom:1px solid rgba(77,147,255,.15)}
+.an-card-hd{background:#25408F;padding:.65rem 1rem}
+body.dark .an-card-hd{background:rgba(0,7,89,.5)}
+.an-card-title{color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em}
+.an-card-body{padding:1.25rem}
+.an-chart-wrap{position:relative;height:260px}
+.lb-list{display:flex;flex-direction:column;gap:.4rem;padding:0 1.25rem 1rem}
+.lb-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem}
+.lb-item:nth-child(odd){background:#F8FAFF}
+body.dark .lb-item:nth-child(odd){background:rgba(255,255,255,.04)}
+.lb-rank{width:22px;height:22px;border-radius:50%;background:#1C54F4;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lb-rank.top1{background:#FFD400;color:#000759}
+.lb-rank.top2{background:#C0C0C0;color:#000759}
+.lb-rank.top3{background:#CD7F32;color:#fff}
+.lb-name{flex:1;font-size:12px;font-weight:600;color:#000759;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+body.dark .lb-name{color:#fff}
+.lb-meta{font-size:11px;color:#56648F;white-space:nowrap}
+body.dark .lb-meta{color:rgba(255,255,255,.45)}
+.lb-bar-wrap{width:72px;height:4px;background:#EEF3FF;border-radius:2px;flex-shrink:0}
+body.dark .lb-bar-wrap{background:rgba(255,255,255,.1)}
+.lb-bar{height:4px;background:linear-gradient(90deg,#25408F,#1C54F4);border-radius:2px;transition:width .4s ease}
+.an-empty{padding:3rem 1.25rem;text-align:center;color:#7B8BBD;font-size:13px}
+body.dark .an-empty{color:rgba(255,255,255,.4)}
+.an-skel{height:24px;background:linear-gradient(90deg,#EEF3FF 25%,#DBE5FF 50%,#EEF3FF 75%);background-size:200% 100%;animation:skelan 1.4s infinite;border-radius:2px;margin-bottom:.5rem}
+body.dark .an-skel{background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.05) 75%);background-size:200% 100%}
+@keyframes skelan{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -353,6 +405,7 @@ body.dark .cb{background:rgba(255,255,255,.15)!important;color:#C3E6FF!important
     <div class="nu" id="nu">
       <div class="na" id="na">MA</div>
       <span class="nname" id="nn"></span>
+      <button class="nbtn" id="analytics-btn" onclick="toggleAnalytics()" style="display:none">📊 Analytics</button>
       <button class="nbtn" id="admin-btn" onclick="toggleAdmin()" style="display:none">Ver registros</button>
       <button class="nbtn" onclick="logout()">Salir</button>
     </div>
@@ -367,6 +420,44 @@ body.dark .cb{background:rgba(255,255,255,.15)!important;color:#C3E6FF!important
       <button onclick="toggleAdmin()" style="background:#25408F;border:none;color:#fff;font-family:inherit;font-size:12px;padding:6px 16px;cursor:pointer">✕ Cerrar</button>
     </div>
     <div id="admin-table-wrap"><p style="color:#56648F;font-size:13px">Cargando...</p></div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div id="analytics-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:150;overflow-y:auto;padding:2rem">
+  <div class="an-wrap">
+    <div class="an-hdr">
+      <div>
+        <div class="an-title">Analytics · Inteligencia Comercial</div>
+        <div class="an-subtitle" id="an-last-update">Cargando datos...</div>
+      </div>
+      <button onclick="toggleAnalytics()" class="nbtn" style="background:rgba(37,64,143,.15);border-color:rgba(37,64,143,.3);color:#25408F;margin-top:4px">✕ Cerrar</button>
+    </div>
+    <div class="an-kpis" id="an-kpis">
+      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
+      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
+      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
+      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
+    </div>
+    <div class="an-grid2">
+      <div class="an-card">
+        <div class="an-card-hd"><div class="an-card-title">🗺 Zonas más demandadas</div></div>
+        <div class="an-card-body" id="an-body-zonas"><div class="an-chart-wrap"><canvas id="chart-zonas"></canvas></div></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-hd"><div class="an-card-title">📐 Rangos de m² demandados</div></div>
+        <div class="an-card-body" id="an-body-m2"><div class="an-chart-wrap"><canvas id="chart-m2"></canvas></div></div>
+      </div>
+    </div>
+    <div class="an-card">
+      <div class="an-card-hd"><div class="an-card-title">🏢 Top 10 Edificios más enviados</div></div>
+      <div class="an-card-body" id="an-body-edificios"><div class="an-chart-wrap" style="height:300px"><canvas id="chart-edificios"></canvas></div></div>
+    </div>
+    <div class="an-card">
+      <div class="an-card-hd"><div class="an-card-title">🏆 Brokers más activos · Leaderboard</div></div>
+      <div id="an-brokers-lb" class="lb-list"></div>
+      <div class="an-card-body" style="padding-top:0"><div class="an-chart-wrap"><canvas id="chart-brokers"></canvas></div></div>
+    </div>
   </div>
 </div>
 
@@ -717,6 +808,7 @@ function onUserLoggedIn(){
   document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
   document.getElementById('nu').style.display='flex';
   show('as');
+  document.getElementById('analytics-btn').style.display='';
   if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
   populateZonas();
   startChat((user.displayName||'').split(' ')[0]||'Broker');
@@ -1657,7 +1749,7 @@ window.generarPPT=async()=>{
     msg.textContent=`✓ PPT descargado con ${sp.length} alternativas`;
     const fbSec=document.getElementById('feedback-section');
     if(fbSec){fbSec.style.display='block';fbSec.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('fb-thanks').style.display='none';_fbStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
-    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString(),usuario:user?.displayName||user?.email||'desconocido',zonas:resp.zona||'',cliente:document.getElementById('kp')?.value||'',cantidad_alternativas:sp.length};
+    const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString(),usuario:user?.displayName||user?.email||'desconocido',zonas:resp.zona||'',cliente:document.getElementById('kp')?.value||'',cantidad_alternativas:sp.length,edificios:sp.map(p=>p.nombre)};
     registrarDescarga(dlData).catch(e=>console.error('registrarDescarga:',e));
     notificarDescarga(dlData);
   }catch(e){
@@ -1734,7 +1826,8 @@ async function registrarDescarga(datos){
       usuario:datos.usuario,
       zonas:datos.zonas,
       cliente:datos.cliente,
-      cantidad_alternativas:datos.cantidad_alternativas
+      cantidad_alternativas:datos.cantidad_alternativas,
+      edificios:datos.edificios||datos.propiedades||[]
     });
     console.log('Descarga registrada:',docId);
   }catch(e){
@@ -1796,6 +1889,192 @@ window.enviarFeedback=async()=>{
     alert('Error al enviar feedback: '+e.message);
   }
 };
+
+// ===== ANALYTICS =====
+const _anCharts={};
+
+window.toggleAnalytics=()=>{
+  const panel=document.getElementById('analytics-panel');
+  const open=panel.style.display==='none'||!panel.style.display;
+  panel.style.display=open?'block':'none';
+  if(open)loadAnalytics();
+};
+
+async function loadAnalytics(){
+  if(!db){
+    document.getElementById('an-kpis').innerHTML='<div style="color:#ED1B34;font-size:13px;padding:1rem;grid-column:1/-1">Firebase no configurado.</div>';
+    document.getElementById('an-last-update').textContent='Sin conexión a base de datos';
+    return;
+  }
+  try{
+    const snap=await db.collection('descargas').orderBy('fecha','desc').get();
+    const docs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    renderAnalytics(docs);
+    const last=docs[0];
+    if(last&&last.fecha){
+      const d=last.fecha.toDate?last.fecha.toDate():new Date(last.fecha);
+      document.getElementById('an-last-update').textContent=`Última actividad: ${d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})} · ${docs.length} registros`;
+    }else{
+      document.getElementById('an-last-update').textContent=`${docs.length} registros cargados`;
+    }
+  }catch(e){
+    console.error('Analytics error:',e);
+    document.getElementById('an-kpis').innerHTML=`<div style="color:#ED1B34;font-size:13px;padding:1rem;grid-column:1/-1">Error al cargar: ${e.message}</div>`;
+    document.getElementById('an-last-update').textContent='Error al cargar datos';
+  }
+}
+
+function renderAnalytics(docs){
+  const isDark=document.body.classList.contains('dark');
+  const textColor=isDark?'rgba(195,230,255,.8)':'#353E59';
+  const gridColor=isDark?'rgba(255,255,255,.08)':'rgba(37,64,143,.08)';
+
+  // KPIs
+  const totalPPTs=docs.length;
+  const clientesUnicos=new Set(docs.map(d=>d.cliente).filter(Boolean)).size;
+  const brokersActivos=new Set(docs.map(d=>d.usuario||d.nombre).filter(Boolean)).size;
+  const totalAlternativas=docs.reduce((s,d)=>s+(Number(d.cantidad_alternativas)||0),0);
+  document.getElementById('an-kpis').innerHTML=`
+    <div class="kpi-card">
+      <div class="kpi-label">PPTs Generados</div>
+      <div class="kpi-val">${totalPPTs}</div>
+      <div class="kpi-sub">Total histórico</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Clientes Únicos</div>
+      <div class="kpi-val">${clientesUnicos||'–'}</div>
+      <div class="kpi-sub">Clientes distintos atendidos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Brokers Activos</div>
+      <div class="kpi-val">${brokersActivos||'–'}</div>
+      <div class="kpi-sub">Usuarios con actividad registrada</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Alternativas Enviadas</div>
+      <div class="kpi-val">${totalAlternativas}</div>
+      <div class="kpi-sub">Edificios presentados en PPTs</div>
+    </div>`;
+
+  // Zonas
+  const zonaCount={};
+  docs.forEach(d=>{
+    let zs=[];
+    if(Array.isArray(d.zonas))zs=d.zonas;
+    else if(d.zonas&&typeof d.zonas==='string')zs=d.zonas.split(',').map(z=>z.trim()).filter(Boolean);
+    else if(d.zona&&typeof d.zona==='string')zs=d.zona.split(',').map(z=>z.trim()).filter(Boolean);
+    zs.forEach(z=>{if(z&&z!=='Todas')zonaCount[z]=(zonaCount[z]||0)+1;});
+  });
+  const zonaSorted=Object.entries(zonaCount).sort((a,b)=>b[1]-a[1]);
+  if(_anCharts.zonas)_anCharts.zonas.destroy();
+  if(zonaSorted.length){
+    _anCharts.zonas=new Chart(document.getElementById('chart-zonas'),{
+      type:'bar',
+      data:{
+        labels:zonaSorted.map(([z])=>z),
+        datasets:[{label:'Búsquedas',data:zonaSorted.map(([,v])=>v),backgroundColor:'rgba(37,64,143,.75)',borderColor:'#1C54F4',borderWidth:1,borderRadius:2,hoverBackgroundColor:'#1C54F4'}]
+      },
+      options:{
+        indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} búsquedas`}}},
+        scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}}}
+      }
+    });
+  }else{
+    document.getElementById('an-body-zonas').innerHTML='<div class="an-empty">Sin datos de zonas registrados aún.</div>';
+  }
+
+  // M² ranges
+  const m2R={'0–200':0,'200–500':0,'500–1000':0,'1000–3000':0,'3000+':0};
+  docs.forEach(d=>{
+    const m2=parseFloat(d.m2)||0;
+    if(m2>0){
+      if(m2<200)m2R['0–200']++;
+      else if(m2<500)m2R['200–500']++;
+      else if(m2<1000)m2R['500–1000']++;
+      else if(m2<3000)m2R['1000–3000']++;
+      else m2R['3000+']++;
+    }
+  });
+  if(_anCharts.m2)_anCharts.m2.destroy();
+  const m2Total=Object.values(m2R).reduce((s,v)=>s+v,0);
+  _anCharts.m2=new Chart(document.getElementById('chart-m2'),{
+    type:'bar',
+    data:{
+      labels:Object.keys(m2R),
+      datasets:[{label:'Búsquedas',data:Object.values(m2R),backgroundColor:['#000759','#25408F','#1C54F4','#4D93FF','#C3E6FF'],borderRadius:3,borderWidth:0}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} búsquedas${m2Total?` (${Math.round(ctx.raw/m2Total*100)}%)`:''}` }}},
+      scales:{x:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}}}
+    }
+  });
+
+  // Edificios
+  const edifCount={};
+  docs.forEach(d=>{
+    const eds=d.edificios||d.propiedades||[];
+    if(Array.isArray(eds))eds.forEach(e=>{if(e)edifCount[e]=(edifCount[e]||0)+1;});
+  });
+  const edifSorted=Object.entries(edifCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(_anCharts.edificios)_anCharts.edificios.destroy();
+  if(edifSorted.length){
+    _anCharts.edificios=new Chart(document.getElementById('chart-edificios'),{
+      type:'bar',
+      data:{
+        labels:edifSorted.map(([e])=>e),
+        datasets:[{label:'Veces enviado',data:edifSorted.map(([,v])=>v),backgroundColor:edifSorted.map((_,i)=>`rgba(28,84,244,${Math.max(0.25,1-i*0.08)})`),borderRadius:3,borderWidth:0}]
+      },
+      options:{
+        indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} veces enviado`}}},
+        scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}}}
+      }
+    });
+  }else{
+    document.getElementById('an-body-edificios').innerHTML='<div class="an-empty">Sin datos de edificios aún.<br><small>Los nuevos PPTs incluyen este campo automáticamente.</small></div>';
+  }
+
+  // Brokers
+  const brokerMap={};
+  docs.forEach(d=>{
+    const key=d.usuario||d.nombre||'Desconocido';
+    if(!brokerMap[key])brokerMap[key]={nombre:key,ppts:0,alts:0};
+    brokerMap[key].ppts++;
+    brokerMap[key].alts+=Number(d.cantidad_alternativas)||0;
+  });
+  const brokerList=Object.values(brokerMap).sort((a,b)=>b.ppts-a.ppts);
+  const maxPPTs=brokerList[0]?.ppts||1;
+  const rankCls=i=>i===0?'top1':i===1?'top2':i===2?'top3':'';
+  document.getElementById('an-brokers-lb').innerHTML=brokerList.slice(0,8).map((b,i)=>`
+    <div class="lb-item">
+      <div class="lb-rank ${rankCls(i)}">${i+1}</div>
+      <div class="lb-name">${b.nombre}</div>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.round(b.ppts/maxPPTs*100)}%"></div></div>
+      <div class="lb-meta">${b.ppts} PPT${b.ppts!==1?'s':''} · ${b.ppts>0?Math.round(b.alts/b.ppts):0} alt. prom.</div>
+    </div>`).join('');
+
+  if(_anCharts.brokers)_anCharts.brokers.destroy();
+  if(brokerList.length){
+    const top10=brokerList.slice(0,10);
+    _anCharts.brokers=new Chart(document.getElementById('chart-brokers'),{
+      type:'bar',
+      data:{
+        labels:top10.map(b=>b.nombre.split(' ')[0]),
+        datasets:[
+          {label:'PPTs generados',data:top10.map(b=>b.ppts),backgroundColor:'rgba(28,84,244,.8)',borderColor:'#1C54F4',borderWidth:1,borderRadius:3,hoverBackgroundColor:'#25408F'},
+          {label:'Alt. promedio',data:top10.map(b=>b.ppts>0?Math.round(b.alts/b.ppts):0),backgroundColor:'rgba(195,230,255,.6)',borderColor:'#4D93FF',borderWidth:1,borderRadius:3,hoverBackgroundColor:'#4D93FF'}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{color:textColor,font:{size:10},boxWidth:12}}},
+        scales:{x:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}}}
+      }
+    });
+  }
+}
 
 function show(id){
   ["ls","ds","as"].forEach(s=>{
