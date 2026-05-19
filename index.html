@@ -808,7 +808,7 @@ function onUserLoggedIn(){
   document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
   document.getElementById('nu').style.display='flex';
   show('as');
-  document.getElementById('analytics-btn').style.display='';
+  if(ANALYTICS_ALLOWED.includes(user?.email))document.getElementById('analytics-btn').style.display='';
   if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
   populateZonas();
   startChat((user.displayName||'').split(' ')[0]||'Broker');
@@ -1892,8 +1892,10 @@ window.enviarFeedback=async()=>{
 
 // ===== ANALYTICS =====
 const _anCharts={};
+const ANALYTICS_ALLOWED=['mazaretto@gmail.com','matias.azaretto@colliers.com'];
 
 window.toggleAnalytics=()=>{
+  if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
   const panel=document.getElementById('analytics-panel');
   const open=panel.style.display==='none'||!panel.style.display;
   panel.style.display=open?'block':'none';
