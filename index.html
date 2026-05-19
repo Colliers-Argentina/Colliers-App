@@ -1397,14 +1397,14 @@ window.generarPPT=async()=>{
         }
 
         // ONE addTable() — all rows, all columns, single native PPT table object
-        const NB={pt:0};
+        const NB={pt:0,color:"FFFFFF"};
         const numRow=[
-          {text:"",options:{fill:{color:MID},border:NB}},
-          ...grupo.map((p,i)=>({text:String(i+1+gi*MAX_COLS),options:{bold:true,color:WHITE,align:"center",valign:"middle",fill:{color:MID},fontSize:12,fontFace:"Open Sans",border:NB}}))
+          {text:"",options:{fill:{color:"1C54F4"},border:NB}},
+          ...grupo.map((p,i)=>({text:String(i+1+gi*MAX_COLS),options:{bold:true,color:"FFFFFF",align:"center",valign:"middle",fill:{color:"1C54F4"},fontSize:12,fontFace:"Open Sans",border:NB}}))
         ];
         const namRow=[
-          {text:"",options:{fill:{color:MID},border:NB}},
-          ...grupo.map(p=>({text:p.nombre,options:{bold:true,color:WHITE,align:"center",valign:"middle",fill:{color:MID},fontSize:7,fontFace:"Open Sans",wrap:true,border:NB}}))
+          {text:"",options:{fill:{color:"1C54F4"},border:NB}},
+          ...grupo.map(p=>({text:p.nombre,options:{bold:true,color:"FFFFFF",align:"center",valign:"middle",fill:{color:"1C54F4"},fontSize:7,fontFace:"Open Sans",wrap:true,border:NB}}))
         ];
         const dataRows=ROWS.map(([lbl,key],ri)=>{
           const bg=ri%2===0?"F4F7FF":WHITE;
@@ -1423,7 +1423,6 @@ window.generarPPT=async()=>{
           y:TABLE_Y,
           colW:[LW,...Array(ng).fill(CW)],
           rowH:[NR_H,NAM_H,...Array(ROWS.length).fill(ROW_H)],
-          border:{pt:0},
         });
 
       }
