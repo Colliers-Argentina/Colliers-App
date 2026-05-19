@@ -281,8 +281,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:rgba(255,255,255,.3
 .fb-thanks{background:rgba(77,147,255,.15);border-left:3px solid #4D93FF;padding:.75rem 1rem;font-size:13px;color:#C3E6FF;display:none}
 
 /* THEME TOGGLE */
-#theme-toggle{position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:18px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;transition:background .2s,box-shadow .2s;line-height:1}
-#theme-toggle:hover{background:rgba(255,255,255,.22);box-shadow:0 4px 16px rgba(0,0,0,.5)}
+
 
 /* LIGHT MODE overrides (when toggle is OFF / body has no .dark) */
 body.dark{background:#F0F4FF;color:#000759}
@@ -335,15 +334,34 @@ body.dark .rec-card{background:#F0F4FF!important;border-left:4px solid #25408F!i
 body.dark .rec-card strong{color:#25408F!important}
 body.dark .rec-btn{background:#25408F!important}
 body.dark footer{color:#56648F!important;border-top:1px solid #DBE5FF!important}
-body.dark #theme-toggle{background:#25408F!important;border-color:transparent!important;box-shadow:0 2px 12px rgba(0,7,89,.35)!important}
-body.dark #theme-toggle:hover{background:#1C54F4!important}
 body.dark .dbox{background:#fff!important;border:none!important;border-top:4px solid #ED1B34!important;box-shadow:0 8px 30px rgba(0,7,89,.1)!important}
 body.dark .dbox p{color:#56648F!important}
+body.dark{background:linear-gradient(135deg,#000759 0%,#25408F 50%,#1C54F4 100%)!important}
+body.dark nav{background:rgba(0,7,89,.6)!important;backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.1)!important}
+body.dark .chat-panel{background:linear-gradient(160deg,#1a3070,#000d3d)!important;border:1px solid rgba(77,147,255,.2)!important}
+body.dark .chat-header{background:rgba(255,255,255,.08)!important;backdrop-filter:blur(12px)}
+body.dark .msg-bot{background:rgba(255,255,255,.09)!important;border:0.5px solid rgba(255,255,255,.1)!important;color:#fff!important;border-radius:8px}
+body.dark .msg-user{background:rgba(77,147,255,.25)!important;color:#C3E6FF!important}
+body.dark .chat-opt{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.13)!important;color:rgba(255,255,255,.75)!important}
+body.dark .chat-opt.selected,body.dark .chat-opt.sel{background:rgba(77,147,255,.18)!important;border-color:rgba(77,147,255,.5)!important;color:#C3E6FF!important}
+body.dark .table-card,body.dark .card,body.dark .tc{background:rgba(255,255,255,.08)!important;backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12)!important}
+body.dark thead tr{background:rgba(0,7,89,.5)!important}
+body.dark th{color:rgba(255,255,255,.7)!important}
+body.dark td{color:#fff!important;border-bottom-color:rgba(255,255,255,.06)!important}
+body.dark tr:hover td{background:rgba(255,255,255,.05)!important}
+body.dark .selected-bar,body.dark .sb{background:rgba(0,7,89,.7)!important;backdrop-filter:blur(12px);border:1px solid rgba(77,147,255,.25)!important}
+body.dark .btn-gen-ppt,body.dark .bp{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important;box-shadow:0 4px 15px rgba(28,84,244,.4)!important}
+body.dark .config-card,body.dark .kk{background:rgba(255,255,255,.06)!important;backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1)!important}
+body.dark .kf label,.body.dark .config-title,.body.dark .kt{color:rgba(255,255,255,.45)!important}
+body.dark .kf input,.body.dark .cfg-input{background:rgba(255,255,255,.08)!important;border-color:rgba(255,255,255,.15)!important;color:#fff!important}
+body.dark .chk-row,.body.dark .kr{color:rgba(255,255,255,.7)!important}
+body.dark .prop-name{color:#fff!important}
+body.dark .sup-val,.body.dark .sv{color:#4D93FF!important}
+body.dark footer{border-top-color:rgba(255,255,255,.1)!important;color:rgba(255,255,255,.3)!important}
 </style>
 </head>
 <body>
 
-<button id="theme-toggle" onclick="toggleTheme()" title="Cambiar modo">🌙</button>
 
 <nav id="main-nav">
   <div class="nb">
@@ -360,6 +378,7 @@ body.dark .dbox p{color:#56648F!important}
       <div class="na" id="na">MA</div>
       <span class="nname" id="nn"></span>
       <button class="nbtn" id="admin-btn" onclick="toggleAdmin()" style="display:none">Ver registros</button>
+      <button id="theme-toggle" onclick="toggleTheme()" style="background:transparent;border:0.5px solid rgba(255,255,255,.25);color:#C3E6FF;font-size:14px;padding:3px 8px;border-radius:3px;cursor:pointer">🌙</button>
       <button class="nbtn" onclick="logout()">Salir</button>
     </div>
   </div>
@@ -1813,24 +1832,17 @@ function show(id){
   const nav=document.getElementById('main-nav');
   if(nav)nav.style.display=id==="as"?"flex":"none";
 }
+function toggleTheme(){
+  const dark = document.body.classList.toggle('dark');
+  document.getElementById('theme-toggle').textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem('colliers-theme', dark ? 'dark' : 'light');
+}
+if(localStorage.getItem('colliers-theme')==='dark'){
+  document.body.classList.add('dark');
+  const btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = '☀️';
+}
 </script>
 </body>
 
-<script>
-(function(){
-  var saved = localStorage.getItem('colliers-theme');
-  if(saved === 'dark'){
-    document.body.classList.add('dark');
-    var btn = document.getElementById('theme-toggle');
-    if(btn) btn.textContent = '☀️';
-  }
-})();
-
-window.toggleTheme = function(){
-  var isDark = document.body.classList.toggle('dark');
-  localStorage.setItem('colliers-theme', isDark ? 'dark' : 'light');
-  var btn = document.getElementById('theme-toggle');
-  if(btn) btn.textContent = isDark ? '☀️' : '🌙';
-};
-</script>
 </html>
