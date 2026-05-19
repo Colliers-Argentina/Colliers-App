@@ -354,7 +354,6 @@ body.dark .cb{background:rgba(255,255,255,.15)!important;color:#C3E6FF!important
       <div class="na" id="na">MA</div>
       <span class="nname" id="nn"></span>
       <button class="nbtn" id="admin-btn" onclick="toggleAdmin()" style="display:none">Ver registros</button>
-      <button id="theme-toggle" style="background:transparent;border:0.5px solid rgba(255,255,255,.25);color:#fff;font-size:13px;padding:3px 8px;border-radius:3px;cursor:pointer">🌙</button>
       <button class="nbtn" onclick="logout()">Salir</button>
     </div>
   </div>
@@ -1813,7 +1812,6 @@ function toggleTheme(){
   document.getElementById('theme-toggle').textContent=dark?'☀️':'🌙';
   localStorage.setItem('colliers-theme',dark?'dark':'light');
 }
-document.getElementById('theme-toggle').addEventListener('click',toggleTheme);
 if(localStorage.getItem('colliers-theme')==='dark'){
   document.body.classList.add('dark');
   const btn=document.getElementById('theme-toggle');
