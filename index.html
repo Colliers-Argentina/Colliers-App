@@ -387,6 +387,82 @@ body.dark .an-empty{color:#A8B3D1}
 .an-skel{height:24px;background:linear-gradient(90deg,#EEF3FF 25%,#DBE5FF 50%,#EEF3FF 75%);background-size:200% 100%;animation:skelan 1.4s infinite;border-radius:2px;margin-bottom:.5rem}
 body.dark .an-skel{background:linear-gradient(90deg,rgba(16,27,82,.8) 25%,rgba(28,84,244,.15) 50%,rgba(16,27,82,.8) 75%);background-size:200% 100%}
 @keyframes skelan{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ===== CRM ===== */
+#crm-panel{background:#F0F4FF}
+body.dark #crm-panel{background:#050816}
+.crm-wrap{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:1.25rem}
+.crm-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.crm-title{color:#25408F;font-size:22px;font-weight:700}
+.crm-subtitle{color:#7B8BBD;font-size:12px;margin-top:3px}
+body.dark .crm-title{color:#fff}
+body.dark .crm-subtitle{color:#A8B3D1}
+.crm-controls{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.crm-input{font-family:inherit;font-size:12px;padding:7px 12px;border:1px solid #DBE5FF;color:#000759;background:#fff;flex:1;min-width:200px}
+.crm-input:focus{outline:none;border-color:#1C54F4}
+.crm-select{font-family:inherit;font-size:12px;padding:7px 12px;border:1px solid #DBE5FF;color:#000759;background:#fff;cursor:pointer}
+.crm-select:focus{outline:none;border-color:#1C54F4}
+body.dark .crm-input{background:#101B52;border-color:rgba(255,255,255,.12);color:#fff}
+body.dark .crm-input::placeholder{color:#A8B3D1}
+body.dark .crm-select{background:#101B52;border-color:rgba(255,255,255,.12);color:#fff}
+body.dark .crm-select option{background:#101B52}
+.crm-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 14px rgba(0,7,89,.08);overflow:hidden}
+body.dark .crm-card{background:rgba(16,27,82,.78);backdrop-filter:blur(16px);border-top:3px solid #1C54F4;border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 32px rgba(5,8,22,.4)}
+.crm-table{width:100%;border-collapse:collapse;font-size:12px}
+.crm-table thead tr{background:#25408F}
+body.dark .crm-table thead tr{background:#0A1240}
+.crm-table th{padding:10px 14px;text-align:left;color:rgba(255,255,255,.9);font-weight:600;font-size:11px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
+.crm-table th:last-child{border-right:none}
+body.dark .crm-table th{color:#DCE7FF}
+.crm-table tbody tr{cursor:pointer;transition:background .1s}
+.crm-table td{padding:10px 14px;border-bottom:1px solid #EEF3FF;color:#353E59;vertical-align:middle}
+.crm-table tbody tr:hover td{background:#EEF3FF}
+body.dark .crm-table td{color:#fff;border-bottom:1px solid rgba(255,255,255,.06)}
+body.dark .crm-table tbody tr:hover td{background:rgba(77,147,255,.1)}
+.crm-client-name{font-weight:700;color:#000759}
+body.dark .crm-client-name{color:#fff}
+.crm-broker-cell{color:#56648F;font-size:11px}
+body.dark .crm-broker-cell{color:#A8B3D1}
+.crm-date{font-size:11px;color:#56648F;white-space:nowrap}
+body.dark .crm-date{color:#A8B3D1}
+.crm-ppts{font-weight:700;color:#1C54F4;text-align:center}
+body.dark .crm-ppts{color:#4D93FF}
+.crm-zonas-cell{font-size:10px;color:#56648F;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.dark .crm-zonas-cell{color:#A8B3D1}
+.estado-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap;letter-spacing:.03em}
+.crm-action-btn{background:transparent;border:1px solid #DBE5FF;color:#25408F;font-family:inherit;font-size:10px;padding:3px 10px;cursor:pointer;border-radius:2px;white-space:nowrap;transition:all .12s}
+.crm-action-btn:hover{background:#25408F;color:#fff;border-color:#25408F}
+body.dark .crm-action-btn{border-color:rgba(255,255,255,.2);color:#C3E6FF}
+body.dark .crm-action-btn:hover{background:#1C54F4;border-color:#1C54F4;color:#fff}
+.crm-empty{padding:3rem;text-align:center;color:#7B8BBD;font-size:13px;line-height:1.8}
+body.dark .crm-empty{color:#A8B3D1}
+/* CRM Modal */
+.crm-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:400;background:rgba(0,7,89,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.crm-modal.open{display:flex}
+.crm-modal-box{background:#fff;width:100%;max-width:620px;max-height:88vh;overflow-y:auto;margin:2rem;box-shadow:0 24px 60px rgba(0,7,89,.2);border-top:4px solid #1C54F4}
+body.dark .crm-modal-box{background:#101B52;border:1px solid rgba(255,255,255,.12);border-top:4px solid #1C54F4;box-shadow:0 24px 60px rgba(5,8,22,.7)}
+.crm-modal-hd{background:#25408F;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+body.dark .crm-modal-hd{background:#0A1240}
+.crm-modal-title{color:#fff;font-size:16px;font-weight:700}
+.crm-modal-close{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;font-family:inherit;font-size:12px;padding:4px 12px;cursor:pointer;border-radius:2px;transition:all .12s}
+.crm-modal-close:hover{background:rgba(255,255,255,.15)}
+.crm-modal-body{padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem}
+.crm-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:500px){.crm-modal-grid{grid-template-columns:1fr}}
+.crm-modal-field{display:flex;flex-direction:column;gap:4px}
+.crm-modal-lbl{font-size:10px;font-weight:700;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em}
+body.dark .crm-modal-lbl{color:#A8B3D1}
+.crm-modal-val{font-size:13px;color:#000759;font-weight:600}
+body.dark .crm-modal-val{color:#fff}
+.crm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.crm-tag{background:#EEF3FF;color:#25408F;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+body.dark .crm-tag{background:rgba(77,147,255,.18);color:#C3E6FF;border:1px solid rgba(77,147,255,.25)}
+.crm-estado-sel{font-family:inherit;font-size:12px;padding:6px 10px;border:1px solid #DBE5FF;color:#000759;background:#fff;cursor:pointer;border-radius:2px;width:100%}
+.crm-estado-sel:focus{outline:none;border-color:#1C54F4}
+body.dark .crm-estado-sel{background:#162566;border-color:rgba(255,255,255,.2);color:#fff}
+body.dark .crm-estado-sel option{background:#101B52}
+.crm-section-hd{font-size:11px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.06em;padding-bottom:.4rem;border-bottom:1px solid #EEF3FF;margin-bottom:.25rem}
+body.dark .crm-section-hd{color:#4D93FF;border-bottom-color:rgba(255,255,255,.08)}
 </style>
 </head>
 <body>
@@ -407,6 +483,7 @@ body.dark .an-skel{background:linear-gradient(90deg,rgba(16,27,82,.8) 25%,rgba(2
     <div class="nu" id="nu">
       <div class="na" id="na">MA</div>
       <span class="nname" id="nn"></span>
+      <button class="nbtn" id="crm-btn" onclick="toggleCRM()" style="display:none">👥 CRM</button>
       <button class="nbtn" id="analytics-btn" onclick="toggleAnalytics()" style="display:none">📊 Analytics</button>
       <button class="nbtn" id="admin-btn" onclick="toggleAdmin()" style="display:none">Ver registros</button>
       <button class="nbtn" onclick="logout()">Salir</button>
@@ -461,6 +538,37 @@ body.dark .an-skel{background:linear-gradient(90deg,rgba(16,27,82,.8) 25%,rgba(2
       <div class="an-card-body" style="padding-top:0"><div class="an-chart-wrap"><canvas id="chart-brokers"></canvas></div></div>
     </div>
   </div>
+</div>
+
+<!-- CRM -->
+<div id="crm-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:150;overflow-y:auto;padding:2rem">
+  <div class="crm-wrap">
+    <div class="crm-hdr">
+      <div>
+        <div class="crm-title">CRM · Gestión de Clientes</div>
+        <div class="crm-subtitle" id="crm-subtitle">Cargando datos...</div>
+      </div>
+      <button onclick="toggleCRM()" class="nbtn" style="background:rgba(37,64,143,.15);border-color:rgba(37,64,143,.3);color:#25408F;margin-top:4px">✕ Cerrar</button>
+    </div>
+    <div class="crm-controls">
+      <input id="crm-search" type="text" placeholder="🔍  Buscar cliente..." class="crm-input" oninput="filterCRM()">
+      <select id="crm-filter-broker" class="crm-select" onchange="filterCRM()">
+        <option value="">Todos los brokers</option>
+      </select>
+      <select id="crm-filter-estado" class="crm-select" onchange="filterCRM()">
+        <option value="">Todos los estados</option>
+        <option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option>
+      </select>
+    </div>
+    <div class="crm-card">
+      <div id="crm-table-wrap"><div class="crm-empty">Cargando clientes...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CRM Modal -->
+<div id="crm-modal" class="crm-modal" onclick="if(event.target===this)closeCRMModal()">
+  <div class="crm-modal-box" id="crm-modal-box"></div>
 </div>
 
 <!-- LOGIN -->
@@ -810,6 +918,7 @@ function onUserLoggedIn(){
   document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
   document.getElementById('nu').style.display='flex';
   show('as');
+  document.getElementById('crm-btn').style.display='';
   if(ANALYTICS_ALLOWED.includes(user?.email))document.getElementById('analytics-btn').style.display='';
   if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
   populateZonas();
@@ -1753,6 +1862,7 @@ window.generarPPT=async()=>{
     if(fbSec){fbSec.style.display='block';fbSec.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('fb-thanks').style.display='none';_fbStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
     const dlData={nombre:user?.displayName||'',email:user?.email||'',zona:(resp.zona&&resp.zona.length?resp.zona.join(', '):'Todas'),m2:resp.sup?.[0]||'',empresa:prepPara,propiedades:sp.map(p=>p.nombre),fecha:new Date().toISOString(),usuario:user?.displayName||user?.email||'desconocido',zonas:resp.zona||'',cliente:document.getElementById('kp')?.value||'',cantidad_alternativas:sp.length,edificios:sp.map(p=>p.nombre)};
     registrarDescarga(dlData).catch(e=>console.error('registrarDescarga:',e));
+    upsertCliente(dlData).catch(e=>console.error('upsertCliente:',e));
     notificarDescarga(dlData);
   }catch(e){
     console.error(e);
@@ -1891,6 +2001,169 @@ window.enviarFeedback=async()=>{
     alert('Error al enviar feedback: '+e.message);
   }
 };
+
+// ===== CRM =====
+let _crmDocs=[];
+
+const ESTADO_COLORS={
+  'Activo':{bg:'#1C54F4',text:'#fff'},
+  'Visitas':{bg:'#00AEEF',text:'#fff'},
+  'Negociación':{bg:'#F59E0B',text:'#fff'},
+  'Cerrado':{bg:'#22C55E',text:'#fff'},
+  'Perdido':{bg:'#EF3340',text:'#fff'}
+};
+
+function estadoBadge(e){const c=ESTADO_COLORS[e]||{bg:'#7B8BBD',text:'#fff'};return`<span class="estado-badge" style="background:${c.bg};color:${c.text}">${e||'Activo'}</span>`;}
+function fmtDate(ts){if(!ts)return'–';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});}
+
+window.toggleCRM=()=>{
+  const panel=document.getElementById('crm-panel');
+  const open=panel.style.display==='none'||!panel.style.display;
+  panel.style.display=open?'block':'none';
+  if(open)loadCRM();
+};
+
+async function loadCRM(){
+  if(!db){document.getElementById('crm-table-wrap').innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
+  document.getElementById('crm-table-wrap').innerHTML='<div class="crm-empty">Cargando...</div>';
+  try{
+    const snap=await db.collection('clientes').orderBy('ultimaActividad','desc').get();
+    _crmDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    document.getElementById('crm-subtitle').textContent=`${_crmDocs.length} cliente${_crmDocs.length!==1?'s':''} registrados`;
+    const brokers=[...new Set(_crmDocs.map(d=>d.broker).filter(Boolean))].sort();
+    const sel=document.getElementById('crm-filter-broker');
+    sel.innerHTML='<option value="">Todos los brokers</option>'+brokers.map(b=>`<option value="${b}">${b}</option>`).join('');
+    filterCRM();
+  }catch(e){
+    console.error('CRM load error:',e);
+    document.getElementById('crm-table-wrap').innerHTML=`<div class="crm-empty">Error al cargar: ${e.message}</div>`;
+    document.getElementById('crm-subtitle').textContent='Error al cargar datos';
+  }
+}
+
+function filterCRM(){
+  const q=(document.getElementById('crm-search')?.value||'').toLowerCase();
+  const broker=document.getElementById('crm-filter-broker')?.value||'';
+  const estado=document.getElementById('crm-filter-estado')?.value||'';
+  const filtered=_crmDocs.filter(d=>{
+    if(q&&!(d.nombre||'').toLowerCase().includes(q)&&!(d.broker||'').toLowerCase().includes(q))return false;
+    if(broker&&d.broker!==broker)return false;
+    if(estado&&d.estado!==estado)return false;
+    return true;
+  });
+  renderCRMTable(filtered);
+}
+
+function renderCRMTable(docs){
+  const wrap=document.getElementById('crm-table-wrap');
+  if(!docs.length){
+    wrap.innerHTML='<div class="crm-empty">Sin clientes registrados todavía.<br>Se crearán automáticamente al generar el próximo PPT.</div>';
+    return;
+  }
+  let h='<div style="overflow-x:auto"><table class="crm-table"><thead><tr>';
+  ['Cliente','Broker','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>{
+    h+=`<th>${col}</th>`;
+  });
+  h+='</tr></thead><tbody>';
+  docs.forEach(d=>{
+    const zonas=(d.zonasInteres||[]).slice(0,2).join(', ')+(d.zonasInteres?.length>2?'…':'');
+    h+=`<tr onclick="openClientDetail('${d._id}')">
+      <td><div class="crm-client-name">${d.nombre||d._id}</div></td>
+      <td><div class="crm-broker-cell">${d.broker||'–'}</div></td>
+      <td class="crm-date">${fmtDate(d.ultimaActividad)}</td>
+      <td class="crm-ppts">${d.cantidadPPTs||0}</td>
+      <td class="crm-zonas-cell">${zonas||'–'}</td>
+      <td>${estadoBadge(d.estado||'Activo')}</td>
+      <td><button class="crm-action-btn" onclick="event.stopPropagation();openClientDetail('${d._id}')">Ver ficha →</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table></div>';
+  wrap.innerHTML=h;
+}
+
+function openClientDetail(docId){
+  const d=_crmDocs.find(x=>x._id===docId);
+  if(!d)return;
+  const opts=['Activo','Visitas','Negociación','Cerrado','Perdido'].map(e=>`<option value="${e}"${d.estado===e?' selected':''}>${e}</option>`).join('');
+  const section=(title,arr)=>arr?.length?`<div class="crm-section-hd">${title}</div><div class="crm-tags">${arr.map(t=>`<span class="crm-tag">${t}</span>`).join('')}</div>`:'';
+  document.getElementById('crm-modal-box').innerHTML=`
+    <div class="crm-modal-hd">
+      <div class="crm-modal-title">${d.nombre||d._id}</div>
+      <button class="crm-modal-close" onclick="closeCRMModal()">✕ Cerrar</button>
+    </div>
+    <div class="crm-modal-body">
+      <div class="crm-modal-grid">
+        <div class="crm-modal-field"><div class="crm-modal-lbl">Broker asignado</div><div class="crm-modal-val">${d.broker||'–'}</div></div>
+        <div class="crm-modal-field"><div class="crm-modal-lbl">Email broker</div><div class="crm-modal-val" style="font-size:11px;font-weight:400">${d.broker_email||'–'}</div></div>
+        <div class="crm-modal-field"><div class="crm-modal-lbl">PPTs generados</div><div class="crm-modal-val" style="color:#1C54F4;font-size:22px">${d.cantidadPPTs||0}</div></div>
+        <div class="crm-modal-field"><div class="crm-modal-lbl">Última actividad</div><div class="crm-modal-val">${fmtDate(d.ultimaActividad)}</div></div>
+        <div class="crm-modal-field"><div class="crm-modal-lbl">Cliente desde</div><div class="crm-modal-val">${fmtDate(d.fechaCreacion)}</div></div>
+        <div class="crm-modal-field"><div class="crm-modal-lbl">Pipeline · Estado</div>
+          <select class="crm-estado-sel" onchange="saveClientEstado('${docId}',this.value)">${opts}</select>
+        </div>
+      </div>
+      ${section('Zonas de interés',d.zonasInteres)}
+      ${section('Edificios enviados',d.edificiosEnviados)}
+      ${section('Rangos m² solicitados',d.rangoM2)}
+    </div>`;
+  document.getElementById('crm-modal').classList.add('open');
+}
+
+window.closeCRMModal=()=>document.getElementById('crm-modal').classList.remove('open');
+
+async function saveClientEstado(docId,estado){
+  if(!db)return;
+  try{
+    await db.collection('clientes').doc(docId).update({estado});
+    const d=_crmDocs.find(x=>x._id===docId);
+    if(d)d.estado=estado;
+    filterCRM();
+  }catch(e){console.error('saveClientEstado:',e);}
+}
+
+async function upsertCliente(datos){
+  if(!db)return;
+  const clienteRaw=(datos.cliente||'').trim();
+  if(!clienteRaw)return;
+  const docId=clienteRaw.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')||'sin_cliente';
+  const zonas=Array.isArray(datos.zonas)?datos.zonas:(datos.zonas?String(datos.zonas).split(',').map(z=>z.trim()).filter(Boolean):[]);
+  const edificios=datos.edificios||datos.propiedades||[];
+  const m2=datos.m2?[String(datos.m2)+' m²']:[];
+  try{
+    const ref=db.collection('clientes').doc(docId);
+    const snap=await ref.get();
+    if(snap.exists){
+      const ex=snap.data();
+      await ref.update({
+        ultimaActividad:firebase.firestore.FieldValue.serverTimestamp(),
+        cantidadBusquedas:firebase.firestore.FieldValue.increment(1),
+        cantidadPPTs:firebase.firestore.FieldValue.increment(1),
+        broker:datos.usuario||datos.nombre||ex.broker||'',
+        broker_email:datos.email||ex.broker_email||'',
+        zonasInteres:[...new Set([...(ex.zonasInteres||[]),...zonas])],
+        edificiosEnviados:[...new Set([...(ex.edificiosEnviados||[]),...edificios])],
+        rangoM2:[...new Set([...(ex.rangoM2||[]),...m2])]
+      });
+    }else{
+      await ref.set({
+        nombre:clienteRaw,
+        broker:datos.usuario||datos.nombre||'',
+        broker_email:datos.email||'',
+        ultimaActividad:firebase.firestore.FieldValue.serverTimestamp(),
+        fechaCreacion:firebase.firestore.FieldValue.serverTimestamp(),
+        cantidadBusquedas:1,
+        cantidadPPTs:1,
+        zonasInteres:zonas,
+        edificiosEnviados:edificios,
+        rangoM2:m2,
+        estado:'Activo'
+      });
+    }
+    console.log('Cliente upserted:',docId);
+  }catch(e){console.error('upsertCliente:',e);}
+}
 
 // ===== ANALYTICS =====
 const _anCharts={};
