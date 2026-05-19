@@ -73,6 +73,7 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .nname{color:#C3E6FF;font-size:12px}
 .nbtn{background:transparent;border:1px solid rgba(255,255,255,.3);color:#C3E6FF;font-family:inherit;font-size:11px;padding:4px 12px;cursor:pointer;transition:all .15s;border-radius:2px}
 .nbtn:hover{background:rgba(255,255,255,.1)}
+#theme-toggle-btn{background:transparent;border:0.5px solid rgba(255,255,255,.25);color:#C3E6FF;font-size:14px;padding:3px 8px;border-radius:3px;cursor:pointer;line-height:1;display:none}
 
 /* LOGIN */
 .login-page{display:grid;grid-template-columns:3fr 2fr;min-height:100vh;font-family:'Open Sans',Verdana,sans-serif}
@@ -127,7 +128,7 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .app-wrap{max-width:1600px;margin:0 auto;padding:1.5rem 2rem}
 .app-grid{display:grid;grid-template-columns:310px 1fr;gap:1.5rem;align-items:start}
 
-/* ── STEP 1: LEFT PANEL (CHAT) ── */
+/* CHAT PANEL */
 .side-panel{background:#fff;border-top:3px solid #25408F;box-shadow:0 4px 20px rgba(0,7,89,.1);position:sticky;top:70px;max-height:calc(100vh - 82px);display:flex;flex-direction:column;overflow:hidden}
 .panel-hd{background:#25408F;padding:.7rem 1rem;display:flex;align-items:center;gap:8px;flex-shrink:0}
 .panel-dot{width:8px;height:8px;border-radius:50%;background:#C3E6FF;flex-shrink:0}
@@ -180,7 +181,7 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .btn-reset{background:transparent;color:#56648F;font-family:inherit;font-size:11px;padding:6px;border:1px solid #DBE5FF;cursor:pointer;width:100%;transition:all .15s}
 .btn-reset:hover{background:#EEF3FF;color:#25408F}
 
-/* ── RIGHT PANEL ── */
+/* RIGHT PANEL */
 .main-panel{display:flex;flex-direction:column;gap:1.5rem}
 
 /* Cards */
@@ -192,39 +193,26 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .sel-all-lbl input{accent-color:#fff;cursor:pointer;width:13px;height:13px}
 .card-badge{color:#fff;background:#1C54F4;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px}
 
-/* ── STEP 2: COMPARISON TABLE ── */
+/* Comparison table */
 .table-outer{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .ctable{border-collapse:collapse;width:max-content;min-width:100%;font-size:11px}
-
-/* Sticky label column */
 .lcell{background:#F0F4FF;font-size:10px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;white-space:nowrap;position:sticky;left:0;z-index:5;border-right:2px solid #C3E6FF;min-width:155px;vertical-align:middle}
 .lcell-top{background:#F0F4FF;position:sticky;left:0;z-index:6;border-right:2px solid #C3E6FF;min-width:155px}
-
-/* Photo row */
 .photo-row .lcell-top{background:#F0F4FF}
 .pcell{min-width:150px;max-width:220px;text-align:center;vertical-align:bottom;border-right:1px solid #DBE5FF;padding:0;position:relative}
 .pcell-inner{position:relative}
 .prop-img{width:100%;height:115px;object-fit:cover;display:block}
 .ph-img{width:100%;height:115px;background:#DBE5FF;display:flex;align-items:center;justify-content:center;font-size:28px}
 .col-cb{position:absolute;top:6px;left:6px;width:16px;height:16px;accent-color:#1C54F4;cursor:pointer;z-index:2}
-
-/* Number badge row */
 .nbadge-cell{background:#000759;text-align:center;padding:7px 4px;border-right:1px solid rgba(255,255,255,.15)}
 .nbadge{font-size:15px;font-weight:700;color:#fff}
-
-/* Building name row */
 .name-cell-td{background:#1C54F4;text-align:center;padding:8px 8px;font-size:11px;font-weight:700;color:#fff;line-height:1.3;border-right:1px solid rgba(255,255,255,.15)}
-
-/* Data cells */
 .dcell{padding:7px 10px;border-bottom:1px solid #EEF3FF;border-right:1px solid #EEF3FF;color:#353E59;text-align:center;vertical-align:middle;transition:background .1s}
 .row-even .dcell{background:#FAFBFF}
 .row-odd .dcell{background:#fff}
-
-/* Selected column highlight */
 .csel .pcell,.csel .dcell{background:#EAF0FF!important}
 .csel .nbadge-cell{background:#1C54F4!important}
 .csel .name-cell-td{background:#000759!important}
-
 .cb{display:inline-block;font-size:9px;padding:1px 6px;background:#DBE5FF;color:#25408F;font-weight:700}
 .sv{font-weight:700;color:#1C54F4;font-size:12px}
 .rent-v{font-weight:700;color:#25408F;font-size:12px}
@@ -263,7 +251,7 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .sp{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:4px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── STEP 3: PERSONALIZATION ── */
+/* Personalization */
 .pers-body{padding:1.25rem;display:grid;grid-template-columns:1.4fr 1.8fr 1fr 1fr;gap:1.5rem}
 @media(max-width:1100px){.pers-body{grid-template-columns:1fr 1fr}}
 .pers-col{display:flex;flex-direction:column;gap:.5rem}
@@ -279,7 +267,7 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .color-inp{width:38px;height:30px;border:1px solid #DBE5FF;cursor:pointer;padding:0;background:none}
 .sm{padding:.4rem 1.25rem .9rem;font-size:11px;color:#56648F;min-height:28px}
 
-/* ── STEP 4: PPT PREVIEW ── */
+/* PPT Preview */
 .preview-body{padding:1.25rem}
 .preview-grid{display:flex;flex-wrap:wrap;gap:1rem}
 .thumb-card{display:flex;flex-direction:column;align-items:center;gap:.4rem}
@@ -321,9 +309,56 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
 .fb-textarea:focus{outline:none;border-color:#1C54F4}
 .fb-body{padding:1.25rem;display:flex;flex-direction:column;gap:.75rem}
 .fb-thanks{background:#EEF3FF;border-left:3px solid #1C54F4;padding:.75rem 1rem;font-size:13px;color:#25408F;display:none}
+
+/* ===== DARK MODE ===== */
+body.dark{background:linear-gradient(135deg,#000759 0%,#25408F 50%,#1C54F4 100%)!important}
+body.dark nav{background:rgba(0,7,89,.6)!important;backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.1)!important}
+body.dark .side-panel{background:linear-gradient(160deg,#1a3070 0%,#000d3d 100%)!important;border-top:none!important;border:1px solid rgba(77,147,255,.2)!important}
+body.dark .panel-hd{background:rgba(255,255,255,.08)!important;backdrop-filter:blur(12px)}
+body.dark .mb{background:rgba(255,255,255,.09)!important;border:0.5px solid rgba(255,255,255,.1)!important;color:#fff!important;border-left:none!important;border-radius:8px!important}
+body.dark .mu{background:rgba(77,147,255,.25)!important;color:#C3E6FF!important}
+body.dark .co button{background:rgba(255,255,255,.07)!important;border:0.5px solid rgba(255,255,255,.13)!important;color:rgba(255,255,255,.75)!important}
+body.dark .co button.sel{background:rgba(77,147,255,.18)!important;border-color:rgba(77,147,255,.5)!important;color:#C3E6FF!important}
+body.dark .cat{background:rgba(255,255,255,.07)!important;color:rgba(255,255,255,.75)!important;border-top:1px solid rgba(255,255,255,.1)!important}
+body.dark .fl{color:rgba(255,255,255,.45)!important}
+body.dark .fk{color:rgba(255,255,255,.7)!important}
+body.dark .fi,body.dark .fsel,body.dark .co-ri{background:rgba(255,255,255,.08)!important;border:0.5px solid rgba(255,255,255,.15)!important;color:#fff!important}
+body.dark .btn-search{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important}
+body.dark .btn-reset{background:rgba(255,255,255,.06)!important;color:rgba(255,255,255,.6)!important;border-color:rgba(255,255,255,.15)!important}
+body.dark .card{background:rgba(255,255,255,.08)!important;backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12)!important;border-top:none!important}
+body.dark .card-hd{background:rgba(0,7,89,.5)!important}
+body.dark .lcell,body.dark .lcell-top,body.dark .photo-row .lcell-top{background:rgba(0,7,89,.5)!important;color:rgba(255,255,255,.7)!important;border-right:2px solid rgba(77,147,255,.3)!important}
+body.dark .dcell{color:#fff!important;border-bottom:1px solid rgba(255,255,255,.06)!important;border-right:1px solid rgba(255,255,255,.06)!important}
+body.dark .row-even .dcell{background:rgba(255,255,255,.03)!important}
+body.dark .row-odd .dcell{background:transparent!important}
+body.dark .ltable thead tr{background:rgba(0,7,89,.5)!important}
+body.dark .ltable th{color:rgba(255,255,255,.7)!important}
+body.dark .ltable td{color:#fff!important;border-bottom:1px solid rgba(255,255,255,.06)!important}
+body.dark .ltable tr:hover td{background:rgba(255,255,255,.05)!important}
+body.dark .ltable tr.lsr td{background:rgba(77,147,255,.15)!important}
+body.dark .lname{color:#fff!important}
+body.dark .sb{background:rgba(0,7,89,.7)!important;backdrop-filter:blur(12px);border:1px solid rgba(77,147,255,.25)!important}
+body.dark .bp{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important;box-shadow:0 4px 15px rgba(28,84,244,.4)!important}
+body.dark .pers-lbl{color:rgba(255,255,255,.45)!important}
+body.dark .pers-input,body.dark .pers-sel{background:rgba(255,255,255,.08)!important;border:0.5px solid rgba(255,255,255,.15)!important;color:#fff!important}
+body.dark .chk-item{color:rgba(255,255,255,.7)!important}
+body.dark .sm{color:rgba(255,255,255,.4)!important}
+body.dark .view-tabs{background:rgba(0,7,89,.4)!important;border-bottom:1px solid rgba(255,255,255,.1)!important}
+body.dark .view-tab{color:rgba(255,255,255,.5)!important}
+body.dark .view-tab.active{color:#4D93FF!important;border-bottom-color:#4D93FF!important}
+body.dark .fb-card{background:rgba(255,255,255,.08)!important;border-top:none!important;border:1px solid rgba(255,255,255,.12)!important}
+body.dark .fb-textarea{background:rgba(255,255,255,.08)!important;border:0.5px solid rgba(255,255,255,.15)!important;color:#fff!important}
+body.dark .rec-card{background:rgba(255,255,255,.08)!important;border-left:4px solid #4D93FF!important;color:#fff!important}
+body.dark .rec-card strong{color:#4D93FF!important}
+body.dark .rec-btn{background:linear-gradient(90deg,#1C54F4,#4D93FF)!important}
+body.dark footer{border-top-color:rgba(255,255,255,.1)!important;color:rgba(255,255,255,.3)!important}
+body.dark .sv{color:#4D93FF!important}
+body.dark .rent-v{color:#C3E6FF!important}
+body.dark .cb{background:rgba(255,255,255,.15)!important;color:#C3E6FF!important}
 </style>
 </head>
 <body>
+
 
 <nav id="main-nav">
   <div class="nb">
@@ -335,6 +370,7 @@ footer{text-align:center;padding:1.5rem;font-size:10px;color:#56648F;border-top:
     <div class="nsubt">Generador de Alternativas</div>
   </div>
   <div class="nright">
+    <button id="theme-toggle" onclick="toggleTheme()" style="background:transparent;border:0.5px solid rgba(255,255,255,.25);color:#C3E6FF;font-size:14px;padding:3px 8px;border-radius:3px;cursor:pointer;line-height:1">🌙</button>
     <div class="ntag">Accelerating success.</div>
     <div class="nu" id="nu">
       <div class="na" id="na">MA</div>
@@ -1807,4 +1843,5 @@ if(localStorage.getItem('colliers-theme')==='dark'){
 }
 </script>
 </body>
+
 </html>
