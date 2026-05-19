@@ -338,52 +338,54 @@ body.dark .cb{background:rgba(255,255,255,.15)!important;color:#C3E6FF!important
 
 /* ===== ANALYTICS ===== */
 #analytics-panel{background:#F0F4FF}
-body.dark #analytics-panel{background:linear-gradient(135deg,#000d3d 0%,#0a1a5e 100%)}
+body.dark #analytics-panel{background:#050816}
 .an-wrap{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem}
 .an-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 .an-title{color:#25408F;font-size:22px;font-weight:700}
 .an-subtitle{color:#7B8BBD;font-size:12px;margin-top:3px}
-body.dark .an-title{color:#C3E6FF}
-body.dark .an-subtitle{color:rgba(195,230,255,.5)}
+body.dark .an-title{color:#FFFFFF}
+body.dark .an-subtitle{color:#A8B3D1}
 .an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
 @media(max-width:960px){.an-kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.an-kpis{grid-template-columns:1fr}}
 .kpi-card{background:#fff;border-top:3px solid #25408F;padding:1.25rem 1.5rem;box-shadow:0 2px 12px rgba(0,7,89,.07)}
-body.dark .kpi-card{background:rgba(255,255,255,.07);backdrop-filter:blur(12px);border-top:3px solid #1C54F4;box-shadow:none}
+body.dark .kpi-card{background:#101B52;border:1px solid rgba(255,255,255,.08);border-top:3px solid #1C54F4;box-shadow:0 4px 20px rgba(28,84,244,.12)}
 .kpi-label{font-size:10px;font-weight:700;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
 .kpi-val{font-size:34px;font-weight:700;color:#000759;line-height:1}
 .kpi-sub{font-size:11px;color:#56648F;margin-top:.35rem}
-body.dark .kpi-label{color:rgba(195,230,255,.45)}
-body.dark .kpi-val{color:#C3E6FF}
-body.dark .kpi-sub{color:rgba(255,255,255,.35)}
+body.dark .kpi-label{color:#A8B3D1}
+body.dark .kpi-val{color:#FFFFFF}
+body.dark .kpi-sub{color:#A8B3D1}
 .an-grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 @media(max-width:900px){.an-grid2{grid-template-columns:1fr}}
 .an-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 12px rgba(0,7,89,.07);overflow:hidden}
-body.dark .an-card{background:rgba(255,255,255,.07);backdrop-filter:blur(12px);border-top:3px solid #1C54F4;border-left:1px solid rgba(77,147,255,.15);border-right:1px solid rgba(77,147,255,.15);border-bottom:1px solid rgba(77,147,255,.15)}
+body.dark .an-card{background:rgba(16,27,82,.78);backdrop-filter:blur(16px);border-top:3px solid #1C54F4;border-left:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 8px 32px rgba(5,8,22,.4)}
 .an-card-hd{background:#25408F;padding:.65rem 1rem}
-body.dark .an-card-hd{background:rgba(0,7,89,.5)}
+body.dark .an-card-hd{background:#0A1240;border-bottom:1px solid rgba(255,255,255,.08)}
 .an-card-title{color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em}
 .an-card-body{padding:1.25rem}
 .an-chart-wrap{position:relative;height:260px}
 .lb-list{display:flex;flex-direction:column;gap:.4rem;padding:0 1.25rem 1rem}
-.lb-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem}
+.lb-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:4px}
 .lb-item:nth-child(odd){background:#F8FAFF}
 body.dark .lb-item:nth-child(odd){background:rgba(255,255,255,.04)}
+body.dark .lb-item:hover{background:rgba(77,147,255,.1)}
 .lb-rank{width:22px;height:22px;border-radius:50%;background:#1C54F4;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lb-rank.top1{background:#FFD400;color:#000759}
 .lb-rank.top2{background:#C0C0C0;color:#000759}
 .lb-rank.top3{background:#CD7F32;color:#fff}
 .lb-name{flex:1;font-size:12px;font-weight:600;color:#000759;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-body.dark .lb-name{color:#fff}
+body.dark .lb-name{color:#FFFFFF}
 .lb-meta{font-size:11px;color:#56648F;white-space:nowrap}
-body.dark .lb-meta{color:rgba(255,255,255,.45)}
+body.dark .lb-meta{color:#A8B3D1}
 .lb-bar-wrap{width:72px;height:4px;background:#EEF3FF;border-radius:2px;flex-shrink:0}
 body.dark .lb-bar-wrap{background:rgba(255,255,255,.1)}
 .lb-bar{height:4px;background:linear-gradient(90deg,#25408F,#1C54F4);border-radius:2px;transition:width .4s ease}
+body.dark .lb-bar{background:linear-gradient(90deg,#1C54F4,#72AEFF)}
 .an-empty{padding:3rem 1.25rem;text-align:center;color:#7B8BBD;font-size:13px}
-body.dark .an-empty{color:rgba(255,255,255,.4)}
+body.dark .an-empty{color:#A8B3D1}
 .an-skel{height:24px;background:linear-gradient(90deg,#EEF3FF 25%,#DBE5FF 50%,#EEF3FF 75%);background-size:200% 100%;animation:skelan 1.4s infinite;border-radius:2px;margin-bottom:.5rem}
-body.dark .an-skel{background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.05) 75%);background-size:200% 100%}
+body.dark .an-skel{background:linear-gradient(90deg,rgba(16,27,82,.8) 25%,rgba(28,84,244,.15) 50%,rgba(16,27,82,.8) 75%);background-size:200% 100%}
 @keyframes skelan{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
@@ -1928,8 +1930,10 @@ async function loadAnalytics(){
 
 function renderAnalytics(docs){
   const isDark=document.body.classList.contains('dark');
-  const textColor=isDark?'rgba(195,230,255,.8)':'#353E59';
-  const gridColor=isDark?'rgba(255,255,255,.08)':'rgba(37,64,143,.08)';
+  const textColor=isDark?'#DCE7FF':'#353E59';
+  const gridColor=isDark?'rgba(255,255,255,.06)':'rgba(37,64,143,.08)';
+  const barColor=isDark?'#4D93FF':'rgba(37,64,143,.75)';
+  const barHover=isDark?'#72AEFF':'#1C54F4';
 
   // KPIs
   const totalPPTs=docs.length;
@@ -1974,7 +1978,7 @@ function renderAnalytics(docs){
       type:'bar',
       data:{
         labels:zonaSorted.map(([z])=>z),
-        datasets:[{label:'Búsquedas',data:zonaSorted.map(([,v])=>v),backgroundColor:'rgba(37,64,143,.75)',borderColor:'#1C54F4',borderWidth:1,borderRadius:2,hoverBackgroundColor:'#1C54F4'}]
+        datasets:[{label:'Búsquedas',data:zonaSorted.map(([,v])=>v),backgroundColor:barColor,borderColor:isDark?'#72AEFF':'#1C54F4',borderWidth:isDark?0:1,borderRadius:3,hoverBackgroundColor:barHover}]
       },
       options:{
         indexAxis:'y',responsive:true,maintainAspectRatio:false,
@@ -2004,7 +2008,7 @@ function renderAnalytics(docs){
     type:'bar',
     data:{
       labels:Object.keys(m2R),
-      datasets:[{label:'Búsquedas',data:Object.values(m2R),backgroundColor:['#000759','#25408F','#1C54F4','#4D93FF','#C3E6FF'],borderRadius:3,borderWidth:0}]
+      datasets:[{label:'Búsquedas',data:Object.values(m2R),backgroundColor:isDark?['#1C54F4','#2D68F5','#4D93FF','#72AEFF','#A8CFFF']:['#000759','#25408F','#1C54F4','#4D93FF','#C3E6FF'],borderRadius:4,borderWidth:0}]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
@@ -2026,7 +2030,7 @@ function renderAnalytics(docs){
       type:'bar',
       data:{
         labels:edifSorted.map(([e])=>e),
-        datasets:[{label:'Veces enviado',data:edifSorted.map(([,v])=>v),backgroundColor:edifSorted.map((_,i)=>`rgba(28,84,244,${Math.max(0.25,1-i*0.08)})`),borderRadius:3,borderWidth:0}]
+        datasets:[{label:'Veces enviado',data:edifSorted.map(([,v])=>v),backgroundColor:isDark?edifSorted.map((_,i)=>`rgba(77,147,255,${Math.max(0.35,1-i*0.07)})`):edifSorted.map((_,i)=>`rgba(28,84,244,${Math.max(0.25,1-i*0.08)})`),borderRadius:3,borderWidth:0,hoverBackgroundColor:isDark?'#72AEFF':'#1C54F4'}]
       },
       options:{
         indexAxis:'y',responsive:true,maintainAspectRatio:false,
@@ -2065,8 +2069,8 @@ function renderAnalytics(docs){
       data:{
         labels:top10.map(b=>b.nombre.split(' ')[0]),
         datasets:[
-          {label:'PPTs generados',data:top10.map(b=>b.ppts),backgroundColor:'rgba(28,84,244,.8)',borderColor:'#1C54F4',borderWidth:1,borderRadius:3,hoverBackgroundColor:'#25408F'},
-          {label:'Alt. promedio',data:top10.map(b=>b.ppts>0?Math.round(b.alts/b.ppts):0),backgroundColor:'rgba(195,230,255,.6)',borderColor:'#4D93FF',borderWidth:1,borderRadius:3,hoverBackgroundColor:'#4D93FF'}
+          {label:'PPTs generados',data:top10.map(b=>b.ppts),backgroundColor:isDark?'#4D93FF':'rgba(28,84,244,.8)',borderWidth:0,borderRadius:4,hoverBackgroundColor:isDark?'#72AEFF':'#25408F'},
+          {label:'Alt. promedio',data:top10.map(b=>b.ppts>0?Math.round(b.alts/b.ppts):0),backgroundColor:isDark?'rgba(168,179,209,.25)':'rgba(195,230,255,.6)',borderWidth:0,borderRadius:4,hoverBackgroundColor:isDark?'rgba(168,179,209,.45)':'#4D93FF'}
         ]
       },
       options:{
