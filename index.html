@@ -463,6 +463,34 @@ body.dark .crm-estado-sel{background:#162566;border-color:rgba(255,255,255,.2);c
 body.dark .crm-estado-sel option{background:#101B52}
 .crm-section-hd{font-size:11px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.06em;padding-bottom:.4rem;border-bottom:1px solid #EEF3FF;margin-bottom:.25rem}
 body.dark .crm-section-hd{color:#4D93FF;border-bottom-color:rgba(255,255,255,.08)}
+
+/* ===== CLIENT SELECTOR ===== */
+.client-mode-row{display:flex;gap:4px;margin-bottom:.35rem}
+.client-mode-btn{font-family:inherit;font-size:11px;padding:5px 10px;border:1px solid #DBE5FF;color:#56648F;background:#fff;cursor:pointer;transition:all .12s;flex:1;font-weight:600;text-align:center}
+.client-mode-btn:hover{background:#EEF3FF;color:#25408F}
+.client-mode-btn.active{background:#25408F;color:#fff;border-color:#25408F}
+body.dark .client-mode-btn{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.55)}
+body.dark .client-mode-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+body.dark .client-mode-btn.active{background:#1C54F4;border-color:#1C54F4;color:#fff}
+.client-ac-list{position:absolute;left:0;right:0;top:calc(100% + 1px);background:#fff;border:1px solid #DBE5FF;z-index:300;max-height:230px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.14)}
+body.dark .client-ac-list{background:#101B52;border-color:rgba(255,255,255,.12);box-shadow:0 8px 24px rgba(5,8,22,.5)}
+.client-ac-section{font-size:10px;font-weight:700;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;padding:6px 12px 3px;background:#F8FAFF;border-bottom:1px solid #EEF3FF;position:sticky;top:0}
+body.dark .client-ac-section{background:rgba(5,8,22,.6);color:#A8B3D1;border-bottom-color:rgba(255,255,255,.06)}
+.client-ac-item{padding:8px 12px;cursor:pointer;border-bottom:1px solid #EEF3FF;transition:background .1s}
+.client-ac-item:last-child{border-bottom:none}
+.client-ac-item:hover{background:#EEF3FF}
+body.dark .client-ac-item{border-bottom-color:rgba(255,255,255,.05)}
+body.dark .client-ac-item:hover{background:rgba(77,147,255,.15)}
+.client-ac-name{font-size:12px;font-weight:700;color:#000759}
+body.dark .client-ac-name{color:#fff}
+.client-ac-meta{font-size:10px;color:#7B8BBD;margin-top:1px}
+body.dark .client-ac-meta{color:#A8B3D1}
+.client-ac-empty{padding:10px 12px;font-size:11px;color:#7B8BBD;cursor:default}
+body.dark .client-ac-empty{color:#A8B3D1}
+.kp-chip{display:flex;align-items:center;gap:6px;background:#EEF3FF;border:1px solid #C3E6FF;color:#25408F;font-size:11px;font-weight:700;padding:4px 8px 4px 10px;margin-top:2px}
+body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.35);color:#C3E6FF}
+.kp-chip-clear{background:none;border:none;color:#56648F;cursor:pointer;font-size:15px;line-height:1;padding:0;display:flex;align-items:center}
+.kp-chip-clear:hover{color:#EF3340}
 </style>
 </head>
 <body>
@@ -750,7 +778,16 @@ body.dark .crm-section-hd{color:#4D93FF;border-bottom-color:rgba(255,255,255,.08
               <div class="pers-lbl">Cliente / Informe</div>
               <input type="text" id="kc" class="pers-input" placeholder="Ej: Securitas · Mayo 2026">
               <div class="pers-lbl" style="margin-top:.5rem">Preparado para <span style="color:#ED1B34">*</span></div>
-              <input type="text" id="kp" class="pers-input" placeholder="Ej: Securitas SA">
+              <div class="client-mode-row">
+                <button type="button" class="client-mode-btn active" id="btn-nuevo" onclick="setClientMode('nuevo')">＋ Nuevo</button>
+                <button type="button" class="client-mode-btn" id="btn-existente" onclick="setClientMode('existente')">↗ Existente</button>
+              </div>
+              <input type="text" id="kp" class="pers-input" placeholder="Ej: Securitas SA" style="margin-top:0">
+              <div id="kp-ac-wrap" style="display:none;position:relative;margin-top:0">
+                <input type="text" id="kp-ac-q" class="pers-input" placeholder="🔍 Buscar cliente..." autocomplete="off" oninput="onAcInput(this.value)" onfocus="openAcList()" onblur="hideAcListLater()" style="margin-top:0">
+                <div id="kp-ac-list" class="client-ac-list" style="display:none"></div>
+                <div id="kp-chip" style="display:none"></div>
+              </div>
             </div>
             <div class="pers-col">
               <div class="pers-lbl">Contenido</div>
@@ -2001,6 +2038,120 @@ window.enviarFeedback=async()=>{
     alert('Error al enviar feedback: '+e.message);
   }
 };
+
+// ===== CLIENT SELECTOR =====
+let _clientesCache=[];
+let _acListOpen=false;
+let _acHideTimer=null;
+
+async function loadClientesParaSelector(){
+  if(!db)return;
+  // Reuse CRM cache if available
+  if(_crmDocs.length){_clientesCache=_crmDocs;return;}
+  if(_clientesCache.length)return;
+  try{
+    const snap=await db.collection('clientes').orderBy('ultimaActividad','desc').get();
+    _clientesCache=snap.docs.map(d=>({...d.data(),_id:d.id}));
+  }catch(e){console.warn('loadClientesParaSelector:',e.message);}
+}
+
+function setClientMode(mode){
+  const kp=document.getElementById('kp');
+  const acWrap=document.getElementById('kp-ac-wrap');
+  document.getElementById('btn-nuevo').classList.toggle('active',mode==='nuevo');
+  document.getElementById('btn-existente').classList.toggle('active',mode==='existente');
+  if(mode==='nuevo'){
+    kp.style.display='';
+    acWrap.style.display='none';
+    document.getElementById('kp-ac-list').style.display='none';
+    document.getElementById('kp-chip').style.display='none';
+    document.getElementById('kp-ac-q').value='';
+  }else{
+    kp.style.display='none';
+    kp.value='';
+    acWrap.style.display='';
+    loadClientesParaSelector().then(()=>renderAcItems(''));
+    setTimeout(()=>document.getElementById('kp-ac-q')?.focus(),60);
+  }
+}
+
+function openAcList(){
+  clearTimeout(_acHideTimer);
+  renderAcItems(document.getElementById('kp-ac-q')?.value||'');
+}
+
+function hideAcListLater(){
+  _acHideTimer=setTimeout(()=>{
+    document.getElementById('kp-ac-list').style.display='none';
+  },180);
+}
+
+function onAcInput(q){
+  // Clear selected value when user types again
+  const kp=document.getElementById('kp');
+  if(kp)kp.value='';
+  document.getElementById('kp-chip').style.display='none';
+  renderAcItems(q);
+}
+
+function renderAcItems(q){
+  const list=document.getElementById('kp-ac-list');
+  if(!list)return;
+  const lq=q.trim().toLowerCase();
+
+  // My recents (this broker's email or name)
+  const myEmail=user?.email||'';
+  const myName=user?.displayName||'';
+  const myRecent=_clientesCache.filter(d=>d.broker_email===myEmail||d.broker===myName).slice(0,5);
+
+  // Matching results
+  const matches=lq?_clientesCache.filter(d=>(d.nombre||'').toLowerCase().includes(lq)):_clientesCache;
+
+  if(!_clientesCache.length){
+    list.innerHTML='<div class="client-ac-empty">Sin clientes en Firestore aún. Generá un PPT para crear el primero.</div>';
+    list.style.display='block';return;
+  }
+
+  let h='';
+  if(!lq&&myRecent.length){
+    h+=`<div class="client-ac-section">⏱ Mis recientes</div>`;
+    myRecent.forEach(d=>{h+=acItem(d);});
+    if(matches.length){h+='<div class="client-ac-section">📋 Todos</div>';}
+  }
+  const shownIds=new Set(!lq&&myRecent.length?myRecent.map(d=>d._id):[]);
+  matches.forEach(d=>{if(!shownIds.has(d._id))h+=acItem(d);});
+  if(!h){h=`<div class="client-ac-empty">Sin resultados para "${q}"</div>`;}
+  list.innerHTML=h;
+  list.style.display='block';
+}
+
+function acItem(d){
+  const nom=(d.nombre||d._id).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const ts=d.ultimaActividad?.toDate?d.ultimaActividad.toDate().toLocaleDateString('es-AR',{day:'2-digit',month:'short'}):'' ;
+  return`<div class="client-ac-item" data-nombre="${nom}" onmousedown="selectAcCliente(this)">
+    <div class="client-ac-name">${nom}</div>
+    <div class="client-ac-meta">${d.broker||''}${ts?' · '+ts:''} · ${d.cantidadPPTs||0} PPTs</div>
+  </div>`;
+}
+
+function selectAcCliente(el){
+  const nombre=el.dataset.nombre;
+  document.getElementById('kp').value=nombre;
+  document.getElementById('kp-ac-q').value='';
+  document.getElementById('kp-ac-list').style.display='none';
+  // Show chip
+  const chip=document.getElementById('kp-chip');
+  chip.innerHTML=`<div class="kp-chip"><span>✓ ${nombre}</span><button type="button" class="kp-chip-clear" onclick="clearAcCliente()" title="Cambiar cliente">✕</button></div>`;
+  chip.style.display='block';
+}
+
+function clearAcCliente(){
+  document.getElementById('kp').value='';
+  document.getElementById('kp-ac-q').value='';
+  document.getElementById('kp-chip').style.display='none';
+  document.getElementById('kp-ac-q')?.focus();
+  renderAcItems('');
+}
 
 // ===== CRM =====
 let _crmDocs=[];
