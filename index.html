@@ -632,8 +632,8 @@ body.dark .bld-sub-cell{color:#A8B3D1}
 body.dark .bld-num{color:#4D93FF}
 .bld-muted{font-size:11px;color:#7B8BBD}
 body.dark .bld-muted{color:#A8B3D1}
-.bld-foto{width:40px;height:40px;border-radius:8px;object-fit:cover;background:linear-gradient(135deg,#EEF3FF,#DBE5FF);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.bld-foto img{width:40px;height:40px;border-radius:8px;object-fit:cover}
+.bld-foto{width:56px;height:56px;border-radius:10px;object-fit:cover;background:linear-gradient(135deg,#EEF3FF,#DBE5FF);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden}
+.bld-foto img{width:56px;height:56px;border-radius:10px;object-fit:cover;display:block}
 .bld-empty{padding:5rem 2rem;text-align:center;color:#7B8BBD;font-size:13px;line-height:2}
 body.dark .bld-empty{color:#A8B3D1}
 
@@ -694,6 +694,64 @@ body.dark .bld-ed-del{background:rgba(255,255,255,.06);border-color:rgba(255,255
 .bld-toast{position:fixed;bottom:2rem;right:2rem;background:#0A1B4D;color:#fff;font-size:13px;font-weight:600;padding:.85rem 1.4rem;border-radius:12px;box-shadow:0 8px 30px rgba(0,7,89,.3);z-index:500;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
 .bld-toast.show{opacity:1;transform:translateY(0)}
 body.dark .bld-toast{background:rgba(28,84,244,.9);box-shadow:0 8px 30px rgba(28,84,244,.35)}
+
+/* ===== BUILDING EDITOR TABS ===== */
+.bld-tabs{display:flex;padding:0 1.75rem;border-bottom:1px solid #EEF3FF;flex-shrink:0}
+body.dark .bld-tabs{border-bottom-color:rgba(255,255,255,.08)}
+.bld-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:#7B8BBD;font-family:inherit;font-size:12px;font-weight:600;padding:10px 14px;cursor:pointer;transition:all .15s;margin-bottom:-1px;display:flex;align-items:center;gap:6px}
+.bld-tab:hover{color:#25408F}
+.bld-tab.active{color:#1C54F4;border-bottom-color:#1C54F4}
+body.dark .bld-tab{color:rgba(168,179,209,.65)}
+body.dark .bld-tab:hover{color:#fff}
+body.dark .bld-tab.active{color:#4D93FF;border-bottom-color:#4D93FF}
+.bld-tab-badge{background:#1C54F4;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;line-height:1.6}
+body.dark .bld-tab-badge{background:#4D93FF}
+.bld-tab-panel{flex:1;overflow-y:auto;padding:1.25rem 1.75rem;display:flex;flex-direction:column;gap:1.25rem}
+
+/* ===== UNITS TABLE ===== */
+.units-toolbar{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-shrink:0}
+.unit-count{font-size:11px;color:#7B8BBD;font-weight:600}
+body.dark .unit-count{color:#A8B3D1}
+.unit-add-btn{font-family:inherit;font-size:12px;font-weight:700;padding:8px 14px;background:linear-gradient(90deg,#1C54F4,#4D93FF);border:none;color:#fff;border-radius:8px;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(28,84,244,.25);white-space:nowrap}
+.unit-add-btn:hover{box-shadow:0 5px 16px rgba(28,84,244,.35);transform:translateY(-1px)}
+.unit-search{font-family:inherit;font-size:11px;padding:7px 10px;border:1px solid #E2EAF4;background:#fff;color:#000759;border-radius:8px;transition:all .15s;min-width:140px}
+.unit-search:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 2px rgba(28,84,244,.08)}
+body.dark .unit-search{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .unit-search::placeholder{color:rgba(168,179,209,.5)}
+.unit-tbl-wrap{overflow-x:auto;border:1px solid #E8EFF8;border-radius:12px}
+body.dark .unit-tbl-wrap{border-color:rgba(255,255,255,.07)}
+.unit-table{width:100%;border-collapse:collapse;font-size:11px;min-width:580px}
+.unit-table thead tr{background:#F8FAFF}
+body.dark .unit-table thead tr{background:rgba(255,255,255,.04)}
+.unit-table th{padding:9px 8px;text-align:left;color:#7B8BBD;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;border-bottom:1px solid #EEF3FF}
+body.dark .unit-table th{color:#A8B3D1;border-bottom-color:rgba(255,255,255,.06)}
+.unit-table td{padding:5px 5px;vertical-align:middle;border-bottom:1px solid #F4F6FB}
+.unit-table tr:last-child td{border-bottom:none}
+body.dark .unit-table td{border-bottom-color:rgba(255,255,255,.04)}
+.unit-table tbody tr:hover{background:#F8FBFF}
+body.dark .unit-table tbody tr:hover{background:rgba(77,147,255,.05)}
+.unit-inp{font-family:inherit;font-size:11px;padding:5px 6px;border:1.5px solid transparent;background:transparent;color:#0A1B4D;border-radius:6px;width:100%;box-sizing:border-box;transition:all .12s}
+.unit-inp:hover{border-color:#E2EAF4;background:#fff}
+.unit-inp:focus{outline:none;border-color:#1C54F4;background:#fff;box-shadow:0 0 0 2px rgba(28,84,244,.08)}
+body.dark .unit-inp{color:#DCE7FF}
+body.dark .unit-inp:hover{border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.06)}
+body.dark .unit-inp:focus{border-color:#4D93FF;background:rgba(255,255,255,.08)}
+.unit-sel{font-family:inherit;font-size:11px;padding:5px 4px;border:1.5px solid transparent;background:transparent;color:#0A1B4D;border-radius:6px;cursor:pointer;transition:all .12s;width:100%}
+.unit-sel:hover{border-color:#E2EAF4;background:#fff}
+.unit-sel:focus{outline:none;border-color:#1C54F4;background:#fff}
+body.dark .unit-sel{color:#DCE7FF}
+body.dark .unit-sel:hover{border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.06)}
+body.dark .unit-sel option{background:#0A1B4D}
+.unit-estado{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.unit-estado::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.unit-actions{display:flex;gap:2px}
+.unit-del-btn,.unit-dup-btn{background:transparent;border:none;color:rgba(123,139,189,.5);cursor:pointer;font-size:14px;padding:4px 5px;border-radius:5px;transition:all .12s;line-height:1}
+.unit-del-btn:hover{color:#EF3340;background:rgba(239,51,64,.08)}
+.unit-dup-btn:hover{color:#4D93FF;background:rgba(77,147,255,.1)}
+.unit-empty{padding:2.5rem 1rem;text-align:center;color:#7B8BBD;font-size:12px;line-height:1.8}
+body.dark .unit-empty{color:#A8B3D1}
+.unit-saving{font-size:9px;font-weight:700;color:#16A34A;opacity:0;transition:opacity .3s;margin-left:3px}
+.unit-saving.visible{opacity:1}
 </style>
 </head>
 <body>
@@ -2701,58 +2759,232 @@ function openBuildingEditor(docId){
   document.getElementById('bld-layout').classList.add('editor-open');
   document.getElementById('bld-editor').style.display='flex';
   document.getElementById('bld-ed-title').textContent=d.nombre||d._id;
-
   const states=['Disponible','Reservado','Ocupado','Archivado'].map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('');
   const monedas=['USD','ARS'].map(m=>`<option${(d.moneda||'USD')===m?' selected':''}>${m}</option>`).join('');
-
   document.getElementById('bld-ed-body').innerHTML=`
-    <div class="bld-ed-section">
-      <div class="bld-ed-section-hd">Identificación</div>
-      <div class="bld-ed-grid">
-        <div class="bld-ed-field full"><div class="bld-ed-lbl">Nombre</div><input class="bld-ed-inp" id="be-nombre" value="${esc(d.nombre)}"></div>
-        <div class="bld-ed-field full"><div class="bld-ed-lbl">Dirección</div><input class="bld-ed-inp" id="be-direccion" value="${esc(d.direccion)}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Zona / Submercado</div><input class="bld-ed-inp" id="be-zona" value="${esc(d.zona||d.submercado)}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Estado</div><select class="bld-ed-inp" id="be-estado">${states}</select></div>
+    <div class="bld-tabs" id="bld-ed-tabs">
+      <button class="bld-tab active" onclick="bldEdTab(this,'bld-tab-info')">Información</button>
+      <button class="bld-tab" onclick="bldEdTab(this,'bld-tab-units')">Disponibilidades <span class="bld-tab-badge" id="units-count-badge">…</span></button>
+    </div>
+    <div id="bld-tab-info" class="bld-tab-panel">
+      <div class="bld-ed-section">
+        <div class="bld-ed-section-hd">Identificación</div>
+        <div class="bld-ed-grid">
+          <div class="bld-ed-field full"><div class="bld-ed-lbl">Nombre</div><input class="bld-ed-inp" id="be-nombre" value="${esc(d.nombre)}"></div>
+          <div class="bld-ed-field full"><div class="bld-ed-lbl">Dirección</div><input class="bld-ed-inp" id="be-direccion" value="${esc(d.direccion)}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Zona / Submercado</div><input class="bld-ed-inp" id="be-zona" value="${esc(d.zona||d.submercado)}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Estado</div><select class="bld-ed-inp" id="be-estado">${states}</select></div>
+        </div>
+      </div>
+      <div class="bld-ed-section">
+        <div class="bld-ed-section-hd">Superficies</div>
+        <div class="bld-ed-grid">
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Disponible (m²)</div><input class="bld-ed-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Planta (m²)</div><input class="bld-ed-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Mínima (m²)</div><input class="bld-ed-inp" id="be-supMin" type="number" value="${d.superficieMinima||''}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Pisos disponibles</div><input class="bld-ed-inp" id="be-pisosDisp" value="${esc(d.pisosDisponibles||d.pisosDisp||'')}"></div>
+        </div>
+      </div>
+      <div class="bld-ed-section">
+        <div class="bld-ed-section-hd">Financiero</div>
+        <div class="bld-ed-grid">
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Asking Rent</div><input class="bld-ed-inp" id="be-asking" value="${esc(d.asking||d.rent||'')}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Expensas</div><input class="bld-ed-inp" id="be-expensas" value="${esc(d.expensas||'')}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Moneda</div><select class="bld-ed-inp" id="be-moneda">${monedas}</select></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Categoría</div><input class="bld-ed-inp" id="be-cat" value="${esc(d.categoria||d.cat||'')}"></div>
+        </div>
+      </div>
+      <div class="bld-ed-section">
+        <div class="bld-ed-section-hd">Operación</div>
+        <div class="bld-ed-grid">
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Broker responsable</div><input class="bld-ed-inp" id="be-broker" value="${esc(d.broker||'')}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Certificación</div><input class="bld-ed-inp" id="be-cert" value="${esc(d.certificacion||d.cat||'')}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">Google Maps URL</div><input class="bld-ed-inp" id="be-maps" value="${esc(d.googleMaps||'')}"></div>
+          <div class="bld-ed-field"><div class="bld-ed-lbl">URL Foto</div><input class="bld-ed-inp" id="be-foto" value="${esc(d.foto||(d.imagenes&&d.imagenes[0])||'')}"></div>
+        </div>
+      </div>
+      <div class="bld-ed-section">
+        <div class="bld-ed-section-hd">Descripción y Amenities</div>
+        <div class="bld-ed-grid">
+          <div class="bld-ed-field full"><div class="bld-ed-lbl">Descripción</div><textarea class="bld-ed-inp" id="be-desc">${esc(d.descripcion||d.comentarios||'')}</textarea></div>
+          <div class="bld-ed-field full"><div class="bld-ed-lbl">Amenities</div><textarea class="bld-ed-inp" id="be-amenities">${esc(d.amenities||d.comentarios||'')}</textarea></div>
+        </div>
       </div>
     </div>
-    <div class="bld-ed-section">
-      <div class="bld-ed-section-hd">Superficies</div>
-      <div class="bld-ed-grid">
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Disponible (m²)</div><input class="bld-ed-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Planta (m²)</div><input class="bld-ed-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Mínima (m²)</div><input class="bld-ed-inp" id="be-supMin" type="number" value="${d.superficieMinima||''}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Pisos disponibles</div><input class="bld-ed-inp" id="be-pisosDisp" value="${esc(d.pisosDisponibles||d.pisosDisp)}"></div>
-      </div>
-    </div>
-    <div class="bld-ed-section">
-      <div class="bld-ed-section-hd">Financiero</div>
-      <div class="bld-ed-grid">
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Asking Rent</div><input class="bld-ed-inp" id="be-asking" value="${esc(d.asking||d.rent)}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Expensas</div><input class="bld-ed-inp" id="be-expensas" value="${esc(d.expensas)}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Moneda</div><select class="bld-ed-inp" id="be-moneda">${monedas}</select></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Categoría</div><input class="bld-ed-inp" id="be-cat" value="${esc(d.categoria||d.cat)}"></div>
-      </div>
-    </div>
-    <div class="bld-ed-section">
-      <div class="bld-ed-section-hd">Operación</div>
-      <div class="bld-ed-grid">
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Broker responsable</div><input class="bld-ed-inp" id="be-broker" value="${esc(d.broker)}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Certificación</div><input class="bld-ed-inp" id="be-cert" value="${esc(d.certificacion||d.cat)}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">Google Maps URL</div><input class="bld-ed-inp" id="be-maps" value="${esc(d.googleMaps)}"></div>
-        <div class="bld-ed-field"><div class="bld-ed-lbl">URL Foto</div><input class="bld-ed-inp" id="be-foto" value="${esc(d.foto||(d.imagenes&&d.imagenes[0])||'')}"></div>
-      </div>
-    </div>
-    <div class="bld-ed-section">
-      <div class="bld-ed-section-hd">Descripción y Amenities</div>
-      <div class="bld-ed-grid">
-        <div class="bld-ed-field full"><div class="bld-ed-lbl">Descripción</div><textarea class="bld-ed-inp" id="be-desc">${esc(d.descripcion||d.comentarios)}</textarea></div>
-        <div class="bld-ed-field full"><div class="bld-ed-lbl">Amenities</div><textarea class="bld-ed-inp" id="be-amenities">${esc(d.amenities||d.comentarios)}</textarea></div>
-      </div>
+    <div id="bld-tab-units" class="bld-tab-panel" style="display:none">
+      <div class="unit-empty" id="units-loading">Cargando unidades...</div>
     </div>
   `;
-  // highlight selected row
   renderBuildingsTable();
+  loadUnits(docId);
 }
+
+function bldEdTab(el,tabId){
+  el.closest('#bld-ed-body').querySelectorAll('.bld-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  el.closest('#bld-ed-body').querySelectorAll('.bld-tab-panel').forEach(p=>{p.style.display='none';});
+  const panel=document.getElementById(tabId);
+  if(panel)panel.style.display='flex';
+}
+
+/* ===== UNITS (subcollection buildings/{id}/units) ===== */
+let _unitDocs=[];
+
+const UNIT_ESTADO_COLORS={
+  'Disponible':{bg:'rgba(34,197,94,.1)',border:'rgba(34,197,94,.3)',text:'#16A34A'},
+  'Reservado'  :{bg:'rgba(245,158,11,.1)',border:'rgba(245,158,11,.3)',text:'#B45309'},
+  'Ocupado'    :{bg:'rgba(239,51,64,.1)',border:'rgba(239,51,64,.3)',text:'#EF3340'},
+};
+
+async function loadUnits(buildingId){
+  if(!db)return;
+  try{
+    const snap=await db.collection('buildings').doc(buildingId).collection('units').orderBy('piso').get();
+    _unitDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+  }catch(e){
+    // If no units yet (no index needed for orderBy on single field)
+    _unitDocs=[];
+  }
+  const badge=document.getElementById('units-count-badge');
+  if(badge)badge.textContent=_unitDocs.length;
+  renderUnitsTable(buildingId);
+}
+
+function unitEstadoBadge(e){
+  const c=UNIT_ESTADO_COLORS[e]||UNIT_ESTADO_COLORS['Disponible'];
+  return`<span class="unit-estado" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${e||'Disponible'}</span>`;
+}
+
+function renderUnitsTable(buildingId,filterQ=''){
+  const panel=document.getElementById('bld-tab-units');
+  if(!panel)return;
+  const filtered=filterQ?_unitDocs.filter(u=>(u.piso||'').toLowerCase().includes(filterQ)||(u.unidad||'').toLowerCase().includes(filterQ)||(u.ocupante||'').toLowerCase().includes(filterQ)):_unitDocs;
+  const badge=document.getElementById('units-count-badge');
+  if(badge)badge.textContent=_unitDocs.length;
+  const stateOpts=e=>['Disponible','Reservado','Ocupado'].map(s=>`<option${e===s?' selected':''}>${s}</option>`).join('');
+  let h=`
+    <div class="units-toolbar">
+      <span class="unit-count">${filtered.length} unidad${filtered.length!==1?'es':''}</span>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <input type="text" class="unit-search" placeholder="🔍 Buscar..." oninput="renderUnitsTable('${buildingId}',this.value)" value="${filterQ}">
+        <button class="unit-add-btn" onclick="addUnit('${buildingId}')">+ Agregar unidad</button>
+      </div>
+    </div>`;
+  if(!filtered.length){
+    h+=`<div class="unit-empty">${_unitDocs.length?'Sin coincidencias.':'Sin unidades todavía.<br>Agregá la primera disponibilidad con el botón de arriba.'}</div>`;
+  }else{
+    h+=`<div class="unit-tbl-wrap"><table class="unit-table"><thead><tr>
+      <th>Piso</th><th>Unidad</th><th>m²</th><th>Asking</th><th>Ocupante</th><th>Propietario</th><th>Broker</th><th>Estado</th><th></th>
+    </tr></thead><tbody>`;
+    filtered.forEach(u=>{
+      h+=`<tr data-uid="${u._id}">
+        <td><input class="unit-inp" style="width:52px" value="${esc(u.piso||'')}" onblur="saveUnitField('${buildingId}','${u._id}','piso',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:60px" value="${esc(u.unidad||'')}" onblur="saveUnitField('${buildingId}','${u._id}','unidad',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:62px" type="number" value="${u.m2||''}" onblur="saveUnitField('${buildingId}','${u._id}','m2',parseFloat(this.value)||0,this)"></td>
+        <td><input class="unit-inp" style="width:70px" value="${esc(u.askingRent||'')}" onblur="saveUnitField('${buildingId}','${u._id}','askingRent',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:80px" value="${esc(u.ocupante||'')}" onblur="saveUnitField('${buildingId}','${u._id}','ocupante',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:80px" value="${esc(u.propietario||'')}" onblur="saveUnitField('${buildingId}','${u._id}','propietario',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:75px" value="${esc(u.brokerAsignado||'')}" onblur="saveUnitField('${buildingId}','${u._id}','brokerAsignado',this.value,this)"></td>
+        <td><select class="unit-sel" style="width:96px" onchange="saveUnitField('${buildingId}','${u._id}','estado',this.value,this)">${stateOpts(u.estado)}</select></td>
+        <td><div class="unit-actions">
+          <button class="unit-dup-btn" title="Duplicar" onclick="duplicateUnit('${buildingId}','${u._id}')">⧉</button>
+          <button class="unit-del-btn" title="Eliminar" onclick="deleteUnit('${buildingId}','${u._id}',this.closest('tr'))">✕</button>
+        </div></td>
+      </tr>`;
+    });
+    h+=`</tbody></table></div>`;
+  }
+  panel.innerHTML=h;
+}
+
+async function addUnit(buildingId){
+  if(!db)return;
+  const newUnit={
+    piso:'',unidad:'',m2:0,askingRent:'',moneda:'USD',
+    ocupante:'',propietario:'',brokerAsignado:'',
+    estado:'Disponible',observaciones:'',
+    createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try{
+    const ref=await db.collection('buildings').doc(buildingId).collection('units').add(newUnit);
+    _unitDocs.push({...newUnit,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
+    renderUnitsTable(buildingId);
+    // focus first input of new row
+    setTimeout(()=>{
+      const rows=document.querySelectorAll('#bld-tab-units table tbody tr');
+      if(rows.length)rows[rows.length-1].querySelector('.unit-inp')?.focus();
+    },50);
+  }catch(e){showBldToast('❌ Error al crear unidad: '+e.message,3500);}
+}
+
+async function saveUnitField(buildingId,unitId,field,value,el){
+  if(!db)return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).update({
+      [field]:value,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const u=_unitDocs.find(x=>x._id===unitId);
+    if(u)u[field]=value;
+    // flash green indicator on the cell
+    if(el){
+      const orig=el.style.borderColor;
+      el.style.borderColor='#16A34A';
+      el.style.boxShadow='0 0 0 2px rgba(22,163,74,.12)';
+      setTimeout(()=>{el.style.borderColor='';el.style.boxShadow='';},900);
+    }
+  }catch(e){
+    showBldToast('❌ Error al guardar: '+e.message,3000);
+    console.error('saveUnitField:',e);
+  }
+}
+
+async function deleteUnit(buildingId,unitId,rowEl){
+  if(!db)return;
+  if(!confirm('¿Eliminar esta unidad?'))return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).delete();
+    _unitDocs=_unitDocs.filter(x=>x._id!==unitId);
+    if(rowEl)rowEl.style.opacity='0';
+    setTimeout(()=>renderUnitsTable(buildingId),300);
+    const badge=document.getElementById('units-count-badge');
+    if(badge)badge.textContent=_unitDocs.length;
+  }catch(e){showBldToast('❌ Error al eliminar: '+e.message,3000);}
+}
+
+async function duplicateUnit(buildingId,unitId){
+  if(!db)return;
+  const u=_unitDocs.find(x=>x._id===unitId);
+  if(!u)return;
+  const copy={...u};
+  delete copy._id;
+  copy.unidad=(copy.unidad?copy.unidad+' (copia)':'(copia)');
+  copy.estado='Disponible';
+  copy.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+  copy.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+  try{
+    const ref=await db.collection('buildings').doc(buildingId).collection('units').add(copy);
+    _unitDocs.push({...copy,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
+    renderUnitsTable(buildingId);
+    showBldToast('⧉ Unidad duplicada');
+  }catch(e){showBldToast('❌ Error al duplicar: '+e.message,3000);}
+}
+
+// Expose available units for PPT/CRM/Analytics integration
+window.getAvailableUnitsForBuilding=async(buildingId)=>{
+  if(!db)return[];
+  try{
+    const snap=await db.collection('buildings').doc(buildingId).collection('units').where('estado','==','Disponible').get();
+    return snap.docs.map(d=>({...d.data(),_id:d.id,buildingId}));
+  }catch(e){return[];}
+};
+
+window.getAllAvailableUnits=async()=>{
+  if(!db||!_bldDocs.length)return[];
+  const results=await Promise.all(_bldDocs.map(b=>window.getAvailableUnitsForBuilding(b._id).then(us=>us.map(u=>({...u,buildingNombre:b.nombre,buildingZona:b.zona||b.submercado})))));
+  return results.flat();
+};
 
 function closeBldEditor(){
   _bldEditId=null;
