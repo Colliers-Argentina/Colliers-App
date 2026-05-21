@@ -552,6 +552,148 @@ body.dark .client-ac-empty{color:#A8B3D1}
 body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.35);color:#C3E6FF}
 .kp-chip-clear{background:none;border:none;color:#56648F;cursor:pointer;font-size:15px;line-height:1;padding:0;display:flex;align-items:center}
 .kp-chip-clear:hover{color:#EF3340}
+
+/* ===== BUILDINGS ADMIN ===== */
+#buildings-panel{background:#F4F6FB}
+body.dark #buildings-panel{background:#030B1E}
+.bld-layout{display:grid;grid-template-columns:1fr;height:100%;transition:grid-template-columns .25s ease}
+.bld-layout.editor-open{grid-template-columns:1fr 420px}
+@media(max-width:1100px){.bld-layout.editor-open{grid-template-columns:1fr 360px}}
+.bld-main{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.bld-wrap{max-width:none;padding:2rem 2.5rem;display:flex;flex-direction:column;gap:1.5rem;height:100%;box-sizing:border-box}
+
+/* Header */
+.bld-hz{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;flex-shrink:0}
+.bld-hz-l{display:flex;flex-direction:column;gap:4px}
+.bld-title{color:#0A1B4D;font-size:28px;font-weight:700;letter-spacing:-.5px}
+.bld-subtitle{color:#7B8BBD;font-size:13px}
+body.dark .bld-title{color:#fff}
+body.dark .bld-subtitle{color:#A8B3D1}
+.bld-hz-r{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+
+/* Inputs */
+.bld-input{font-family:inherit;font-size:12px;padding:9px 14px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;min-width:200px;transition:all .15s}
+.bld-input:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.1)}
+.bld-select{font-family:inherit;font-size:12px;padding:9px 12px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;cursor:pointer;transition:all .15s}
+.bld-select:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.1)}
+body.dark .bld-input{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .bld-input::placeholder{color:rgba(168,179,209,.55)}
+body.dark .bld-input:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.15)}
+body.dark .bld-select{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .bld-select option{background:#0A1B4D}
+.bld-btn{font-family:inherit;font-size:12px;padding:9px 14px;border-radius:8px;cursor:pointer;transition:all .15s;white-space:nowrap;font-weight:600}
+.bld-btn-primary{background:linear-gradient(90deg,#1C54F4,#4D93FF);border:none;color:#fff;box-shadow:0 4px 14px rgba(28,84,244,.3)}
+.bld-btn-primary:hover{box-shadow:0 6px 20px rgba(28,84,244,.4);transform:translateY(-1px)}
+.bld-btn-outline{background:#fff;border:1px solid #E2EAF4;color:#56648F}
+.bld-btn-outline:hover{border-color:#1C54F4;color:#1C54F4}
+body.dark .bld-btn-outline{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#A8B3D1}
+body.dark .bld-btn-outline:hover{border-color:#4D93FF;color:#4D93FF}
+.bld-close-btn{background:#fff;border:1px solid #E2EAF4;color:#56648F;font-family:inherit;font-size:13px;padding:9px 14px;cursor:pointer;border-radius:8px;transition:all .15s;white-space:nowrap;font-weight:500}
+.bld-close-btn:hover{background:#FFF0F0;border-color:#EF3340;color:#EF3340}
+body.dark .bld-close-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#A8B3D1}
+body.dark .bld-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(239,51,64,.35);color:#EF3340}
+
+/* KPI row */
+.bld-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;flex-shrink:0}
+@media(max-width:960px){.bld-kpi-row{grid-template-columns:repeat(2,1fr)}}
+.bld-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:1.1rem 1.4rem;display:flex;flex-direction:column;gap:.3rem;transition:all .2s}
+body.dark .bld-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)}
+.bld-kpi-icon{font-size:18px;line-height:1}
+.bld-kpi-v{font-size:30px;font-weight:700;color:#0A1B4D;line-height:1}
+body.dark .bld-kpi-v{color:#fff}
+.bld-kpi-l{font-size:11px;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+body.dark .bld-kpi-l{color:#A8B3D1}
+
+/* Table */
+.bld-tbl-wrap{background:#fff;border:1px solid #E8EFF8;border-radius:16px;overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0}
+body.dark .bld-tbl-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(14px)}
+.bld-tbl-scroll{overflow-y:auto;flex:1}
+.bld-table{width:100%;border-collapse:collapse;font-size:12px}
+.bld-table thead tr{background:#F8FAFF;position:sticky;top:0;z-index:2}
+body.dark .bld-table thead tr{background:rgba(255,255,255,.04)}
+.bld-table th{padding:12px 16px;text-align:left;color:#7B8BBD;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;border-bottom:1px solid #EEF3FF;cursor:pointer;user-select:none;transition:color .15s}
+.bld-table th:hover{color:#1C54F4}
+body.dark .bld-table th{color:#A8B3D1;border-bottom:1px solid rgba(255,255,255,.06)}
+body.dark .bld-table th:hover{color:#4D93FF}
+.bld-table tbody tr{cursor:pointer;transition:all .12s;border-bottom:1px solid #F4F6FB}
+.bld-table tbody tr:last-child{border-bottom:none}
+.bld-table tbody tr:hover{background:#F0F6FF}
+.bld-table tbody tr.selected{background:#EEF3FF}
+body.dark .bld-table td{color:#DCE7FF;border-bottom:1px solid rgba(255,255,255,.04)}
+body.dark .bld-table tbody tr{border-bottom:1px solid rgba(255,255,255,.04)}
+body.dark .bld-table tbody tr:hover{background:rgba(77,147,255,.07)}
+body.dark .bld-table tbody tr.selected{background:rgba(77,147,255,.12)}
+.bld-table td{padding:13px 16px;vertical-align:middle}
+.bld-name-cell{font-size:13px;font-weight:700;color:#0A1B4D}
+body.dark .bld-name-cell{color:#fff}
+.bld-sub-cell{font-size:10px;color:#7B8BBD;margin-top:2px}
+body.dark .bld-sub-cell{color:#A8B3D1}
+.bld-num{font-size:13px;font-weight:700;color:#1C54F4}
+body.dark .bld-num{color:#4D93FF}
+.bld-muted{font-size:11px;color:#7B8BBD}
+body.dark .bld-muted{color:#A8B3D1}
+.bld-foto{width:40px;height:40px;border-radius:8px;object-fit:cover;background:linear-gradient(135deg,#EEF3FF,#DBE5FF);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.bld-foto img{width:40px;height:40px;border-radius:8px;object-fit:cover}
+.bld-empty{padding:5rem 2rem;text-align:center;color:#7B8BBD;font-size:13px;line-height:2}
+body.dark .bld-empty{color:#A8B3D1}
+
+/* Estado badges */
+.bld-estado{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 11px;border-radius:999px;white-space:nowrap}
+.bld-estado::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* Pagination */
+.bld-pagination{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.25rem;border-top:1px solid #EEF3FF;flex-shrink:0}
+body.dark .bld-pagination{border-top-color:rgba(255,255,255,.06)}
+.bld-page-info{font-size:11px;color:#7B8BBD}
+body.dark .bld-page-info{color:#A8B3D1}
+.bld-page-btns{display:flex;gap:4px}
+.bld-page-btn{font-family:inherit;font-size:11px;padding:5px 10px;border:1px solid #E2EAF4;background:#fff;color:#56648F;cursor:pointer;border-radius:6px;transition:all .12s}
+.bld-page-btn:hover:not(:disabled){border-color:#1C54F4;color:#1C54F4}
+.bld-page-btn:disabled{opacity:.4;cursor:default}
+.bld-page-btn.active{background:#1C54F4;border-color:#1C54F4;color:#fff}
+body.dark .bld-page-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#A8B3D1}
+body.dark .bld-page-btn.active{background:#1C54F4;border-color:#1C54F4;color:#fff}
+
+/* Right editor panel */
+.bld-editor{background:#fff;border-left:1px solid #E8EFF8;display:flex;flex-direction:column;overflow:hidden;height:100%}
+body.dark .bld-editor{background:#0A1B4D;border-left:1px solid rgba(255,255,255,.08)}
+.bld-ed-hd{padding:1.5rem 1.75rem 1rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;border-bottom:1px solid #EEF3FF;flex-shrink:0}
+body.dark .bld-ed-hd{border-bottom-color:rgba(255,255,255,.08)}
+.bld-ed-title{font-size:18px;font-weight:700;color:#0A1B4D;letter-spacing:-.3px;line-height:1.3}
+body.dark .bld-ed-title{color:#fff}
+.bld-ed-close{background:rgba(0,0,0,.05);border:none;color:#56648F;font-size:16px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.bld-ed-close:hover{background:rgba(239,51,64,.1);color:#EF3340}
+body.dark .bld-ed-close{background:rgba(255,255,255,.08);color:#A8B3D1}
+.bld-ed-body{flex:1;overflow-y:auto;padding:1.25rem 1.75rem;display:flex;flex-direction:column;gap:1.25rem}
+.bld-ed-section{display:flex;flex-direction:column;gap:.75rem}
+.bld-ed-section-hd{font-size:10px;font-weight:700;color:#1C54F4;text-transform:uppercase;letter-spacing:.08em;padding-bottom:.4rem;border-bottom:1px solid #EEF3FF}
+body.dark .bld-ed-section-hd{color:#4D93FF;border-bottom-color:rgba(255,255,255,.07)}
+.bld-ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.bld-ed-field{display:flex;flex-direction:column;gap:5px}
+.bld-ed-field.full{grid-column:1/-1}
+.bld-ed-lbl{font-size:10px;font-weight:600;color:#7B8BBD;text-transform:uppercase;letter-spacing:.07em}
+body.dark .bld-ed-lbl{color:#A8B3D1}
+.bld-ed-inp{font-family:inherit;font-size:12px;padding:8px 12px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;width:100%;box-sizing:border-box;transition:all .15s}
+.bld-ed-inp:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
+.bld-ed-inp[type=number]{-moz-appearance:textfield}
+textarea.bld-ed-inp{resize:vertical;min-height:70px;line-height:1.5}
+body.dark .bld-ed-inp{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .bld-ed-inp:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.12)}
+.bld-ed-footer{padding:1.25rem 1.75rem;border-top:1px solid #EEF3FF;display:flex;gap:.65rem;flex-shrink:0}
+body.dark .bld-ed-footer{border-top-color:rgba(255,255,255,.08)}
+.bld-ed-save{flex:1;background:linear-gradient(90deg,#1C54F4,#4D93FF);border:none;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:11px;border-radius:8px;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(28,84,244,.3)}
+.bld-ed-save:hover{box-shadow:0 6px 20px rgba(28,84,244,.4);transform:translateY(-1px)}
+.bld-ed-archive{background:#fff;border:1px solid #E2EAF4;color:#7B8BBD;font-family:inherit;font-size:12px;padding:11px 14px;border-radius:8px;cursor:pointer;transition:all .15s}
+.bld-ed-archive:hover{border-color:#F59E0B;color:#F59E0B;background:rgba(245,158,11,.05)}
+body.dark .bld-ed-archive{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+.bld-ed-del{background:#fff;border:1px solid #E2EAF4;color:#7B8BBD;font-family:inherit;font-size:12px;padding:11px 14px;border-radius:8px;cursor:pointer;transition:all .15s}
+.bld-ed-del:hover{border-color:#EF3340;color:#EF3340;background:rgba(239,51,64,.05)}
+body.dark .bld-ed-del{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+
+/* Import status toast */
+.bld-toast{position:fixed;bottom:2rem;right:2rem;background:#0A1B4D;color:#fff;font-size:13px;font-weight:600;padding:.85rem 1.4rem;border-radius:12px;box-shadow:0 8px 30px rgba(0,7,89,.3);z-index:500;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.bld-toast.show{opacity:1;transform:translateY(0)}
+body.dark .bld-toast{background:rgba(28,84,244,.9);box-shadow:0 8px 30px rgba(28,84,244,.35)}
 </style>
 </head>
 <body>
@@ -574,6 +716,7 @@ body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.3
       <span class="nname" id="nn"></span>
       <button class="nbtn" id="crm-btn" onclick="toggleCRM()" style="display:none">👥 CRM</button>
       <button class="nbtn" id="analytics-btn" onclick="toggleAnalytics()" style="display:none">📊 Analytics</button>
+      <button class="nbtn" id="buildings-btn" onclick="toggleBuildings()" style="display:none">🏢 Edificios</button>
       <button class="nbtn" id="admin-btn" onclick="toggleAdmin()" style="display:none">Ver registros</button>
       <button class="nbtn" onclick="logout()">Salir</button>
     </div>
@@ -657,6 +800,54 @@ body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.3
 <div id="crm-modal" class="crm-modal" onclick="if(event.target===this)closeCRMModal()">
   <div class="crm-modal-box" id="crm-modal-box"></div>
 </div>
+
+<!-- BUILDINGS ADMIN -->
+<div id="buildings-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:150;overflow:hidden">
+  <div class="bld-layout" id="bld-layout">
+    <div class="bld-main">
+      <div class="bld-wrap">
+        <div class="bld-hz">
+          <div class="bld-hz-l">
+            <div class="bld-title">Edificios</div>
+            <div class="bld-subtitle" id="bld-subtitle">Cargando...</div>
+          </div>
+          <div class="bld-hz-r">
+            <input id="bld-search" type="text" placeholder="🔍 Buscar edificio..." class="bld-input" oninput="filterBuildings()">
+            <select id="bld-filter-zona" class="bld-select" onchange="filterBuildings()"><option value="">Todas las zonas</option></select>
+            <select id="bld-filter-estado" class="bld-select" onchange="filterBuildings()">
+              <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
+            </select>
+            <button class="bld-btn bld-btn-primary" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
+            <button onclick="toggleBuildings()" class="bld-close-btn">✕ Cerrar</button>
+          </div>
+        </div>
+        <div class="bld-kpi-row" id="bld-kpi-row"></div>
+        <div class="bld-tbl-wrap">
+          <div class="bld-tbl-scroll">
+            <div id="bld-table-wrap"><div class="bld-empty">Cargando edificios...</div></div>
+          </div>
+          <div class="bld-pagination" id="bld-pagination" style="display:none">
+            <div class="bld-page-info" id="bld-page-info"></div>
+            <div class="bld-page-btns" id="bld-page-btns"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bld-editor" id="bld-editor" style="display:none">
+      <div class="bld-ed-hd">
+        <div class="bld-ed-title" id="bld-ed-title">Edificio</div>
+        <button class="bld-ed-close" onclick="closeBldEditor()">✕</button>
+      </div>
+      <div class="bld-ed-body" id="bld-ed-body"></div>
+      <div class="bld-ed-footer">
+        <button class="bld-ed-save" onclick="saveBuildingEdits()">💾 Guardar cambios</button>
+        <button class="bld-ed-archive" onclick="archiveBuilding()">📦 Archivar</button>
+        <button class="bld-ed-del" onclick="deleteBuilding()">🗑</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bld-toast" id="bld-toast"></div>
 
 <!-- LOGIN -->
 <div class="login-page" id="ls">
@@ -1016,6 +1207,8 @@ function onUserLoggedIn(){
   show('as');
   const crmBtn=document.getElementById('crm-btn');
   if(crmBtn)crmBtn.style.display='inline-block';
+  const bldBtn=document.getElementById('buildings-btn');
+  if(bldBtn&&ANALYTICS_ALLOWED.includes(user?.email))bldBtn.style.display='inline-block';
   if(ANALYTICS_ALLOWED.includes(user?.email)){const ab=document.getElementById('analytics-btn');if(ab)ab.style.display='inline-block';}
   if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
   populateZonas();
@@ -2367,6 +2560,327 @@ function openClientDetail(docId){
 }
 
 window.closeCRMModal=()=>document.getElementById('crm-modal').classList.remove('open');
+
+/* ===== BUILDINGS ADMIN ===== */
+const BLD_PAGE_SIZE=20;
+let _bldDocs=[], _bldFiltered=[], _bldPage=0, _bldEditId=null;
+
+const BLD_ESTADO_COLORS={
+  'Disponible' :{bg:'rgba(34,197,94,.1)',  border:'rgba(34,197,94,.3)',  text:'#16A34A'},
+  'Reservado'  :{bg:'rgba(245,158,11,.1)', border:'rgba(245,158,11,.3)', text:'#B45309'},
+  'Ocupado'    :{bg:'rgba(239,51,64,.1)',  border:'rgba(239,51,64,.3)',  text:'#EF3340'},
+  'Archivado'  :{bg:'rgba(123,139,189,.1)',border:'rgba(123,139,189,.3)',text:'#7B8BBD'}
+};
+
+function bldEstadoBadge(e){
+  const c=BLD_ESTADO_COLORS[e]||BLD_ESTADO_COLORS['Disponible'];
+  return`<span class="bld-estado" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${e||'Disponible'}</span>`;
+}
+
+function showBldToast(msg,ms=2800){
+  const t=document.getElementById('bld-toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+window.toggleBuildings=()=>{
+  if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
+  const panel=document.getElementById('buildings-panel');
+  const open=panel.style.display==='none'||!panel.style.display;
+  panel.style.display=open?'block':'none';
+  if(open)loadBuildings();
+};
+
+async function loadBuildings(){
+  if(!db){document.getElementById('bld-table-wrap').innerHTML='<div class="bld-empty">Firebase no configurado.</div>';return;}
+  document.getElementById('bld-table-wrap').innerHTML='<div class="bld-empty">Cargando...</div>';
+  try{
+    const snap=await db.collection('buildings').orderBy('nombre').get();
+    _bldDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    renderBldKPIs();
+    populateBldZonaFilter();
+    filterBuildings();
+  }catch(e){
+    document.getElementById('bld-table-wrap').innerHTML=`<div class="bld-empty">Error: ${e.message}</div>`;
+    document.getElementById('bld-subtitle').textContent='Error al cargar';
+  }
+}
+
+function renderBldKPIs(){
+  const row=document.getElementById('bld-kpi-row');
+  if(!row)return;
+  const total=_bldDocs.length;
+  const disponibles=_bldDocs.filter(d=>!d.estado||d.estado==='Disponible').length;
+  const totalM2=_bldDocs.reduce((s,d)=>s+(d.superficieDisponible||0),0);
+  const zonas=new Set(_bldDocs.map(d=>d.zona||d.submercado).filter(Boolean)).size;
+  row.innerHTML=`
+    <div class="bld-kpi"><div class="bld-kpi-icon">🏢</div><div class="bld-kpi-v">${total}</div><div class="bld-kpi-l">Edificios totales</div></div>
+    <div class="bld-kpi"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+    <div class="bld-kpi"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v">${totalM2.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² totales disp.</div></div>
+    <div class="bld-kpi"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v">${zonas}</div><div class="bld-kpi-l">Zonas activas</div></div>
+  `;
+}
+
+function populateBldZonaFilter(){
+  const sel=document.getElementById('bld-filter-zona');
+  const zonas=[...new Set(_bldDocs.map(d=>d.zona||d.submercado).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">Todas las zonas</option>'+zonas.map(z=>`<option value="${z}">${z}</option>`).join('');
+}
+
+function filterBuildings(){
+  const q=(document.getElementById('bld-search')?.value||'').toLowerCase();
+  const zona=document.getElementById('bld-filter-zona')?.value||'';
+  const estado=document.getElementById('bld-filter-estado')?.value||'';
+  _bldFiltered=_bldDocs.filter(d=>{
+    if(q&&!(d.nombre||'').toLowerCase().includes(q)&&!(d.zona||d.submercado||'').toLowerCase().includes(q)&&!(d.broker||'').toLowerCase().includes(q))return false;
+    if(zona&&(d.zona||d.submercado)!==zona)return false;
+    if(estado&&d.estado!==estado)return false;
+    return true;
+  });
+  _bldPage=0;
+  renderBuildingsTable();
+}
+
+function renderBuildingsTable(){
+  const wrap=document.getElementById('bld-table-wrap');
+  const total=_bldFiltered.length;
+  document.getElementById('bld-subtitle').textContent=`${_bldDocs.length} edificio${_bldDocs.length!==1?'s':''} · ${total} en vista`;
+  if(!total){
+    wrap.innerHTML='<div class="bld-empty">Sin edificios. Importá desde Sheets para comenzar.</div>';
+    document.getElementById('bld-pagination').style.display='none';
+    return;
+  }
+  const start=_bldPage*BLD_PAGE_SIZE;
+  const page=_bldFiltered.slice(start,start+BLD_PAGE_SIZE);
+  const fmtTs=ts=>{if(!ts)return'–';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short'});};
+  let h='<table class="bld-table"><thead><tr>';
+  ['','Edificio','Zona','m² Disp.','Asking','Broker','Estado','Actualizado',''].forEach(col=>{h+=`<th>${col}</th>`;});
+  h+='</tr></thead><tbody>';
+  page.forEach(d=>{
+    const foto=d.foto||(d.imagenes&&d.imagenes[0])||'';
+    const fotoHtml=foto?`<img src="${foto}" onerror="this.parentElement.textContent='🏢'" style="width:40px;height:40px;border-radius:8px;object-fit:cover">`:'🏢';
+    const selected=_bldEditId===d._id?' selected':'';
+    h+=`<tr onclick="openBuildingEditor('${d._id}')" class="${selected}">
+      <td><div class="bld-foto">${fotoHtml}</div></td>
+      <td><div class="bld-name-cell">${d.nombre||d._id}</div><div class="bld-sub-cell">${d.direccion||'–'}</div></td>
+      <td><span class="bld-muted">${d.zona||d.submercado||'–'}</span></td>
+      <td><span class="bld-num">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+' m²':'–'}</span></td>
+      <td><span class="bld-muted">${d.asking||d.rent||'–'}</span></td>
+      <td><span class="bld-muted">${d.broker||'–'}</span></td>
+      <td>${bldEstadoBadge(d.estado||'Disponible')}</td>
+      <td class="bld-muted">${fmtTs(d.updatedAt)}</td>
+      <td><button class="bld-btn bld-btn-outline" style="padding:5px 10px;font-size:11px" onclick="event.stopPropagation();openBuildingEditor('${d._id}')">Editar →</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=h;
+
+  // Pagination
+  const totalPages=Math.ceil(total/BLD_PAGE_SIZE);
+  const pg=document.getElementById('bld-pagination');
+  const info=document.getElementById('bld-page-info');
+  const btns=document.getElementById('bld-page-btns');
+  pg.style.display=total>BLD_PAGE_SIZE?'flex':'none';
+  info.textContent=`${start+1}–${Math.min(start+BLD_PAGE_SIZE,total)} de ${total}`;
+  let btnH=`<button class="bld-page-btn" ${_bldPage===0?'disabled':''} onclick="bldGoPage(${_bldPage-1})">← Ant</button>`;
+  for(let i=0;i<totalPages;i++){
+    if(totalPages<=7||i===0||i===totalPages-1||Math.abs(i-_bldPage)<=1){
+      btnH+=`<button class="bld-page-btn${i===_bldPage?' active':''}" onclick="bldGoPage(${i})">${i+1}</button>`;
+    }else if(Math.abs(i-_bldPage)===2){btnH+=`<span style="padding:5px 4px;color:#7B8BBD">…</span>`;}
+  }
+  btnH+=`<button class="bld-page-btn" ${_bldPage===totalPages-1?'disabled':''} onclick="bldGoPage(${_bldPage+1})">Sig →</button>`;
+  btns.innerHTML=btnH;
+}
+
+function bldGoPage(p){_bldPage=p;renderBuildingsTable();}
+
+function openBuildingEditor(docId){
+  const d=_bldDocs.find(x=>x._id===docId);
+  if(!d)return;
+  _bldEditId=docId;
+  document.getElementById('bld-layout').classList.add('editor-open');
+  document.getElementById('bld-editor').style.display='flex';
+  document.getElementById('bld-ed-title').textContent=d.nombre||d._id;
+
+  const states=['Disponible','Reservado','Ocupado','Archivado'].map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('');
+  const monedas=['USD','ARS'].map(m=>`<option${(d.moneda||'USD')===m?' selected':''}>${m}</option>`).join('');
+
+  document.getElementById('bld-ed-body').innerHTML=`
+    <div class="bld-ed-section">
+      <div class="bld-ed-section-hd">Identificación</div>
+      <div class="bld-ed-grid">
+        <div class="bld-ed-field full"><div class="bld-ed-lbl">Nombre</div><input class="bld-ed-inp" id="be-nombre" value="${esc(d.nombre)}"></div>
+        <div class="bld-ed-field full"><div class="bld-ed-lbl">Dirección</div><input class="bld-ed-inp" id="be-direccion" value="${esc(d.direccion)}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Zona / Submercado</div><input class="bld-ed-inp" id="be-zona" value="${esc(d.zona||d.submercado)}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Estado</div><select class="bld-ed-inp" id="be-estado">${states}</select></div>
+      </div>
+    </div>
+    <div class="bld-ed-section">
+      <div class="bld-ed-section-hd">Superficies</div>
+      <div class="bld-ed-grid">
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Disponible (m²)</div><input class="bld-ed-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Planta (m²)</div><input class="bld-ed-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Mínima (m²)</div><input class="bld-ed-inp" id="be-supMin" type="number" value="${d.superficieMinima||''}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Pisos disponibles</div><input class="bld-ed-inp" id="be-pisosDisp" value="${esc(d.pisosDisponibles||d.pisosDisp)}"></div>
+      </div>
+    </div>
+    <div class="bld-ed-section">
+      <div class="bld-ed-section-hd">Financiero</div>
+      <div class="bld-ed-grid">
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Asking Rent</div><input class="bld-ed-inp" id="be-asking" value="${esc(d.asking||d.rent)}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Expensas</div><input class="bld-ed-inp" id="be-expensas" value="${esc(d.expensas)}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Moneda</div><select class="bld-ed-inp" id="be-moneda">${monedas}</select></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Categoría</div><input class="bld-ed-inp" id="be-cat" value="${esc(d.categoria||d.cat)}"></div>
+      </div>
+    </div>
+    <div class="bld-ed-section">
+      <div class="bld-ed-section-hd">Operación</div>
+      <div class="bld-ed-grid">
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Broker responsable</div><input class="bld-ed-inp" id="be-broker" value="${esc(d.broker)}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Certificación</div><input class="bld-ed-inp" id="be-cert" value="${esc(d.certificacion||d.cat)}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">Google Maps URL</div><input class="bld-ed-inp" id="be-maps" value="${esc(d.googleMaps)}"></div>
+        <div class="bld-ed-field"><div class="bld-ed-lbl">URL Foto</div><input class="bld-ed-inp" id="be-foto" value="${esc(d.foto||(d.imagenes&&d.imagenes[0])||'')}"></div>
+      </div>
+    </div>
+    <div class="bld-ed-section">
+      <div class="bld-ed-section-hd">Descripción y Amenities</div>
+      <div class="bld-ed-grid">
+        <div class="bld-ed-field full"><div class="bld-ed-lbl">Descripción</div><textarea class="bld-ed-inp" id="be-desc">${esc(d.descripcion||d.comentarios)}</textarea></div>
+        <div class="bld-ed-field full"><div class="bld-ed-lbl">Amenities</div><textarea class="bld-ed-inp" id="be-amenities">${esc(d.amenities||d.comentarios)}</textarea></div>
+      </div>
+    </div>
+  `;
+  // highlight selected row
+  renderBuildingsTable();
+}
+
+function closeBldEditor(){
+  _bldEditId=null;
+  document.getElementById('bld-layout').classList.remove('editor-open');
+  document.getElementById('bld-editor').style.display='none';
+  renderBuildingsTable();
+}
+
+function esc(v){return(v||'').toString().replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function gv(id){return document.getElementById(id)?.value||'';}
+
+async function saveBuildingEdits(){
+  if(!db||!_bldEditId)return;
+  const data={
+    nombre:gv('be-nombre'),
+    direccion:gv('be-direccion'),
+    zona:gv('be-zona'),
+    submercado:gv('be-zona'),
+    estado:gv('be-estado'),
+    superficieDisponible:parseFloat(gv('be-supDisp'))||0,
+    superficiePlanta:parseFloat(gv('be-supPlanta'))||0,
+    superficieMinima:parseFloat(gv('be-supMin'))||0,
+    pisosDisponibles:gv('be-pisosDisp'),
+    asking:gv('be-asking'),
+    expensas:gv('be-expensas'),
+    moneda:gv('be-moneda'),
+    categoria:gv('be-cat'),
+    broker:gv('be-broker'),
+    certificacion:gv('be-cert'),
+    googleMaps:gv('be-maps'),
+    foto:gv('be-foto'),
+    imagenes:gv('be-foto')?[gv('be-foto')]:[],
+    descripcion:gv('be-desc'),
+    amenities:gv('be-amenities'),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try{
+    await db.collection('buildings').doc(_bldEditId).update(data);
+    const idx=_bldDocs.findIndex(x=>x._id===_bldEditId);
+    if(idx!==-1)_bldDocs[idx]={..._bldDocs[idx],...data};
+    document.getElementById('bld-ed-title').textContent=data.nombre||_bldEditId;
+    showBldToast('✅ Guardado correctamente');
+    filterBuildings();
+  }catch(e){showBldToast('❌ Error: '+e.message,4000);}
+}
+
+async function archiveBuilding(){
+  if(!db||!_bldEditId)return;
+  if(!confirm('¿Archivar este edificio?'))return;
+  try{
+    await db.collection('buildings').doc(_bldEditId).update({estado:'Archivado',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const idx=_bldDocs.findIndex(x=>x._id===_bldEditId);
+    if(idx!==-1)_bldDocs[idx].estado='Archivado';
+    showBldToast('📦 Edificio archivado');
+    filterBuildings();
+  }catch(e){showBldToast('❌ Error: '+e.message,4000);}
+}
+
+async function deleteBuilding(){
+  if(!db||!_bldEditId)return;
+  if(!confirm('¿Eliminar permanentemente este edificio? Esta acción no se puede deshacer.'))return;
+  try{
+    await db.collection('buildings').doc(_bldEditId).delete();
+    _bldDocs=_bldDocs.filter(x=>x._id!==_bldEditId);
+    closeBldEditor();
+    renderBldKPIs();
+    filterBuildings();
+    showBldToast('🗑 Edificio eliminado');
+  }catch(e){showBldToast('❌ Error: '+e.message,4000);}
+}
+
+async function syncSheetToFirestore(){
+  if(!db){showBldToast('❌ Firebase no disponible',3000);return;}
+  if(!props||!props.length){showBldToast('⚠️ Cargá los datos del Sheet primero',3000);return;}
+  const btn=document.getElementById('bld-import-btn');
+  if(btn){btn.textContent='⏳ Importando...';btn.disabled=true;}
+  showBldToast('⏳ Sincronizando '+props.length+' edificios...',5000);
+  try{
+    // Batch in chunks of 400 (Firestore limit is 500)
+    const CHUNK=400;
+    for(let i=0;i<props.length;i+=CHUNK){
+      const chunk=props.slice(i,i+CHUNK);
+      const batch=db.batch();
+      chunk.forEach(p=>{
+        const raw=(p.nombre||'sin_nombre').toLowerCase()
+          .normalize('NFD').replace(/[̀-ͯ]/g,'')
+          .replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')||'edificio';
+        const ref=db.collection('buildings').doc(raw);
+        batch.set(ref,{
+          nombre:p.nombre,
+          direccion:p.direccion||'',
+          zona:p.submercado||'',
+          submercado:p.submercado||'',
+          superficieDisponible:p.supDisp||0,
+          superficiePlanta:p.supPlanta||0,
+          superficieMinima:p.supMinima||0,
+          pisosDisponibles:p.pisosDisp||'',
+          asking:p.rent||'',
+          expensas:'',
+          moneda:'USD',
+          descripcion:p.comentarios||'',
+          amenities:p.comentarios||'',
+          categoria:p.cat||'',
+          certificacion:p.cat||'',
+          anio:p.anio||'',
+          pisos:p.pisos||'',
+          cocheras:p.cocheras||'',
+          foto:p.foto||'',
+          imagenes:p.foto?[p.foto]:[],
+          googleMaps:'',
+          estado:'Disponible',
+          broker:user?.displayName||'',
+          activo:true,
+          _source:'sheets',
+          updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        },{mergeFields:['nombre','direccion','zona','submercado','superficieDisponible','superficiePlanta','superficieMinima','pisosDisponibles','asking','descripcion','amenities','categoria','certificacion','anio','pisos','cocheras','foto','imagenes','activo','_source','updatedAt']});
+      });
+      await batch.commit();
+    }
+    showBldToast(`✅ ${props.length} edificios sincronizados desde Sheets`);
+    await loadBuildings();
+  }catch(e){
+    showBldToast('❌ Error en sync: '+e.message,5000);
+    console.error('syncSheetToFirestore:',e);
+  }finally{
+    if(btn){btn.textContent='⬇ Importar Sheets';btn.disabled=false;}
+  }
+}
 
 async function saveClientEstado(docId,estado){
   if(!db)return;
