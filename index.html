@@ -1449,7 +1449,11 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
           </div>
           <div class="table-outer">
             <div id="tb">
-              <div class="et">Usá el chat o los filtros para buscar alternativas de oficinas</div>
+              <div class="et" style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:3rem 1rem">
+                <div style="font-size:40px">🔍</div>
+                <div style="font-size:15px;font-weight:700">Seleccioná al menos un criterio de búsqueda</div>
+                <div style="font-size:12px;opacity:.55">Elegí una zona, ingresá m² o usá el chat para buscar alternativas</div>
+              </div>
             </div>
           </div>
           <div class="sb" id="sb">
@@ -2032,7 +2036,6 @@ window.toggleFilters=()=>{
 };
 
 function applyFilters(){
-  console.log('DEBUG filtros:', {zonasCheck:[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value), respZona:resp.zona, zonas:[...new Set([...[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value),...(Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]))])]});
   const zonasCheck=[...document.querySelectorAll('input[name="zona"]:checked')].map(c=>c.value);
   const zonasChat=Array.isArray(resp.zona)?resp.zona:(resp.zona?[resp.zona]:[]);
   const zonas=zonasCheck.length>0?zonasCheck:zonasChat;
@@ -2043,6 +2046,19 @@ function applyFilters(){
   const cats=[...document.querySelectorAll('input[name="cat"]:checked')].map(c=>c.value);
   const cantVal=parseInt(document.getElementById('fcant').value)||0;
   const needCocheras=resp.cocheras==="Con cocheras";
+
+  // Require at least one meaningful filter before showing results
+  const hasFilters=zonas.length>0||supMin>0||supMax<Infinity||rentMin>0||rentMax<Infinity||cats.length>0;
+  if(!hasFilters){
+    filt=[];sel.clear();
+    document.getElementById('tb').innerHTML=
+      `<div class="et" style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:3rem 1rem">
+        <div style="font-size:40px">🔍</div>
+        <div style="font-size:15px;font-weight:700;color:inherit">Seleccioná al menos un criterio de búsqueda</div>
+        <div style="font-size:12px;opacity:.55">Elegí una zona, ingresá m² o usá el chat para buscar alternativas</div>
+      </div>`;
+    updBar();return;
+  }
   let r=props.filter(p=>{
     if(zonas.length&&!zonas.some(z=>p.submercado===z))return false;
     const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
