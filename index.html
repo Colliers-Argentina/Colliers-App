@@ -902,7 +902,7 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .sb-logout-btn:hover{background:rgba(239,51,64,.15);border-color:rgba(239,51,64,.4)}
 
 /* ===== HOME HUB ===== */
-#home-hub{display:none;min-height:100vh;padding-left:240px;background:linear-gradient(135deg,#000D2E 0%,#000B24 50%,#000F36 100%)}
+#home-hub{display:none;padding-left:240px;background:linear-gradient(135deg,#000D2E 0%,#000B24 50%,#000F36 100%);height:100vh;overflow-y:auto}
 .hub-wrap{max-width:1100px;margin:0 auto;padding:3rem 2.5rem}
 .hub-hero{margin-bottom:2.5rem}
 .hub-greeting{font-size:13px;color:rgba(163,193,255,.6);font-weight:500;margin-bottom:.35rem}
@@ -933,10 +933,12 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .hub-quick-sub{font-size:10px;color:rgba(163,193,255,.45)}
 
 /* ===== SIDEBAR-OPEN LAYOUT ADJUSTMENTS ===== */
-body.sidebar-open #as{padding-left:240px}
+body.sidebar-open{overflow:hidden;height:100vh}
+body.sidebar-open #as{padding-left:240px;height:100vh;overflow-y:auto}
 body.sidebar-open #analytics-panel{left:240px;top:0}
 body.sidebar-open #buildings-panel{left:240px;top:0}
 body.sidebar-open #admin-panel{left:240px;top:0}
+body.sidebar-open #crm-panel{left:240px;top:0}
 </style>
 </head>
 <body>
@@ -952,7 +954,7 @@ body.sidebar-open #admin-panel{left:240px;top:0}
     <div class="nsubt">Generador de Alternativas</div>
   </div>
   <div class="nright">
-    <button id="theme-toggle" onclick="toggleTheme()" style="background:transparent;border:0.5px solid rgba(255,255,255,.25);color:#C3E6FF;font-size:14px;padding:3px 8px;border-radius:3px;cursor:pointer;line-height:1">🌙</button>
+    <button onclick="toggleTheme()" style="background:transparent;border:0.5px solid rgba(255,255,255,.25);color:#C3E6FF;font-size:14px;padding:3px 8px;border-radius:3px;cursor:pointer;line-height:1">🌙</button>
     <div class="ntag">Accelerating success.</div>
     <div class="nu" id="nu">
       <div class="na" id="na">MA</div>
@@ -1002,6 +1004,10 @@ body.sidebar-open #admin-panel{left:240px;top:0}
     </button>
   </nav>
   <div class="sb-footer">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
+      <span style="font-size:11px;color:rgba(163,193,255,.45)">Tema</span>
+      <button id="theme-toggle" onclick="toggleTheme()" style="background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.2);color:#C3E6FF;font-size:15px;padding:4px 10px;border-radius:6px;cursor:pointer;line-height:1;transition:all .15s">🌙</button>
+    </div>
     <button class="sb-logout-btn" onclick="logout()">← Cerrar sesión</button>
   </div>
 </div>
