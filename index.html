@@ -1707,10 +1707,17 @@ async function loadData(){
     try{
       const snap=await db.collection('buildings').orderBy('nombre').get();
       if(!snap.empty){
-        const mapped=snap.docs.map(d=>{
+        const seen=new Map();
+        snap.docs.forEach(d=>{
           const f=d.data();
-          if(f.activo===false||f.estado==='Archivado')return null;
-          return{
+          if(f.activo===false||f.estado==='Archivado')return;
+          const key=(f.nombre||'').toLowerCase().trim();
+          if(!key)return;
+          if(seen.has(key)){
+            console.warn('loadData: duplicado ignorado →',f.nombre,'(docId:',d.id,')');
+            return;
+          }
+          seen.set(key,{
             nombre:      f.nombre||'–',
             direccion:   f.direccion||'–',
             submercado:  f.zona||f.submercado||'–',
@@ -1725,18 +1732,20 @@ async function loadData(){
             rent:        f.asking||f.rent||'–',
             comentarios: f.amenities||f.descripcion||'–',
             foto:        f.foto||(f.imagenes&&f.imagenes[0])||'',
-          };
-        }).filter(Boolean);
+          });
+        });
+        const mapped=[...seen.values()];
         if(mapped.length>0){
           props=mapped;
           window._props=props;
           populateZonas();
-          console.log('loadData: buildings OK —',props.length,'registros');
+          console.log('loadData: buildings OK —',mapped.length,'únicos de',snap.size,'docs en Firestore');
+          console.table(mapped.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
           return;
         }
-        console.warn('loadData: colección buildings vacía, usando CSV fallback');
+        console.warn('loadData: buildings vacío, usando CSV fallback');
       }else{
-        console.warn('loadData: colección buildings vacía, usando CSV fallback');
+        console.warn('loadData: buildings vacío, usando CSV fallback');
       }
     }catch(e){console.warn('loadData: Firestore error, usando CSV fallback:',e.message);}
   }
@@ -1756,7 +1765,8 @@ async function loadData(){
       props=parseCSV(csv);
       window._props=props;
       populateZonas();
-      console.log('loadData: CSV OK via',url.substring(0,40));
+      console.log('loadData: CSV OK via',url.substring(0,40),'—',props.length,'edificios');
+      console.table(props.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
       return;
     }catch(e){console.warn('loadData proxy failed:',url.substring(0,40),e.message);}
   }
@@ -3561,21 +3571,41 @@ async function deleteBuilding(){
 
 async function syncSheetToFirestore(){
   if(!db){showBldToast('❌ Firebase no disponible',3000);return;}
-  if(!props||!props.length){showBldToast('⚠️ Cargá los datos del Sheet primero',3000);return;}
   const btn=document.getElementById('bld-import-btn');
-  if(btn){btn.textContent='⏳ Importando...';btn.disabled=true;}
-  showBldToast('⏳ Sincronizando '+props.length+' edificios...',5000);
+  if(btn){btn.textContent='⏳ Cargando Sheet...';btn.disabled=true;}
+  // Always re-fetch CSV fresh so sync has the latest Sheet data (no stale props)
+  await loadData();
+  if(!props||!props.length){
+    showBldToast('⚠️ Sin datos en el Sheet para importar',3000);
+    if(btn){btn.textContent='⬇ Importar Sheets';btn.disabled=false;}
+    return;
+  }
+  if(btn)btn.textContent='⏳ Sincronizando...';
+  showBldToast('⏳ Sincronizando '+props.length+' edificios...',8000);
+  const CHUNK=400;
   try{
-    // Batch in chunks of 400 (Firestore limit is 500)
-    const CHUNK=400;
-    for(let i=0;i<props.length;i+=CHUNK){
-      const chunk=props.slice(i,i+CHUNK);
+    // Step 1: DELETE all sheet-sourced buildings (clean slate, eliminates stale/duplicate docs)
+    const existing=await db.collection('buildings').where('_source','==','sheets').get();
+    if(!existing.empty){
+      for(let i=0;i<existing.docs.length;i+=CHUNK){
+        const b=db.batch();
+        existing.docs.slice(i,i+CHUNK).forEach(d=>b.delete(d.ref));
+        await b.commit();
+      }
+      console.log('syncSheet: eliminados',existing.docs.length,'docs previos de sheets');
+    }
+    // Step 2: Write fresh from CSV — full set(), no mergeFields, fixed accent normalization
+    const toId=n=>(n||'sin_nombre').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g,'')
+      .replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')||'edificio';
+    // Deduplicate props by nombre before writing
+    const seen=new Map();
+    props.forEach(p=>{const k=(p.nombre||'').toLowerCase().trim();if(k&&!seen.has(k))seen.set(k,p);});
+    const unique=[...seen.values()];
+    for(let i=0;i<unique.length;i+=CHUNK){
       const batch=db.batch();
-      chunk.forEach(p=>{
-        const raw=(p.nombre||'sin_nombre').toLowerCase()
-          .normalize('NFD').replace(/[̀-ͯ]/g,'')
-          .replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')||'edificio';
-        const ref=db.collection('buildings').doc(raw);
+      unique.slice(i,i+CHUNK).forEach(p=>{
+        const ref=db.collection('buildings').doc(toId(p.nombre));
         batch.set(ref,{
           nombre:p.nombre,
           direccion:p.direccion||'',
@@ -3603,12 +3633,13 @@ async function syncSheetToFirestore(){
           activo:true,
           _source:'sheets',
           updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
-        },{mergeFields:['nombre','direccion','zona','submercado','superficieDisponible','superficiePlanta','superficieMinima','pisosDisponibles','asking','descripcion','amenities','categoria','certificacion','anio','pisos','cocheras','foto','imagenes','activo','_source','updatedAt']});
+        });
       });
       await batch.commit();
     }
-    showBldToast(`✅ ${props.length} edificios sincronizados desde Sheets`);
-    await loadBuildings();
+    showBldToast(`✅ ${unique.length} edificios sincronizados desde Sheets`);
+    console.log('syncSheet: escritos',unique.length,'docs únicos en buildings');
+    await Promise.all([loadBuildings(), loadData()]);
   }catch(e){
     showBldToast('❌ Error en sync: '+e.message,5000);
     console.error('syncSheetToFirestore:',e);
@@ -3893,6 +3924,7 @@ function showModule(mod){
     show('home-hub');
   } else if(mod==='generator'){
     show('as');
+    loadData();
   } else if(mod==='buildings'){
     show('home-hub');
     const bpanel=document.getElementById('buildings-panel');
