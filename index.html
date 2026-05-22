@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Alternativas de Oficinas · Colliers</title>
+<title>Colliers One · Plataforma Comercial</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -879,6 +879,64 @@ body.dark .det-unit-empty{color:#A8B3D1}
 .det-unit-add-row:hover{background:#F5F8FF;color:#1C54F4}
 body.dark .det-unit-add-row{border-top-color:rgba(255,255,255,.07);color:#56648F}
 body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
+
+/* ===== SIDEBAR ===== */
+#app-sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;background:linear-gradient(180deg,#000D2E 0%,#000B24 60%,#000759 100%);z-index:185;display:none;flex-direction:column;border-right:1px solid rgba(77,147,255,.1)}
+#app-sidebar.sb-open{display:flex}
+.sb-logo-area{padding:1.25rem;border-bottom:1px solid rgba(77,147,255,.08)}
+.sb-brand{color:#fff;font-size:17px;font-weight:700}
+.sb-brand-bar{height:2px;background:linear-gradient(90deg,#FFD200 0%,#FFD200 33%,#00AEEF 33%,#00AEEF 66%,#EF3340 66%,#EF3340 100%);margin-top:4px;margin-bottom:4px}
+.sb-brand-sub{color:rgba(77,147,255,.7);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.sb-user{padding:1rem 1.25rem;border-bottom:1px solid rgba(77,147,255,.06)}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:#1C54F4;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{color:#C3E6FF;font-size:12px;font-weight:600}
+.sb-user-email{color:rgba(163,193,255,.5);font-size:10px}
+.sb-nav{flex:1;overflow-y:auto;padding:.75rem .75rem}
+.sb-nav-section{font-size:9px;font-weight:700;color:rgba(163,193,255,.4);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .5rem .25rem}
+.sb-nav-item{display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:8px;cursor:pointer;color:rgba(163,193,255,.7);font-size:12.5px;font-weight:500;transition:all .15s;border:none;background:transparent;font-family:inherit;width:100%;text-align:left}
+.sb-nav-item:hover{background:rgba(77,147,255,.1);color:#fff}
+.sb-nav-item.active{background:rgba(28,84,244,.25);color:#4D93FF;font-weight:600}
+.sb-nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sb-footer{padding:1rem 1.25rem;border-top:1px solid rgba(77,147,255,.08)}
+.sb-logout-btn{width:100%;padding:.6rem;background:rgba(239,51,64,.08);border:1px solid rgba(239,51,64,.18);color:#EF3340;font-family:inherit;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;transition:all .15s}
+.sb-logout-btn:hover{background:rgba(239,51,64,.15);border-color:rgba(239,51,64,.4)}
+
+/* ===== HOME HUB ===== */
+#home-hub{display:none;min-height:100vh;padding-left:240px;background:linear-gradient(135deg,#000D2E 0%,#000B24 50%,#000F36 100%)}
+.hub-wrap{max-width:1100px;margin:0 auto;padding:3rem 2.5rem}
+.hub-hero{margin-bottom:2.5rem}
+.hub-greeting{font-size:13px;color:rgba(163,193,255,.6);font-weight:500;margin-bottom:.35rem}
+.hub-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.2}
+.hub-title span{background:linear-gradient(90deg,#4D93FF,#C3E6FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hub-subtitle{font-size:14px;color:rgba(163,193,255,.55);margin-top:.5rem}
+.hub-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2.5rem}
+@media(max-width:900px){.hub-cards{grid-template-columns:1fr}}
+.hub-card{background:rgba(255,255,255,.03);border:1px solid rgba(77,147,255,.1);border-radius:18px;padding:1.75rem 2rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:1.1rem}
+.hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(77,147,255,.4),transparent);opacity:0;transition:.25s}
+.hub-card:hover{background:rgba(77,147,255,.07);border-color:rgba(77,147,255,.25);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
+.hub-card:hover::before{opacity:1}
+.hub-card-icon{font-size:32px;line-height:1;width:56px;height:56px;background:rgba(28,84,244,.15);border:1px solid rgba(77,147,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hub-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.hub-card-title{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.2px}
+.hub-card-desc{font-size:13px;color:rgba(163,193,255,.6);line-height:1.6}
+.hub-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.25rem}
+.hub-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#4D93FF;background:rgba(28,84,244,.12);border:1px solid rgba(77,147,255,.2);padding:.5rem 1rem;border-radius:7px;cursor:pointer;transition:all .15s;font-family:inherit}
+.hub-card-btn:hover{background:rgba(28,84,244,.25);border-color:rgba(77,147,255,.4)}
+.hub-card-badge{font-size:9px;font-weight:700;color:#B45309;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.05em}
+.hub-section-title{font-size:13px;font-weight:700;color:rgba(163,193,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
+.hub-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+@media(max-width:900px){.hub-quick{grid-template-columns:repeat(2,1fr)}}
+.hub-quick-card{background:rgba(255,255,255,.025);border:1px solid rgba(77,147,255,.08);border-radius:12px;padding:1.1rem 1.25rem;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:.4rem}
+.hub-quick-card:hover{background:rgba(77,147,255,.06);border-color:rgba(77,147,255,.18);transform:translateY(-1px)}
+.hub-quick-icon{font-size:20px}
+.hub-quick-label{font-size:12px;font-weight:600;color:#C3E6FF}
+.hub-quick-sub{font-size:10px;color:rgba(163,193,255,.45)}
+
+/* ===== SIDEBAR-OPEN LAYOUT ADJUSTMENTS ===== */
+body.sidebar-open #as{padding-left:240px}
+body.sidebar-open #analytics-panel{left:240px;top:0}
+body.sidebar-open #buildings-panel{left:240px;top:0}
+body.sidebar-open #admin-panel{left:240px;top:0}
 </style>
 </head>
 <body>
@@ -907,6 +965,83 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
     </div>
   </div>
 </nav>
+
+<!-- APP SIDEBAR -->
+<div id="app-sidebar">
+  <div class="sb-logo-area">
+    <div class="sb-brand">Colliers One</div>
+    <div class="sb-brand-bar"></div>
+    <div class="sb-brand-sub">Plataforma Comercial</div>
+  </div>
+  <div class="sb-user" id="sb-user-area">
+    <div style="display:flex;align-items:center;gap:.65rem">
+      <div class="sb-avatar" id="sb-avatar">CO</div>
+      <div>
+        <div class="sb-user-name" id="sb-user-name">Usuario</div>
+        <div class="sb-user-email" id="sb-user-email"></div>
+      </div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-nav-section">Módulos</div>
+    <button class="sb-nav-item active" id="sbn-home" onclick="showModule('home')">
+      <span class="sb-nav-icon">🏠</span>Inicio
+    </button>
+    <button class="sb-nav-item" id="sbn-generator" onclick="showModule('generator')">
+      <span class="sb-nav-icon">🔍</span>Generador de Alternativas
+    </button>
+    <button class="sb-nav-item" id="sbn-buildings" onclick="showModule('buildings')">
+      <span class="sb-nav-icon">🏢</span>Inventario de Edificios
+    </button>
+    <button class="sb-nav-item" id="sbn-crm" onclick="showModule('crm')">
+      <span class="sb-nav-icon">👥</span>CRM Comercial
+    </button>
+    <div class="sb-nav-section" id="sbn-analytics-section" style="display:none">Analytics</div>
+    <button class="sb-nav-item" id="sbn-analytics" onclick="showModule('analytics')" style="display:none">
+      <span class="sb-nav-icon">📊</span>Analytics
+    </button>
+  </nav>
+  <div class="sb-footer">
+    <button class="sb-logout-btn" onclick="logout()">← Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- HOME HUB -->
+<div id="home-hub">
+  <div class="hub-wrap">
+    <div class="hub-hero">
+      <div class="hub-greeting" id="hub-greeting">Buenos días</div>
+      <h1 class="hub-title">¿Qué querés <span>gestionar hoy?</span></h1>
+      <p class="hub-subtitle">Seleccioná un módulo para comenzar</p>
+    </div>
+    <div class="hub-cards" id="hub-cards">
+      <!-- cards rendered by JS so analytics card only shows for whitelist -->
+    </div>
+    <div class="hub-section-title">Accesos rápidos</div>
+    <div class="hub-quick">
+      <div class="hub-quick-card" onclick="showModule('generator')">
+        <div class="hub-quick-icon">📄</div>
+        <div class="hub-quick-label">Nueva presentación</div>
+        <div class="hub-quick-sub">Generador PPT</div>
+      </div>
+      <div class="hub-quick-card" onclick="showModule('crm')">
+        <div class="hub-quick-icon">👤</div>
+        <div class="hub-quick-label">Clientes activos</div>
+        <div class="hub-quick-sub">CRM Comercial</div>
+      </div>
+      <div class="hub-quick-card" onclick="showModule('buildings')">
+        <div class="hub-quick-icon">🏗️</div>
+        <div class="hub-quick-label">Inventario</div>
+        <div class="hub-quick-sub">Edificios y disponibilidades</div>
+      </div>
+      <div class="hub-quick-card" onclick="showModule('generator')">
+        <div class="hub-quick-icon">🔍</div>
+        <div class="hub-quick-label">Búsqueda de oficinas</div>
+        <div class="hub-quick-sub">Filtros avanzados</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ADMIN PANEL -->
 <div id="admin-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:#F0F4FF;z-index:150;overflow-y:auto;padding:2rem">
@@ -1077,21 +1212,21 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
     <div class="lp-top">
       <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers" class="lp-logo">
       <div class="lp-hero">
-        <h1>Generador de<br><span>Alternativas</span><br>de Oficinas</h1>
-        <p>La herramienta interna de Colliers Argentina para buscar, filtrar y presentar alternativas de oficinas de forma profesional.</p>
+        <h1>Plataforma Comercial<br><span>Colliers One</span></h1>
+        <p>Plataforma interna de Colliers Argentina para gestionar edificios, clientes, disponibilidades y presentaciones comerciales.</p>
       </div>
     </div>
     <div class="lp-feats">
-      <div class="lp-feat"><div class="lp-feat-icon">💬</div><div class="lp-feat-text"><strong>Chat guiado inteligente</strong>Filtrá por zona, superficie, precio y categoría</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">📊</div><div class="lp-feat-text"><strong>PPT profesional en segundos</strong>Portada, tabla comparativa, fichas y mapa</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">✨</div><div class="lp-feat-text"><strong>Recomendaciones con IA</strong>El asistente sugiere la mejor alternativa</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">🔄</div><div class="lp-feat-text"><strong>Datos siempre actualizados</strong>Conectado en tiempo real al Google Sheet</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">🏢</div><div class="lp-feat-text"><strong>Inventario de edificios</strong>Pisos, unidades, asking rents y ocupantes</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">👥</div><div class="lp-feat-text"><strong>CRM Comercial</strong>Clientes, oportunidades y actividad comercial</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">📊</div><div class="lp-feat-text"><strong>Analytics</strong>Insights, demanda y reporting estratégico</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">📋</div><div class="lp-feat-text"><strong>Generador PPT</strong>Alternativas y presentaciones en segundos</div></div>
     </div>
     <div class="lp-bottom">
       <div class="lp-stats">
-        <div><div class="lp-stat-num">26+</div><div class="lp-stat-label">Edificios activos</div></div>
+        <div><div class="lp-stat-num">4</div><div class="lp-stat-label">Módulos</div></div>
         <div class="lp-stat-sep"></div>
-        <div><div class="lp-stat-num">PPT</div><div class="lp-stat-label">En segundos</div></div>
+        <div><div class="lp-stat-num">CRM</div><div class="lp-stat-label">Integrado</div></div>
         <div class="lp-stat-sep"></div>
         <div><div class="lp-stat-num">IA</div><div class="lp-stat-label">Asistente integrado</div></div>
       </div>
@@ -1113,10 +1248,10 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
       <div class="lp-note">Acceso exclusivo para el equipo Colliers</div>
       <div class="lp-divider"><div class="lp-divider-line"></div><div class="lp-divider-text">Incluye acceso a</div><div class="lp-divider-line"></div></div>
       <div class="lp-pills">
-        <div class="lp-pill"><div class="lp-pill-dot"></div>26+ edificios activos en Buenos Aires</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Generación de PPT con estilo Colliers</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Panel de registros para administradores</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Feedback y seguimiento de informes</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Módulo de edificios con inventario real</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>CRM comercial integrado</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Generación PPT profesional</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Analytics e inteligencia comercial</div>
       </div>
       <div class="lp-footer"><strong>Colliers International Argentina</strong><br>Uso interno · colliers.com</div>
     </div>
@@ -1420,16 +1555,28 @@ function handleCredentialResponse(response){
 
 function onUserLoggedIn(){
   const ini=(user.displayName||user.email).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('na').textContent=ini;
-  document.getElementById('nn').textContent=(user.displayName||'').split(' ')[0]||user.email;
-  document.getElementById('nu').style.display='flex';
-  show('as');
-  const crmBtn=document.getElementById('crm-btn');
-  if(crmBtn)crmBtn.style.display='inline-block';
-  const bldBtn=document.getElementById('buildings-btn');
-  if(bldBtn&&ANALYTICS_ALLOWED.includes(user?.email))bldBtn.style.display='inline-block';
-  if(ANALYTICS_ALLOWED.includes(user?.email)){const ab=document.getElementById('analytics-btn');if(ab)ab.style.display='inline-block';}
-  if(user.email==='matias.azaretto@colliers.com'){document.getElementById('admin-btn').style.display='';}
+  // Legacy nav elements (kept for compatibility)
+  const naEl=document.getElementById('na');if(naEl)naEl.textContent=ini;
+  const nnEl=document.getElementById('nn');if(nnEl)nnEl.textContent=(user.displayName||'').split(' ')[0]||user.email;
+  const nuEl=document.getElementById('nu');if(nuEl)nuEl.style.display='flex';
+  // Populate sidebar user info
+  const sbAvatar=document.getElementById('sb-avatar');if(sbAvatar)sbAvatar.textContent=ini;
+  const sbName=document.getElementById('sb-user-name');if(sbName)sbName.textContent=(user.displayName||user.email).split(' ').slice(0,2).join(' ');
+  const sbEmail=document.getElementById('sb-user-email');if(sbEmail)sbEmail.textContent=user.email;
+  // Set greeting based on time
+  const h=new Date().getHours();
+  const greeting=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
+  const greetEl=document.getElementById('hub-greeting');if(greetEl)greetEl.textContent=greeting+', '+((user.displayName||'').split(' ')[0]||'Broker');
+  // Show analytics sidebar items only for whitelist
+  const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
+  const sbAnSection=document.getElementById('sbn-analytics-section');if(sbAnSection)sbAnSection.style.display=isAdmin?'':'none';
+  const sbAnBtn=document.getElementById('sbn-analytics');if(sbAnBtn)sbAnBtn.style.display=isAdmin?'':'none';
+  // Render hub cards
+  renderHubCards();
+  // Show home hub
+  show('home-hub');
+  // Admin button (legacy)
+  if(user.email==='matias.azaretto@colliers.com'){const ab=document.getElementById('admin-btn');if(ab)ab.style.display='';}
   populateZonas();
   startChat((user.displayName||'').split(' ')[0]||'Broker');
   Promise.all([loadData(),cargarOverview()]);
@@ -3577,12 +3724,82 @@ function renderAnalytics(docs){
 }
 
 function show(id){
-  ["ls","ds","as"].forEach(s=>{
+  ["ls","ds","as","home-hub"].forEach(s=>{
     const el=document.getElementById(s);
-    if(el)el.style.display=s===id?(s==="ls"?"grid":s==="ds"?"flex":"block"):"none";
+    if(!el)return;
+    if(s==="ls")el.style.display=s===id?"grid":"none";
+    else if(s==="ds")el.style.display=s===id?"flex":"none";
+    else el.style.display=s===id?"block":"none";
   });
+  const sidebar=document.getElementById('app-sidebar');
+  const isApp=id!=="ls"&&id!=="ds";
+  if(sidebar)sidebar.classList.toggle('sb-open',isApp);
+  document.body.classList.toggle('sidebar-open',isApp);
   const nav=document.getElementById('main-nav');
-  if(nav)nav.style.display=id==="as"?"flex":"none";
+  if(nav)nav.style.display="none";
+}
+function showModule(mod){
+  // Close all overlays first
+  const ap=document.getElementById('analytics-panel');
+  const bp=document.getElementById('buildings-panel');
+  const adp=document.getElementById('admin-panel');
+  if(ap)ap.style.display='none';
+  if(bp)bp.style.display='none';
+  if(adp)adp.style.display='none';
+  const bldLayout=document.getElementById('bld-layout');
+  if(bldLayout)bldLayout.classList.remove('editor-open');
+  // Update sidebar active state
+  ['home','generator','buildings','crm','analytics'].forEach(m=>{
+    const btn=document.getElementById('sbn-'+m);
+    if(btn)btn.classList.toggle('active',m===mod);
+  });
+  if(mod==='home'){
+    show('home-hub');
+  } else if(mod==='generator'){
+    show('as');
+  } else if(mod==='buildings'){
+    show('home-hub');
+    if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
+    const bpanel=document.getElementById('buildings-panel');
+    if(bpanel){bpanel.style.display='block';loadBuildings();}
+  } else if(mod==='crm'){
+    show('home-hub');
+    const cp=document.getElementById('crm-panel');
+    if(cp&&(cp.style.display==='none'||!cp.style.display))toggleCRM();
+  } else if(mod==='analytics'){
+    if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
+    show('home-hub');
+    const apanel=document.getElementById('analytics-panel');
+    if(apanel){apanel.style.display='block';loadAnalytics();}
+  }
+}
+function renderHubCards(){
+  const container=document.getElementById('hub-cards');
+  if(!container)return;
+  const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
+  const cards=[
+    {icon:'🔍',title:'Generador de Alternativas',desc:'Buscá oficinas, compará opciones y generá presentaciones profesionales en segundos.',mod:'generator',btn:'Abrir módulo'},
+    {icon:'🏢',title:'Inventario de Edificios',desc:'Administrá edificios, pisos, disponibilidades, asking rents y ocupantes.',mod:'buildings',btn:'Abrir módulo'},
+    {icon:'👥',title:'CRM Comercial',desc:'Gestioná clientes, oportunidades, reuniones y actividad comercial.',mod:'crm',btn:'Abrir módulo'},
+  ];
+  if(isAdmin){
+    cards.push({icon:'📊',title:'Analytics',desc:'Insights comerciales, demanda, brokers y reporting estratégico.',mod:'analytics',btn:'Abrir módulo',badge:'Solo Admin'});
+  }
+  container.innerHTML=cards.map(c=>`
+    <div class="hub-card" onclick="showModule('${c.mod}')">
+      <div class="hub-card-hd">
+        <div class="hub-card-icon">${c.icon}</div>
+        ${c.badge?`<span class="hub-card-badge">${c.badge}</span>`:''}
+      </div>
+      <div>
+        <div class="hub-card-title">${c.title}</div>
+        <div class="hub-card-desc">${c.desc}</div>
+      </div>
+      <div class="hub-card-footer">
+        <button class="hub-card-btn" onclick="event.stopPropagation();showModule('${c.mod}')">${c.btn} →</button>
+      </div>
+    </div>
+  `).join('');
 }
 function toggleTheme(){
   const dark=document.body.classList.toggle('dark');
