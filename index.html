@@ -3204,7 +3204,175 @@ function closeBldDetail(){
   _bldEditId=null;
   _unitDocs=[];
   renderBuildingsTable();
+  loadUnits(docId);
 }
+
+function bldEdTab(el,tabId){
+  el.closest('#bld-ed-body').querySelectorAll('.bld-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  el.closest('#bld-ed-body').querySelectorAll('.bld-tab-panel').forEach(p=>{p.style.display='none';});
+  const panel=document.getElementById(tabId);
+  if(panel)panel.style.display='flex';
+}
+
+/* ===== UNITS (subcollection buildings/{id}/units) ===== */
+let _unitDocs=[];
+
+const UNIT_ESTADO_COLORS={
+  'Disponible':{bg:'rgba(34,197,94,.1)',border:'rgba(34,197,94,.3)',text:'#16A34A'},
+  'Reservado'  :{bg:'rgba(245,158,11,.1)',border:'rgba(245,158,11,.3)',text:'#B45309'},
+  'Ocupado'    :{bg:'rgba(239,51,64,.1)',border:'rgba(239,51,64,.3)',text:'#EF3340'},
+};
+
+async function loadUnits(buildingId){
+  if(!db)return;
+  try{
+    const snap=await db.collection('buildings').doc(buildingId).collection('units').orderBy('piso').get();
+    _unitDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+  }catch(e){
+    // If no units yet (no index needed for orderBy on single field)
+    _unitDocs=[];
+  }
+  const badge=document.getElementById('units-count-badge');
+  if(badge)badge.textContent=_unitDocs.length;
+  renderUnitsTable(buildingId);
+}
+
+function unitEstadoBadge(e){
+  const c=UNIT_ESTADO_COLORS[e]||UNIT_ESTADO_COLORS['Disponible'];
+  return`<span class="unit-estado" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${e||'Disponible'}</span>`;
+}
+
+function renderUnitsTable(buildingId,filterQ=''){
+  const panel=document.getElementById('bld-tab-units');
+  if(!panel)return;
+  const filtered=filterQ?_unitDocs.filter(u=>(u.piso||'').toLowerCase().includes(filterQ)||(u.unidad||'').toLowerCase().includes(filterQ)||(u.ocupante||'').toLowerCase().includes(filterQ)):_unitDocs;
+  const badge=document.getElementById('units-count-badge');
+  if(badge)badge.textContent=_unitDocs.length;
+  const stateOpts=e=>['Disponible','Reservado','Ocupado'].map(s=>`<option${e===s?' selected':''}>${s}</option>`).join('');
+  let h=`
+    <div class="units-toolbar">
+      <span class="unit-count">${filtered.length} unidad${filtered.length!==1?'es':''}</span>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <input type="text" class="unit-search" placeholder="🔍 Buscar..." oninput="renderUnitsTable('${buildingId}',this.value)" value="${filterQ}">
+        <button class="unit-add-btn" onclick="addUnit('${buildingId}')">+ Agregar unidad</button>
+      </div>
+    </div>`;
+  if(!filtered.length){
+    h+=`<div class="unit-empty">${_unitDocs.length?'Sin coincidencias.':'Sin unidades todavía.<br>Agregá la primera disponibilidad con el botón de arriba.'}</div>`;
+  }else{
+    h+=`<div class="unit-tbl-wrap"><table class="unit-table"><thead><tr>
+      <th>Piso</th><th>Unidad</th><th>m²</th><th>Asking</th><th>Ocupante</th><th>Propietario</th><th>Broker</th><th>Estado</th><th></th>
+    </tr></thead><tbody>`;
+    filtered.forEach(u=>{
+      h+=`<tr data-uid="${u._id}">
+        <td><input class="unit-inp" style="width:52px" value="${esc(u.piso||'')}" onblur="saveUnitField('${buildingId}','${u._id}','piso',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:60px" value="${esc(u.unidad||'')}" onblur="saveUnitField('${buildingId}','${u._id}','unidad',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:62px" type="number" value="${u.m2||''}" onblur="saveUnitField('${buildingId}','${u._id}','m2',parseFloat(this.value)||0,this)"></td>
+        <td><input class="unit-inp" style="width:70px" value="${esc(u.askingRent||'')}" onblur="saveUnitField('${buildingId}','${u._id}','askingRent',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:80px" value="${esc(u.ocupante||'')}" onblur="saveUnitField('${buildingId}','${u._id}','ocupante',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:80px" value="${esc(u.propietario||'')}" onblur="saveUnitField('${buildingId}','${u._id}','propietario',this.value,this)"></td>
+        <td><input class="unit-inp" style="width:75px" value="${esc(u.brokerAsignado||'')}" onblur="saveUnitField('${buildingId}','${u._id}','brokerAsignado',this.value,this)"></td>
+        <td><select class="unit-sel" style="width:96px" onchange="saveUnitField('${buildingId}','${u._id}','estado',this.value,this)">${stateOpts(u.estado)}</select></td>
+        <td><div class="unit-actions">
+          <button class="unit-dup-btn" title="Duplicar" onclick="duplicateUnit('${buildingId}','${u._id}')">⧉</button>
+          <button class="unit-del-btn" title="Eliminar" onclick="deleteUnit('${buildingId}','${u._id}',this.closest('tr'))">✕</button>
+        </div></td>
+      </tr>`;
+    });
+    h+=`</tbody></table></div>`;
+  }
+  panel.innerHTML=h;
+}
+
+async function addUnit(buildingId){
+  if(!db)return;
+  const newUnit={
+    piso:'',unidad:'',m2:0,askingRent:'',moneda:'USD',
+    ocupante:'',propietario:'',brokerAsignado:'',
+    estado:'Disponible',observaciones:'',
+    createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try{
+    const ref=await db.collection('buildings').doc(buildingId).collection('units').add(newUnit);
+    _unitDocs.push({...newUnit,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
+    renderUnitsTable(buildingId);
+    // focus first input of new row
+    setTimeout(()=>{
+      const rows=document.querySelectorAll('#bld-tab-units table tbody tr');
+      if(rows.length)rows[rows.length-1].querySelector('.unit-inp')?.focus();
+    },50);
+  }catch(e){showBldToast('❌ Error al crear unidad: '+e.message,3500);}
+}
+
+async function saveUnitField(buildingId,unitId,field,value,el){
+  if(!db)return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).update({
+      [field]:value,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const u=_unitDocs.find(x=>x._id===unitId);
+    if(u)u[field]=value;
+    // flash green indicator on the cell
+    if(el){
+      const orig=el.style.borderColor;
+      el.style.borderColor='#16A34A';
+      el.style.boxShadow='0 0 0 2px rgba(22,163,74,.12)';
+      setTimeout(()=>{el.style.borderColor='';el.style.boxShadow='';},900);
+    }
+  }catch(e){
+    showBldToast('❌ Error al guardar: '+e.message,3000);
+    console.error('saveUnitField:',e);
+  }
+}
+
+async function deleteUnit(buildingId,unitId,rowEl){
+  if(!db)return;
+  if(!confirm('¿Eliminar esta unidad?'))return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).delete();
+    _unitDocs=_unitDocs.filter(x=>x._id!==unitId);
+    if(rowEl)rowEl.style.opacity='0';
+    setTimeout(()=>renderUnitsTable(buildingId),300);
+    const badge=document.getElementById('units-count-badge');
+    if(badge)badge.textContent=_unitDocs.length;
+  }catch(e){showBldToast('❌ Error al eliminar: '+e.message,3000);}
+}
+
+async function duplicateUnit(buildingId,unitId){
+  if(!db)return;
+  const u=_unitDocs.find(x=>x._id===unitId);
+  if(!u)return;
+  const copy={...u};
+  delete copy._id;
+  copy.unidad=(copy.unidad?copy.unidad+' (copia)':'(copia)');
+  copy.estado='Disponible';
+  copy.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+  copy.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+  try{
+    const ref=await db.collection('buildings').doc(buildingId).collection('units').add(copy);
+    _unitDocs.push({...copy,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
+    renderUnitsTable(buildingId);
+    showBldToast('⧉ Unidad duplicada');
+  }catch(e){showBldToast('❌ Error al duplicar: '+e.message,3000);}
+}
+
+// Expose available units for PPT/CRM/Analytics integration
+window.getAvailableUnitsForBuilding=async(buildingId)=>{
+  if(!db)return[];
+  try{
+    const snap=await db.collection('buildings').doc(buildingId).collection('units').where('estado','==','Disponible').get();
+    return snap.docs.map(d=>({...d.data(),_id:d.id,buildingId}));
+  }catch(e){return[];}
+};
+
+window.getAllAvailableUnits=async()=>{
+  if(!db||!_bldDocs.length)return[];
+  const results=await Promise.all(_bldDocs.map(b=>window.getAvailableUnitsForBuilding(b._id).then(us=>us.map(u=>({...u,buildingNombre:b.nombre,buildingZona:b.zona||b.submercado})))));
+  return results.flat();
+};
 
 function closeBldEditor(){
   closeBldDetail();
