@@ -918,9 +918,10 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .sb-user-email{color:rgba(163,193,255,.5);font-size:10px}
 .sb-nav{flex:1;overflow-y:auto;padding:.75rem .75rem}
 .sb-nav-section{font-size:9px;font-weight:700;color:rgba(163,193,255,.4);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .5rem .25rem}
-.sb-nav-item{display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:8px;cursor:pointer;color:rgba(163,193,255,.7);font-size:12.5px;font-weight:500;transition:all .15s;border:none;background:transparent;font-family:inherit;width:100%;text-align:left}
-.sb-nav-item:hover{background:rgba(77,147,255,.1);color:#fff}
-.sb-nav-item.active{background:rgba(28,84,244,.25);color:#4D93FF;font-weight:600}
+.sb-nav-item{position:relative;display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;border-radius:8px;cursor:pointer;color:rgba(163,193,255,.7);font-size:12.5px;font-weight:500;transition:all .15s;border:none;background:transparent;font-family:inherit;width:100%;text-align:left}
+.sb-nav-item:hover{background:rgba(77,147,255,.12);color:#C3E6FF}
+.sb-nav-item.active{background:linear-gradient(90deg,rgba(77,147,255,.2),rgba(28,84,244,.08));color:#C3E6FF;font-weight:700;box-shadow:inset 0 0 20px rgba(77,147,255,.06)}
+.sb-nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:#4D93FF;border-radius:0 3px 3px 0;box-shadow:0 0 8px rgba(77,147,255,.7)}
 .sb-nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
 .sb-footer{padding:1rem 1.25rem;border-top:1px solid rgba(77,147,255,.08)}
 .sb-logout-btn{width:100%;padding:.6rem;background:rgba(239,51,64,.08);border:1px solid rgba(239,51,64,.18);color:#EF3340;font-family:inherit;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;transition:all .15s}
@@ -3817,13 +3818,11 @@ function show(id){
   if(nav)nav.style.display="none";
 }
 function showModule(mod){
-  // Close all overlays first
-  const ap=document.getElementById('analytics-panel');
-  const bp=document.getElementById('buildings-panel');
-  const adp=document.getElementById('admin-panel');
-  if(ap)ap.style.display='none';
-  if(bp)bp.style.display='none';
-  if(adp)adp.style.display='none';
+  // Close all overlays (including CRM)
+  ['analytics-panel','buildings-panel','admin-panel','crm-panel'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display='none';
+  });
   const bldLayout=document.getElementById('bld-layout');
   if(bldLayout)bldLayout.classList.remove('editor-open');
   // Update sidebar active state
@@ -3837,13 +3836,12 @@ function showModule(mod){
     show('as');
   } else if(mod==='buildings'){
     show('home-hub');
-    if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
     const bpanel=document.getElementById('buildings-panel');
     if(bpanel){bpanel.style.display='block';loadBuildings();}
   } else if(mod==='crm'){
     show('home-hub');
     const cp=document.getElementById('crm-panel');
-    if(cp&&(cp.style.display==='none'||!cp.style.display))toggleCRM();
+    if(cp){cp.style.display='block';loadCRM();}
   } else if(mod==='analytics'){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
     show('home-hub');
