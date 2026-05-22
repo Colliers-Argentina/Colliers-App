@@ -632,8 +632,8 @@ body.dark .bld-sub-cell{color:#A8B3D1}
 body.dark .bld-num{color:#4D93FF}
 .bld-muted{font-size:11px;color:#7B8BBD}
 body.dark .bld-muted{color:#A8B3D1}
-.bld-foto{width:56px;height:56px;border-radius:10px;object-fit:cover;background:linear-gradient(135deg,#EEF3FF,#DBE5FF);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden}
-.bld-foto img{width:56px;height:56px;border-radius:10px;object-fit:cover;display:block}
+.bld-foto{width:72px;height:72px;border-radius:12px;object-fit:cover;background:linear-gradient(135deg,#1C54F4,#4D93FF);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden;box-shadow:0 4px 14px rgba(28,84,244,.18)}
+.bld-foto img{width:72px;height:72px;border-radius:12px;object-fit:cover;display:block}
 .bld-empty{padding:5rem 2rem;text-align:center;color:#7B8BBD;font-size:13px;line-height:2}
 body.dark .bld-empty{color:#A8B3D1}
 
@@ -752,6 +752,133 @@ body.dark .unit-sel option{background:#0A1B4D}
 body.dark .unit-empty{color:#A8B3D1}
 .unit-saving{font-size:9px;font-weight:700;color:#16A34A;opacity:0;transition:opacity .3s;margin-left:3px}
 .unit-saving.visible{opacity:1}
+
+/* ===== BUILDING DETAIL OVERLAY (fullscreen) ===== */
+#bld-detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;display:none;flex-direction:column;background:#F4F6FB}
+#bld-detail-overlay.open{display:flex}
+body.dark #bld-detail-overlay{background:#030B1E}
+.bld-det-hdr{height:56px;background:#fff;border-bottom:1px solid #E8EFF8;display:flex;align-items:center;gap:.85rem;padding:0 1.5rem;flex-shrink:0;z-index:2;box-shadow:0 1px 8px rgba(0,7,89,.05)}
+body.dark .bld-det-hdr{background:#040D24;border-bottom-color:rgba(255,255,255,.08)}
+.bld-det-back{background:transparent;border:none;color:#7B8BBD;font-family:inherit;font-size:13px;cursor:pointer;padding:6px 10px;border-radius:7px;transition:all .15s;display:flex;align-items:center;gap:5px;font-weight:600;white-space:nowrap}
+.bld-det-back:hover{background:#EEF3FF;color:#1C54F4}
+body.dark .bld-det-back:hover{background:rgba(77,147,255,.1);color:#4D93FF}
+.bld-det-sep{color:#D1DCF0;font-size:15px;flex-shrink:0}
+body.dark .bld-det-sep{color:rgba(255,255,255,.15)}
+.bld-det-hdr-name{font-size:15px;font-weight:700;color:#0A1B4D;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+body.dark .bld-det-hdr-name{color:#fff}
+.bld-det-hdr-actions{display:flex;align-items:center;gap:.45rem;flex-shrink:0}
+.bld-det-save-btn{font-family:inherit;font-size:12px;font-weight:700;padding:8px 18px;background:linear-gradient(90deg,#1C54F4,#4D93FF);border:none;color:#fff;border-radius:8px;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(28,84,244,.28);white-space:nowrap}
+.bld-det-save-btn:hover{box-shadow:0 5px 18px rgba(28,84,244,.4);transform:translateY(-1px)}
+.bld-det-arch-btn,.bld-det-del-btn{font-family:inherit;font-size:12px;font-weight:500;padding:8px 13px;border-radius:8px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bld-det-arch-btn{background:#fff;border:1px solid #E2EAF4;color:#7B8BBD}
+.bld-det-arch-btn:hover{border-color:#F59E0B;color:#B45309;background:rgba(245,158,11,.05)}
+.bld-det-del-btn{background:#fff;border:1px solid #E2EAF4;color:#7B8BBD}
+.bld-det-del-btn:hover{border-color:#EF3340;color:#EF3340;background:rgba(239,51,64,.05)}
+body.dark .bld-det-arch-btn,body.dark .bld-det-del-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#A8B3D1}
+body.dark .bld-det-arch-btn:hover{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#F59E0B}
+body.dark .bld-det-del-btn:hover{background:rgba(239,51,64,.1);border-color:rgba(239,51,64,.3);color:#EF3340}
+.bld-det-close{background:rgba(0,0,0,.05);border:none;color:#56648F;font-size:16px;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.bld-det-close:hover{background:rgba(239,51,64,.1);color:#EF3340}
+body.dark .bld-det-close{background:rgba(255,255,255,.08);color:#A8B3D1}
+.bld-det-body{display:flex;flex:1;overflow:hidden;min-height:0}
+.bld-det-sidebar{width:300px;min-width:260px;max-width:300px;border-right:1px solid #E8EFF8;overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0;scrollbar-width:thin}
+body.dark .bld-det-sidebar{border-right-color:rgba(255,255,255,.08)}
+.bld-det-img-wrap{width:100%;height:168px;flex-shrink:0;position:relative;overflow:hidden;background:linear-gradient(135deg,#1C54F4,#4D93FF)}
+.bld-det-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.bld-det-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(135deg,#1C54F4 0%,#0A1B4D 100%)}
+.bld-det-img-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,5,60,.75));padding:1.2rem 1rem .7rem}
+.bld-det-img-name{color:#fff;font-size:14px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.5);line-height:1.3}
+.bld-det-img-addr{color:rgba(255,255,255,.75);font-size:10px;margin-top:2px;font-weight:500}
+.bld-det-sidebar-body{padding:1rem 1.1rem 1.5rem;display:flex;flex-direction:column;gap:1.1rem}
+.bld-det-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.bld-det-kpi{background:#EEF3FF;border:1px solid #DBE5FF;border-radius:10px;padding:.55rem .6rem;display:flex;flex-direction:column;gap:2px}
+body.dark .bld-det-kpi{background:rgba(28,84,244,.12);border-color:rgba(77,147,255,.2)}
+.bld-det-kpi-v{font-size:14px;font-weight:700;color:#0A1B4D;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.dark .bld-det-kpi-v{color:#fff}
+.bld-det-kpi-l{font-size:8px;color:#7B8BBD;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+body.dark .bld-det-kpi-l{color:#A8B3D1}
+.bld-det-section{display:flex;flex-direction:column;gap:.55rem}
+.bld-det-sec-hd{font-size:9px;font-weight:700;color:#1C54F4;text-transform:uppercase;letter-spacing:.1em;padding-bottom:.4rem;border-bottom:1px solid #EEF3FF}
+body.dark .bld-det-sec-hd{color:#4D93FF;border-bottom-color:rgba(255,255,255,.07)}
+.bld-det-field{display:flex;flex-direction:column;gap:3px}
+.bld-det-field-row{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.bld-det-lbl{font-size:9px;font-weight:700;color:#7B8BBD;text-transform:uppercase;letter-spacing:.07em}
+body.dark .bld-det-lbl{color:#A8B3D1}
+.bld-det-inp{font-family:inherit;font-size:12px;padding:7px 9px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:7px;width:100%;box-sizing:border-box;transition:all .15s}
+.bld-det-inp:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
+textarea.bld-det-inp{resize:vertical;min-height:58px;line-height:1.5}
+body.dark .bld-det-inp{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .bld-det-inp::placeholder{color:rgba(168,179,209,.4)}
+body.dark .bld-det-inp:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.12)}
+.bld-det-maps-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#1C54F4;text-decoration:none;padding:5px 10px;background:#EEF3FF;border-radius:6px;transition:all .15s;border:1px solid #C3D8FF;margin-top:2px;width:fit-content}
+.bld-det-maps-btn:hover{background:#DBE8FF;border-color:#1C54F4}
+body.dark .bld-det-maps-btn{background:rgba(28,84,244,.15);border-color:rgba(77,147,255,.3);color:#4D93FF}
+/* RIGHT: spreadsheet panel */
+.bld-det-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.bld-det-main-hd{padding:.85rem 1.25rem;border-bottom:1px solid #E8EFF8;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:.75rem;flex-wrap:wrap}
+body.dark .bld-det-main-hd{border-bottom-color:rgba(255,255,255,.08);background:rgba(4,13,36,.6)}
+.bld-det-main-title{font-size:14px;font-weight:700;color:#0A1B4D;display:flex;align-items:center;gap:.45rem;white-space:nowrap}
+body.dark .bld-det-main-title{color:#fff}
+.bld-det-main-cnt{background:#EEF3FF;color:#1C54F4;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;min-width:20px;text-align:center}
+body.dark .bld-det-main-cnt{background:rgba(28,84,244,.2);color:#4D93FF}
+.bld-det-tools{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.bld-det-stats{display:flex;align-items:center;gap:.35rem}
+.bld-det-stat{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.bld-det-stat::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.bld-det-stat.disp{background:rgba(34,197,94,.1);color:#16A34A;border:1px solid rgba(34,197,94,.22)}
+.bld-det-stat.res{background:rgba(245,158,11,.1);color:#B45309;border:1px solid rgba(245,158,11,.22)}
+.bld-det-stat.ocup{background:rgba(239,51,64,.1);color:#EF3340;border:1px solid rgba(239,51,64,.22)}
+.bld-det-search{font-family:inherit;font-size:12px;padding:7px 12px;border:1px solid #E2EAF4;background:#fff;color:#000759;border-radius:8px;transition:all .15s;min-width:160px}
+.bld-det-search:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
+body.dark .bld-det-search{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .bld-det-search::placeholder{color:rgba(168,179,209,.45)}
+.bld-det-add-btn{font-family:inherit;font-size:12px;font-weight:700;padding:8px 16px;background:linear-gradient(90deg,#1C54F4,#4D93FF);border:none;color:#fff;border-radius:8px;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(28,84,244,.22);white-space:nowrap}
+.bld-det-add-btn:hover{box-shadow:0 5px 16px rgba(28,84,244,.35);transform:translateY(-1px)}
+.bld-det-tbl-wrap{flex:1;overflow:auto;min-height:0}
+/* Spreadsheet table */
+.det-unit-table{width:100%;border-collapse:collapse;font-size:12px;min-width:820px}
+.det-unit-table thead{position:sticky;top:0;z-index:4}
+.det-unit-table thead tr{background:#F8FAFF}
+body.dark .det-unit-table thead tr{background:#040D24}
+.det-unit-table th{padding:11px 10px;text-align:left;color:#7B8BBD;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;border-bottom:2px solid #E8EFF8;cursor:pointer;user-select:none;transition:color .12s;position:relative}
+.det-unit-table th:hover{color:#1C54F4}
+body.dark .det-unit-table th{color:#A8B3D1;border-bottom-color:rgba(255,255,255,.1)}
+body.dark .det-unit-table th:hover{color:#4D93FF}
+.det-unit-table th.sort-asc::after{content:' ↑';font-size:9px;color:#1C54F4}
+.det-unit-table th.sort-desc::after{content:' ↓';font-size:9px;color:#1C54F4}
+.det-unit-table tbody tr{border-bottom:1px solid #F0F4FB;transition:background .1s}
+.det-unit-table tbody tr:hover{background:#F5F8FF}
+body.dark .det-unit-table tbody tr{border-bottom-color:rgba(255,255,255,.04)}
+body.dark .det-unit-table tbody tr:hover{background:rgba(77,147,255,.06)}
+.det-unit-table td{padding:7px 8px;vertical-align:middle}
+body.dark .det-unit-table td{color:#DCE7FF}
+.det-unit-table tr:last-child td{border-bottom:none}
+.det-unit-table .col-num{width:36px;text-align:center;font-size:11px;color:#B0BDD6;font-weight:600}
+body.dark .det-unit-table .col-num{color:#56648F}
+.det-unit-table .col-actions{width:52px;text-align:center}
+.du-inp{font-family:inherit;font-size:12px;padding:5px 8px;border:1.5px solid transparent;background:transparent;color:#0A1B4D;border-radius:6px;width:100%;box-sizing:border-box;transition:all .12s;min-width:0}
+.du-inp:hover{border-color:#D1DCF0;background:rgba(248,250,255,.9)}
+.du-inp:focus{outline:none;border-color:#1C54F4;background:#fff;box-shadow:0 0 0 3px rgba(28,84,244,.09)}
+body.dark .du-inp{color:#DCE7FF}
+body.dark .du-inp:hover{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.05)}
+body.dark .du-inp:focus{border-color:#4D93FF;background:rgba(255,255,255,.08);box-shadow:0 0 0 3px rgba(77,147,255,.12)}
+.du-sel{font-family:inherit;font-size:11px;padding:5px 6px;border:1.5px solid transparent;background:transparent;color:#0A1B4D;border-radius:6px;cursor:pointer;transition:all .12s;max-width:100px}
+.du-sel:hover{border-color:#D1DCF0;background:rgba(248,250,255,.9)}
+.du-sel:focus{outline:none;border-color:#1C54F4;background:#fff}
+body.dark .du-sel{color:#DCE7FF}
+body.dark .du-sel:hover{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.06)}
+body.dark .du-sel option{background:#0A1B4D}
+.du-estado-cell{min-width:105px}
+.du-actions{display:flex;gap:2px;justify-content:center}
+.du-btn{background:transparent;border:none;width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:13px;color:rgba(123,139,189,.5);display:flex;align-items:center;justify-content:center;transition:all .12s;line-height:1}
+.du-btn.dup:hover{color:#4D93FF;background:rgba(77,147,255,.1)}
+.du-btn.del:hover{color:#EF3340;background:rgba(239,51,64,.08)}
+.det-unit-empty{padding:5rem 2rem;text-align:center;color:#7B8BBD;font-size:13px;line-height:2}
+body.dark .det-unit-empty{color:#A8B3D1}
+.det-unit-add-row{width:100%;padding:9px 12px;border:none;border-top:1px dashed #E2EAF4;background:transparent;cursor:pointer;color:#7B8BBD;font-size:11px;font-weight:600;font-family:inherit;text-align:left;display:flex;align-items:center;gap:.5rem;transition:all .12s}
+.det-unit-add-row:hover{background:#F5F8FF;color:#1C54F4}
+body.dark .det-unit-add-row{border-top-color:rgba(255,255,255,.07);color:#56648F}
+body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 </style>
 </head>
 <body>
@@ -906,6 +1033,40 @@ body.dark .unit-empty{color:#A8B3D1}
   </div>
 </div>
 <div class="bld-toast" id="bld-toast"></div>
+
+<!-- BUILDING DETAIL OVERLAY -->
+<div id="bld-detail-overlay">
+  <div class="bld-det-hdr">
+    <button class="bld-det-back" onclick="closeBldDetail()">← Edificios</button>
+    <div class="bld-det-sep">/</div>
+    <div class="bld-det-hdr-name" id="bld-det-hdr-name">Edificio</div>
+    <div class="bld-det-hdr-actions">
+      <button class="bld-det-save-btn" onclick="saveBuildingEdits()">💾 Guardar</button>
+      <button class="bld-det-arch-btn" onclick="archiveBuilding()">Archivar</button>
+      <button class="bld-det-del-btn" onclick="deleteBuilding()">🗑</button>
+      <button class="bld-det-close" onclick="closeBldDetail()">✕</button>
+    </div>
+  </div>
+  <div class="bld-det-body">
+    <div class="bld-det-sidebar" id="bld-det-sidebar"></div>
+    <div class="bld-det-main">
+      <div class="bld-det-main-hd">
+        <div class="bld-det-main-title">
+          Disponibilidades
+          <span class="bld-det-main-cnt" id="bld-det-unit-count">0</span>
+        </div>
+        <div class="bld-det-tools">
+          <div class="bld-det-stats" id="bld-det-stats"></div>
+          <input type="text" class="bld-det-search" id="bld-det-search" placeholder="🔍 Buscar unidad..." oninput="renderDetailUnits(window._bldEditId,this.value)">
+          <button class="bld-det-add-btn" id="bld-det-add-btn" onclick="addUnit(window._bldEditId)">＋ Agregar unidad</button>
+        </div>
+      </div>
+      <div class="bld-det-tbl-wrap" id="bld-det-tbl-wrap">
+        <div class="det-unit-empty">Cargando...</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div class="login-page" id="ls">
@@ -2756,65 +2917,292 @@ function openBuildingEditor(docId){
   const d=_bldDocs.find(x=>x._id===docId);
   if(!d)return;
   _bldEditId=docId;
-  document.getElementById('bld-layout').classList.add('editor-open');
-  document.getElementById('bld-editor').style.display='flex';
-  document.getElementById('bld-ed-title').textContent=d.nombre||d._id;
+  const hasFoto=d.foto||(d.imagenes&&d.imagenes[0])||'';
   const states=['Disponible','Reservado','Ocupado','Archivado'].map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('');
   const monedas=['USD','ARS'].map(m=>`<option${(d.moneda||'USD')===m?' selected':''}>${m}</option>`).join('');
-  document.getElementById('bld-ed-body').innerHTML=`
-    <div class="bld-tabs" id="bld-ed-tabs">
-      <button class="bld-tab active" onclick="bldEdTab(this,'bld-tab-info')">Información</button>
-      <button class="bld-tab" onclick="bldEdTab(this,'bld-tab-units')">Disponibilidades <span class="bld-tab-badge" id="units-count-badge">…</span></button>
-    </div>
-    <div id="bld-tab-info" class="bld-tab-panel">
-      <div class="bld-ed-section">
-        <div class="bld-ed-section-hd">Identificación</div>
-        <div class="bld-ed-grid">
-          <div class="bld-ed-field full"><div class="bld-ed-lbl">Nombre</div><input class="bld-ed-inp" id="be-nombre" value="${esc(d.nombre)}"></div>
-          <div class="bld-ed-field full"><div class="bld-ed-lbl">Dirección</div><input class="bld-ed-inp" id="be-direccion" value="${esc(d.direccion)}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Zona / Submercado</div><input class="bld-ed-inp" id="be-zona" value="${esc(d.zona||d.submercado)}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Estado</div><select class="bld-ed-inp" id="be-estado">${states}</select></div>
-        </div>
-      </div>
-      <div class="bld-ed-section">
-        <div class="bld-ed-section-hd">Superficies</div>
-        <div class="bld-ed-grid">
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Disponible (m²)</div><input class="bld-ed-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Planta (m²)</div><input class="bld-ed-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Sup. Mínima (m²)</div><input class="bld-ed-inp" id="be-supMin" type="number" value="${d.superficieMinima||''}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Pisos disponibles</div><input class="bld-ed-inp" id="be-pisosDisp" value="${esc(d.pisosDisponibles||d.pisosDisp||'')}"></div>
-        </div>
-      </div>
-      <div class="bld-ed-section">
-        <div class="bld-ed-section-hd">Financiero</div>
-        <div class="bld-ed-grid">
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Asking Rent</div><input class="bld-ed-inp" id="be-asking" value="${esc(d.asking||d.rent||'')}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Expensas</div><input class="bld-ed-inp" id="be-expensas" value="${esc(d.expensas||'')}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Moneda</div><select class="bld-ed-inp" id="be-moneda">${monedas}</select></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Categoría</div><input class="bld-ed-inp" id="be-cat" value="${esc(d.categoria||d.cat||'')}"></div>
-        </div>
-      </div>
-      <div class="bld-ed-section">
-        <div class="bld-ed-section-hd">Operación</div>
-        <div class="bld-ed-grid">
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Broker responsable</div><input class="bld-ed-inp" id="be-broker" value="${esc(d.broker||'')}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Certificación</div><input class="bld-ed-inp" id="be-cert" value="${esc(d.certificacion||d.cat||'')}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">Google Maps URL</div><input class="bld-ed-inp" id="be-maps" value="${esc(d.googleMaps||'')}"></div>
-          <div class="bld-ed-field"><div class="bld-ed-lbl">URL Foto</div><input class="bld-ed-inp" id="be-foto" value="${esc(d.foto||(d.imagenes&&d.imagenes[0])||'')}"></div>
-        </div>
-      </div>
-      <div class="bld-ed-section">
-        <div class="bld-ed-section-hd">Descripción y Amenities</div>
-        <div class="bld-ed-grid">
-          <div class="bld-ed-field full"><div class="bld-ed-lbl">Descripción</div><textarea class="bld-ed-inp" id="be-desc">${esc(d.descripcion||d.comentarios||'')}</textarea></div>
-          <div class="bld-ed-field full"><div class="bld-ed-lbl">Amenities</div><textarea class="bld-ed-inp" id="be-amenities">${esc(d.amenities||d.comentarios||'')}</textarea></div>
-        </div>
+  const mapsBtn=d.googleMaps?`<a class="bld-det-maps-btn" href="${esc(d.googleMaps)}" target="_blank" rel="noopener">📍 Ver en Maps</a>`:'';
+  document.getElementById('bld-det-hdr-name').textContent=d.nombre||d._id;
+  document.getElementById('bld-det-sidebar').innerHTML=`
+    <div class="bld-det-img-wrap">
+      ${hasFoto?`<img src="${esc(hasFoto)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}
+      <div class="bld-det-img-ph" style="${hasFoto?'display:none':''}">🏢</div>
+      <div class="bld-det-img-overlay">
+        <div class="bld-det-img-name">${esc(d.nombre||'Edificio')}</div>
+        <div class="bld-det-img-addr">${esc(d.direccion||'')}</div>
       </div>
     </div>
-    <div id="bld-tab-units" class="bld-tab-panel" style="display:none">
-      <div class="unit-empty" id="units-loading">Cargando unidades...</div>
+    <div class="bld-det-sidebar-body">
+      <div class="bld-det-kpis">
+        <div class="bld-det-kpi"><div class="bld-det-kpi-v">${d.superficieDisponible?d.superficieDisponible+'m²':'—'}</div><div class="bld-det-kpi-l">Sup. Disp.</div></div>
+        <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.asking||d.rent||'—')}</div><div class="bld-det-kpi-l">Asking</div></div>
+        <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.categoria||d.cat||'—')}</div><div class="bld-det-kpi-l">Categ.</div></div>
+      </div>
+      <div class="bld-det-section">
+        <div class="bld-det-sec-hd">Identificación</div>
+        <div class="bld-det-field"><div class="bld-det-lbl">Nombre</div><input class="bld-det-inp" id="be-nombre" value="${esc(d.nombre||'')}"></div>
+        <div class="bld-det-field"><div class="bld-det-lbl">Dirección</div><input class="bld-det-inp" id="be-direccion" value="${esc(d.direccion||'')}"></div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Zona</div><input class="bld-det-inp" id="be-zona" value="${esc(d.zona||d.submercado||'')}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Estado</div><select class="bld-det-inp" id="be-estado">${states}</select></div>
+        </div>
+      </div>
+      <div class="bld-det-section">
+        <div class="bld-det-sec-hd">Superficies</div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Disp. (m²)</div><input class="bld-det-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Planta (m²)</div><input class="bld-det-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}"></div>
+        </div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Mín. (m²)</div><input class="bld-det-inp" id="be-supMin" type="number" value="${d.superficieMinima||''}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Pisos disp.</div><input class="bld-det-inp" id="be-pisosDisp" value="${esc(d.pisosDisponibles||d.pisosDisp||'')}"></div>
+        </div>
+      </div>
+      <div class="bld-det-section">
+        <div class="bld-det-sec-hd">Financiero</div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Asking Rent</div><input class="bld-det-inp" id="be-asking" value="${esc(d.asking||d.rent||'')}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Moneda</div><select class="bld-det-inp" id="be-moneda">${monedas}</select></div>
+        </div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Expensas</div><input class="bld-det-inp" id="be-expensas" value="${esc(d.expensas||'')}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Categoría</div><input class="bld-det-inp" id="be-cat" value="${esc(d.categoria||d.cat||'')}"></div>
+        </div>
+      </div>
+      <div class="bld-det-section">
+        <div class="bld-det-sec-hd">Operación</div>
+        <div class="bld-det-field"><div class="bld-det-lbl">Broker responsable</div><input class="bld-det-inp" id="be-broker" value="${esc(d.broker||'')}"></div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Certificación</div><input class="bld-det-inp" id="be-cert" value="${esc(d.certificacion||'')}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">URL Foto</div><input class="bld-det-inp" id="be-foto" value="${esc(hasFoto)}"></div>
+        </div>
+        <div class="bld-det-field"><div class="bld-det-lbl">Google Maps URL</div><input class="bld-det-inp" id="be-maps" value="${esc(d.googleMaps||'')}"></div>
+        ${mapsBtn}
+      </div>
+      <div class="bld-det-section">
+        <div class="bld-det-sec-hd">Descripción y Amenities</div>
+        <div class="bld-det-field"><div class="bld-det-lbl">Descripción</div><textarea class="bld-det-inp" id="be-desc">${esc(d.descripcion||d.comentarios||'')}</textarea></div>
+        <div class="bld-det-field"><div class="bld-det-lbl">Amenities</div><textarea class="bld-det-inp" id="be-amenities">${esc(d.amenities||'')}</textarea></div>
+      </div>
     </div>
   `;
+  const overlay=document.getElementById('bld-detail-overlay');
+  overlay.classList.add('open');
+  document.getElementById('bld-det-search').value='';
+  document.getElementById('bld-det-tbl-wrap').innerHTML='<div class="det-unit-empty">Cargando unidades...</div>';
+  loadUnits(docId);
+}
+
+function bldEdTab(el,tabId){
+  el.closest('#bld-ed-body').querySelectorAll('.bld-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  el.closest('#bld-ed-body').querySelectorAll('.bld-tab-panel').forEach(p=>{p.style.display='none';});
+  const panel=document.getElementById(tabId);
+  if(panel)panel.style.display='flex';
+}
+
+/* ===== UNITS (subcollection buildings/{id}/units) ===== */
+let _unitDocs=[];
+
+const UNIT_ESTADO_COLORS={
+  'Disponible':{bg:'rgba(34,197,94,.1)',border:'rgba(34,197,94,.3)',text:'#16A34A'},
+  'Reservado'  :{bg:'rgba(245,158,11,.1)',border:'rgba(245,158,11,.3)',text:'#B45309'},
+  'Ocupado'    :{bg:'rgba(239,51,64,.1)',border:'rgba(239,51,64,.3)',text:'#EF3340'},
+};
+
+async function loadUnits(buildingId){
+  if(!db)return;
+  try{
+    const snap=await db.collection('buildings').doc(buildingId).collection('units').orderBy('piso').get();
+    _unitDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+  }catch(e){
+    _unitDocs=[];
+  }
+  renderDetailUnits(buildingId);
+}
+
+function unitEstadoBadge(e){
+  const c=UNIT_ESTADO_COLORS[e]||UNIT_ESTADO_COLORS['Disponible'];
+  return`<span class="unit-estado" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${e||'Disponible'}</span>`;
+}
+
+function _updateUnitStats(){
+  const disp=_unitDocs.filter(u=>u.estado==='Disponible').length;
+  const res=_unitDocs.filter(u=>u.estado==='Reservado').length;
+  const ocup=_unitDocs.filter(u=>u.estado==='Ocupado').length;
+  const cnt=document.getElementById('bld-det-unit-count');
+  if(cnt)cnt.textContent=_unitDocs.length;
+  const stats=document.getElementById('bld-det-stats');
+  if(stats)stats.innerHTML=`
+    ${disp?`<span class="bld-det-stat disp">${disp} Disp.</span>`:''}
+    ${res?`<span class="bld-det-stat res">${res} Res.</span>`:''}
+    ${ocup?`<span class="bld-det-stat ocup">${ocup} Ocup.</span>`:''}`;
+}
+
+let _unitSortCol='piso',_unitSortDir=1;
+
+function sortDetailUnits(col){
+  if(_unitSortCol===col)_unitSortDir*=-1;
+  else{_unitSortCol=col;_unitSortDir=1;}
+  const bid=window._bldEditId;
+  const q=document.getElementById('bld-det-search')?.value||'';
+  renderDetailUnits(bid,q);
+}
+
+function renderDetailUnits(buildingId,filterQ=''){
+  _updateUnitStats();
+  const wrap=document.getElementById('bld-det-tbl-wrap');
+  if(!wrap)return;
+  const q=(filterQ||'').toLowerCase();
+  let filtered=q?_unitDocs.filter(u=>
+    (u.piso||'').toLowerCase().includes(q)||
+    (u.unidad||'').toLowerCase().includes(q)||
+    (u.ocupante||'').toLowerCase().includes(q)||
+    (u.propietario||'').toLowerCase().includes(q)||
+    (u.estado||'').toLowerCase().includes(q)
+  ):_unitDocs;
+  filtered=[...filtered].sort((a,b)=>{
+    const av=a[_unitSortCol]||'',bv=b[_unitSortCol]||'';
+    return typeof av==='number'&&typeof bv==='number'?(av-bv)*_unitSortDir:String(av).localeCompare(String(bv))*_unitSortDir;
+  });
+  if(!filtered.length){
+    wrap.innerHTML=`<div class="det-unit-empty">${_unitDocs.length?'Sin coincidencias para "'+filterQ+'"':'Todavía no hay unidades.<br>Agregá la primera disponibilidad con el botón de arriba.'}</div>`;
+    return;
+  }
+  const so=e=>['Disponible','Reservado','Ocupado'].map(s=>`<option${e===s?' selected':''}>${s}</option>`).join('');
+  const th=(col,label)=>{
+    const cls=_unitSortCol===col?(_unitSortDir===1?'sort-asc':'sort-desc'):'';
+    return`<th class="${cls}" onclick="sortDetailUnits('${col}')">${label}</th>`;
+  };
+  let h=`<table class="det-unit-table"><thead><tr>
+    <th class="col-num">#</th>
+    ${th('piso','Piso')}
+    ${th('unidad','Unidad')}
+    ${th('estado','Estado')}
+    ${th('ocupante','Ocupante')}
+    ${th('m2','m²')}
+    ${th('askingRent','Asking Rent')}
+    ${th('propietario','Propietario')}
+    ${th('brokerAsignado','Broker Asig.')}
+    <th>Observaciones</th>
+    <th class="col-actions"></th>
+  </tr></thead><tbody>`;
+  filtered.forEach((u,i)=>{
+    const c=UNIT_ESTADO_COLORS[u.estado]||UNIT_ESTADO_COLORS['Disponible'];
+    h+=`<tr data-uid="${u._id}">
+      <td class="col-num">${i+1}</td>
+      <td><input class="du-inp" style="width:54px" value="${esc(u.piso||'')}" onblur="saveUnitField('${buildingId}','${u._id}','piso',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:68px" value="${esc(u.unidad||'')}" onblur="saveUnitField('${buildingId}','${u._id}','unidad',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td class="du-estado-cell"><select class="du-sel" style="background:${c.bg};border:1px solid ${c.border};color:${c.text};font-weight:700;padding:4px 6px;border-radius:999px" onchange="saveUnitField('${buildingId}','${u._id}','estado',this.value,this);renderDetailUnits('${buildingId}',document.getElementById('bld-det-search')?.value||'')">${so(u.estado)}</select></td>
+      <td><input class="du-inp" style="width:100px" value="${esc(u.ocupante||'')}" onblur="saveUnitField('${buildingId}','${u._id}','ocupante',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:58px" type="number" value="${u.m2||''}" onblur="saveUnitField('${buildingId}','${u._id}','m2',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:80px" value="${esc(u.askingRent||'')}" onblur="saveUnitField('${buildingId}','${u._id}','askingRent',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:100px" value="${esc(u.propietario||'')}" onblur="saveUnitField('${buildingId}','${u._id}','propietario',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:90px" value="${esc(u.brokerAsignado||'')}" onblur="saveUnitField('${buildingId}','${u._id}','brokerAsignado',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="min-width:120px" value="${esc(u.observaciones||'')}" onblur="saveUnitField('${buildingId}','${u._id}','observaciones',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td class="col-actions"><div class="du-actions">
+        <button class="du-btn dup" title="Duplicar" onclick="duplicateUnit('${buildingId}','${u._id}')">⧉</button>
+        <button class="du-btn del" title="Eliminar" onclick="deleteUnit('${buildingId}','${u._id}',this.closest('tr'))">✕</button>
+      </div></td>
+    </tr>`;
+  });
+  h+=`</tbody></table>
+  <button class="det-unit-add-row" onclick="addUnit('${buildingId}')">＋ Agregar fila</button>`;
+  wrap.innerHTML=h;
+}
+
+/* keep old renderUnitsTable as alias so existing callers don't break */
+function renderUnitsTable(buildingId,filterQ=''){renderDetailUnits(buildingId,filterQ);}
+
+async function addUnit(buildingId){
+  if(!db)return;
+  const newUnit={
+    piso:'',unidad:'',m2:0,askingRent:'',moneda:'USD',
+    ocupante:'',propietario:'',brokerAsignado:'',
+    estado:'Disponible',observaciones:'',
+    createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try{
+    const ref=await db.collection('buildings').doc(buildingId).collection('units').add(newUnit);
+    _unitDocs.push({...newUnit,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
+    renderDetailUnits(buildingId);
+    setTimeout(()=>{
+      const rows=document.querySelectorAll('#bld-det-tbl-wrap table tbody tr');
+      if(rows.length)rows[rows.length-1].querySelector('.du-inp')?.focus();
+    },50);
+  }catch(e){showBldToast('❌ Error al crear unidad: '+e.message,3500);}
+}
+
+async function saveUnitField(buildingId,unitId,field,value,el){
+  if(!db)return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).update({
+      [field]:value,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const u=_unitDocs.find(x=>x._id===unitId);
+    if(u)u[field]=value;
+    // flash green indicator on the cell
+    if(el){
+      const orig=el.style.borderColor;
+      el.style.borderColor='#16A34A';
+      el.style.boxShadow='0 0 0 2px rgba(22,163,74,.12)';
+      setTimeout(()=>{el.style.borderColor='';el.style.boxShadow='';},900);
+    }
+  }catch(e){
+    showBldToast('❌ Error al guardar: '+e.message,3000);
+    console.error('saveUnitField:',e);
+  }
+}
+
+async function deleteUnit(buildingId,unitId,rowEl){
+  if(!db)return;
+  if(!confirm('¿Eliminar esta unidad?'))return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).delete();
+    _unitDocs=_unitDocs.filter(x=>x._id!==unitId);
+    if(rowEl){rowEl.style.opacity='0';rowEl.style.transition='opacity .25s';}
+    setTimeout(()=>renderDetailUnits(buildingId),280);
+  }catch(e){showBldToast('❌ Error al eliminar: '+e.message,3000);}
+}
+
+async function duplicateUnit(buildingId,unitId){
+  if(!db)return;
+  const u=_unitDocs.find(x=>x._id===unitId);
+  if(!u)return;
+  const copy={...u};
+  delete copy._id;
+  copy.unidad=(copy.unidad?copy.unidad+' (copia)':'(copia)');
+  copy.estado='Disponible';
+  copy.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+  copy.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+  try{
+    const ref=await db.collection('buildings').doc(buildingId).collection('units').add(copy);
+    _unitDocs.push({...copy,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
+    renderDetailUnits(buildingId);
+    showBldToast('⧉ Unidad duplicada');
+  }catch(e){showBldToast('❌ Error al duplicar: '+e.message,3000);}
+}
+
+// Expose available units for PPT/CRM/Analytics integration
+window.getAvailableUnitsForBuilding=async(buildingId)=>{
+  if(!db)return[];
+  try{
+    const snap=await db.collection('buildings').doc(buildingId).collection('units').where('estado','==','Disponible').get();
+    return snap.docs.map(d=>({...d.data(),_id:d.id,buildingId}));
+  }catch(e){return[];}
+};
+
+window.getAllAvailableUnits=async()=>{
+  if(!db||!_bldDocs.length)return[];
+  const results=await Promise.all(_bldDocs.map(b=>window.getAvailableUnitsForBuilding(b._id).then(us=>us.map(u=>({...u,buildingNombre:b.nombre,buildingZona:b.zona||b.submercado})))));
+  return results.flat();
+};
+
+function closeBldDetail(){
+  document.getElementById('bld-detail-overlay').classList.remove('open');
+  _bldEditId=null;
+  _unitDocs=[];
   renderBuildingsTable();
   loadUnits(docId);
 }
@@ -2987,10 +3375,7 @@ window.getAllAvailableUnits=async()=>{
 };
 
 function closeBldEditor(){
-  _bldEditId=null;
-  document.getElementById('bld-layout').classList.remove('editor-open');
-  document.getElementById('bld-editor').style.display='none';
-  renderBuildingsTable();
+  closeBldDetail();
 }
 
 function esc(v){return(v||'').toString().replace(/"/g,'&quot;').replace(/</g,'&lt;');}
@@ -3025,7 +3410,8 @@ async function saveBuildingEdits(){
     await db.collection('buildings').doc(_bldEditId).update(data);
     const idx=_bldDocs.findIndex(x=>x._id===_bldEditId);
     if(idx!==-1)_bldDocs[idx]={..._bldDocs[idx],...data};
-    document.getElementById('bld-ed-title').textContent=data.nombre||_bldEditId;
+    const hdrName=document.getElementById('bld-det-hdr-name');
+    if(hdrName)hdrName.textContent=data.nombre||_bldEditId;
     showBldToast('✅ Guardado correctamente');
     filterBuildings();
   }catch(e){showBldToast('❌ Error: '+e.message,4000);}
@@ -3049,7 +3435,7 @@ async function deleteBuilding(){
   try{
     await db.collection('buildings').doc(_bldEditId).delete();
     _bldDocs=_bldDocs.filter(x=>x._id!==_bldEditId);
-    closeBldEditor();
+    closeBldDetail();
     renderBldKPIs();
     filterBuildings();
     showBldToast('🗑 Edificio eliminado');
