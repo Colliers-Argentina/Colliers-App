@@ -881,7 +881,7 @@ body.dark .det-unit-add-row{border-top-color:rgba(255,255,255,.07);color:#56648F
 body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 
 /* ===== SIDEBAR ===== */
-#app-sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;background:linear-gradient(180deg,#000D2E 0%,#000B24 60%,#000759 100%);z-index:185;display:none;flex-direction:column;border-right:1px solid rgba(77,147,255,.1)}
+#app-sidebar{width:240px;min-width:240px;flex-shrink:0;background:linear-gradient(180deg,#000D2E 0%,#000B24 60%,#000759 100%);z-index:10;display:none;flex-direction:column;border-right:1px solid rgba(77,147,255,.1);overflow-y:auto}
 #app-sidebar.sb-open{display:flex}
 .sb-logo-area{padding:1.25rem;border-bottom:1px solid rgba(77,147,255,.08)}
 .sb-brand{color:#fff;font-size:17px;font-weight:700}
@@ -902,7 +902,7 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .sb-logout-btn:hover{background:rgba(239,51,64,.15);border-color:rgba(239,51,64,.4)}
 
 /* ===== HOME HUB ===== */
-#home-hub{display:none;padding-left:240px;background:linear-gradient(135deg,#000D2E 0%,#000B24 50%,#000F36 100%);height:100vh;overflow-y:auto}
+#home-hub{display:none;background:linear-gradient(135deg,#000D2E 0%,#000B24 50%,#000F36 100%);flex:1;overflow-y:auto;min-width:0}
 .hub-wrap{max-width:1100px;margin:0 auto;padding:3rem 2.5rem}
 .hub-hero{margin-bottom:2.5rem}
 .hub-greeting{font-size:13px;color:rgba(163,193,255,.6);font-weight:500;margin-bottom:.35rem}
@@ -932,13 +932,52 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .hub-quick-label{font-size:12px;font-weight:600;color:#C3E6FF}
 .hub-quick-sub{font-size:10px;color:rgba(163,193,255,.45)}
 
-/* ===== SIDEBAR-OPEN LAYOUT ADJUSTMENTS ===== */
-body.sidebar-open{overflow:hidden;height:100vh}
-body.sidebar-open #as{padding-left:240px;height:100vh;overflow-y:auto}
-body.sidebar-open #analytics-panel{left:240px;top:0}
-body.sidebar-open #buildings-panel{left:240px;top:0}
-body.sidebar-open #admin-panel{left:240px;top:0}
-body.sidebar-open #crm-panel{left:240px;top:0}
+/* ===== APP SHELL FLEX LAYOUT ===== */
+body.app-active{display:flex;height:100vh;overflow:hidden}
+body.app-active #as{flex:1;overflow-y:auto;min-width:0;height:100%}
+body.app-active #analytics-panel{left:240px;top:0}
+body.app-active #buildings-panel{left:240px;top:0}
+body.app-active #admin-panel{left:240px;top:0}
+body.app-active #crm-panel{left:240px;top:0}
+
+/* ===== APP GRID MIN-WIDTH FIX ===== */
+.app-grid{min-width:0}
+.app-grid > *{min-width:0}
+.main-panel{min-width:0}
+
+/* ===== HUB LIGHT MODE ===== */
+body:not(.dark) #home-hub{background:linear-gradient(135deg,#EEF4FF 0%,#F4F8FF 50%,#E8F0FF 100%)}
+body:not(.dark) .hub-greeting{color:rgba(0,7,89,.55)}
+body:not(.dark) .hub-title{color:#000759}
+body:not(.dark) .hub-title span{background:linear-gradient(90deg,#1C54F4,#25408F);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+body:not(.dark) .hub-subtitle{color:#7B8BBD}
+body:not(.dark) .hub-card{background:rgba(255,255,255,.8);border-color:rgba(37,64,143,.12)}
+body:not(.dark) .hub-card:hover{background:#fff;border-color:rgba(28,84,244,.3);box-shadow:0 16px 48px rgba(37,64,143,.12)}
+body:not(.dark) .hub-card-title{color:#000759}
+body:not(.dark) .hub-card-desc{color:#56648F}
+body:not(.dark) .hub-card-icon{background:rgba(28,84,244,.1);border-color:rgba(37,64,143,.2)}
+body:not(.dark) .hub-card-btn{color:#1C54F4;background:rgba(28,84,244,.08);border-color:rgba(37,64,143,.2)}
+body:not(.dark) .hub-section-title{color:rgba(0,7,89,.45)}
+body:not(.dark) .hub-quick-card{background:rgba(255,255,255,.8);border-color:rgba(37,64,143,.1)}
+body:not(.dark) .hub-quick-card:hover{background:#fff}
+body:not(.dark) .hub-quick-label{color:#000759}
+body:not(.dark) .hub-quick-sub{color:#7B8BBD}
+
+/* ===== MOBILE RESPONSIVE ===== */
+#sb-hamburger{display:none}
+@media(max-width:768px){
+  #sb-hamburger{display:flex;position:fixed;top:12px;left:12px;z-index:190;background:#000D2E;border:1px solid rgba(77,147,255,.3);color:#C3E6FF;font-size:20px;padding:7px 9px;border-radius:8px;cursor:pointer;line-height:1;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+  body.app-active{display:block;height:100vh;overflow:hidden}
+  #app-sidebar{position:fixed!important;top:0;left:0;bottom:0;width:240px;z-index:195;transform:translateX(-100%);transition:transform .25s ease}
+  #app-sidebar.sb-open{transform:translateX(0)}
+  body.app-active #home-hub{height:100vh;overflow-y:auto;flex:none;display:block}
+  body.app-active #as{height:100vh;overflow-y:auto;flex:none;display:block}
+  body.app-active #analytics-panel,body.app-active #buildings-panel,body.app-active #admin-panel,body.app-active #crm-panel{left:0}
+  .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:188}
+  .sb-overlay.active{display:block}
+  .hub-cards{grid-template-columns:1fr}
+  .hub-quick{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
@@ -1011,6 +1050,8 @@ body.sidebar-open #crm-panel{left:240px;top:0}
     <button class="sb-logout-btn" onclick="logout()">← Cerrar sesión</button>
   </div>
 </div>
+<div class="sb-overlay" id="sb-overlay" onclick="closeMobileSidebar()"></div>
+<button id="sb-hamburger" onclick="toggleMobileSidebar()" aria-label="Menú">☰</button>
 
 <!-- HOME HUB -->
 <div id="home-hub">
@@ -3737,10 +3778,11 @@ function show(id){
     else if(s==="ds")el.style.display=s===id?"flex":"none";
     else el.style.display=s===id?"block":"none";
   });
-  const sidebar=document.getElementById('app-sidebar');
   const isApp=id!=="ls"&&id!=="ds";
+  document.body.classList.toggle('app-active',isApp);
+  document.body.classList.remove('sidebar-open');
+  const sidebar=document.getElementById('app-sidebar');
   if(sidebar)sidebar.classList.toggle('sb-open',isApp);
-  document.body.classList.toggle('sidebar-open',isApp);
   const nav=document.getElementById('main-nav');
   if(nav)nav.style.display="none";
 }
@@ -3806,6 +3848,17 @@ function renderHubCards(){
       </div>
     </div>
   `).join('');
+}
+function toggleMobileSidebar(){
+  const sb=document.getElementById('app-sidebar');
+  const ov=document.getElementById('sb-overlay');
+  const open=sb.classList.toggle('sb-open');
+  if(ov)ov.classList.toggle('active',open);
+}
+function closeMobileSidebar(){
+  document.getElementById('app-sidebar').classList.remove('sb-open');
+  const ov=document.getElementById('sb-overlay');
+  if(ov)ov.classList.remove('active');
 }
 function toggleTheme(){
   const dark=document.body.classList.toggle('dark');
