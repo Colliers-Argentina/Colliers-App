@@ -605,8 +605,7 @@ body.dark .bld-kpi-v{color:#fff}
 body.dark .bld-kpi-l{color:#A8B3D1}
 
 /* Table */
-.bld-tbl-wrap{background:#fff;border:1px solid #E8EFF8;border-radius:16px;overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0}
-body.dark .bld-tbl-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(14px)}
+.bld-tbl-wrap{background:transparent;overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0}
 .bld-tbl-scroll{overflow-y:auto;flex:1}
 .bld-table{width:100%;border-collapse:collapse;font-size:12px}
 .bld-table thead tr{background:#F8FAFF;position:sticky;top:0;z-index:2}
@@ -634,6 +633,32 @@ body.dark .bld-num{color:#4D93FF}
 body.dark .bld-muted{color:#A8B3D1}
 .bld-foto{width:72px;height:72px;border-radius:12px;object-fit:cover;background:linear-gradient(135deg,#1C54F4,#4D93FF);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden;box-shadow:0 4px 14px rgba(28,84,244,.18)}
 .bld-foto img{width:72px;height:72px;border-radius:12px;object-fit:cover;display:block}
+/* ===== BUILDING CARDS ===== */
+.bld-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;padding:1.5rem}
+@media(max-width:700px){.bld-grid{grid-template-columns:1fr;padding:1rem}}
+.bld-card{background:#fff;border:1px solid #E8EFF8;border-radius:18px;overflow:hidden;cursor:pointer;transition:all .22s;box-shadow:0 2px 8px rgba(0,7,89,.06);display:flex;flex-direction:column}
+.bld-card:hover{box-shadow:0 12px 40px rgba(0,7,89,.13);transform:translateY(-3px);border-color:rgba(28,84,244,.18)}
+.bld-card.selected{border-color:#1C54F4;box-shadow:0 0 0 2px rgba(28,84,244,.18),0 10px 32px rgba(0,7,89,.12)}
+body.dark .bld-card{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)}
+body.dark .bld-card:hover{background:rgba(255,255,255,.07);border-color:rgba(77,147,255,.22);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+body.dark .bld-card.selected{border-color:#4D93FF;box-shadow:0 0 0 2px rgba(77,147,255,.22)}
+.bld-card-img{width:100%;height:200px;background:linear-gradient(135deg,#1C54F4 0%,#4D93FF 100%);display:flex;align-items:center;justify-content:center;font-size:52px;overflow:hidden;flex-shrink:0}
+.bld-card-img img{width:100%;height:100%;object-fit:cover;display:block}
+.bld-card-body{padding:1rem 1.1rem 1.1rem;display:flex;flex-direction:column;flex:1}
+.bld-card-name{font-size:14px;font-weight:700;color:#0A1B4D;margin-bottom:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.dark .bld-card-name{color:#fff}
+.bld-card-addr{font-size:11px;color:#7B8BBD;margin-bottom:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bld-card-meta{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .6rem;margin-bottom:.85rem}
+.bld-meta-item{display:flex;flex-direction:column;gap:2px}
+.bld-meta-val{font-size:12.5px;font-weight:700;color:#0A1B4D;line-height:1.2}
+body.dark .bld-meta-val{color:#C3E6FF}
+.bld-meta-lbl{font-size:9px;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+body.dark .bld-meta-lbl{color:#56648F}
+.bld-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid #F0F4FF;margin-top:auto}
+body.dark .bld-card-footer{border-top-color:rgba(255,255,255,.06)}
+.bld-card-edit-btn{font-size:11px;font-weight:600;color:#1C54F4;background:rgba(28,84,244,.08);border:1px solid rgba(28,84,244,.15);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.bld-card-edit-btn:hover{background:rgba(28,84,244,.15);border-color:rgba(28,84,244,.3)}
+body.dark .bld-card-edit-btn{color:#4D93FF;background:rgba(77,147,255,.1);border-color:rgba(77,147,255,.2)}
 .bld-empty{padding:5rem 2rem;text-align:center;color:#7B8BBD;font-size:13px;line-height:2}
 body.dark .bld-empty{color:#A8B3D1}
 
@@ -881,7 +906,7 @@ body.dark .det-unit-add-row{border-top-color:rgba(255,255,255,.07);color:#56648F
 body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 
 /* ===== SIDEBAR ===== */
-#app-sidebar{width:240px;min-width:240px;flex-shrink:0;background:linear-gradient(180deg,#000D2E 0%,#000B24 60%,#000759 100%);z-index:10;display:none;flex-direction:column;border-right:1px solid rgba(77,147,255,.1);overflow-y:auto}
+#app-sidebar{width:240px;min-width:240px;flex-shrink:0;background:linear-gradient(180deg,#000D2E 0%,#000B24 60%,#000759 100%);z-index:160;display:none;flex-direction:column;border-right:1px solid rgba(77,147,255,.1);overflow-y:auto}
 #app-sidebar.sb-open{display:flex}
 .sb-logo-area{padding:1.25rem;border-bottom:1px solid rgba(77,147,255,.08)}
 .sb-brand{color:#fff;font-size:17px;font-weight:700}
@@ -935,10 +960,10 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 /* ===== APP SHELL FLEX LAYOUT ===== */
 body.app-active{display:flex;height:100vh;overflow:hidden}
 body.app-active #as{flex:1;overflow-y:auto;min-width:0;height:100%}
-body.app-active #analytics-panel{left:240px;top:0}
-body.app-active #buildings-panel{left:240px;top:0}
-body.app-active #admin-panel{left:240px;top:0}
-body.app-active #crm-panel{left:240px;top:0}
+body.app-active #analytics-panel{left:240px!important;top:0!important}
+body.app-active #buildings-panel{left:240px!important;top:0!important}
+body.app-active #admin-panel{left:240px!important;top:0!important}
+body.app-active #crm-panel{left:240px!important;top:0!important}
 
 /* ===== MIN-WIDTH FIX (tablas) ===== */
 .app-grid{min-width:0}
@@ -972,7 +997,7 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
   #app-sidebar.sb-open{transform:translateX(0)}
   body.app-active #home-hub{height:100vh;overflow-y:auto;flex:none;display:block}
   body.app-active #as{height:100vh;overflow-y:auto;flex:none;display:block}
-  body.app-active #analytics-panel,body.app-active #buildings-panel,body.app-active #admin-panel,body.app-active #crm-panel{left:0}
+  body.app-active #analytics-panel,body.app-active #buildings-panel,body.app-active #admin-panel,body.app-active #crm-panel{left:0!important}
   .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:188}
   .sb-overlay.active{display:block}
   .hub-cards{grid-template-columns:1fr}
@@ -3065,27 +3090,32 @@ function renderBuildingsTable(){
   }
   const start=_bldPage*BLD_PAGE_SIZE;
   const page=_bldFiltered.slice(start,start+BLD_PAGE_SIZE);
-  const fmtTs=ts=>{if(!ts)return'–';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short'});};
-  let h='<table class="bld-table"><thead><tr>';
-  ['','Edificio','Zona','m² Disp.','Asking','Broker','Estado','Actualizado',''].forEach(col=>{h+=`<th>${col}</th>`;});
-  h+='</tr></thead><tbody>';
+  let h='<div class="bld-grid">';
   page.forEach(d=>{
     const foto=d.foto||(d.imagenes&&d.imagenes[0])||'';
-    const fotoHtml=foto?`<img src="${foto}" onerror="this.parentElement.textContent='🏢'" style="width:40px;height:40px;border-radius:8px;object-fit:cover">`:'🏢';
-    const selected=_bldEditId===d._id?' selected':'';
-    h+=`<tr onclick="openBuildingEditor('${d._id}')" class="${selected}">
-      <td><div class="bld-foto">${fotoHtml}</div></td>
-      <td><div class="bld-name-cell">${d.nombre||d._id}</div><div class="bld-sub-cell">${d.direccion||'–'}</div></td>
-      <td><span class="bld-muted">${d.zona||d.submercado||'–'}</span></td>
-      <td><span class="bld-num">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+' m²':'–'}</span></td>
-      <td><span class="bld-muted">${d.asking||d.rent||'–'}</span></td>
-      <td><span class="bld-muted">${d.broker||'–'}</span></td>
-      <td>${bldEstadoBadge(d.estado||'Disponible')}</td>
-      <td class="bld-muted">${fmtTs(d.updatedAt)}</td>
-      <td><button class="bld-btn bld-btn-outline" style="padding:5px 10px;font-size:11px" onclick="event.stopPropagation();openBuildingEditor('${d._id}')">Editar →</button></td>
-    </tr>`;
+    const imgHtml=foto
+      ?`<div class="bld-card-img"><img src="${foto}" loading="lazy" onerror="this.parentElement.innerHTML='🏢'"></div>`
+      :`<div class="bld-card-img">🏢</div>`;
+    const sel=_bldEditId===d._id?' selected':'';
+    h+=`<div class="bld-card${sel}" onclick="openBuildingEditor('${d._id}')">
+      ${imgHtml}
+      <div class="bld-card-body">
+        <div class="bld-card-name">${d.nombre||d._id}</div>
+        <div class="bld-card-addr">${d.direccion||d.zona||'–'}</div>
+        <div class="bld-card-meta">
+          <div class="bld-meta-item"><span class="bld-meta-val">${d.zona||d.submercado||'–'}</span><span class="bld-meta-lbl">Zona</span></div>
+          <div class="bld-meta-item"><span class="bld-meta-val">${d.asking||d.rent||'–'}</span><span class="bld-meta-lbl">Asking</span></div>
+          <div class="bld-meta-item"><span class="bld-meta-val">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+' m²':'–'}</span><span class="bld-meta-lbl">Disponible</span></div>
+          <div class="bld-meta-item"><span class="bld-meta-val">${d.broker||'–'}</span><span class="bld-meta-lbl">Broker</span></div>
+        </div>
+        <div class="bld-card-footer">
+          ${bldEstadoBadge(d.estado||'Disponible')}
+          <button class="bld-card-edit-btn" onclick="event.stopPropagation();openBuildingEditor('${d._id}')">Editar →</button>
+        </div>
+      </div>
+    </div>`;
   });
-  h+='</tbody></table>';
+  h+='</div>';
   wrap.innerHTML=h;
 
   // Pagination
