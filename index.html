@@ -1702,42 +1702,41 @@ window.onGoogleLibraryLoad=initGSI;
 if(typeof google!=='undefined'&&google.accounts)initGSI();
 
 async function loadData(){
-  // 1. Firestore: colección 'edificios'
+  // 1. Firestore: colección 'buildings' (misma que Inventario + syncSheetToFirestore)
   if(db){
     try{
-      const snap=await db.collection('edificios').get();
+      const snap=await db.collection('buildings').orderBy('nombre').get();
       if(!snap.empty){
-        const toNum=v=>parseFloat((String(v||'0')).replace(/\./g,'').replace(',','.'))||0;
         const mapped=snap.docs.map(d=>{
           const f=d.data();
-          if(f.activo===false||(f['Activo (SI/NO)']||'').toUpperCase()==='NO')return null;
+          if(f.activo===false||f.estado==='Archivado')return null;
           return{
-            nombre:      f.nombre||f['Nombre Edificio']||'–',
-            direccion:   f.direccion||f['Dirección']||'–',
-            submercado:  f.submercado||f['Submercado']||'–',
-            cat:         f.categoria||f.cat||f['Categoría']||'–',
-            anio:        f.anio||f['Año Construcción']||'–',
-            pisos:       f.pisos||f['Pisos Totales']||'–',
-            cocheras:    f.cocheras||f['Ratio Cocheras']||'–',
-            supDisp:     toNum(f.supDisp||f.superficieDisponible||f['Superficie Disponible (m²)']||f['Superficie Disponible m²']),
-            pisosDisp:   f.pisosDisp||f.pisosDisponibles||f['Pisos Disponibles']||'–',
-            supPlanta:   toNum(f.supPlanta||f.superficiePlanta||f['Sup. Promedio Planta (m²)']||f['Sup. Promedio Planta m²']),
-            supMinima:   toNum(f.supMinima||f.superficieMinima||f['Sup. Mínima Divisible m²']||f['Sup. Mínima Divisible (m²)']),
-            rent:        f.rent||f.askingRent||f['Asking Rent (USD/m²)']||f['Asking Rent USD/m²']||'–',
-            comentarios: f.comentarios||f.amenities||f['Comentarios / Amenities']||'–',
-            foto:        f.foto||f.fotoUrl||f['URL Foto']||'',
+            nombre:      f.nombre||'–',
+            direccion:   f.direccion||'–',
+            submercado:  f.zona||f.submercado||'–',
+            cat:         f.categoria||f.certificacion||'–',
+            anio:        f.anio||'–',
+            pisos:       f.pisos||'–',
+            cocheras:    f.cocheras||'–',
+            supDisp:     Number(f.superficieDisponible)||0,
+            pisosDisp:   f.pisosDisponibles||'–',
+            supPlanta:   Number(f.superficiePlanta)||0,
+            supMinima:   Number(f.superficieMinima)||0,
+            rent:        f.asking||f.rent||'–',
+            comentarios: f.amenities||f.descripcion||'–',
+            foto:        f.foto||(f.imagenes&&f.imagenes[0])||'',
           };
         }).filter(Boolean);
         if(mapped.length>0){
           props=mapped;
           window._props=props;
           populateZonas();
-          console.log('loadData: Firestore edificios OK —',props.length,'registros');
+          console.log('loadData: buildings OK —',props.length,'registros');
           return;
         }
-        console.warn('loadData: colección edificios vacía, usando CSV fallback');
+        console.warn('loadData: colección buildings vacía, usando CSV fallback');
       }else{
-        console.warn('loadData: colección edificios vacía, usando CSV fallback');
+        console.warn('loadData: colección buildings vacía, usando CSV fallback');
       }
     }catch(e){console.warn('loadData: Firestore error, usando CSV fallback:',e.message);}
   }
