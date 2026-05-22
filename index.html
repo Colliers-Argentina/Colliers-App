@@ -593,6 +593,16 @@ body.dark .bld-btn-outline:hover{border-color:#4D93FF;color:#4D93FF}
 body.dark .bld-close-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#A8B3D1}
 body.dark .bld-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(239,51,64,.35);color:#EF3340}
 
+/* ===== GENERATOR TOPBAR ===== */
+.gen-topbar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 2rem;background:rgba(255,255,255,.72);backdrop-filter:blur(16px);border-bottom:1px solid rgba(37,64,143,.1);flex-shrink:0}
+body.dark .gen-topbar{background:rgba(0,13,46,.7);backdrop-filter:blur(16px);border-bottom-color:rgba(77,147,255,.1)}
+.gen-topbar-title{font-size:15px;font-weight:700;color:#25408F;display:flex;align-items:center;gap:.5rem}
+body.dark .gen-topbar-title{color:#C3E6FF}
+.gen-close-btn{background:rgba(255,255,255,.55);border:1px solid rgba(37,64,143,.18);color:#56648F;font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .18s;backdrop-filter:blur(8px);white-space:nowrap}
+.gen-close-btn:hover{background:rgba(239,51,64,.08);border-color:rgba(239,51,64,.4);color:#EF3340}
+body.dark .gen-close-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#A8B3D1}
+body.dark .gen-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(239,51,64,.35);color:#EF3340}
+
 /* KPI row */
 .bld-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;flex-shrink:0}
 @media(max-width:960px){.bld-kpi-row{grid-template-columns:repeat(2,1fr)}}
@@ -1345,6 +1355,10 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
 
 <!-- APP -->
 <div id="as">
+  <div class="gen-topbar">
+    <div class="gen-topbar-title">🔍 Generador de Alternativas</div>
+    <button class="gen-close-btn" onclick="showModule('home')">✕ Cerrar</button>
+  </div>
   <div class="app-wrap">
     <div class="app-grid">
 
