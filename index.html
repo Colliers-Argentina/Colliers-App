@@ -1706,7 +1706,36 @@ window.onGoogleLibraryLoad=initGSI;
 if(typeof google!=='undefined'&&google.accounts)initGSI();
 
 async function loadData(){
-  // 1. Firestore: colección 'buildings' (misma que Inventario + syncSheetToFirestore)
+  // Fuente principal: Google Sheet CSV en vivo (sin caché)
+  const proxies=[
+    'https://corsproxy.io/?'+encodeURIComponent(CSV),
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(CSV),
+    CSV,
+  ];
+  for(const url of proxies){
+    try{
+      const r=await fetch(url,{cache:'no-store'});
+      if(!r.ok)continue;
+      const csv=await r.text();
+      if(!csv.trim())continue;
+      const parsed=parseCSV(csv);
+      if(!parsed.length)continue;
+      // Deduplicate por nombre (por si el Sheet tiene filas repetidas)
+      const seen=new Map();
+      parsed.forEach(p=>{
+        const k=(p.nombre||'').toLowerCase().trim();
+        if(k&&!seen.has(k))seen.set(k,p);
+      });
+      props=[...seen.values()];
+      window._props=props;
+      populateZonas();
+      console.log('loadData: Sheet OK —',props.length,'edificios únicos via',url.substring(0,40));
+      console.table(props.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
+      return;
+    }catch(e){console.warn('loadData proxy failed:',url.substring(0,40),e.message);}
+  }
+
+  // Fallback: Firestore buildings (si el Sheet no responde)
   if(db){
     try{
       const snap=await db.collection('buildings').orderBy('nombre').get();
@@ -1715,66 +1744,30 @@ async function loadData(){
         snap.docs.forEach(d=>{
           const f=d.data();
           if(f.activo===false||f.estado==='Archivado')return;
-          const key=(f.nombre||'').toLowerCase().trim();
-          if(!key)return;
-          if(seen.has(key)){
-            console.warn('loadData: duplicado ignorado →',f.nombre,'(docId:',d.id,')');
-            return;
-          }
-          seen.set(key,{
-            nombre:      f.nombre||'–',
-            direccion:   f.direccion||'–',
-            submercado:  f.zona||f.submercado||'–',
-            cat:         f.categoria||f.certificacion||'–',
-            anio:        f.anio||'–',
-            pisos:       f.pisos||'–',
-            cocheras:    f.cocheras||'–',
-            supDisp:     Number(f.superficieDisponible)||0,
-            pisosDisp:   f.pisosDisponibles||'–',
-            supPlanta:   Number(f.superficiePlanta)||0,
-            supMinima:   Number(f.superficieMinima)||0,
-            rent:        f.asking||f.rent||'–',
-            comentarios: f.amenities||f.descripcion||'–',
-            foto:        f.foto||(f.imagenes&&f.imagenes[0])||'',
+          const k=(f.nombre||'').toLowerCase().trim();
+          if(!k||seen.has(k))return;
+          seen.set(k,{
+            nombre:f.nombre||'–',direccion:f.direccion||'–',
+            submercado:f.zona||f.submercado||'–',cat:f.categoria||f.certificacion||'–',
+            anio:f.anio||'–',pisos:f.pisos||'–',cocheras:f.cocheras||'–',
+            supDisp:Number(f.superficieDisponible)||0,pisosDisp:f.pisosDisponibles||'–',
+            supPlanta:Number(f.superficiePlanta)||0,supMinima:Number(f.superficieMinima)||0,
+            rent:f.asking||f.rent||'–',comentarios:f.amenities||f.descripcion||'–',
+            foto:f.foto||(f.imagenes&&f.imagenes[0])||'',
           });
         });
-        const mapped=[...seen.values()];
-        if(mapped.length>0){
-          props=mapped;
+        props=[...seen.values()];
+        if(props.length){
           window._props=props;
           populateZonas();
-          console.log('loadData: buildings OK —',mapped.length,'únicos de',snap.size,'docs en Firestore');
-          console.table(mapped.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
+          console.warn('loadData: Sheet falló — usando Firestore fallback,',props.length,'edificios');
+          console.table(props.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp})));
           return;
         }
-        console.warn('loadData: buildings vacío, usando CSV fallback');
-      }else{
-        console.warn('loadData: buildings vacío, usando CSV fallback');
       }
-    }catch(e){console.warn('loadData: Firestore error, usando CSV fallback:',e.message);}
+    }catch(e){console.warn('loadData: Firestore fallback también falló:',e.message);}
   }
-
-  // 2. Fallback: Google Sheet CSV
-  const proxies=[
-    'https://corsproxy.io/?'+encodeURIComponent(CSV),
-    'https://api.allorigins.win/raw?url='+encodeURIComponent(CSV),
-    CSV,
-  ];
-  for(const url of proxies){
-    try{
-      const r=await fetch(url);
-      if(!r.ok)continue;
-      const csv=await r.text();
-      if(!csv.trim())continue;
-      props=parseCSV(csv);
-      window._props=props;
-      populateZonas();
-      console.log('loadData: CSV OK via',url.substring(0,40),'—',props.length,'edificios');
-      console.table(props.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
-      return;
-    }catch(e){console.warn('loadData proxy failed:',url.substring(0,40),e.message);}
-  }
-  console.error('loadData: Firestore y todos los proxies CSV fallaron');
+  console.error('loadData: Sheet y Firestore fallaron — sin datos');
 }
 
 async function cargarOverview(){
