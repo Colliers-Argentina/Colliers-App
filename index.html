@@ -1002,19 +1002,78 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
 
 /* ===== MOBILE RESPONSIVE ===== */
 #sb-hamburger{display:none}
+
+/* ── Tablet (≤1024px) ── */
+@media(max-width:1024px){
+  .app-grid{grid-template-columns:270px 1fr}
+  .app-wrap{padding:1.25rem 1.5rem}
+  .hub-wrap{padding:2rem 1.75rem}
+  .crm-wrap{padding:1.5rem 1.75rem}
+  .an-wrap{padding:0 1.75rem 1.5rem}
+  .bld-layout{padding:1.25rem 1.5rem}
+  .gen-topbar{padding:.75rem 1.5rem}
+}
+
+/* ── Mobile + small tablet (≤768px) ── */
 @media(max-width:768px){
+  /* Hamburger + sidebar overlay */
   #sb-hamburger{display:flex;position:fixed;top:12px;left:12px;z-index:190;background:#000D2E;border:1px solid rgba(77,147,255,.3);color:#C3E6FF;font-size:20px;padding:7px 9px;border-radius:8px;cursor:pointer;line-height:1;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4)}
   #app-shell.active{display:block;height:100vh;overflow:hidden}
   #app-sidebar{position:fixed!important;top:0;left:0;bottom:0;width:280px;z-index:195;transform:translateX(-100%);transition:transform .25s ease;display:flex!important}
   #app-sidebar.sb-open{transform:translateX(0)}
-  #main-content{height:100vh;overflow-y:auto}
-  #app-shell.active #home-hub{height:100vh;overflow-y:auto;flex:none;display:block}
-  #app-shell.active #as{height:100vh;overflow-y:auto;flex:none;display:block}
-  #app-shell.active #analytics-panel,#app-shell.active #buildings-panel,#app-shell.active #admin-panel,#app-shell.active #crm-panel{left:0!important}
+  #main-content{height:100vh;overflow-y:auto;overflow-x:hidden}
+  #app-shell.active #home-hub{height:auto;min-height:100vh;overflow-y:auto;flex:none;display:block}
+  #app-shell.active #as{height:auto;min-height:100vh;overflow-y:auto;flex:none;display:block}
+  #app-shell.active #analytics-panel,#app-shell.active #buildings-panel,#app-shell.active #admin-panel,#app-shell.active #crm-panel{left:0!important;top:0!important}
   .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:188}
   .sb-overlay.active{display:block}
+
+  /* Generator: stack columns vertically */
+  .app-grid{grid-template-columns:1fr;gap:1rem}
+  .side-panel{position:relative;top:auto;max-height:none;overflow:visible;border-radius:0}
+  .app-wrap{padding:0 0 1.5rem}
+  .gen-topbar{padding:.65rem 1rem}
+
+  /* Hub */
   .hub-cards{grid-template-columns:1fr}
   .hub-quick{grid-template-columns:repeat(2,1fr)}
+  .hub-wrap{padding:1.5rem 1rem}
+
+  /* Panels: full screen on mobile */
+  .crm-wrap{padding:1rem}
+  .an-wrap{padding:0 1rem 1rem}
+  .bld-layout{padding:1rem}
+
+  /* Tables: always scrollable */
+  .table-outer,.crm-table-wrap,.bld-table-wrap,.an-card-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* Cards: full width */
+  .bld-grid{grid-template-columns:1fr;padding:1rem}
+  .hub-card{padding:1.25rem 1.25rem}
+}
+
+/* ── Small mobile (≤480px) ── */
+@media(max-width:480px){
+  .hub-wrap{padding:1rem .75rem}
+  .hub-title{font-size:24px}
+  .hub-quick{grid-template-columns:1fr 1fr}
+  .hub-cards{gap:.75rem}
+  .app-wrap{padding:0}
+  .gen-topbar{padding:.55rem .75rem;font-size:13px}
+  .gen-topbar-title{font-size:13px}
+  .an-kpis{grid-template-columns:1fr 1fr}
+  .crm-kpi-row{grid-template-columns:1fr 1fr}
+  .bld-kpi-row{grid-template-columns:1fr 1fr}
+}
+
+/* ── Landscape mobile (short viewport) ── */
+@media(max-height:500px) and (orientation:landscape){
+  #app-shell.active #home-hub,#app-shell.active #as{min-height:100vh}
+  .sb-logo-area{padding:.5rem 1rem}
+  .sb-user{padding:.5rem 1rem}
+  .sb-nav{padding:.5rem}
+  .hub-wrap{padding:1rem}
+  .side-panel{max-height:none}
 }
 </style>
 </head>
