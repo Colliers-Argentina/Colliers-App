@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Colliers One · Plataforma Comercial</title>
+<title>Colliers Nexus · Commercial Intelligence Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -52,7 +52,7 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 
 /* LOGIN */
 .login-page{display:grid;grid-template-columns:3fr 2fr;min-height:100vh;font-family:'Open Sans',Verdana,sans-serif}
-.lp-left{background:#000759;display:flex;flex-direction:column;justify-content:space-between;padding:3rem 3.5rem;position:relative;overflow:hidden}
+.lp-left{background:linear-gradient(160deg,#050816 0%,#0B122B 55%,#050F3A 100%);display:flex;flex-direction:column;justify-content:space-between;padding:3rem 3.5rem;position:relative;overflow:hidden}
 .lp-circle{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.06)}
 .lp-top{position:relative;z-index:1;display:flex;flex-direction:column;gap:2.5rem}
 .lp-logo-box{display:inline-flex;flex-direction:column;width:fit-content}
@@ -71,25 +71,27 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .lp-stat-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;letter-spacing:.03em}
 .lp-stat-sep{width:1px;background:rgba(255,255,255,.15)}
 .lp-tagline{font-size:12px;color:rgba(255,255,255,.35);font-style:italic;border-top:0.5px solid rgba(255,255,255,.1);padding-top:1rem}
-.lp-right{background:#F4F6FB;display:flex;align-items:center;justify-content:center;padding:3rem}
-.lp-card{background:#fff;border-radius:16px;border:0.5px solid #D8E2F0;padding:3rem 2.5rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,7,89,.08)}
+.lp-right{background:linear-gradient(160deg,#050816 0%,#080F24 100%);display:flex;align-items:center;justify-content:center;padding:3rem;position:relative;overflow:hidden}
+.lp-right::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(28,84,244,.12) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none}
+.lp-right::after{content:'';position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(77,147,255,.08) 0%,transparent 70%);bottom:-80px;left:-60px;pointer-events:none}
+.lp-card{background:rgba(11,18,43,.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:20px;border:1px solid rgba(77,147,255,.18);padding:3rem 2.5rem;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(77,147,255,.1);position:relative;z-index:1}
 .lp-card-top{text-align:center;margin-bottom:2.25rem}
 .lp-logo{width:180px;height:auto;display:block;object-fit:contain;background:transparent}
-.lp-card-top .lp-logo{margin:0 auto 1.25rem}
-.lp-keyline{height:3px;width:56px;margin:.85rem auto;border-radius:2px;background:linear-gradient(90deg,#25408F,#4D93FF,#C3E6FF)}
-.lp-card-top h2{font-size:22px;font-weight:700;color:#000759;margin-bottom:.4rem}
-.lp-card-top p{font-size:13px;color:#7B8BBD;line-height:1.65}
-.lp-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;background:#25408F;color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:8px;cursor:pointer;margin-bottom:.85rem;transition:background .15s}
-.lp-btn:hover{background:#000759}
-.lp-note{text-align:center;font-size:11px;color:#ACBBE8}
+.lp-card-top .lp-logo{margin:0 auto 1.25rem;filter:brightness(1.1)}
+.lp-keyline{height:3px;width:56px;margin:.85rem auto;border-radius:2px;background:linear-gradient(90deg,#1C54F4,#4D93FF,#C3E6FF)}
+.lp-card-top h2{font-size:22px;font-weight:700;color:#fff;margin-bottom:.4rem}
+.lp-card-top p{font-size:13px;color:rgba(163,193,255,.6);line-height:1.65}
+.lp-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;background:linear-gradient(135deg,#1C54F4,#4D93FF);color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:10px;cursor:pointer;margin-bottom:.85rem;transition:all .2s;box-shadow:0 4px 20px rgba(28,84,244,.35)}
+.lp-btn:hover{background:linear-gradient(135deg,#1445d4,#3d7de8);box-shadow:0 6px 28px rgba(28,84,244,.5);transform:translateY(-1px)}
+.lp-note{text-align:center;font-size:11px;color:rgba(163,193,255,.4)}
 .lp-divider{display:flex;align-items:center;gap:.75rem;margin:1.5rem 0}
-.lp-divider-line{flex:1;height:0.5px;background:#E0E8F5}
-.lp-divider-text{font-size:10px;color:#ACBBE8;white-space:nowrap}
+.lp-divider-line{flex:1;height:0.5px;background:rgba(77,147,255,.2)}
+.lp-divider-text{font-size:10px;color:rgba(163,193,255,.4);white-space:nowrap}
 .lp-pills{display:flex;flex-direction:column;gap:.5rem}
-.lp-pill{display:flex;align-items:center;gap:.6rem;background:#F4F6FB;border-radius:6px;padding:.5rem .75rem;font-size:11.5px;color:#353E59}
-.lp-pill-dot{width:6px;height:6px;border-radius:50%;background:#25408F;flex-shrink:0}
-.lp-footer{text-align:center;margin-top:1.75rem;font-size:10px;color:#ACBBE8}
-.lp-footer strong{color:#25408F}
+.lp-pill{display:flex;align-items:center;gap:.6rem;background:rgba(77,147,255,.07);border:1px solid rgba(77,147,255,.12);border-radius:8px;padding:.5rem .75rem;font-size:11.5px;color:rgba(163,193,255,.75)}
+.lp-pill-dot{width:6px;height:6px;border-radius:50%;background:#4D93FF;flex-shrink:0}
+.lp-footer{text-align:center;margin-top:1.75rem;font-size:10px;color:rgba(163,193,255,.3)}
+.lp-footer strong{color:#4D93FF}
 @media(max-width:768px){.login-page{grid-template-columns:1fr}.lp-left{display:none}.lp-right{min-height:100vh}}
 
 /* DENIED */
@@ -955,8 +957,9 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .hub-card-title{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.2px}
 .hub-card-desc{font-size:13px;color:rgba(163,193,255,.6);line-height:1.6}
 .hub-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.25rem}
-.hub-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#4D93FF;background:rgba(28,84,244,.12);border:1px solid rgba(77,147,255,.2);padding:.5rem 1rem;border-radius:7px;cursor:pointer;transition:all .15s;font-family:inherit}
-.hub-card-btn:hover{background:rgba(28,84,244,.25);border-color:rgba(77,147,255,.4)}
+.hub-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#4D93FF;background:rgba(28,84,244,.12);border:1px solid rgba(77,147,255,.2);padding:.5rem 1rem;border-radius:7px;cursor:pointer;transition:all .2s;font-family:inherit}
+.hub-card-btn:hover{background:rgba(28,84,244,.25);border-color:rgba(77,147,255,.4);box-shadow:0 0 12px rgba(77,147,255,.2)}
+.hub-card:hover .hub-card-icon{box-shadow:0 0 20px rgba(28,84,244,.25);transform:scale(1.06);transition:all .25s}
 .hub-card-badge{font-size:9px;font-weight:700;color:#B45309;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.05em}
 .hub-section-title{font-size:13px;font-weight:700;color:rgba(163,193,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
 .hub-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
@@ -1087,7 +1090,7 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
       <div class="nlogo-bar"></div>
     </div>
     <div class="ndiv"></div>
-    <div class="nsubt">Generador de Alternativas</div>
+    <div class="nsubt">Alternative Generator</div>
   </div>
   <div class="nright">
     <button onclick="toggleTheme()" style="background:transparent;border:0.5px solid rgba(255,255,255,.25);color:#C3E6FF;font-size:14px;padding:3px 8px;border-radius:3px;cursor:pointer;line-height:1">🌙</button>
@@ -1113,23 +1116,23 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
     <div class="lp-top">
       <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers" class="lp-logo">
       <div class="lp-hero">
-        <h1>Plataforma Comercial<br><span>Colliers One</span></h1>
-        <p>Plataforma interna de Colliers Argentina para gestionar edificios, clientes, disponibilidades y presentaciones comerciales.</p>
+        <h1>Commercial Intelligence<br><span>Colliers Nexus</span></h1>
+        <p>Colliers Argentina's internal platform to manage buildings, clients, availabilities, and generate commercial presentations.</p>
       </div>
     </div>
     <div class="lp-feats">
-      <div class="lp-feat"><div class="lp-feat-icon">🏢</div><div class="lp-feat-text"><strong>Inventario de edificios</strong>Pisos, unidades, asking rents y ocupantes</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">👥</div><div class="lp-feat-text"><strong>CRM Comercial</strong>Clientes, oportunidades y actividad comercial</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">📊</div><div class="lp-feat-text"><strong>Analytics</strong>Insights, demanda y reporting estratégico</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">📋</div><div class="lp-feat-text"><strong>Generador PPT</strong>Alternativas y presentaciones en segundos</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">🏢</div><div class="lp-feat-text"><strong>Building Inventory</strong>Floors, units, asking rents and occupants</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">👥</div><div class="lp-feat-text"><strong>Commercial CRM</strong>Clients, opportunities and deal pipeline</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">📊</div><div class="lp-feat-text"><strong>Market Analytics</strong>Demand insights and strategic reporting</div></div>
+      <div class="lp-feat"><div class="lp-feat-icon">📋</div><div class="lp-feat-text"><strong>PPT Generator</strong>Alternatives and presentations in seconds</div></div>
     </div>
     <div class="lp-bottom">
       <div class="lp-stats">
-        <div><div class="lp-stat-num">4</div><div class="lp-stat-label">Módulos</div></div>
+        <div><div class="lp-stat-num">4</div><div class="lp-stat-label">Modules</div></div>
         <div class="lp-stat-sep"></div>
-        <div><div class="lp-stat-num">CRM</div><div class="lp-stat-label">Integrado</div></div>
+        <div><div class="lp-stat-num">CRM</div><div class="lp-stat-label">Integrated</div></div>
         <div class="lp-stat-sep"></div>
-        <div><div class="lp-stat-num">IA</div><div class="lp-stat-label">Asistente integrado</div></div>
+        <div><div class="lp-stat-num">AI</div><div class="lp-stat-label">Built-in assistant</div></div>
       </div>
       <div class="lp-tagline">Accelerating success.</div>
     </div>
@@ -1139,22 +1142,22 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
       <div class="lp-card-top">
         <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers" class="lp-logo">
         <div class="lp-keyline"></div>
-        <h2>Bienvenido</h2>
-        <p>Iniciá sesión con tu cuenta<br>corporativa para acceder</p>
+        <h2>Welcome</h2>
+        <p>Sign in with your corporate account<br>to access Colliers Nexus</p>
       </div>
       <button class="lp-btn" id="login-btn" onclick="console.log('login-btn clicked');if(typeof google!=='undefined'&&google.accounts)google.accounts.id.prompt();">
         <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
-        Iniciar sesión con Google
+        Sign in with Google
       </button>
-      <div class="lp-note">Acceso exclusivo para el equipo Colliers</div>
-      <div class="lp-divider"><div class="lp-divider-line"></div><div class="lp-divider-text">Incluye acceso a</div><div class="lp-divider-line"></div></div>
+      <div class="lp-note">Exclusive access for the Colliers team</div>
+      <div class="lp-divider"><div class="lp-divider-line"></div><div class="lp-divider-text">Includes access to</div><div class="lp-divider-line"></div></div>
       <div class="lp-pills">
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Módulo de edificios con inventario real</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>CRM comercial integrado</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Generación PPT profesional</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Analytics e inteligencia comercial</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Building inventory with real-time data</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Integrated commercial CRM</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Professional PPT generation</div>
+        <div class="lp-pill"><div class="lp-pill-dot"></div>Analytics & commercial intelligence</div>
       </div>
-      <div class="lp-footer"><strong>Colliers International Argentina</strong><br>Uso interno · colliers.com</div>
+      <div class="lp-footer"><strong>Colliers International Argentina</strong><br>Internal use · colliers.com</div>
     </div>
   </div>
 </div>
@@ -1173,9 +1176,9 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
 <!-- APP SIDEBAR -->
 <div id="app-sidebar">
   <div class="sb-logo-area">
-    <div class="sb-brand">Colliers One</div>
+    <div class="sb-brand">Colliers Nexus</div>
     <div class="sb-brand-bar"></div>
-    <div class="sb-brand-sub">Plataforma Comercial</div>
+    <div class="sb-brand-sub">Commercial Intelligence Platform</div>
   </div>
   <div class="sb-user" id="sb-user-area">
     <div style="display:flex;align-items:center;gap:.65rem">
@@ -1187,22 +1190,22 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
     </div>
   </div>
   <nav class="sb-nav">
-    <div class="sb-nav-section">Módulos</div>
+    <div class="sb-nav-section">Modules</div>
     <button class="sb-nav-item active" id="sbn-home" onclick="showModule('home')">
       <span class="sb-nav-icon">🏠</span>Inicio
     </button>
     <button class="sb-nav-item" id="sbn-generator" onclick="showModule('generator')">
-      <span class="sb-nav-icon">🔍</span>Generador de Alternativas
+      <span class="sb-nav-icon">🔍</span>Alternative Generator
     </button>
     <button class="sb-nav-item" id="sbn-buildings" onclick="showModule('buildings')">
-      <span class="sb-nav-icon">🏢</span>Inventario de Edificios
+      <span class="sb-nav-icon">🏢</span>Building Inventory
     </button>
     <button class="sb-nav-item" id="sbn-crm" onclick="showModule('crm')">
-      <span class="sb-nav-icon">👥</span>CRM Comercial
+      <span class="sb-nav-icon">👥</span>Commercial CRM
     </button>
     <div class="sb-nav-section" id="sbn-analytics-section" style="display:none">Analytics</div>
     <button class="sb-nav-item" id="sbn-analytics" onclick="showModule('analytics')" style="display:none">
-      <span class="sb-nav-icon">📊</span>Analytics
+      <span class="sb-nav-icon">📊</span>Market Analytics
     </button>
   </nav>
   <div class="sb-footer">
@@ -1219,34 +1222,34 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
 <div id="home-hub">
   <div class="hub-wrap">
     <div class="hub-hero">
-      <div class="hub-greeting" id="hub-greeting">Buenos días</div>
-      <h1 class="hub-title">¿Qué querés <span>gestionar hoy?</span></h1>
-      <p class="hub-subtitle">Seleccioná un módulo para comenzar</p>
+      <div class="hub-greeting" id="hub-greeting">Good morning</div>
+      <h1 class="hub-title">What do you want to <span>manage today?</span></h1>
+      <p class="hub-subtitle">Select a module to get started</p>
     </div>
     <div class="hub-cards" id="hub-cards">
       <!-- cards rendered by JS so analytics card only shows for whitelist -->
     </div>
-    <div class="hub-section-title">Accesos rápidos</div>
+    <div class="hub-section-title">Quick Access</div>
     <div class="hub-quick">
       <div class="hub-quick-card" onclick="showModule('generator')">
         <div class="hub-quick-icon">📄</div>
-        <div class="hub-quick-label">Nueva presentación</div>
-        <div class="hub-quick-sub">Generador PPT</div>
+        <div class="hub-quick-label">New presentation</div>
+        <div class="hub-quick-sub">PPT Generator</div>
       </div>
       <div class="hub-quick-card" onclick="showModule('crm')">
         <div class="hub-quick-icon">👤</div>
-        <div class="hub-quick-label">Clientes activos</div>
-        <div class="hub-quick-sub">CRM Comercial</div>
+        <div class="hub-quick-label">Active clients</div>
+        <div class="hub-quick-sub">Commercial CRM</div>
       </div>
       <div class="hub-quick-card" onclick="showModule('buildings')">
         <div class="hub-quick-icon">🏗️</div>
-        <div class="hub-quick-label">Inventario</div>
-        <div class="hub-quick-sub">Edificios y disponibilidades</div>
+        <div class="hub-quick-label">Inventory</div>
+        <div class="hub-quick-sub">Buildings & availabilities</div>
       </div>
       <div class="hub-quick-card" onclick="showModule('generator')">
         <div class="hub-quick-icon">🔍</div>
-        <div class="hub-quick-label">Búsqueda de oficinas</div>
-        <div class="hub-quick-sub">Filtros avanzados</div>
+        <div class="hub-quick-label">Office search</div>
+        <div class="hub-quick-sub">Advanced filters</div>
       </div>
     </div>
   </div>
@@ -1268,7 +1271,7 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
   <div class="an-wrap">
     <div class="an-hdr">
       <div>
-        <div class="an-title">Analytics · Inteligencia Comercial</div>
+        <div class="an-title">Market Analytics · Commercial Intelligence</div>
         <div class="an-subtitle" id="an-last-update">Cargando datos...</div>
       </div>
       <button onclick="toggleAnalytics()" class="nbtn" style="background:rgba(37,64,143,.15);border-color:rgba(37,64,143,.3);color:#25408F;margin-top:4px">✕ Cerrar</button>
@@ -1415,7 +1418,7 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
 <!-- APP -->
 <div id="as">
   <div class="gen-topbar">
-    <div class="gen-topbar-title">🔍 Generador de Alternativas</div>
+    <div class="gen-topbar-title">🔍 Alternative Generator</div>
     <button class="gen-close-btn" onclick="showModule('home')">✕ Cerrar</button>
   </div>
   <div class="app-wrap">
@@ -1625,7 +1628,7 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
       </main>
     </div>
   </div>
-  <footer>Colliers International Argentina · Uso interno · Generador de Alternativas</footer>
+  <footer>Colliers International Argentina · Internal use · Alternative Generator</footer>
 </div>
 </div><!-- /main-content -->
 </div><!-- /app-shell -->
@@ -1721,7 +1724,7 @@ function onUserLoggedIn(){
   const sbEmail=document.getElementById('sb-user-email');if(sbEmail)sbEmail.textContent=user.email;
   // Set greeting based on time
   const h=new Date().getHours();
-  const greeting=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
+  const greeting=h<12?'Good morning':h<19?'Good afternoon':'Good evening';
   const greetEl=document.getElementById('hub-greeting');if(greetEl)greetEl.textContent=greeting+', '+((user.displayName||'').split(' ')[0]||'Broker');
   // Show analytics sidebar items only for whitelist
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
@@ -4013,12 +4016,12 @@ function renderHubCards(){
   if(!container)return;
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
   const cards=[
-    {icon:'🔍',title:'Generador de Alternativas',desc:'Buscá oficinas, compará opciones y generá presentaciones profesionales en segundos.',mod:'generator',btn:'Abrir módulo'},
-    {icon:'🏢',title:'Inventario de Edificios',desc:'Administrá edificios, pisos, disponibilidades, asking rents y ocupantes.',mod:'buildings',btn:'Abrir módulo'},
-    {icon:'👥',title:'CRM Comercial',desc:'Gestioná clientes, oportunidades, reuniones y actividad comercial.',mod:'crm',btn:'Abrir módulo'},
+    {icon:'🔍',title:'Alternative Generator',desc:'Search offices, compare options and generate professional presentations in seconds.',mod:'generator',btn:'Open module'},
+    {icon:'🏢',title:'Building Inventory',desc:'Manage buildings, floors, availabilities, asking rents and occupants.',mod:'buildings',btn:'Open module'},
+    {icon:'👥',title:'Commercial CRM',desc:'Manage clients, opportunities, meetings and commercial activity.',mod:'crm',btn:'Open module'},
   ];
   if(isAdmin){
-    cards.push({icon:'📊',title:'Analytics',desc:'Insights comerciales, demanda, brokers y reporting estratégico.',mod:'analytics',btn:'Abrir módulo',badge:'Solo Admin'});
+    cards.push({icon:'📊',title:'Market Analytics',desc:'Commercial insights, demand, brokers and strategic reporting.',mod:'analytics',btn:'Open module',badge:'Admin only'});
   }
   container.innerHTML=cards.map(c=>`
     <div class="hub-card" onclick="showModule('${c.mod}')">
