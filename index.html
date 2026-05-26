@@ -608,11 +608,17 @@ body.dark .gen-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(
 /* KPI row */
 .bld-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;flex-shrink:0}
 @media(max-width:960px){.bld-kpi-row{grid-template-columns:repeat(2,1fr)}}
-.bld-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:1.1rem 1.4rem;display:flex;flex-direction:column;gap:.3rem;transition:all .2s}
+.bld-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:1.1rem 1.4rem;display:flex;flex-direction:column;gap:.3rem;transition:all .25s}
 body.dark .bld-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)}
+.bld-kpi.filtered{border-color:rgba(28,84,244,.35);box-shadow:0 0 0 1px rgba(28,84,244,.15),0 4px 16px rgba(28,84,244,.1)}
+body.dark .bld-kpi.filtered{border-color:rgba(77,147,255,.4);box-shadow:0 0 0 1px rgba(77,147,255,.15),0 4px 20px rgba(28,84,244,.2)}
 .bld-kpi-icon{font-size:18px;line-height:1}
-.bld-kpi-v{font-size:30px;font-weight:700;color:#0A1B4D;line-height:1}
+.bld-kpi-v{font-size:30px;font-weight:700;color:#0A1B4D;line-height:1;transition:color .2s}
 body.dark .bld-kpi-v{color:#fff}
+.bld-kpi.filtered .bld-kpi-v{color:#1C54F4}
+body.dark .bld-kpi.filtered .bld-kpi-v{color:#4D93FF}
+@keyframes kpi-pop{0%{transform:scale(.92);opacity:.5}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+.bld-kpi-v.pop{animation:kpi-pop .22s ease-out forwards}
 .bld-kpi-l{font-size:11px;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 body.dark .bld-kpi-l{color:#A8B3D1}
 
@@ -3225,18 +3231,23 @@ async function loadBuildings(){
   }
 }
 
-function renderBldKPIs(){
+function renderBldKPIs(docs){
   const row=document.getElementById('bld-kpi-row');
   if(!row)return;
-  const total=_bldDocs.length;
-  const disponibles=_bldDocs.filter(d=>!d.estado||d.estado==='Disponible').length;
-  const totalM2=_bldDocs.reduce((s,d)=>s+(d.superficieDisponible||0),0);
-  const zonas=new Set(_bldDocs.map(d=>d.zona||d.submercado).filter(Boolean)).size;
+  // docs = _bldFiltered when filtered, _bldDocs when showing all
+  const src=docs||_bldDocs;
+  const isFiltered=src!==_bldDocs&&src.length!==_bldDocs.length;
+  const total=src.length;
+  const disponibles=src.filter(d=>!d.estado||d.estado==='Disponible').length;
+  const totalM2=src.reduce((s,d)=>s+(Number(d.superficieDisponible)||0),0);
+  const zonas=new Set(src.map(d=>d.zona||d.submercado).filter(Boolean)).size;
+  const fc=isFiltered?' filtered':'';
+  const suffix=isFiltered?' <span style="font-size:9px;font-weight:700;color:#1C54F4;background:rgba(28,84,244,.1);border-radius:4px;padding:1px 5px;vertical-align:middle;margin-left:4px">FILTRADO</span>':'';
   row.innerHTML=`
-    <div class="bld-kpi"><div class="bld-kpi-icon">🏢</div><div class="bld-kpi-v">${total}</div><div class="bld-kpi-l">Edificios totales</div></div>
-    <div class="bld-kpi"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
-    <div class="bld-kpi"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v">${totalM2.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² totales disp.</div></div>
-    <div class="bld-kpi"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v">${zonas}</div><div class="bld-kpi-l">Zonas activas</div></div>
+    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏢</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Edificios${isFiltered?' en vista':' totales'}</div></div>
+    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v pop">${totalM2.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² disp.${isFiltered?' (vista)':''}</div></div>
+    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${zonas}</div><div class="bld-kpi-l">Zona${zonas!==1?'s':''} activa${zonas!==1?'s':''}</div></div>
   `;
 }
 
@@ -3247,16 +3258,29 @@ function populateBldZonaFilter(){
 }
 
 function filterBuildings(){
-  const q=(document.getElementById('bld-search')?.value||'').toLowerCase();
+  const q=(document.getElementById('bld-search')?.value||'').toLowerCase().trim();
   const zona=document.getElementById('bld-filter-zona')?.value||'';
   const estado=document.getElementById('bld-filter-estado')?.value||'';
   _bldFiltered=_bldDocs.filter(d=>{
-    if(q&&!(d.nombre||'').toLowerCase().includes(q)&&!(d.zona||d.submercado||'').toLowerCase().includes(q)&&!(d.broker||'').toLowerCase().includes(q))return false;
+    if(q){
+      // Search by name, address, zone, broker — any field that could match
+      const haystack=[
+        d.nombre||'',
+        d.direccion||'',
+        d.zona||'',
+        d.submercado||'',
+        d.broker||'',
+        d.descripcion||'',
+        d.amenities||'',
+      ].join(' ').toLowerCase();
+      if(!haystack.includes(q))return false;
+    }
     if(zona&&(d.zona||d.submercado)!==zona)return false;
     if(estado&&d.estado!==estado)return false;
     return true;
   });
   _bldPage=0;
+  renderBldKPIs(_bldFiltered);
   renderBuildingsTable();
 }
 
@@ -3673,7 +3697,6 @@ async function deleteBuilding(){
     await db.collection('buildings').doc(_bldEditId).delete();
     _bldDocs=_bldDocs.filter(x=>x._id!==_bldEditId);
     closeBldDetail();
-    renderBldKPIs();
     filterBuildings();
     showBldToast('🗑 Edificio eliminado');
   }catch(e){showBldToast('❌ Error: '+e.message,4000);}
