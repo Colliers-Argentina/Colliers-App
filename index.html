@@ -1889,7 +1889,7 @@ async function loadData(){
             cat:f.categoria||f.certificacion||'–',
             anio:f.anio||'–',
             pisos:f.pisos||'–',
-            cocheras:f.cocheras||'–',
+            cocheras:formatCocherasES(f.cocheras||''),
             supDisp:Number(f.superficieDisponible)||0,
             pisosDisp:f.pisosDisponibles||'–',
             supPlanta:Number(f.superficiePlanta)||0,
@@ -1959,7 +1959,7 @@ function parseCSV(csv){
       cat:v[c("Categoría")]||"–",
       anio:v[c("Año Construcción")]||"–",
       pisos:v[c("Pisos Totales")]||"–",
-      cocheras:v[c("Ratio Cocheras")]||"–",
+      cocheras:formatCocherasES(v[c("Ratio Cocheras")]||''),
       supDisp:parseFloat(((v[c("Superficie Disponible (m²)")]||v[c("Superficie Disponible m²")])||"0").replace(/\./g,"").replace(",","."))||0,
       pisosDisp:v[c("Pisos Disponibles")]||"–",
       supPlanta:parseFloat(((v[c("Sup. Promedio Planta (m²)")]||v[c("Sup. Promedio Planta m²")])||"0").replace(/\./g,"").replace(",","."))||0,
@@ -2210,7 +2210,7 @@ function applyFilters(){
     if(rentMin&&rn<rentMin)return false;
     if(rentMax<Infinity&&rn>rentMax)return false;
     if(cats.length&&!cats.some(c=>p.cat===c))return false;
-    if(needCocheras&&(p.cocheras==="–"||p.cocheras==="0"))return false;
+    if(needCocheras&&!parseParkingRatio(p.cocheras))return false;
     return true;
   });
   if(cantVal>0)r=r.slice(0,cantVal);
@@ -2266,7 +2266,7 @@ function renderCompView(){
     {lbl:"Año",           fn:p=>p.anio},
     {lbl:"Pisos totales", fn:p=>p.pisos},
     {lbl:"Sup. disponible m²", fn:p=>`<span class="sv">${p.supDisp?p.supDisp.toLocaleString("es-AR")+" m²":"–"}</span>${p.supMinima>0?`<br><span class="subdiv-badge">✂ Subdivisible desde ${p.supMinima.toLocaleString("es-AR")} m²</span>`:''}`},
-    {lbl:"Cocheras",      fn:p=>p.cocheras},
+    {lbl:"Cocheras",      fn:p=>formatCocherasES(p.cocheras)},
     {lbl:"Pisos disponibles", fn:p=>p.pisosDisp},
     {lbl:"Sup. promedio m²",  fn:p=>p.supPlanta?p.supPlanta.toLocaleString("es-AR")+" m²":"–"},
     {lbl:"Sup. a adquirir",   fn:(_,i)=>`<input type="text" class="acq-inp" id="acq-${i}" placeholder="Ingresar m²">`},
@@ -2575,7 +2575,7 @@ window.generarPPT=async()=>{
           const dc=grupo.map(prop=>{
             let val=key==="__empty__"?"":prop[key]||"–";
             if((key==="supDisp"||key==="supPlanta")&&prop[key])val=Number(prop[key]).toLocaleString(numLocale);
-            if(key==="cocheras"&&lang==="en"&&val&&val!=="–")val=val.replace(/\bparking\b\s*/gi,'').replace(/\bm²\b|\bm2\b/g,'sq. m').replace(/\bcada\b/gi,'every').trim();
+            if(key==="cocheras")val=lang==="en"?formatCocherasEN(val):formatCocherasES(val);
             const isDisp=key==="supDisp", isCom=key==="comentarios";
             if(isCom){val=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean).map(b=>`• ${b}`).join('\n');}
             return{text:String(val),options:{color:isDisp?MID:"353E59",bold:isDisp,align:isCom?"left":"center",valign:"middle",fill:{color:bg},fontSize:isDisp?9:7.5,fontFace:"Open Sans",wrap:true,border:NB}};
@@ -2597,12 +2597,8 @@ window.generarPPT=async()=>{
       const ROW_H=0.44;
       const fichaLocale=lang==="en"?"en-US":"es-AR";
       const fmtArea=n=>n?Number(n).toLocaleString(fichaLocale):"–";
-      const fmtCoch=v=>{
-        if(!v||v==="–")return v||"–";
-        if(lang!=="en")return v;
-        return v.replace(/\bparking\b\s*/gi,'').replace(/\bm²\b|\bm2\b/g,'sq. m').replace(/\bcada\b/gi,'every').trim();
-      };
       const rentUnit=lang==="en"?"sq. m":"m²";
+      const fmtCoch=lang==="en"?formatCocherasEN:formatCocherasES;
       const CAMPOS_DEF=[
         [t.rowDir,p=>p.direccion,false],
         [t.rowSub,p=>p.submercado,false],
@@ -3294,7 +3290,7 @@ async function loadBuildings(){
           cat:f.categoria||f.certificacion||'–',
           anio:f.anio||'–',
           pisos:f.pisos||'–',
-          cocheras:f.cocheras||'–',
+          cocheras:formatCocherasES(f.cocheras||''),
           supDisp:Number(f.superficieDisponible)||0,
           pisosDisp:f.pisosDisponibles||'–',
           supPlanta:Number(f.superficiePlanta)||0,
@@ -3603,6 +3599,43 @@ function normalizeM2Input(v){
     return parseFloat(s.replace(/,/g,''))||0;
   // Remove any non-numeric except period/comma, then try
   return parseFloat(s.replace(/[^\d.,]/g,'').replace(',','.'))||0;
+}
+
+/**
+ * Parse a parking ratio string to a number (the denominator).
+ * Handles: "1 cada 60 m2", "1 c/60", "1 cada 60m2", "1/60", "1 every 60 sq. m", "60"
+ * Returns the denominator as integer, or null if unparseable.
+ */
+function parseParkingRatio(raw){
+  if(!raw||raw==='–'||!String(raw).trim())return null;
+  const s=String(raw).trim();
+  // "cada N" / "every N" / "c/ N" — keyword patterns
+  const kwM=s.match(/(?:cada|every|c\/)\s*(\d+)/i);
+  if(kwM)return parseInt(kwM[1]);
+  // "N / M" or "N/M" — fraction pattern (take denominator M)
+  const frM=s.match(/\d+\s*[\/]\s*(\d+)/);
+  if(frM)return parseInt(frM[1]);
+  // Pure number
+  if(/^\d+$/.test(s.trim()))return parseInt(s);
+  console.warn('[parseParkingRatio] Ratio inválido:',JSON.stringify(raw));
+  return null;
+}
+
+/** Render parking ratio in Spanish: "1 cochera cada 60 m²" */
+function formatCocherasES(raw){
+  if(!raw||raw==='–'||raw==='0')return'–';
+  const r=parseParkingRatio(raw);
+  if(r)return`1 cochera cada ${r} m²`;
+  // Fallback: normalize known unit strings but keep as-is
+  return String(raw).replace(/\bm2\b/gi,'m²').replace(/\bsq\.?\s*m\b/gi,'m²').trim()||'–';
+}
+
+/** Render parking ratio in English: "1 every 60 sq. m" */
+function formatCocherasEN(raw){
+  if(!raw||raw==='–'||raw==='0')return'–';
+  const r=parseParkingRatio(raw);
+  if(r)return`1 every ${r} sq. m`;
+  return String(raw).replace(/\bm²\b|\bm2\b/gi,'sq. m').replace(/\bcada\b/gi,'every').replace(/\bparking\b\s*/gi,'').trim()||'–';
 }
 
 /* ===== UNITS (subcollection buildings/{id}/units) ===== */
@@ -3994,7 +4027,7 @@ async function syncSheetToFirestore(){
           certificacion:p.cat||'',
           anio:p.anio||'',
           pisos:p.pisos||'',
-          cocheras:p.cocheras||'',
+          cocheras:formatCocherasES(p.cocheras||''),
           foto:p.foto||'',
           imagenes:p.foto?[p.foto]:[],
           googleMaps:'',
