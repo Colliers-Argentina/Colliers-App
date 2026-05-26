@@ -1510,6 +1510,10 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
             <div class="pers-col">
               <div class="pers-lbl">Cliente / Informe</div>
               <input type="text" id="kc" class="pers-input" placeholder="Ej: Securitas · Mayo 2026">
+              <div class="pers-lbl" style="margin-top:.5rem">Creado por</div>
+              <select id="ppt-broker" class="pers-sel" onchange="saveBrokerPref(this.value)">
+                <option value="">— Usuario actual —</option>
+              </select>
               <div class="pers-lbl" style="margin-top:.5rem">Preparado para <span style="color:#ED1B34">*</span></div>
               <div class="client-mode-row">
                 <button type="button" class="client-mode-btn active" id="btn-nuevo" onclick="setClientMode('nuevo')">＋ Nuevo</button>
@@ -1533,7 +1537,12 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
               </div>
             </div>
             <div class="pers-col">
-              <div class="pers-lbl">Estilo</div>
+              <div class="pers-lbl">Idioma del informe</div>
+              <select id="ppt-lang" class="pers-sel">
+                <option value="es">🇦🇷 Español</option>
+                <option value="en">🇺🇸 English</option>
+              </select>
+              <div class="pers-lbl" style="margin-top:.75rem">Estilo</div>
               <select class="pers-sel">
                 <option>Corporativo Premium</option>
                 <option>Moderno</option>
@@ -1638,6 +1647,96 @@ try{
 let user=null, masterBuildings=[], filt=[], sel=new Set(), overviewData={};
 const ZONAS_DEFAULT=['Catalinas','Macrocentro','Macrocentro Sur','Microcentro','Norte CABA','Norte GBA','Plaza Roma','Puerto Madero','Retiro','Sur CABA'];
 
+const BROKERS=[
+  {name:"Alejandro Bartra",displayName:"Bartra, Alejandro",email:"Alejandro.Bartra@colliers.com"},
+  {name:"Juan Manuel Farola",displayName:"Farola, Juan Manuel",email:"JuanManuel.Farola@colliers.com"},
+  {name:"Marcelo Zuliani",displayName:"Zuliani, Marcelo",email:"Marcelo.Zuliani@colliers.com"},
+  {name:"Juan Manuel Troncoso",displayName:"Troncoso, Juan Manuel",email:"JuanManuel.Troncoso@colliers.com"},
+  {name:"Nicolas Matienzo",displayName:"Matienzo, Nicolas",email:"nicolas.matienzo@colliers.com"},
+  {name:"Juan Giancontieri",displayName:"Giancontieri, Juan",email:"Juan.Giancontieri@colliers.com"}
+];
+
+const TRANSLATIONS={
+  es:{
+    reportTitle:"Informe de Alternativas\nde Oficinas",
+    preparedFor:"Preparado para:",
+    preparedBy:"Preparado por: Colliers Argentina",
+    accelerating:"Accelerating success.",
+    tableTitle:"Alternativas de Oficinas",
+    page:"Pág.",
+    rowDir:"Dirección",rowSub:"Submercado",rowCat:"Categoría",rowAnio:"Año",rowPisos:"Pisos",
+    rowCoch:"Cocheras",rowSupDisp:"Superficie Disponible (m²)",rowPisosDisp:"Pisos disponibles",
+    rowSupPlanta:"Sup. Planta Promedio (m²)",rowSupAdq:"Sup. A adquirir (m²)",rowRent:"Asking Rent (USD/m²)",rowComent:"Comentarios",
+    specs:"Especificaciones",noPhoto:"Sin foto",comments:"Comentarios",
+    footerNote:"* Rango de expensas promedio USD 5-7 m². A validar en cada caso concreto.",
+    confidential:"Información confidencial — Colliers International Argentina",
+    conclTitle:"Conclusiones y Recomendaciones",
+    conclSub:"Análisis generado por IA · Colliers",
+    conclNoKey:"Para activar esta función contactá al administrador.",
+    mapTitle:"Alternativas · Ubicaciones",
+    mapLocations:"Ubicaciones",
+    moreInfo:"Para más información →",
+    closingTitle:"Muchas gracias.",
+    closingContact:"Para más información\ncontactarse con:",
+    marketTitle:"Resumen informe de mercado ",
+    marketGeneral:"General Data",
+    marketBuildings:"Edificios",marketInventory:"Inventario",marketAvail:"Sup. Disponible",
+    marketVacancy:"Vacancia",marketRent:"Asking Rent prom"
+  },
+  en:{
+    reportTitle:"Office Alternatives\nReport",
+    preparedFor:"Prepared for:",
+    preparedBy:"Prepared by: Colliers Argentina",
+    accelerating:"Accelerating success.",
+    tableTitle:"Office Alternatives",
+    page:"Page",
+    rowDir:"Address",rowSub:"Submarket",rowCat:"Category",rowAnio:"Year",rowPisos:"Floors",
+    rowCoch:"Parking",rowSupDisp:"Available Area (sqm)",rowPisosDisp:"Available floors",
+    rowSupPlanta:"Avg. Floor Area (sqm)",rowSupAdq:"Area to acquire (sqm)",rowRent:"Asking Rent (USD/sqm)",rowComent:"Comments",
+    specs:"Specifications",noPhoto:"No photo",comments:"Comments",
+    footerNote:"* Average service charges USD 5-7 sqm. To be confirmed per case.",
+    confidential:"Confidential — Colliers International Argentina",
+    conclTitle:"Conclusions & Recommendations",
+    conclSub:"AI-generated analysis · Colliers",
+    conclNoKey:"To activate this feature contact your administrator.",
+    mapTitle:"Alternatives · Locations",
+    mapLocations:"Locations",
+    moreInfo:"For more information →",
+    closingTitle:"Thank you.",
+    closingContact:"For more information\nplease contact:",
+    marketTitle:"Market overview ",
+    marketGeneral:"General Data",
+    marketBuildings:"Buildings",marketInventory:"Inventory",marketAvail:"Available Area",
+    marketVacancy:"Vacancy",marketRent:"Avg. Asking Rent"
+  }
+};
+
+function initBrokerDropdown(){
+  const sel=document.getElementById('ppt-broker');
+  if(!sel)return;
+  sel.innerHTML='<option value="">— Usuario actual —</option>';
+  BROKERS.forEach(b=>{
+    const o=document.createElement('option');
+    o.value=b.email;
+    o.textContent=b.displayName;
+    sel.appendChild(o);
+  });
+  // Auto-select logged-in user if they match a broker
+  const matchByEmail=BROKERS.find(b=>b.email.toLowerCase()===(user?.email||'').toLowerCase());
+  if(matchByEmail){
+    sel.value=matchByEmail.email;
+  }else{
+    // Restore last saved broker
+    const saved=localStorage.getItem('colliers-broker');
+    if(saved&&BROKERS.find(b=>b.email===saved))sel.value=saved;
+  }
+}
+
+window.saveBrokerPref=function(email){
+  if(email)localStorage.setItem('colliers-broker',email);
+  else localStorage.removeItem('colliers-broker');
+};
+
 function decodeJWT(token){
   const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
   return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
@@ -1711,6 +1810,7 @@ function onUserLoggedIn(){
   show('home-hub');
   // Admin button (legacy)
   if(user.email==='matias.azaretto@colliers.com'){const ab=document.getElementById('admin-btn');if(ab)ab.style.display='';}
+  initBrokerDropdown();
   populateZonas();
   startChat((user.displayName||'').split(' ')[0]||'Broker');
   Promise.all([loadData(),cargarOverview()]);
@@ -2325,6 +2425,12 @@ window.generarPPT=async()=>{
   const msg=document.getElementById("sm");
   const cliente=document.getElementById("kc").value.trim()||"Colliers Internacional";
   const kpVal=document.getElementById("kp").value.trim();
+  const lang=(document.getElementById("ppt-lang")?.value)||'es';
+  const t=TRANSLATIONS[lang]||TRANSLATIONS.es;
+  const brokerEmail=document.getElementById("ppt-broker")?.value||'';
+  const brokerObj=BROKERS.find(b=>b.email===brokerEmail);
+  const brokerDisplayName=brokerObj?brokerObj.name:(user?.displayName||'Colliers Argentina');
+  const brokerEmailFinal=brokerObj?brokerObj.email:(user?.email||'');
   if(!('zona' in resp)){msg.style.color='#ED1B34';msg.textContent='⚠ Zona es obligatoria. Completá el chat primero.';return;}
   if(!('sup' in resp)){msg.style.color='#ED1B34';msg.textContent='⚠ Superficie es obligatoria. Completá el chat primero.';return;}
   if(!kpVal){msg.style.color='#ED1B34';msg.textContent='⚠ El campo "Preparado para" es obligatorio.';return;}
@@ -2363,36 +2469,36 @@ window.generarPPT=async()=>{
     if(portadaB64){s0.addImage({data:portadaB64,x:0,y:0,w:13.33,h:7.5});}
     else{s0.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});}
     s0.addShape(pptx.ShapeType.rect,{x:0,y:1.2,w:5.8,h:2.8,fill:{color:MID}});
-    s0.addText("Informe de Alternativas\nde Oficinas",{x:0.3,y:1.4,w:5.4,h:2.4,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
+    s0.addText(t.reportTitle,{x:0.3,y:1.4,w:5.4,h:2.4,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
     s0.addShape(pptx.ShapeType.rect,{x:0,y:4.0,w:5.8,h:1.6,fill:{color:WHITE}});
     s0.addText(fechaStr,{x:0.3,y:4.1,w:5.4,h:0.38,fontSize:13,bold:true,color:DARK,fontFace:"Open Sans"});
-    s0.addText(`Preparado para: ${prepPara}`,{x:0.3,y:4.52,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
-    s0.addText("Preparado por: Colliers Argentina",{x:0.3,y:4.9,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
+    s0.addText(`${t.preparedFor} ${prepPara}`,{x:0.3,y:4.52,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
+    s0.addText(t.preparedBy,{x:0.3,y:4.9,w:5.4,h:0.35,fontSize:10,color:"353E59",fontFace:"Open Sans"});
     s0.addShape(pptx.ShapeType.rect,{x:0,y:6.9,w:5.8,h:0.6,fill:{color:DEEP}});
-    s0.addText("Accelerating success.",{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
+    s0.addText(t.accelerating,{x:0.3,y:6.9,w:5.4,h:0.6,fontSize:11,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
 
     // OVERVIEW DE MERCADO
     const s1=pptx.addSlide();
     s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
     s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
-    const ovTitulo="Resumen informe de mercado "+(overviewData['Fecha actualización']||'');
+    const ovTitulo=t.marketTitle+(overviewData['Fecha actualización']||'');
     s1.addText(ovTitulo,{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
-    s1.addText("General Data",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
+    s1.addText(t.marketGeneral,{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
     if(mapaB64){s1.addImage({data:mapaB64,x:0.2,y:1.3,w:5.8,h:5.2});}
     else{s1.addShape(pptx.ShapeType.rect,{x:0.2,y:1.3,w:5.8,h:5.2,fill:{color:"DBE5FF"}});}
     const ovBullets=[
-      {lbl:"Edificios",val:overviewData['Edificios']||'–'},
-      {lbl:"Inventario",val:(overviewData['Inventario m²']||'–')+" m²"},
-      {lbl:"Sup. Disponible",val:(overviewData['Sup. Disponible']||'–')+" m²"},
-      {lbl:"Vacancia",val:(overviewData['Vacancia %']||'–')+"%"},
-      {lbl:"Asking Rent prom",val:(overviewData['Asking Rent prom']||'–')+" USD/m²"},
+      {lbl:t.marketBuildings,val:overviewData['Edificios']||'–'},
+      {lbl:t.marketInventory,val:(overviewData['Inventario m²']||'–')+" m²"},
+      {lbl:t.marketAvail,val:(overviewData['Sup. Disponible']||'–')+" m²"},
+      {lbl:t.marketVacancy,val:(overviewData['Vacancia %']||'–')+"%"},
+      {lbl:t.marketRent,val:(overviewData['Asking Rent prom']||'–')+" USD/m²"},
     ];
     ovBullets.forEach(({lbl,val},i)=>{
       const iy=2.0+i*0.7;
       s1.addText([{text:"• "+lbl+":  ",options:{bold:true,color:DARK}},{text:val,options:{bold:false,color:"353E59"}}],{x:6,y:iy,w:7.0,h:0.55,fontSize:18,fontFace:"Open Sans",valign:"middle"});
     });
     s1.addShape(pptx.ShapeType.rect,{x:8.5,y:6.5,w:4.5,h:0.6,fill:{color:MID}});
-    s1.addText("Para más información →",{x:8.5,y:6.5,w:4.5,h:0.6,fontSize:13,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:"https://colliersar.my.canva.site/reporte-de-oficinas-q1-2026",tooltip:"Ver reporte completo"}});
+    s1.addText(t.moreInfo,{x:8.5,y:6.5,w:4.5,h:0.6,fontSize:13,bold:true,color:WHITE,align:"center",valign:"middle",fontFace:"Open Sans",hyperlink:{url:"https://colliersar.my.canva.site/reporte-de-oficinas-q1-2026",tooltip:"Ver reporte completo"}});
 
     // TABLA COMPARATIVA
     if(document.getElementById("it").checked){
@@ -2404,10 +2510,10 @@ window.generarPPT=async()=>{
       const TABLE_Y=1.55;
       const NR_H=0.28, NAM_H=0.38, ROW_H=0.41;
       const ROWS=[
-        ["Dirección","direccion"],["Submercado","submercado"],["Categoría","cat"],
-        ["Año","anio"],["Pisos","pisos"],["Cocheras","cocheras"],
-        ["Superficie Disponible (m²)","supDisp"],["Pisos disponibles","pisosDisp"],
-        ["Sup. Planta Promedio (m²)","supPlanta"],["Sup. A adquirir (m²)","__empty__"],["Asking Rent (USD/m²)","rent"],["Comentarios","comentarios"],
+        [t.rowDir,"direccion"],[t.rowSub,"submercado"],[t.rowCat,"cat"],
+        [t.rowAnio,"anio"],[t.rowPisos,"pisos"],[t.rowCoch,"cocheras"],
+        [t.rowSupDisp,"supDisp"],[t.rowPisosDisp,"pisosDisp"],
+        [t.rowSupPlanta,"supPlanta"],[t.rowSupAdq,"__empty__"],[t.rowRent,"rent"],[t.rowComent,"comentarios"],
       ];
       const DPI=200;
       const PX_W=Math.round(CW*DPI), PX_H=Math.round(IMG_H*DPI);
@@ -2436,8 +2542,8 @@ window.generarPPT=async()=>{
         const sl=pptx.addSlide();
 
         // Header — text only, no background rect
-        sl.addText("Alternativas de Oficinas",{x:0.2,y:0.04,w:7,h:0.27,fontSize:12,bold:true,color:"25408F",fontFace:"Open Sans",shrinkText:true});
-        if(grupos.length>1)sl.addText(`Pág. ${gi+1}/${grupos.length}`,{x:10,y:0.04,w:1.3,h:0.27,fontSize:9,color:"25408F",align:"right",fontFace:"Open Sans"});
+        sl.addText(t.tableTitle,{x:0.2,y:0.04,w:7,h:0.27,fontSize:12,bold:true,color:"25408F",fontFace:"Open Sans",shrinkText:true});
+        if(grupos.length>1)sl.addText(`${t.page} ${gi+1}/${grupos.length}`,{x:10,y:0.04,w:1.3,h:0.27,fontSize:9,color:"25408F",align:"right",fontFace:"Open Sans"});
 
         // Images — addImage() per column, above table, outside addTable()
         for(const[i] of grupo.entries()){
@@ -2488,29 +2594,29 @@ window.generarPPT=async()=>{
     if(document.getElementById("if").checked){
       const ROW_H=0.44;
       const CAMPOS_DEF=[
-        ["Dirección",p=>p.direccion,false],
-        ["Submercado",p=>p.submercado,false],
-        ["Categoría",p=>p.cat,false],
-        ["Año",p=>String(p.anio),false],
-        ["Pisos",p=>String(p.pisos),false],
-        ["Cocheras",p=>p.cocheras,false],
-        ["Superficie Disponible (m²)",p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
-        ["Pisos disponibles",p=>p.pisosDisp,false],
-        ["Sup. Planta Promedio (m²)",p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
-        ["Sup. A adquirir (m²)",p=>'',false],
-        ["Asking Rent (USD/m²)",p=>`USD ${p.rent}/m²`,false],
+        [t.rowDir,p=>p.direccion,false],
+        [t.rowSub,p=>p.submercado,false],
+        [t.rowCat,p=>p.cat,false],
+        [t.rowAnio,p=>String(p.anio),false],
+        [t.rowPisos,p=>String(p.pisos),false],
+        [t.rowCoch,p=>p.cocheras,false],
+        [t.rowSupDisp,p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
+        [t.rowPisosDisp,p=>p.pisosDisp,false],
+        [t.rowSupPlanta,p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
+        [t.rowSupAdq,p=>'',false],
+        [t.rowRent,p=>`USD ${p.rent}/m²`,false],
       ];
       for(const[idx,prop] of sp.entries()){
         const s=pptx.addSlide();
         s.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
         // Header
         s.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:0.04,fill:{color:MID}});
-        s.addText("Especificaciones",{x:0.3,y:0.08,w:6,h:0.26,fontSize:9,color:MID,fontFace:"Open Sans"});
+        s.addText(t.specs,{x:0.3,y:0.08,w:6,h:0.26,fontSize:9,color:MID,fontFace:"Open Sans"});
         s.addText(`${idx+1}. ${prop.nombre}`,{x:0.3,y:0.34,w:9.5,h:0.58,fontSize:20,bold:true,color:DARK,fontFace:"Open Sans",shrinkText:true});
         // Foto — lado derecho
         const fb64=fotos[idx];
         if(fb64){s.addImage({data:fb64,x:6.5,y:1.0,w:6.83,h:6.2});}
-        else{s.addShape(pptx.ShapeType.rect,{x:6.5,y:1.0,w:6.83,h:6.2,fill:{color:"DBE5FF"}});s.addText("Sin foto",{x:6.5,y:4.0,w:6.83,h:0.4,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"});}
+        else{s.addShape(pptx.ShapeType.rect,{x:6.5,y:1.0,w:6.83,h:6.2,fill:{color:"DBE5FF"}});s.addText(t.noPhoto,{x:6.5,y:4.0,w:6.83,h:0.4,fontSize:9,color:"56648F",align:"center",fontFace:"Open Sans"});}
         // Tabla de datos — lado izquierdo
         CAMPOS_DEF.forEach(([lbl,fn,hl],fi)=>{
           const fy=1.0+fi*ROW_H;
@@ -2524,11 +2630,11 @@ window.generarPPT=async()=>{
         const cH=7.2-cY;
         const bullets=(prop.comentarios||'').split(',').map(b=>b.trim()).filter(Boolean);
         s.addShape(pptx.ShapeType.rect,{x:0,y:cY,w:6.5,h:cH,fill:{color:"F4F7FF"}});
-        s.addText("Comentarios",{x:0.1,y:cY+0.05,w:2.6,h:0.26,fontSize:8,color:"56648F",fontFace:"Open Sans"});
+        s.addText(t.comments,{x:0.1,y:cY+0.05,w:2.6,h:0.26,fontSize:8,color:"56648F",fontFace:"Open Sans"});
         s.addText(bullets.map(b=>`• ${b}`).join('\n'),{x:0.1,y:cY+0.3,w:6.3,h:cH-0.35,fontSize:8,color:"353E59",wrap:true,fontFace:"Open Sans"});
         // Footer
         s.addShape(pptx.ShapeType.rect,{x:0,y:7.2,w:13.33,h:0.3,fill:{color:DARK}});
-        s.addText("* Rango de expensas promedio USD 5-7 m². A validar en cada caso concreto.",{x:0.2,y:7.22,w:13,h:0.22,fontSize:7,color:PALE,fontFace:"Open Sans"});
+        s.addText(t.footerNote,{x:0.2,y:7.22,w:13,h:0.22,fontSize:7,color:PALE,fontFace:"Open Sans"});
       }
     }
 
@@ -2548,8 +2654,8 @@ window.generarPPT=async()=>{
           const sAI=pptx.addSlide();
           sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
           sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
-          sAI.addText("Conclusiones y Recomendaciones",{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
-          sAI.addText("Análisis generado por IA · Colliers",{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
+          sAI.addText(t.conclTitle,{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+          sAI.addText(t.conclSub,{x:0.3,y:0.72,w:10,h:0.35,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather"});
           const aiLines=aiText.split("\n").filter(l=>l.trim());
           aiLines.forEach((line,i)=>{
             const ly=1.5+i*0.85;
@@ -2558,24 +2664,24 @@ window.generarPPT=async()=>{
             sAI.addText(line.trim(),{x:0.5,y:ly,w:12.3,h:0.75,fontSize:isBullet?14:12,bold:isBullet,color:isBullet?DARK:"353E59",fontFace:"Open Sans",wrap:true});
           });
           sAI.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
-          sAI.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+          sAI.addText(t.confidential,{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
         }
       }catch(aiErr){console.error("AI slide error:",aiErr);}
     }else if(document.getElementById("iai")?.checked&&!ANTHROPIC_API_KEY){
       const sAI=pptx.addSlide();
       sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
       sAI.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.2,fill:{color:DARK}});
-      sAI.addText("Conclusiones y Recomendaciones",{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
-      sAI.addText("Para activar esta función contactá al administrador.",{x:1.5,y:3.0,w:10.3,h:1.0,fontSize:16,color:"56648F",align:"center",valign:"middle",fontFace:"Open Sans",italic:true});
+      sAI.addText(t.conclTitle,{x:0.3,y:0.1,w:10.5,h:0.58,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+      sAI.addText(t.conclNoKey,{x:1.5,y:3.0,w:10.3,h:1.0,fontSize:16,color:"56648F",align:"center",valign:"middle",fontFace:"Open Sans",italic:true});
       sAI.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
-      sAI.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+      sAI.addText(t.confidential,{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
     }
     // SLIDE MAPA DE UBICACIONES (penúltima)
     const sMapa=pptx.addSlide();
     sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
     sMapa.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:1.15,fill:{color:DARK}});
-    sMapa.addText("Alternativas · Ubicaciones",{x:0.3,y:0.1,w:10.5,h:0.55,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
-    sMapa.addText("Ubicaciones",{x:0.3,y:1.25,w:3.3,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
+    sMapa.addText(t.mapTitle,{x:0.3,y:0.1,w:10.5,h:0.55,fontSize:22,bold:true,color:WHITE,fontFace:"Open Sans"});
+    sMapa.addText(t.mapLocations,{x:0.3,y:1.25,w:3.3,h:0.38,fontSize:14,bold:true,color:DARK,fontFace:"Open Sans"});
     sMapa.addShape(pptx.ShapeType.rect,{x:0.3,y:1.63,w:3.3,h:0.04,fill:{color:MID}});
     {
       const availH=7.1-1.78;
@@ -2691,23 +2797,25 @@ window.generarPPT=async()=>{
       }
     }
     sMapa.addShape(pptx.ShapeType.rect,{x:0,y:7.22,w:13.33,h:0.28,fill:{color:DARK}});
-    sMapa.addText("Información confidencial — Colliers International Argentina",{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
+    sMapa.addText(t.confidential,{x:0.2,y:7.25,w:8,h:0.2,fontSize:7,color:PALE,fontFace:"Open Sans"});
 
     // SLIDE CIERRE (última)
     const sCierre=pptx.addSlide();
     if(cierreB64){sCierre.addImage({data:cierreB64,x:0,y:0,w:13.33,h:7.5});}
     else if(portadaB64){sCierre.addImage({data:portadaB64,x:0,y:0,w:13.33,h:7.5});}
     else{sCierre.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:"F0F4FF"}});}
-    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:1.5,w:5.8,h:2.5,fill:{color:MID}});
-    sCierre.addText("Muchas gracias.",{x:0.3,y:1.65,w:5.2,h:1.0,fontSize:28,bold:true,color:WHITE,fontFace:"Open Sans"});
-    sCierre.addText("Para más información\ncontactarse con:",{x:0.3,y:2.75,w:5.2,h:0.9,fontSize:13,italic:true,color:WHITE,fontFace:"Merriweather",wrap:true});
-    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:4.0,w:5.8,h:1.5,fill:{color:"4D93FF"}});
-    sCierre.addText(user?.displayName||'Colliers Argentina',{x:0.3,y:4.15,w:5.2,h:0.55,fontSize:16,bold:true,color:WHITE,fontFace:"Open Sans"});
-    const brokerEmail=user?.email||'';
-    if(brokerEmail){sCierre.addText(brokerEmail,{x:0.3,y:4.75,w:5.2,h:0.4,fontSize:12,color:WHITE,fontFace:"Open Sans",hyperlink:{url:`mailto:${brokerEmail}`,tooltip:"Enviar email"}});}
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:1.4,w:6.0,h:1.4,fill:{color:MID}});
+    sCierre.addText(t.closingTitle,{x:0.3,y:1.5,w:5.4,h:1.2,fontSize:32,bold:true,color:WHITE,fontFace:"Open Sans",valign:"middle"});
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:2.8,w:6.0,h:0.9,fill:{color:DEEP}});
+    sCierre.addText(t.closingContact,{x:0.3,y:2.85,w:5.4,h:0.8,fontSize:12,italic:true,color:PALE,fontFace:"Merriweather",wrap:true,valign:"middle"});
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:3.7,w:6.0,h:1.8,fill:{color:"0A1940"}});
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:3.7,w:0.06,h:1.8,fill:{color:"4D93FF"}});
+    sCierre.addText(brokerDisplayName,{x:0.25,y:3.8,w:5.5,h:0.7,fontSize:19,bold:true,color:WHITE,fontFace:"Open Sans",shrinkText:true});
+    if(brokerEmailFinal){sCierre.addText(brokerEmailFinal,{x:0.25,y:4.55,w:5.5,h:0.35,fontSize:11,color:"7FB3FF",fontFace:"Open Sans",hyperlink:{url:`mailto:${brokerEmailFinal}`,tooltip:"Email"}});}
+    sCierre.addShape(pptx.ShapeType.rect,{x:0,y:5.5,w:6.0,h:0.55,fill:{color:DARK}});
+    sCierre.addText(t.accelerating,{x:0.3,y:5.5,w:5.4,h:0.55,fontSize:12,italic:true,color:WHITE,valign:"middle",fontFace:"Merriweather"});
     const disclaimer='This document has been prepared by Colliers solely for advertising and general information purposes. Colliers makes no warranties of any kind, express or implied, in relation to the information, including, but not limited to, warranties of content, accuracy and reliability. Any interested party should make their own inquiries into the accuracy of the information. Colliers unequivocally excludes all inferred or implied terms, conditions and warranties arising from this document and excludes all liability for loss and damage arising therefrom. This publication is the intellectual property of Colliers and/or its licensors. ©2025 All rights reserved.';
     sCierre.addText(disclaimer,{x:0.3,y:6.6,w:12.7,h:0.7,fontSize:7,color:"888888",fontFace:"Open Sans",wrap:true,valign:"top"});
-    sCierre.addText("Accelerating success.",{x:0.3,y:5.8,w:5.2,h:0.45,fontSize:12,italic:true,color:WHITE,fontFace:"Merriweather"});
 
     const fecha=new Date().toISOString().slice(0,10);
     await pptx.writeFile({fileName:`Alternativas_${cliente.replace(/[^a-z0-9]/gi,"_")}_${fecha}.pptx`});
