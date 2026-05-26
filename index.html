@@ -51,48 +51,45 @@ nav{background:#25408F;height:56px;display:none;align-items:center;justify-conte
 .nbtn:hover{background:rgba(255,255,255,.1)}
 
 /* LOGIN */
-.login-page{display:grid;grid-template-columns:3fr 2fr;min-height:100vh;font-family:'Open Sans',Verdana,sans-serif}
-.lp-left{background:linear-gradient(160deg,#050816 0%,#0B122B 55%,#050F3A 100%);display:flex;flex-direction:column;justify-content:space-between;padding:3rem 3.5rem;position:relative;overflow:hidden}
-.lp-circle{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.06)}
-.lp-top{position:relative;z-index:1;display:flex;flex-direction:column;gap:2.5rem}
-.lp-logo-box{display:inline-flex;flex-direction:column;width:fit-content}
-.lp-bars{display:flex;gap:3px;margin-top:6px}
-.lp-hero h1{font-size:36px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:1rem}
-.lp-hero h1 span{color:#4D93FF}
-.lp-hero p{font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;max-width:440px}
-.lp-feats{display:flex;flex-direction:column;gap:.75rem;position:relative;z-index:1}
-.lp-feat{display:flex;align-items:flex-start;gap:.8rem}
-.lp-feat-icon{width:34px;height:34px;border-radius:7px;background:rgba(77,147,255,.18);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.lp-feat-text{font-size:13px;color:rgba(255,255,255,.7);line-height:1.55}
-.lp-feat-text strong{color:#fff;display:block;margin-bottom:1px}
-.lp-bottom{position:relative;z-index:1}
-.lp-stats{display:flex;gap:2rem;margin-bottom:1.5rem}
-.lp-stat-num{font-size:26px;font-weight:700;color:#fff}
-.lp-stat-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;letter-spacing:.03em}
-.lp-stat-sep{width:1px;background:rgba(255,255,255,.15)}
-.lp-tagline{font-size:12px;color:rgba(255,255,255,.35);font-style:italic;border-top:0.5px solid rgba(255,255,255,.1);padding-top:1rem}
-.lp-right{background:linear-gradient(160deg,#050816 0%,#080F24 100%);display:flex;align-items:center;justify-content:center;padding:3rem;position:relative;overflow:hidden}
-.lp-right::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(28,84,244,.12) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none}
-.lp-right::after{content:'';position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(77,147,255,.08) 0%,transparent 70%);bottom:-80px;left:-60px;pointer-events:none}
-.lp-card{background:rgba(11,18,43,.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:20px;border:1px solid rgba(77,147,255,.18);padding:3rem 2.5rem;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(77,147,255,.1);position:relative;z-index:1}
-.lp-card-top{text-align:center;margin-bottom:2.25rem}
-.lp-logo{width:180px;height:auto;display:block;object-fit:contain;background:transparent}
-.lp-card-top .lp-logo{margin:0 auto 1.25rem;filter:brightness(1.1)}
-.lp-keyline{height:3px;width:56px;margin:.85rem auto;border-radius:2px;background:linear-gradient(90deg,#1C54F4,#4D93FF,#C3E6FF)}
-.lp-card-top h2{font-size:22px;font-weight:700;color:#fff;margin-bottom:.4rem}
-.lp-card-top p{font-size:13px;color:rgba(163,193,255,.6);line-height:1.65}
-.lp-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;background:linear-gradient(135deg,#1C54F4,#4D93FF);color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:10px;cursor:pointer;margin-bottom:.85rem;transition:all .2s;box-shadow:0 4px 20px rgba(28,84,244,.35)}
-.lp-btn:hover{background:linear-gradient(135deg,#1445d4,#3d7de8);box-shadow:0 6px 28px rgba(28,84,244,.5);transform:translateY(-1px)}
-.lp-note{text-align:center;font-size:11px;color:rgba(163,193,255,.4)}
-.lp-divider{display:flex;align-items:center;gap:.75rem;margin:1.5rem 0}
-.lp-divider-line{flex:1;height:0.5px;background:rgba(77,147,255,.2)}
-.lp-divider-text{font-size:10px;color:rgba(163,193,255,.4);white-space:nowrap}
-.lp-pills{display:flex;flex-direction:column;gap:.5rem}
-.lp-pill{display:flex;align-items:center;gap:.6rem;background:rgba(77,147,255,.07);border:1px solid rgba(77,147,255,.12);border-radius:8px;padding:.5rem .75rem;font-size:11.5px;color:rgba(163,193,255,.75)}
-.lp-pill-dot{width:6px;height:6px;border-radius:50%;background:#4D93FF;flex-shrink:0}
-.lp-footer{text-align:center;margin-top:1.75rem;font-size:10px;color:rgba(163,193,255,.3)}
-.lp-footer strong{color:#4D93FF}
-@media(max-width:768px){.login-page{grid-template-columns:1fr}.lp-left{display:none}.lp-right{min-height:100vh}}
+.login-page{position:fixed;inset:0;display:grid;grid-template-columns:460px 1fr;font-family:'Open Sans',Verdana,sans-serif;z-index:1000;overflow:hidden}
+.login-page::before{content:'';position:absolute;inset:0;background:url('login-bg.jpg') center/cover no-repeat;z-index:0}
+.login-page::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(2,6,23,.92) 0%,rgba(3,10,30,.80) 45%,rgba(2,8,24,.60) 100%);z-index:0}
+.lp-left{display:flex;flex-direction:column;justify-content:center;padding:3rem 2.75rem;background:rgba(4,8,22,.72);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-right:1px solid rgba(77,147,255,.14);overflow-y:auto;position:relative;z-index:1}
+.lp-right{display:flex;flex-direction:column;justify-content:flex-end;padding:4rem 4.5rem;position:relative;z-index:1}
+/* Brand block */
+.lp-brand{margin-bottom:2.25rem}
+.lp-logo{width:150px;height:auto;display:block;object-fit:contain;background:transparent;margin-bottom:1.1rem;filter:brightness(1.15)}
+.lp-brand-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.2px}
+.lp-brand-sub{font-size:11.5px;color:rgba(163,193,255,.45);margin-top:.3rem;line-height:1.5}
+/* Form block */
+.lp-keyline{width:36px;height:2px;border-radius:2px;background:linear-gradient(90deg,#1C54F4,#4D93FF);margin-bottom:1.75rem}
+.lp-form-title{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:.4rem}
+.lp-form-sub{font-size:13px;color:rgba(163,193,255,.5);margin-bottom:2rem;line-height:1.65}
+.lp-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 16px;background:linear-gradient(135deg,#1C54F4 0%,#4D93FF 100%);color:#fff;font-family:inherit;font-size:14px;font-weight:600;border:none;border-radius:12px;cursor:pointer;margin-bottom:.85rem;transition:all .22s;box-shadow:0 4px 24px rgba(28,84,244,.4),inset 0 1px 0 rgba(255,255,255,.12)}
+.lp-btn:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(28,84,244,.55)}
+.lp-note{text-align:center;font-size:11px;color:rgba(163,193,255,.32);margin-bottom:2rem}
+.lp-divider{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem}
+.lp-divider-line{flex:1;height:0.5px;background:rgba(77,147,255,.18)}
+.lp-divider-text{font-size:10px;color:rgba(163,193,255,.35);white-space:nowrap}
+.lp-pills{display:flex;flex-direction:column;gap:.45rem}
+.lp-pill{display:flex;align-items:center;gap:.6rem;background:rgba(77,147,255,.06);border:1px solid rgba(77,147,255,.1);border-radius:8px;padding:.45rem .7rem;font-size:11px;color:rgba(163,193,255,.65)}
+.lp-pill-dot{width:5px;height:5px;border-radius:50%;background:#4D93FF;flex-shrink:0}
+.lp-footer{text-align:center;margin-top:2rem;font-size:10px;color:rgba(163,193,255,.22)}
+.lp-footer strong{color:rgba(163,193,255,.4)}
+/* Hero right panel */
+.lp-hero-tag{font-size:11px;font-weight:700;color:#4D93FF;text-transform:uppercase;letter-spacing:.12em;margin-bottom:1.25rem;display:flex;align-items:center;gap:.65rem}
+.lp-hero-tag::before{content:'';width:28px;height:2px;background:#4D93FF;border-radius:2px;flex-shrink:0}
+.lp-hero-title{font-size:52px;font-weight:700;color:#fff;line-height:1.12;letter-spacing:-.8px;margin-bottom:1.25rem;text-shadow:0 4px 32px rgba(0,0,0,.5)}
+.lp-hero-sub{font-size:16px;color:rgba(195,230,255,.72);line-height:1.75;max-width:440px;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+.lp-hero-dots{display:flex;gap:.5rem;margin-top:2.5rem}
+.lp-hero-dot{width:8px;height:8px;border-radius:50%;background:rgba(77,147,255,.35);transition:all .2s}
+.lp-hero-dot.active{background:#4D93FF;width:28px;border-radius:4px}
+@media(max-width:860px){
+  .login-page{grid-template-columns:1fr}
+  .lp-right{display:none}
+  .lp-left{min-height:100vh;justify-content:center;border-right:none}
+  .login-page::after{background:rgba(2,6,23,.88)}
+}
 
 /* DENIED */
 #ds{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 56px)}
@@ -945,8 +942,9 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .sb-logout-btn:hover{background:rgba(239,51,64,.15);border-color:rgba(239,51,64,.4)}
 
 /* ===== HOME HUB ===== */
-#home-hub{display:none;background:linear-gradient(135deg,#000D2E 0%,#000B24 50%,#000F36 100%);overflow-y:auto;min-width:0;flex:1;height:100%}
-.hub-wrap{max-width:1100px;margin:0 auto;padding:3rem 2.5rem}
+#home-hub{display:none;background:url('home-bg.jpg') center/cover no-repeat;background-attachment:local;overflow-y:auto;min-width:0;flex:1;height:100%;position:relative}
+#home-hub::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(2,6,23,.88) 0%,rgba(3,10,30,.80) 50%,rgba(2,8,24,.75) 100%);pointer-events:none;z-index:0}
+.hub-wrap{max-width:1100px;margin:0 auto;padding:3rem 2.5rem;position:relative;z-index:1}
 .hub-hero{margin-bottom:2.5rem}
 .hub-greeting{font-size:13px;color:rgba(163,193,255,.6);font-weight:500;margin-bottom:.35rem}
 .hub-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.2}
@@ -954,9 +952,9 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .hub-subtitle{font-size:14px;color:rgba(163,193,255,.55);margin-top:.5rem}
 .hub-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2.5rem}
 @media(max-width:900px){.hub-cards{grid-template-columns:1fr}}
-.hub-card{background:rgba(255,255,255,.03);border:1px solid rgba(77,147,255,.1);border-radius:18px;padding:1.75rem 2rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:1.1rem}
-.hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(77,147,255,.4),transparent);opacity:0;transition:.25s}
-.hub-card:hover{background:rgba(77,147,255,.07);border-color:rgba(77,147,255,.25);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
+.hub-card{background:rgba(8,14,36,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(77,147,255,.14);border-radius:18px;padding:1.75rem 2rem;cursor:pointer;transition:all .28s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:1.1rem;box-shadow:0 4px 24px rgba(0,0,0,.25)}
+.hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(77,147,255,.5),transparent);opacity:0;transition:.28s}
+.hub-card:hover{background:rgba(28,84,244,.12);backdrop-filter:blur(22px);border-color:rgba(77,147,255,.32);transform:translateY(-4px);box-shadow:0 20px 56px rgba(0,0,0,.4),0 0 0 1px rgba(77,147,255,.18)}
 .hub-card:hover::before{opacity:1}
 .hub-card-icon{font-size:32px;line-height:1;width:56px;height:56px;background:rgba(28,84,244,.15);border:1px solid rgba(77,147,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .hub-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
@@ -970,8 +968,8 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .hub-section-title{font-size:13px;font-weight:700;color:rgba(163,193,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
 .hub-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
 @media(max-width:900px){.hub-quick{grid-template-columns:repeat(2,1fr)}}
-.hub-quick-card{background:rgba(255,255,255,.025);border:1px solid rgba(77,147,255,.08);border-radius:12px;padding:1.1rem 1.25rem;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:.4rem}
-.hub-quick-card:hover{background:rgba(77,147,255,.06);border-color:rgba(77,147,255,.18);transform:translateY(-1px)}
+.hub-quick-card{background:rgba(8,14,36,.45);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(77,147,255,.1);border-radius:12px;padding:1.1rem 1.25rem;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;gap:.4rem;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.hub-quick-card:hover{background:rgba(28,84,244,.14);backdrop-filter:blur(18px);border-color:rgba(77,147,255,.25);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .hub-quick-icon{font-size:20px}
 .hub-quick-label{font-size:12px;font-weight:600;color:#C3E6FF}
 .hub-quick-sub{font-size:10px;color:rgba(163,193,255,.45)}
@@ -992,22 +990,8 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .main-panel{min-width:0}
 
 /* ===== HUB LIGHT MODE ===== */
-body:not(.dark) #home-hub{background:linear-gradient(135deg,#EEF4FF 0%,#F4F8FF 50%,#E8F0FF 100%)}
-body:not(.dark) .hub-greeting{color:rgba(0,7,89,.55)}
-body:not(.dark) .hub-title{color:#000759}
-body:not(.dark) .hub-title span{background:linear-gradient(90deg,#1C54F4,#25408F);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-body:not(.dark) .hub-subtitle{color:#7B8BBD}
-body:not(.dark) .hub-card{background:rgba(255,255,255,.8);border-color:rgba(37,64,143,.12)}
-body:not(.dark) .hub-card:hover{background:#fff;border-color:rgba(28,84,244,.3);box-shadow:0 16px 48px rgba(37,64,143,.12)}
-body:not(.dark) .hub-card-title{color:#000759}
-body:not(.dark) .hub-card-desc{color:#56648F}
-body:not(.dark) .hub-card-icon{background:rgba(28,84,244,.1);border-color:rgba(37,64,143,.2)}
-body:not(.dark) .hub-card-btn{color:#1C54F4;background:rgba(28,84,244,.08);border-color:rgba(37,64,143,.2)}
-body:not(.dark) .hub-section-title{color:rgba(0,7,89,.45)}
-body:not(.dark) .hub-quick-card{background:rgba(255,255,255,.8);border-color:rgba(37,64,143,.1)}
-body:not(.dark) .hub-quick-card:hover{background:#fff}
-body:not(.dark) .hub-quick-label{color:#000759}
-body:not(.dark) .hub-quick-sub{color:#7B8BBD}
+/* Light mode: hub image background remains, overlay slightly lighter */
+body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,.82) 0%,rgba(3,10,30,.74) 50%,rgba(2,8,24,.68) 100%)}
 
 /* ===== MOBILE RESPONSIVE ===== */
 #sb-hamburger{display:none}
@@ -1115,55 +1099,39 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
 
 <!-- LOGIN -->
 <div class="login-page" id="ls">
+  <!-- LEFT: glassmorphism login panel -->
   <div class="lp-left">
-    <div class="lp-circle" style="top:-80px;right:-80px;width:320px;height:320px"></div>
-    <div class="lp-circle" style="top:-40px;right:-40px;width:200px;height:200px;border-color:rgba(255,255,255,.08)"></div>
-    <div class="lp-circle" style="bottom:-100px;left:-60px;width:280px;height:280px"></div>
-    <div class="lp-top">
+    <div class="lp-brand">
       <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers" class="lp-logo">
-      <div class="lp-hero">
-        <h1>Plataforma Inteligente<br><span>Colliers Nexus</span></h1>
-        <p>Plataforma interna de Colliers Argentina para gestionar edificios, clientes, disponibilidades y generar presentaciones comerciales.</p>
-      </div>
+      <div class="lp-brand-name">Colliers Nexus</div>
+      <div class="lp-brand-sub">Plataforma Inteligente de Real Estate Corporativo</div>
     </div>
-    <div class="lp-feats">
-      <div class="lp-feat"><div class="lp-feat-icon">🏢</div><div class="lp-feat-text"><strong>Inventario de Edificios</strong>Pisos, unidades, asking rents y ocupantes</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">👥</div><div class="lp-feat-text"><strong>Clientes CRM</strong>Seguimiento comercial y pipeline de negocios</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">📊</div><div class="lp-feat-text"><strong>Analítica de Mercado</strong>Métricas de demanda y reporting estratégico</div></div>
-      <div class="lp-feat"><div class="lp-feat-icon">📋</div><div class="lp-feat-text"><strong>Generador de Informes</strong>Propuestas comerciales profesionales en segundos</div></div>
+    <div class="lp-keyline"></div>
+    <div class="lp-form-title">Iniciar sesión</div>
+    <div class="lp-form-sub">Acceso exclusivo para usuarios autorizados</div>
+    <button class="lp-btn" id="login-btn" onclick="console.log('login-btn clicked');if(typeof google!=='undefined'&&google.accounts)google.accounts.id.prompt();">
+      <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
+      Ingresar con Google
+    </button>
+    <div class="lp-note">Tu sesión se gestiona de forma segura con Google Workspace</div>
+    <div class="lp-divider"><div class="lp-divider-line"></div><div class="lp-divider-text">Incluye acceso a</div><div class="lp-divider-line"></div></div>
+    <div class="lp-pills">
+      <div class="lp-pill"><div class="lp-pill-dot"></div>Inventario de edificios con datos en tiempo real</div>
+      <div class="lp-pill"><div class="lp-pill-dot"></div>CRM comercial integrado</div>
+      <div class="lp-pill"><div class="lp-pill-dot"></div>Generación de informes PPT profesionales</div>
+      <div class="lp-pill"><div class="lp-pill-dot"></div>Analítica e inteligencia comercial</div>
     </div>
-    <div class="lp-bottom">
-      <div class="lp-stats">
-        <div><div class="lp-stat-num">4</div><div class="lp-stat-label">Módulos</div></div>
-        <div class="lp-stat-sep"></div>
-        <div><div class="lp-stat-num">CRM</div><div class="lp-stat-label">Integrado</div></div>
-        <div class="lp-stat-sep"></div>
-        <div><div class="lp-stat-num">IA</div><div class="lp-stat-label">Asistente integrado</div></div>
-      </div>
-      <div class="lp-tagline">Acelerando el éxito.</div>
-    </div>
+    <div class="lp-footer"><strong>Colliers International Argentina</strong><br>Uso interno · colliers.com</div>
   </div>
+  <!-- RIGHT: hero text over background image -->
   <div class="lp-right">
-    <div class="lp-card">
-      <div class="lp-card-top">
-        <img src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers" class="lp-logo">
-        <div class="lp-keyline"></div>
-        <h2>Bienvenido</h2>
-        <p>Ingresá con tu cuenta corporativa<br>para acceder a Colliers Nexus</p>
-      </div>
-      <button class="lp-btn" id="login-btn" onclick="console.log('login-btn clicked');if(typeof google!=='undefined'&&google.accounts)google.accounts.id.prompt();">
-        <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.88 13.04C2.36 15.98 5.48 18 9 18z"/></svg>
-        Ingresar con Google
-      </button>
-      <div class="lp-note">Acceso exclusivo para usuarios autorizados</div>
-      <div class="lp-divider"><div class="lp-divider-line"></div><div class="lp-divider-text">Incluye acceso a</div><div class="lp-divider-line"></div></div>
-      <div class="lp-pills">
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Inventario de edificios con datos en tiempo real</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>CRM comercial integrado</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Generación de informes PPT profesionales</div>
-        <div class="lp-pill"><div class="lp-pill-dot"></div>Analítica e inteligencia comercial</div>
-      </div>
-      <div class="lp-footer"><strong>Colliers International Argentina</strong><br>Uso interno · colliers.com</div>
+    <div class="lp-hero-tag">Colliers Nexus</div>
+    <h1 class="lp-hero-title">Información.<br>Estrategia.<br>Resultados.</h1>
+    <p class="lp-hero-sub">Transformamos datos en decisiones inteligentes para el real estate corporativo.</p>
+    <div class="lp-hero-dots">
+      <div class="lp-hero-dot active"></div>
+      <div class="lp-hero-dot"></div>
+      <div class="lp-hero-dot"></div>
     </div>
   </div>
 </div>
@@ -1228,8 +1196,8 @@ body:not(.dark) .hub-quick-sub{color:#7B8BBD}
 <div id="home-hub">
   <div class="hub-wrap">
     <div class="hub-hero">
-      <div class="hub-greeting" id="hub-greeting">Buenos días</div>
-      <h1 class="hub-title">¿Qué querés <span>gestionar hoy?</span></h1>
+      <div class="hub-greeting" id="hub-greeting">¡Buenos días!</div>
+      <h1 class="hub-title">Bienvenido a tu <span>centro de operaciones</span></h1>
       <p class="hub-subtitle">Seleccioná un módulo para comenzar</p>
     </div>
     <div class="hub-cards" id="hub-cards">
@@ -1731,7 +1699,8 @@ function onUserLoggedIn(){
   // Set greeting based on time
   const h=new Date().getHours();
   const greeting=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
-  const greetEl=document.getElementById('hub-greeting');if(greetEl)greetEl.textContent=greeting+', '+((user.displayName||'').split(' ')[0]||'Broker');
+  const firstName=(user.displayName||'').split(' ')[0]||'Broker';
+  const greetEl=document.getElementById('hub-greeting');if(greetEl)greetEl.textContent='¡'+greeting+', '+firstName+'!';
   // Show analytics sidebar items only for whitelist
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
   const sbAnSection=document.getElementById('sbn-analytics-section');if(sbAnSection)sbAnSection.style.display=isAdmin?'':'none';
