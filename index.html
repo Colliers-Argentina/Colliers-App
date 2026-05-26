@@ -1691,10 +1691,10 @@ const TRANSLATIONS={
     tableTitle:"Office Alternatives",
     page:"Page",
     rowDir:"Address",rowSub:"Submarket",rowCat:"Category",rowAnio:"Year",rowPisos:"Floors",
-    rowCoch:"Parking",rowSupDisp:"Available Area (sqm)",rowPisosDisp:"Available floors",
-    rowSupPlanta:"Avg. Floor Area (sqm)",rowSupAdq:"Area to acquire (sqm)",rowRent:"Asking Rent (USD/sqm)",rowComent:"Comments",
+    rowCoch:"Parking",rowSupDisp:"Available Area (sq. m)",rowPisosDisp:"Available floors",
+    rowSupPlanta:"Avg. Floor Area (sq. m)",rowSupAdq:"Potential Area (sq. m)",rowRent:"Asking Rent (USD/sq. m)",rowComent:"Comments",
     specs:"Specifications",noPhoto:"No photo",comments:"Comments",
-    footerNote:"* Average service charges USD 5-7 sqm. To be confirmed per case.",
+    footerNote:"* Average service charges USD 5-7 sq. m. To be confirmed per case.",
     confidential:"Confidential — Colliers International Argentina",
     conclTitle:"Conclusions & Recommendations",
     conclSub:"AI-generated analysis · Colliers",
@@ -2571,9 +2571,11 @@ window.generarPPT=async()=>{
         const dataRows=ROWS.map(([lbl,key],ri)=>{
           const bg=ri%2===0?"F4F7FF":WHITE;
           const lc={text:lbl,options:{bold:true,color:DARK,align:"left",valign:"middle",fill:{color:bg},fontSize:7.5,fontFace:"Open Sans",border:NB}};
+          const numLocale=lang==="en"?"en-US":"es-AR";
           const dc=grupo.map(prop=>{
             let val=key==="__empty__"?"":prop[key]||"–";
-            if((key==="supDisp"||key==="supPlanta")&&prop[key])val=Number(prop[key]).toLocaleString("es-AR")+" m²";
+            if((key==="supDisp"||key==="supPlanta")&&prop[key])val=Number(prop[key]).toLocaleString(numLocale);
+            if(key==="cocheras"&&lang==="en"&&val&&val!=="–")val=val.replace(/\bparking\b\s*/gi,'').replace(/\bm²\b|\bm2\b/g,'sq. m').replace(/\bcada\b/gi,'every').trim();
             const isDisp=key==="supDisp", isCom=key==="comentarios";
             if(isCom){val=(prop.comentarios||'').split(',').map(s=>s.trim()).filter(Boolean).map(b=>`• ${b}`).join('\n');}
             return{text:String(val),options:{color:isDisp?MID:"353E59",bold:isDisp,align:isCom?"left":"center",valign:"middle",fill:{color:bg},fontSize:isDisp?9:7.5,fontFace:"Open Sans",wrap:true,border:NB}};
@@ -2593,18 +2595,26 @@ window.generarPPT=async()=>{
     // FICHAS INDIVIDUALES
     if(document.getElementById("if").checked){
       const ROW_H=0.44;
+      const fichaLocale=lang==="en"?"en-US":"es-AR";
+      const fmtArea=n=>n?Number(n).toLocaleString(fichaLocale):"–";
+      const fmtCoch=v=>{
+        if(!v||v==="–")return v||"–";
+        if(lang!=="en")return v;
+        return v.replace(/\bparking\b\s*/gi,'').replace(/\bm²\b|\bm2\b/g,'sq. m').replace(/\bcada\b/gi,'every').trim();
+      };
+      const rentUnit=lang==="en"?"sq. m":"m²";
       const CAMPOS_DEF=[
         [t.rowDir,p=>p.direccion,false],
         [t.rowSub,p=>p.submercado,false],
         [t.rowCat,p=>p.cat,false],
         [t.rowAnio,p=>String(p.anio),false],
         [t.rowPisos,p=>String(p.pisos),false],
-        [t.rowCoch,p=>p.cocheras,false],
-        [t.rowSupDisp,p=>`${p.supDisp?Number(p.supDisp).toLocaleString("es-AR"):"–"} m²`,true],
+        [t.rowCoch,p=>fmtCoch(p.cocheras),false],
+        [t.rowSupDisp,p=>fmtArea(p.supDisp),true],
         [t.rowPisosDisp,p=>p.pisosDisp,false],
-        [t.rowSupPlanta,p=>`${p.supPlanta?Number(p.supPlanta).toLocaleString("es-AR"):"–"} m²`,false],
+        [t.rowSupPlanta,p=>fmtArea(p.supPlanta),false],
         [t.rowSupAdq,p=>'',false],
-        [t.rowRent,p=>`USD ${p.rent}/m²`,false],
+        [t.rowRent,p=>`USD ${p.rent}/${rentUnit}`,false],
       ];
       for(const[idx,prop] of sp.entries()){
         const s=pptx.addSlide();
