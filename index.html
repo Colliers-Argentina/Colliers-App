@@ -1661,7 +1661,7 @@ try{
   }
 }catch(e){console.warn("Firebase no configurado:",e);}
 
-let user=null, props=[], filt=[], sel=new Set(), overviewData={};
+let user=null, masterBuildings=[], filt=[], sel=new Set(), overviewData={};
 const ZONAS_DEFAULT=['Catalinas','Macrocentro','Macrocentro Sur','Microcentro','Norte CABA','Norte GBA','Plaza Roma','Puerto Madero','Retiro','Sur CABA'];
 
 function decodeJWT(token){
@@ -1768,7 +1768,7 @@ window.onGoogleLibraryLoad=initGSI;
 if(typeof google!=='undefined'&&google.accounts)initGSI();
 
 async function loadData(){
-  // Fuente principal: Google Sheet CSV en vivo (sin caché)
+  // ONE SOURCE OF TRUTH: Google Sheet CSV → masterBuildings[]
   const proxies=[
     'https://corsproxy.io/?'+encodeURIComponent(CSV),
     'https://api.allorigins.win/raw?url='+encodeURIComponent(CSV),
@@ -1782,22 +1782,21 @@ async function loadData(){
       if(!csv.trim())continue;
       const parsed=parseCSV(csv);
       if(!parsed.length)continue;
-      // Deduplicate por nombre (por si el Sheet tiene filas repetidas)
       const seen=new Map();
       parsed.forEach(p=>{
         const k=(p.nombre||'').toLowerCase().trim();
         if(k&&!seen.has(k))seen.set(k,p);
       });
-      props=[...seen.values()];
-      window._props=props;
+      masterBuildings=[...seen.values()];
+      window._masterBuildings=masterBuildings;
       populateZonas();
-      console.log('loadData: Sheet OK —',props.length,'edificios únicos via',url.substring(0,40));
-      console.table(props.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
+      console.log('%c[masterBuildings] Sheet OK — '+masterBuildings.length+' edificios únicos','color:#1C54F4;font-weight:bold');
+      console.table(masterBuildings.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
       return;
     }catch(e){console.warn('loadData proxy failed:',url.substring(0,40),e.message);}
   }
 
-  // Fallback: Firestore buildings (si el Sheet no responde)
+  // Fallback: Firestore buildings — mismo schema que Sheet para garantizar ONE SOURCE
   if(db){
     try{
       const snap=await db.collection('buildings').orderBy('nombre').get();
@@ -1809,27 +1808,35 @@ async function loadData(){
           const k=(f.nombre||'').toLowerCase().trim();
           if(!k||seen.has(k))return;
           seen.set(k,{
-            nombre:f.nombre||'–',direccion:f.direccion||'–',
-            submercado:f.zona||f.submercado||'–',cat:f.categoria||f.certificacion||'–',
-            anio:f.anio||'–',pisos:f.pisos||'–',cocheras:f.cocheras||'–',
-            supDisp:Number(f.superficieDisponible)||0,pisosDisp:f.pisosDisponibles||'–',
-            supPlanta:Number(f.superficiePlanta)||0,supMinima:Number(f.superficieMinima)||0,
-            rent:f.asking||f.rent||'–',comentarios:f.amenities||f.descripcion||'–',
+            nombre:f.nombre||'–',
+            direccion:f.direccion||'–',
+            submercado:f.zona||f.submercado||'–',
+            cat:f.categoria||f.certificacion||'–',
+            anio:f.anio||'–',
+            pisos:f.pisos||'–',
+            cocheras:f.cocheras||'–',
+            supDisp:Number(f.superficieDisponible)||0,
+            pisosDisp:f.pisosDisponibles||'–',
+            supPlanta:Number(f.superficiePlanta)||0,
+            supMinima:Number(f.superficieMinima)||0,
+            rent:f.asking||f.rent||'–',
+            comentarios:f.amenities||f.descripcion||'–',
             foto:f.foto||(f.imagenes&&f.imagenes[0])||'',
           });
         });
-        props=[...seen.values()];
-        if(props.length){
-          window._props=props;
+        const all=[...seen.values()];
+        if(all.length){
+          masterBuildings=all;
+          window._masterBuildings=masterBuildings;
           populateZonas();
-          console.warn('loadData: Sheet falló — usando Firestore fallback,',props.length,'edificios');
-          console.table(props.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp})));
+          console.warn('%c[masterBuildings] Sheet falló → Firestore fallback: '+masterBuildings.length+' edificios','color:#F59E0B;font-weight:bold');
+          console.table(masterBuildings.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp})));
           return;
         }
       }
     }catch(e){console.warn('loadData: Firestore fallback también falló:',e.message);}
   }
-  console.error('loadData: Sheet y Firestore fallaron — sin datos');
+  console.error('[masterBuildings] Sheet y Firestore fallaron — sin datos');
 }
 
 async function cargarOverview(){
@@ -1902,7 +1909,7 @@ function parseLine(line){
 }
 
 function populateZonas(){
-  const zonas=props.length>0?[...new Set(props.map(p=>p.submercado).filter(Boolean))].sort():[...ZONAS_DEFAULT];
+  const zonas=masterBuildings.length>0?[...new Set(masterBuildings.map(p=>p.submercado).filter(Boolean))].sort():[...ZONAS_DEFAULT];
   document.getElementById('zona-fc').innerHTML=zonas.map(z=>
     `<label class="fk"><input type="checkbox" name="zona" value="${z}"> ${z}</label>`
   ).join('');
@@ -2114,7 +2121,9 @@ function applyFilters(){
       </div>`;
     updBar();return;
   }
-  let r=props.filter(p=>{
+  console.log('%c[masterBuildings] applyFilters — source size: '+masterBuildings.length,'color:#1C54F4;font-weight:bold');
+  console.table(masterBuildings.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
+  let r=masterBuildings.filter(p=>{
     if(zonas.length&&!zonas.some(z=>p.submercado===z))return false;
     const supRef=p.supPlanta>0?p.supPlanta:p.supDisp;
     if(supMin&&p.supDisp<supMin&&(p.supPlanta||0)<supMin&&(p.supMinima||0)<supMin)return false;
@@ -3177,6 +3186,36 @@ async function loadBuildings(){
   try{
     const snap=await db.collection('buildings').orderBy('nombre').get();
     _bldDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    // Sync masterBuildings from Firestore when Sheet hasn't loaded
+    // so Generator always sees the same dataset as Buildings
+    if(!masterBuildings.length&&_bldDocs.length){
+      const seen=new Map();
+      _bldDocs.forEach(f=>{
+        if(f.activo===false||f.estado==='Archivado')return;
+        const k=(f.nombre||'').toLowerCase().trim();
+        if(!k||seen.has(k))return;
+        seen.set(k,{
+          nombre:f.nombre||'–',
+          direccion:f.direccion||'–',
+          submercado:f.zona||f.submercado||'–',
+          cat:f.categoria||f.certificacion||'–',
+          anio:f.anio||'–',
+          pisos:f.pisos||'–',
+          cocheras:f.cocheras||'–',
+          supDisp:Number(f.superficieDisponible)||0,
+          pisosDisp:f.pisosDisponibles||'–',
+          supPlanta:Number(f.superficiePlanta)||0,
+          supMinima:Number(f.superficieMinima)||0,
+          rent:f.asking||f.rent||'–',
+          comentarios:f.amenities||f.descripcion||'–',
+          foto:f.foto||(f.imagenes&&f.imagenes[0])||'',
+        });
+      });
+      masterBuildings=[...seen.values()];
+      window._masterBuildings=masterBuildings;
+      populateZonas();
+      console.log('%c[masterBuildings] populated from Firestore via loadBuildings: '+masterBuildings.length,'color:#10B981;font-weight:bold');
+    }
     renderBldKPIs();
     populateBldZonaFilter();
     filterBuildings();
@@ -3646,13 +3685,13 @@ async function syncSheetToFirestore(){
   if(btn){btn.textContent='⏳ Cargando Sheet...';btn.disabled=true;}
   // Always re-fetch CSV fresh so sync has the latest Sheet data (no stale props)
   await loadData();
-  if(!props||!props.length){
+  if(!masterBuildings||!masterBuildings.length){
     showBldToast('⚠️ Sin datos en el Sheet para importar',3000);
     if(btn){btn.textContent='⬇ Importar Sheets';btn.disabled=false;}
     return;
   }
   if(btn)btn.textContent='⏳ Sincronizando...';
-  showBldToast('⏳ Sincronizando '+props.length+' edificios...',8000);
+  showBldToast('⏳ Sincronizando '+masterBuildings.length+' edificios...',8000);
   const CHUNK=400;
   try{
     // Step 1: DELETE all sheet-sourced buildings (clean slate, eliminates stale/duplicate docs)
@@ -3665,13 +3704,13 @@ async function syncSheetToFirestore(){
       }
       console.log('syncSheet: eliminados',existing.docs.length,'docs previos de sheets');
     }
-    // Step 2: Write fresh from CSV — full set(), no mergeFields, fixed accent normalization
+    // Step 2: Write fresh from masterBuildings — full set(), no mergeFields
     const toId=n=>(n||'sin_nombre').toLowerCase()
       .normalize('NFD').replace(/[̀-ͯ]/g,'')
       .replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')||'edificio';
-    // Deduplicate props by nombre before writing
+    // Deduplicate masterBuildings by nombre before writing
     const seen=new Map();
-    props.forEach(p=>{const k=(p.nombre||'').toLowerCase().trim();if(k&&!seen.has(k))seen.set(k,p);});
+    masterBuildings.forEach(p=>{const k=(p.nombre||'').toLowerCase().trim();if(k&&!seen.has(k))seen.set(k,p);});
     const unique=[...seen.values()];
     for(let i=0;i<unique.length;i+=CHUNK){
       const batch=db.batch();
@@ -3995,7 +4034,11 @@ function showModule(mod){
     show('home-hub');
   } else if(mod==='generator'){
     show('as');
-    loadData();
+    // Always reload masterBuildings from Sheet (Generator + Buildings share same source)
+    loadData().then(()=>{
+      console.log('%c[masterBuildings] Generator opened — '+masterBuildings.length+' buildings loaded','color:#1C54F4;font-weight:bold');
+      console.table(masterBuildings.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
+    });
   } else if(mod==='buildings'){
     show('home-hub');
     const bpanel=document.getElementById('buildings-panel');
