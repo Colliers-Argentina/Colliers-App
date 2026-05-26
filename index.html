@@ -3516,6 +3516,95 @@ function bldEdTab(el,tabId){
   if(panel)panel.style.display='flex';
 }
 
+/* ===== FLOOR PARSER ===== */
+/**
+ * Parse one floor token from the "Pisos Disponibles" CSV field.
+ * Supports: "10 A", "10A", "10° A", "Piso 10", "PB", "SS", "Semi piso", "Semipiso",
+ *           plain numbers, ranges "10-12" / "10/12" / "10 al 12"
+ * Returns {piso, unidad} or null if unrecognisable.
+ */
+function parseSingleFloor(raw){
+  if(!raw)return null;
+  let s=raw.trim()
+    .replace(/°/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+  if(!s)return null;
+  // Strip "Piso " prefix
+  s=s.replace(/^piso\s+/i,'').trim();
+  if(!s)return null;
+  // Semipiso variants
+  if(/^semi\s*piso$/i.test(s))return{piso:'Semipiso',unidad:''};
+  // Named special floors
+  if(/^(PB|SS|SB|ST|Entrepiso|Mezzanine|Subsuelo|Cocheras?)$/i.test(s))
+    return{piso:s.toUpperCase(),unidad:''};
+  // "10 A" or "10 AB" — number + space + letters
+  const spM=s.match(/^(\d+)\s+([A-Za-z]{1,3})$/);
+  if(spM)return{piso:spM[1],unidad:spM[2].toUpperCase()};
+  // "10A" or "10AB" — number immediately followed by letters
+  const noM=s.match(/^(\d+)([A-Za-z]{1,3})$/);
+  if(noM)return{piso:noM[1],unidad:noM[2].toUpperCase()};
+  // Pure number
+  if(/^\d+$/.test(s))return{piso:s,unidad:''};
+  // Range "10-12", "10/12", "10 al 12" — expand into array of floors
+  const rM=s.match(/^(\d+)\s*[-/]\s*(\d+)$/)||s.match(/^(\d+)\s+al\s+(\d+)$/i);
+  if(rM){
+    const a=parseInt(rM[1]),b=parseInt(rM[2]);
+    return{piso:s,unidad:'',_range:[Math.min(a,b),Math.max(a,b)]};
+  }
+  // Fallback: store as-is (unusual notation but don't lose data)
+  if(s.length>0&&s.length<=25)return{piso:s,unidad:''};
+  return null;
+}
+
+/**
+ * Parse the full "Pisos Disponibles" string into an array of unit objects.
+ * @param {string} pisosStr  — raw field value, e.g. "10 A, 10B, Piso 10, PB"
+ * @param {object} bld       — building doc (needs .nombre, .superficiePlanta/.supPlanta, .asking/.rent)
+ */
+function parsePisosToUnits(pisosStr,bld){
+  if(!pisosStr||pisosStr==='–'||!pisosStr.trim())return[];
+  const tokens=pisosStr.split(/[,;]+/).map(t=>t.trim()).filter(Boolean);
+  const units=[];
+  const baseM2=parseFloat(bld.superficiePlanta||bld.supPlanta||0)||0;
+  const asking=String(bld.asking||bld.rent||'');
+  const mkUnit=(piso,unidad)=>({
+    piso,unidad,m2:baseM2,askingRent:asking,moneda:'USD',
+    ocupante:'',propietario:'',brokerAsignado:'',
+    estado:'Disponible',observaciones:'',_source:'sheets'
+  });
+  for(const token of tokens){
+    const p=parseSingleFloor(token);
+    if(!p){
+      console.warn('[parsePisosToUnits] Piso inválido:',JSON.stringify(token),'— edificio:',bld.nombre||'?');
+      continue;
+    }
+    if(p._range){
+      for(let f=p._range[0];f<=p._range[1];f++)units.push(mkUnit(String(f),''));
+    }else{
+      units.push(mkUnit(p.piso,p.unidad));
+    }
+  }
+  if(units.length){
+    console.table(units.map(u=>({edificio:bld.nombre||'?',piso:u.piso,unidad:u.unidad,m2:u.m2,asking:u.askingRent})));
+  }
+  return units;
+}
+
+/** Normalise m² value entered by user: handles "1.234,56" and "1,234.56" → number */
+function normalizeM2Input(v){
+  if(v===null||v===undefined||v==='')return 0;
+  const s=String(v).trim();
+  // Detect Argentine format: has period as thousand sep + comma as decimal
+  if(/\d\.\d{3}/.test(s)&&s.includes(','))
+    return parseFloat(s.replace(/\./g,'').replace(',','.'))||0;
+  // Detect comma as thousand sep + period as decimal
+  if(/\d,\d{3}/.test(s)&&s.includes('.'))
+    return parseFloat(s.replace(/,/g,''))||0;
+  // Remove any non-numeric except period/comma, then try
+  return parseFloat(s.replace(/[^\d.,]/g,'').replace(',','.'))||0;
+}
+
 /* ===== UNITS (subcollection buildings/{id}/units) ===== */
 let _unitDocs=[];
 
@@ -3528,9 +3617,28 @@ const UNIT_ESTADO_COLORS={
 async function loadUnits(buildingId){
   if(!db)return;
   try{
-    const snap=await db.collection('buildings').doc(buildingId).collection('units').orderBy('piso').get();
+    const snap=await db.collection('buildings').doc(buildingId).collection('units').get();
     _unitDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    // Auto-populate from pisosDisponibles if subcollection is empty
+    if(!_unitDocs.length){
+      const bld=_bldDocs.find(x=>x._id===buildingId);
+      const raw=bld?.pisosDisponibles||'';
+      if(raw&&raw!=='–'){
+        const parsed=parsePisosToUnits(raw,bld);
+        if(parsed.length){
+          const batch=db.batch();
+          _unitDocs=parsed.map(u=>{
+            const ref=db.collection('buildings').doc(buildingId).collection('units').doc();
+            batch.set(ref,{...u,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+            return{...u,_id:ref.id};
+          });
+          await batch.commit();
+          console.log('[loadUnits] Auto-creados',parsed.length,'pisos para',bld.nombre);
+        }
+      }
+    }
   }catch(e){
+    console.error('[loadUnits] Error:',e);
     _unitDocs=[];
   }
   renderDetailUnits(buildingId);
@@ -3576,8 +3684,21 @@ function renderDetailUnits(buildingId,filterQ=''){
     (u.propietario||'').toLowerCase().includes(q)||
     (u.estado||'').toLowerCase().includes(q)
   ):_unitDocs;
+  const pisoNum=v=>{
+    const sp={'SS':-2,'SB':-2,'ST':-2,'SUBSUELO':-1,'PB':0,'SEMIPISO':0.5,'ENTREPISO':0.5,'MEZZANINE':0.5};
+    const k=(v||'').toUpperCase();
+    if(sp[k]!==undefined)return sp[k];
+    const n=parseInt(v);
+    return isNaN(n)?999:n;
+  };
   filtered=[...filtered].sort((a,b)=>{
-    const av=a[_unitSortCol]||'',bv=b[_unitSortCol]||'';
+    if(_unitSortCol==='piso'){
+      const da=pisoNum(a.piso),db2=pisoNum(b.piso);
+      if(da!==db2)return(da-db2)*_unitSortDir;
+      // same floor number → sub-sort by unidad
+      return String(a.unidad||'').localeCompare(String(b.unidad||''))*_unitSortDir;
+    }
+    const av=a[_unitSortCol]??'',bv=b[_unitSortCol]??'';
     return typeof av==='number'&&typeof bv==='number'?(av-bv)*_unitSortDir:String(av).localeCompare(String(bv))*_unitSortDir;
   });
   if(!filtered.length){
@@ -3651,9 +3772,24 @@ async function addUnit(buildingId){
 
 async function saveUnitField(buildingId,unitId,field,value,el){
   if(!db)return;
+  // Normalise m² input regardless of locale / thousand-separator format
+  const normalized=field==='m2'?normalizeM2Input(value):value;
+  // Separate piso and unidad when user types "10 A" or "10A" in the piso cell
+  let extra={};
+  if(field==='piso'&&normalized){
+    const p=parseSingleFloor(String(normalized));
+    if(p&&p.unidad){
+      // Only split if the parsed result has both piso AND unidad
+      extra={unidad:p.unidad};
+      // Update the unidad cell in the row
+      const row=el?.closest('tr');
+      if(row){const uInp=row.querySelectorAll('.du-inp')[1];if(uInp)uInp.value=p.unidad;}
+    }
+  }
   try{
     await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).update({
-      [field]:value,
+      [field]:field==='m2'?normalized:(field==='piso'&&extra.unidad?parseSingleFloor(String(normalized))?.piso||normalized:normalized),
+      ...extra,
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     const u=_unitDocs.find(x=>x._id===unitId);
@@ -3804,15 +3940,29 @@ async function syncSheetToFirestore(){
   showBldToast('⏳ Sincronizando '+masterBuildings.length+' edificios...',8000);
   const CHUNK=400;
   try{
-    // Step 1: DELETE all sheet-sourced buildings (clean slate, eliminates stale/duplicate docs)
+    // Step 1: DELETE all sheet-sourced buildings (clean slate)
     const existing=await db.collection('buildings').where('_source','==','sheets').get();
     if(!existing.empty){
+      // 1a: Delete building docs
       for(let i=0;i<existing.docs.length;i+=CHUNK){
         const b=db.batch();
         existing.docs.slice(i,i+CHUNK).forEach(d=>b.delete(d.ref));
         await b.commit();
       }
       console.log('syncSheet: eliminados',existing.docs.length,'docs previos de sheets');
+      // 1b: Delete _source:sheets units in those buildings' subcollections
+      for(const bldDoc of existing.docs){
+        try{
+          const uSnap=await db.collection('buildings').doc(bldDoc.id).collection('units').where('_source','==','sheets').get();
+          if(!uSnap.empty){
+            for(let i=0;i<uSnap.docs.length;i+=CHUNK){
+              const b=db.batch();
+              uSnap.docs.slice(i,i+CHUNK).forEach(d=>b.delete(d.ref));
+              await b.commit();
+            }
+          }
+        }catch(e){console.warn('syncSheet: error borrando units de',bldDoc.id,e.message);}
+      }
     }
     // Step 2: Write fresh from masterBuildings — full set(), no mergeFields
     const toId=n=>(n||'sin_nombre').toLowerCase()
@@ -3857,7 +4007,26 @@ async function syncSheetToFirestore(){
       });
       await batch.commit();
     }
-    showBldToast(`✅ ${unique.length} edificios sincronizados desde Sheets`);
+    // Step 3: Write units for each building from pisosDisp
+    const allUnitWrites=[];
+    unique.forEach(p=>{
+      const bldId=toId(p.nombre);
+      // Pass a building-shaped object so parsePisosToUnits can read supPlanta and rent
+      const bldShape={nombre:p.nombre,superficiePlanta:p.supPlanta||0,supPlanta:p.supPlanta||0,asking:p.rent||'',rent:p.rent||''};
+      parsePisosToUnits(p.pisosDisp||'',bldShape).forEach(u=>allUnitWrites.push({bldId,u}));
+    });
+    if(allUnitWrites.length){
+      for(let i=0;i<allUnitWrites.length;i+=CHUNK){
+        const b=db.batch();
+        allUnitWrites.slice(i,i+CHUNK).forEach(({bldId,u})=>{
+          const ref=db.collection('buildings').doc(bldId).collection('units').doc();
+          b.set(ref,{...u,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+        });
+        await b.commit();
+      }
+      console.log('syncSheet: escritas',allUnitWrites.length,'unidades en subcollections');
+    }
+    showBldToast(`✅ ${unique.length} edificios y ${allUnitWrites.length} unidades sincronizados desde Sheets`);
     console.log('syncSheet: escritos',unique.length,'docs únicos en buildings');
     await Promise.all([loadBuildings(), loadData()]);
   }catch(e){
