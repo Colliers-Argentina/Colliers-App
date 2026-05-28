@@ -1896,7 +1896,7 @@ async function loadData(){
             supMinima:Number(f.superficieMinima)||0,
             rent:f.asking||f.rent||'–',
             comentarios:f.amenities||f.descripcion||'–',
-            foto:f.foto||(f.imagenes&&f.imagenes[0])||'',
+            foto:getBldFoto(f),
           });
         });
         const all=[...seen.values()];
@@ -1948,6 +1948,10 @@ function parseCSV(csv){
   if(lines.length<2)return[];
   const hdrs=lines[0].split(",").map(h=>h.replace(/"/g,"").trim());
   const c=h=>hdrs.indexOf(h);
+  // Case-insensitive finder — used for fields whose column name may vary
+  const ci=h=>{const hl=h.toLowerCase();return hdrs.findIndex(x=>x.toLowerCase()===hl);};
+  // Try multiple column name variants, return first non-empty value
+  const any=(...names)=>{for(const n of names){const i=ci(n);if(i>=0&&v[i])return v[i];}return'';};
   return lines.slice(1).map(line=>{
     const v=parseLine(line);
     if(!v[c("Nombre Edificio")])return null;
@@ -1966,8 +1970,9 @@ function parseCSV(csv){
       supMinima: parseFloat(((v[c("Sup. Mínima Divisible m²")]||v[c("Sup. Mínima Divisible (m²)")]||"0")).replace(/[^\d,\.]/g,"").replace(",",".")) || 0,
       rent:v[c("Asking Rent (USD/m²)")]||v[c("Asking Rent USD/m²")]||"–",
       comentarios:v[c("Comentarios / Amenities")]||"–",
-      foto:v[c("URL Foto")]||"",
+      foto:normalizeImageUrl(any("URL Foto","URL foto","Foto","Imagen","image","imageUrl","imageurl","photo","Photo URL","url_foto","URL_Foto")),
     };
+    if(!obj.foto)console.warn('[parseCSV] Sin imagen:',obj.nombre,'— headers disponibles:',hdrs.filter(h=>/foto|image|photo|imagen|url/i.test(h)));
     if(obj.nombre&&obj.nombre.includes('Mirabilia'))console.log('Mirabilia parsed:',JSON.stringify(obj));
     return obj;
   }).filter(Boolean);
@@ -3297,7 +3302,7 @@ async function loadBuildings(){
           supMinima:Number(f.superficieMinima)||0,
           rent:f.asking||f.rent||'–',
           comentarios:f.amenities||f.descripcion||'–',
-          foto:f.foto||(f.imagenes&&f.imagenes[0])||'',
+          foto:getBldFoto(f),
         });
       });
       masterBuildings=[...seen.values()];
@@ -3380,7 +3385,8 @@ function renderBuildingsTable(){
   const page=_bldFiltered.slice(start,start+BLD_PAGE_SIZE);
   let h='<div class="bld-grid">';
   page.forEach(d=>{
-    const foto=d.foto||(d.imagenes&&d.imagenes[0])||'';
+    const foto=getBldFoto(d);
+    if(!foto)console.warn('[Edificios] Sin imagen:',d.nombre||d._id,d);
     const imgHtml=foto
       ?`<div class="bld-card-img"><img src="${foto}" loading="lazy" onerror="this.parentElement.innerHTML='🏢'"></div>`
       :`<div class="bld-card-img">🏢</div>`;
@@ -3429,7 +3435,7 @@ function openBuildingEditor(docId){
   const d=_bldDocs.find(x=>x._id===docId);
   if(!d)return;
   _bldEditId=docId;
-  const hasFoto=d.foto||(d.imagenes&&d.imagenes[0])||'';
+  const hasFoto=getBldFoto(d);
   const states=['Disponible','Reservado','Ocupado','Archivado'].map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('');
   const monedas=['USD','ARS'].map(m=>`<option${(d.moneda||'USD')===m?' selected':''}>${m}</option>`).join('');
   const mapsBtn=d.googleMaps?`<a class="bld-det-maps-btn" href="${esc(d.googleMaps)}" target="_blank" rel="noopener">📍 Ver en Maps</a>`:'';
@@ -3602,7 +3608,42 @@ function normalizeM2Input(v){
 }
 
 /**
- * Parse a parking ratio string to a number (the denominator).
+ * Normalize an image URL:
+ * - Trims whitespace / hidden chars
+ * - Converts Google Drive share links → direct renderable URL
+ * - Returns '' for non-URL strings
+ */
+function normalizeImageUrl(raw){
+  if(!raw)return'';
+  let url=String(raw).trim().replace(/[\r\n\t]/g,'');
+  if(!url||!url.startsWith('http'))return'';
+  // Google Drive: /file/d/ID/view  or  /open?id=ID  →  /uc?export=view&id=ID
+  const fileM=url.match(/drive\.google\.com\/file\/d\/([^/?]+)/);
+  if(fileM)return`https://drive.google.com/uc?export=view&id=${fileM[1]}`;
+  const openM=url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+  if(openM)return`https://drive.google.com/uc?export=view&id=${openM[1]}`;
+  // Google Drive uc links: ensure export=view
+  if(url.includes('drive.google.com/uc')&&!url.includes('export='))
+    return url+(url.includes('?')?'&':'?')+'export=view';
+  return url;
+}
+
+/** Centralized building image getter — covers all field names old and new */
+function getBldFoto(d){
+  const candidates=[
+    d.foto,
+    d.imageUrl,
+    d.image,
+    d.photo,
+    d.url_foto,
+    d.imagenes&&(d.imagenes[0]||d.imagenes.find(u=>u&&u.startsWith('http'))),
+  ];
+  for(const raw of candidates){
+    const url=normalizeImageUrl(raw||'');
+    if(url)return url;
+  }
+  return'';
+}
  * Handles: "1 cada 60 m2", "1 c/60", "1 cada 60m2", "1/60", "1 every 60 sq. m", "60"
  * Returns the denominator as integer, or null if unparseable.
  */
@@ -3917,8 +3958,8 @@ async function saveBuildingEdits(){
     broker:gv('be-broker'),
     certificacion:gv('be-cert'),
     googleMaps:gv('be-maps'),
-    foto:gv('be-foto'),
-    imagenes:gv('be-foto')?[gv('be-foto')]:[],
+    foto:normalizeImageUrl(gv('be-foto')||''),
+    imagenes:normalizeImageUrl(gv('be-foto')||'')?[normalizeImageUrl(gv('be-foto')||'')]:[]
     descripcion:gv('be-desc'),
     amenities:gv('be-amenities'),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
@@ -4028,8 +4069,8 @@ async function syncSheetToFirestore(){
           anio:p.anio||'',
           pisos:p.pisos||'',
           cocheras:formatCocherasES(p.cocheras||''),
-          foto:p.foto||'',
-          imagenes:p.foto?[p.foto]:[],
+          foto:normalizeImageUrl(p.foto||''),
+          imagenes:normalizeImageUrl(p.foto||'')?[normalizeImageUrl(p.foto||'')]:[]
           googleMaps:'',
           estado:'Disponible',
           broker:user?.displayName||'',
