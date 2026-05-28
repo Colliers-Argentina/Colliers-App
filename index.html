@@ -1399,7 +1399,7 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
     </div>
-    <div class="an-grid2">
+    <div class="an-charts-row">
       <div class="an-card">
         <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Zonas más demandadas</div></div>
         <div class="an-card-body" id="an-body-zonas"><div class="an-chart-wrap"><canvas id="chart-zonas"></canvas></div></div>
@@ -1408,52 +1408,67 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
         <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Rangos de m² demandados</div></div>
         <div class="an-card-body" id="an-body-m2"><div class="an-chart-wrap"><canvas id="chart-m2"></canvas></div></div>
       </div>
-    </div>
-    <div class="an-grid2">
       <div class="an-card">
         <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Top 10 Edificios más enviados</div></div>
-        <div class="an-card-body" id="an-body-edificios"><div class="an-chart-wrap" style="height:250px"><canvas id="chart-edificios"></canvas></div></div>
+        <div class="an-card-body" id="an-body-edificios"><div class="an-empty">Cargando...</div></div>
       </div>
-      <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Brokers más activos</div></div>
-        <div id="an-brokers-lb" class="lb-list"></div>
-        <div class="an-card-body" style="padding-top:0"><div class="an-chart-wrap"><canvas id="chart-brokers"></canvas></div></div>
-      </div>
+    </div>
+    <div class="an-card">
+      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Brokers más activos</div></div>
+      <div id="an-brokers-lb" class="an-brokers-row"></div>
     </div>
   </div>
 </div>
 
 <!-- CRM -->
 <div id="crm-panel" style="display:none">
-  <div class="crm-topbar">
-    <div class="crm-topbar-l">
-      <div class="crm-page-title">Clientes CRM</div>
-      <div class="crm-page-sub" id="crm-subtitle">Cargando...</div>
+  <!-- LIST VIEW -->
+  <div id="crm-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="crm-topbar">
+      <div class="crm-topbar-l">
+        <div class="crm-page-title">Clientes</div>
+        <div class="crm-page-sub" id="crm-subtitle">Cargando...</div>
+      </div>
+      <div class="crm-topbar-r">
+        <input id="crm-search" type="text" placeholder="🔍 Buscar cliente..." class="crm-search-inp" oninput="filterCRM()">
+        <input id="crm-m2-min" type="number" min="0" step="50" placeholder="m² mín" class="crm-m2-inp" oninput="filterCRM()">
+        <span class="crm-m2-sep">–</span>
+        <input id="crm-m2-max" type="number" min="0" step="50" placeholder="m² máx" class="crm-m2-inp" oninput="filterCRM()">
+        <select id="crm-filter-broker" class="crm-sel" onchange="filterCRM()"><option value="">Todos los brokers</option></select>
+        <select id="crm-filter-estado" class="crm-sel" onchange="filterCRM()">
+          <option value="">Todos los estados</option><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option>
+        </select>
+        <button class="crm-new-btn" onclick="openNewClientModal()">+ Nuevo cliente</button>
+      </div>
     </div>
-    <div class="crm-topbar-r">
-      <input id="crm-search" type="text" placeholder="🔍 Buscar cliente..." class="crm-search-inp" oninput="filterCRM()">
-      <input id="crm-m2-min" type="number" min="0" step="50" placeholder="m² mín" class="crm-m2-inp" oninput="filterCRM()">
-      <span class="crm-m2-sep">–</span>
-      <input id="crm-m2-max" type="number" min="0" step="50" placeholder="m² máx" class="crm-m2-inp" oninput="filterCRM()">
-      <select id="crm-filter-broker" class="crm-sel" onchange="filterCRM()"><option value="">Todos los brokers</option></select>
-      <select id="crm-filter-estado" class="crm-sel" onchange="filterCRM()">
-        <option value="">Todos los estados</option><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option>
-      </select>
+    <div class="crm-list-body">
+      <div class="crm-kpi-row" id="crm-kpi-row"></div>
+      <div class="crm-tbl-wrap">
+        <div id="crm-table-wrap">Cargando...</div>
+      </div>
     </div>
   </div>
-  <div class="crm-layout">
-    <div class="crm-list-pane">
-      <div class="crm-list-kpis" id="crm-kpi-row"></div>
-      <div class="crm-list-scroll" id="crm-table-wrap">
-        <div class="crm-empty">Cargando clientes...</div>
+
+  <!-- DETAIL VIEW -->
+  <div id="crm-detail-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+    <div class="crm-det-topbar">
+      <button class="crm-det-back-btn" onclick="closeCRMDetail()">← Volver a clientes</button>
+      <div style="flex:1"></div>
+    </div>
+    <div class="crm-det-layout">
+      <div class="crm-det-left" id="crm-det-left">
+        <!-- filled by openClientDetail() -->
+      </div>
+      <div class="crm-det-right" id="crm-det-right">
+        <!-- filled by openClientDetail() -->
       </div>
     </div>
-    <div class="crm-detail-pane" id="crm-detail-pane">
-      <div class="crm-detail-empty" id="crm-detail-empty">
-        <div class="crm-detail-empty-icon">👤</div>
-        <div class="crm-detail-empty-text">Seleccioná un cliente para ver su ficha</div>
-      </div>
-      <div class="crm-detail-scroll" id="crm-detail-scroll" style="display:none"></div>
+  </div>
+
+  <!-- NEW CLIENT MODAL -->
+  <div id="crm-new-modal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(3,8,25,.7);backdrop-filter:blur(10px);align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+    <div class="crm-new-box" id="crm-new-box">
+      <!-- filled by openNewClientModal() -->
     </div>
   </div>
 </div>
@@ -3355,10 +3370,10 @@ function renderCRMKPIs(docs){
   const totalPPTs=docs.reduce((s,d)=>s+(d.cantidadPPTs||0),0);
   const negociacion=docs.filter(d=>d.estado==='Negociación').length;
   row.innerHTML=`
-    <div class="crm-mini-kpi"><div class="crm-mini-v">${total}</div><div class="crm-mini-l">Clientes</div></div>
-    <div class="crm-mini-kpi"><div class="crm-mini-v">${activos}</div><div class="crm-mini-l">Activos</div></div>
-    <div class="crm-mini-kpi"><div class="crm-mini-v">${totalPPTs}</div><div class="crm-mini-l">PPTs</div></div>
-    <div class="crm-mini-kpi"><div class="crm-mini-v">${negociacion}</div><div class="crm-mini-l">Negociación</div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">👥</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Clientes totales</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${activos}</div><div class="crm-kpi-l">Activos</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">📄</div><div class="crm-kpi-data"><div class="crm-kpi-v">${totalPPTs}</div><div class="crm-kpi-l">PPTs generados</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FFF7EC">🤝</div><div class="crm-kpi-data"><div class="crm-kpi-v">${negociacion}</div><div class="crm-kpi-l">En negociación</div></div></div>
   `;
 }
 
@@ -3370,101 +3385,166 @@ function renderCRMTable(docs){
   renderCRMKPIs(_crmDocs);
   const wrap=document.getElementById('crm-table-wrap');
   if(!docs.length){
-    wrap.innerHTML='<div class="crm-empty">Sin clientes registrados todavía.</div>';
+    wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin clientes registrados.</div>';
     return;
   }
-  wrap.innerHTML=docs.map(d=>{
+  let h='<table class="crm-table"><thead><tr>';
+  ['Cliente','Broker','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
+  h+='</tr></thead><tbody>';
+  docs.forEach(d=>{
     const nombre=d.nombre||d._id;
-    return`<div class="crm-client-row" id="crm-row-${d._id}" onclick="openClientDetail('${d._id}')">
-      <div class="crm-row-avatar" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>
-      <div class="crm-row-info">
-        <div class="crm-row-name">${nombre}</div>
-        <div class="crm-row-meta">${d.broker||'–'} · ${fmtDate(d.ultimaActividad)}</div>
-      </div>
-      <div class="crm-row-badge">${estadoBadge(d.estado||'Activo')}</div>
-    </div>`;
-  }).join('');
+    const initials=crmInitials(nombre);
+    const bg=crmAvatarBg(nombre);
+    const zonas=(d.zonasInteres||[]).slice(0,2).join(', ')+(d.zonasInteres?.length>2?'…':'');
+    h+=`<tr onclick="openClientDetail('${d._id}')">
+      <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${bg}">${initials}</div><div><div class="crm-client-name">${nombre}</div>${d.broker_email?`<div class="crm-client-sub">${d.broker_email}</div>`:''}</div></div></td>
+      <td><div class="crm-broker-cell">${d.broker||'–'}</div></td>
+      <td class="crm-date">${fmtDate(d.ultimaActividad)}</td>
+      <td class="crm-ppts">${d.cantidadPPTs||0}</td>
+      <td class="crm-zonas-cell">${zonas||'–'}</td>
+      <td>${estadoBadge(d.estado||'Activo')}</td>
+      <td><button class="crm-action-btn" onclick="event.stopPropagation();openClientDetail('${d._id}')">Ver ficha →</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
 }
 
 function detTab(el,tabId){
-  const scroll=document.getElementById('crm-detail-scroll');
-  if(!scroll)return;
-  scroll.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));
+  const right=document.getElementById('crm-det-right');
+  if(!right)return;
+  right.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['crm-dt-info','crm-dt-history'].forEach(id=>{
-    const p=scroll.querySelector('#'+id);
-    if(p)p.style.display=id===tabId?'':'none';
-  });
+  right.querySelectorAll('#crm-dt-resumen,#crm-dt-notas').forEach(p=>p.style.display='none');
+  const target=right.querySelector('#'+tabId);
+  if(target)target.style.display='';
 }
 
 function openClientDetail(docId){
   const d=_crmDocs.find(x=>x._id===docId);
   if(!d)return;
-  // Highlight selected row
-  document.querySelectorAll('.crm-client-row').forEach(r=>r.classList.remove('selected'));
-  const row=document.getElementById('crm-row-'+docId);
-  if(row){row.classList.add('selected');row.scrollIntoView({behavior:'smooth',block:'nearest'});}
-  const opts=['Activo','Visitas','Negociación','Cerrado','Perdido'].map(e=>`<option value="${e}"${d.estado===e?' selected':''}>${e}</option>`).join('');
-  const tags=(label,arr)=>arr?.length?`<div class="crm-det-section"><div class="crm-det-section-title">${label}</div><div class="crm-tags">${arr.map(t=>`<span class="crm-tag">${t}</span>`).join('')}</div></div>`:'';
-  const ppts=d.cantidadPPTs||0;
-  let tlHtml='';
-  if(ppts>0)tlHtml+=`<div class="crm-tl-item"><div class="crm-tl-dot"></div><div><div class="crm-tl-title">Último PPT enviado</div><div class="crm-tl-date">${fmtDate(d.ultimaActividad)}</div></div></div>`;
-  if(d.fechaCreacion)tlHtml+=`<div class="crm-tl-item"><div class="crm-tl-dot" style="background:#22C55E"></div><div><div class="crm-tl-title">Cliente creado</div><div class="crm-tl-date">${fmtDate(d.fechaCreacion)}</div></div></div>`;
   const nombre=d.nombre||d._id;
-  const scroll=document.getElementById('crm-detail-scroll');
-  scroll.innerHTML=`
-    <button class="crm-det-back" onclick="closeCRMDetail()">← Volver a la lista</button>
-    <div class="crm-det-header">
-      <div class="crm-det-avatar" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>
-      <div class="crm-det-info">
-        <div class="crm-det-name">${nombre}</div>
-        ${d.broker_email?`<div class="crm-det-email">${d.broker_email}</div>`:''}
-        <div class="crm-det-chips">
-          ${estadoBadge(d.estado||'Activo')}
-          ${d.broker?`<span class="crm-det-chip">${d.broker}</span>`:''}
-          <span class="crm-det-chip">${ppts} PPT${ppts!==1?'s':''}</span>
-        </div>
-      </div>
+  const ppts=d.cantidadPPTs||0;
+  const opts=['Activo','Visitas','Negociación','Cerrado','Perdido'].map(e=>`<option value="${e}"${d.estado===e?' selected':''}>${e}</option>`).join('');
+  const tags=(arr)=>arr?.length?arr.map(t=>`<span class="crm-tag">${t}</span>`).join(''):'–';
+  // Left panel
+  document.getElementById('crm-det-left').innerHTML=`
+    <div class="crm-det-av-wrap">
+      <div class="crm-det-av" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>
+      <div class="crm-det-av-name">${nombre}</div>
+      ${d.broker_email?`<div class="crm-det-av-email">${d.broker_email}</div>`:''}
     </div>
-    <div class="crm-det-kpis">
-      <div class="crm-det-kpi"><div class="crm-det-kv" style="color:#1C54F4">${ppts}</div><div class="crm-det-kl">PPTs</div></div>
-      <div class="crm-det-kpi"><div class="crm-det-kv" style="font-size:13px;font-weight:600">${fmtDate(d.ultimaActividad)}</div><div class="crm-det-kl">Última actividad</div></div>
-      <div class="crm-det-kpi"><div class="crm-det-kv" style="font-size:13px;font-weight:600">${fmtDate(d.fechaCreacion)}</div><div class="crm-det-kl">Cliente desde</div></div>
-    </div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker asignado</div><div class="crm-det-meta-val">${d.broker||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">PPTs generados</div><div class="crm-det-meta-val" style="color:#1C54F4;font-size:20px">${ppts}</div></div>
+  `;
+  // Right panel
+  document.getElementById('crm-det-right').innerHTML=`
     <div class="crm-det-tabs">
-      <button class="crm-det-tab active" onclick="detTab(this,'crm-dt-info')">Información</button>
-      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-history')">Historial</button>
+      <button class="crm-det-tab active" onclick="detTab(this,'crm-dt-resumen')">Resumen</button>
+      <button class="crm-det-tab" onclick="showModule('generator')">Búsquedas</button>
+      <button class="crm-det-tab" onclick="showModule('analytics')">PPTs generados</button>
+      <button class="crm-det-tab" onclick="showModule('analytics')">Alternativas enviadas</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-notas')">Notas</button>
     </div>
-    <div class="crm-det-body">
-      <div id="crm-dt-info">
-        <div class="crm-det-section">
-          <div class="crm-det-section-title">Pipeline</div>
-          <select class="crm-estado-sel" onchange="saveClientEstado('${docId}',this.value)">${opts}</select>
-        </div>
+    <div class="crm-det-tab-body">
+      <div id="crm-dt-resumen">
         <div class="crm-det-grid">
-          <div class="crm-det-field"><div class="crm-det-lbl">Broker asignado</div><div class="crm-det-val">${d.broker||'–'}</div></div>
-          <div class="crm-det-field"><div class="crm-det-lbl">Email broker</div><div class="crm-det-val" style="font-size:11px;font-weight:400">${d.broker_email||'–'}</div></div>
+          <div>
+            <div class="crm-det-section-title" style="font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem">Información general</div>
+            <div style="display:flex;flex-direction:column;gap:.5rem">
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Zonas de interés</div><div class="crm-tags" style="margin-top:.25rem">${tags(d.zonasInteres)}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Presupuesto</div><div class="crm-det-meta-val">A definir</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Pipeline</div><select class="crm-estado-sel" style="margin-top:3px" onchange="saveClientEstado('${docId}',this.value)">${opts}</select></div>
+            </div>
+          </div>
+          <div>
+            <div class="crm-det-section-title" style="font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem">Actividad reciente</div>
+            <div class="crm-timeline">
+              ${ppts>0?`<div class="crm-tl-item"><div class="crm-tl-dot"></div><div><div class="crm-tl-title">PPT generado</div><div class="crm-tl-date">${fmtDate(d.ultimaActividad)}</div></div></div>`:''}
+              ${d.fechaCreacion?`<div class="crm-tl-item"><div class="crm-tl-dot" style="background:#22C55E"></div><div><div class="crm-tl-title">Cliente creado</div><div class="crm-tl-date">${fmtDate(d.fechaCreacion)}</div></div></div>`:''}
+              ${!ppts&&!d.fechaCreacion?'<div class="crm-empty" style="padding:.75rem 0">Sin actividad registrada.</div>':''}
+            </div>
+          </div>
         </div>
-        ${tags('Zonas de interés',d.zonasInteres)}
-        ${tags('Edificios enviados',d.edificiosEnviados)}
-        ${tags('Rangos m² solicitados',d.rangoM2)}
-        ${!d.zonasInteres?.length&&!d.edificiosEnviados?.length&&!d.rangoM2?.length?'<div class="crm-empty" style="padding:1.25rem 0">Sin datos detallados registrados aún.</div>':''}
+        ${d.edificiosEnviados?.length?`<div style="margin-top:1rem"><div class="crm-det-section-title" style="font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem">Edificios enviados</div><div class="crm-tags">${tags(d.edificiosEnviados)}</div></div>`:''}
       </div>
-      <div id="crm-dt-history" style="display:none">
-        ${tlHtml?`<div class="crm-timeline">${tlHtml}</div>`:'<div class="crm-empty" style="padding:1.5rem 0">Sin historial registrado.</div>'}
+      <div id="crm-dt-notas" style="display:none">
+        <textarea class="crm-new-inp" style="min-height:120px;resize:vertical" placeholder="Notas sobre este cliente..."></textarea>
       </div>
-    </div>`;
-  document.getElementById('crm-detail-empty').style.display='none';
-  scroll.style.display='flex';
-  // Mobile: show as overlay
-  if(window.innerWidth<=768)document.getElementById('crm-detail-pane').classList.add('mobile-open');
+    </div>
+  `;
+  // Switch views
+  document.getElementById('crm-list-view').style.display='none';
+  const dv=document.getElementById('crm-detail-view');
+  dv.style.display='flex';
+  dv.style.flexDirection='column';
 }
 
 window.closeCRMDetail=()=>{
-  document.getElementById('crm-detail-pane').classList.remove('mobile-open');
-  document.getElementById('crm-detail-scroll').style.display='none';
-  document.getElementById('crm-detail-empty').style.display='flex';
-  document.querySelectorAll('.crm-client-row').forEach(r=>r.classList.remove('selected'));
+  document.getElementById('crm-detail-view').style.display='none';
+  const lv=document.getElementById('crm-list-view');
+  lv.style.display='flex';
+  lv.style.flexDirection='column';
+};
+
+window.openNewClientModal=()=>{
+  const modal=document.getElementById('crm-new-modal');
+  document.getElementById('crm-new-box').innerHTML=`
+    <div class="crm-new-hd">
+      <div class="crm-new-title">Nuevo Cliente</div>
+      <button class="crm-new-close" onclick="document.getElementById('crm-new-modal').style.display='none'">✕</button>
+    </div>
+    <div class="crm-new-body">
+      <div class="crm-new-grid">
+        <div class="crm-new-field full"><div class="crm-new-lbl">Nombre del cliente *</div><input id="nc-nombre" class="crm-new-inp" placeholder="Ej: Empresa SA" type="text"></div>
+        <div class="crm-new-field"><div class="crm-new-lbl">Broker asignado</div><input id="nc-broker" class="crm-new-inp" placeholder="Nombre del broker" type="text"></div>
+        <div class="crm-new-field"><div class="crm-new-lbl">Email del broker</div><input id="nc-email" class="crm-new-inp" placeholder="email@colliers.com" type="email"></div>
+        <div class="crm-new-field"><div class="crm-new-lbl">Estado</div><select id="nc-estado" class="crm-new-sel"><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option></select></div>
+        <div class="crm-new-field"><div class="crm-new-lbl">m² mínimo</div><input id="nc-m2min" class="crm-new-inp" placeholder="900" type="number"></div>
+        <div class="crm-new-field full"><div class="crm-new-lbl">Zonas de interés (separadas por coma)</div><input id="nc-zonas" class="crm-new-inp" placeholder="Norte CABA, Microcentro, ..."></div>
+      </div>
+    </div>
+    <div class="crm-new-footer">
+      <button class="crm-cancel-btn" onclick="document.getElementById('crm-new-modal').style.display='none'">Cancelar</button>
+      <button class="crm-save-btn" onclick="saveNewClient()">Crear cliente</button>
+    </div>
+  `;
+  modal.style.display='flex';
+};
+
+window.saveNewClient=async()=>{
+  const nombre=(document.getElementById('nc-nombre')?.value||'').trim();
+  if(!nombre){alert('El nombre del cliente es obligatorio.');return;}
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.querySelector('.crm-save-btn');
+  btn.textContent='Guardando...';btn.disabled=true;
+  try{
+    const zonas=(document.getElementById('nc-zonas')?.value||'').split(',').map(z=>z.trim()).filter(Boolean);
+    const m2min=parseFloat(document.getElementById('nc-m2min')?.value)||0;
+    const data={
+      nombre,
+      broker:document.getElementById('nc-broker')?.value||'',
+      broker_email:document.getElementById('nc-email')?.value||'',
+      estado:document.getElementById('nc-estado')?.value||'Activo',
+      zonasInteres:zonas,
+      m2:m2min||null,
+      cantidadPPTs:0,
+      fechaCreacion:firebase.firestore.Timestamp.now(),
+      ultimaActividad:firebase.firestore.Timestamp.now(),
+    };
+    await db.collection('clientes').add(data);
+    document.getElementById('crm-new-modal').style.display='none';
+    loadCRM();
+  }catch(e){
+    alert('Error al crear cliente: '+e.message);
+    btn.textContent='Crear cliente';btn.disabled=false;
+  }
 };
 
 /* ===== BUILDINGS ADMIN ===== */
@@ -4468,19 +4548,19 @@ function renderAnalytics(docs){
   document.getElementById('an-kpis').innerHTML=`
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#EEF3FF">📄</div>
-      <div class="kpi-data"><div class="kpi-val">${totalPPTs}</div><div class="kpi-label">PPTs Generados</div><div class="kpi-sub">Total histórico</div></div>
+      <div class="kpi-data"><div class="kpi-val">${totalPPTs}</div><div class="kpi-label">PPTs Generados</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#EDFAF2">👥</div>
-      <div class="kpi-data"><div class="kpi-val">${clientesUnicos||'–'}</div><div class="kpi-label">Clientes Únicos</div><div class="kpi-sub">Distintos atendidos</div></div>
+      <div class="kpi-data"><div class="kpi-val">${clientesUnicos||'–'}</div><div class="kpi-label">Clientes Únicos</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#FFF7EC">🏆</div>
-      <div class="kpi-data"><div class="kpi-val">${brokersActivos||'–'}</div><div class="kpi-label">Brokers Activos</div><div class="kpi-sub">Con actividad registrada</div></div>
+      <div class="kpi-data"><div class="kpi-val">${brokersActivos||'–'}</div><div class="kpi-label">Brokers Activos</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#F3EEFF">🏢</div>
-      <div class="kpi-data"><div class="kpi-val">${totalAlternativas}</div><div class="kpi-label">Alternativas Enviadas</div><div class="kpi-sub">Edificios en PPTs</div></div>
+      <div class="kpi-data"><div class="kpi-val">${totalAlternativas}</div><div class="kpi-label">Alternativas Enviadas</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
     </div>`;
 
   // Zonas
@@ -4538,32 +4618,30 @@ function renderAnalytics(docs){
     }
   });
 
-  // Edificios
+  // Edificios — ranked list (no chart)
   const edifCount={};
   docs.forEach(d=>{
     const eds=d.edificios||d.propiedades||[];
     if(Array.isArray(eds))eds.forEach(e=>{if(e)edifCount[e]=(edifCount[e]||0)+1;});
   });
   const edifSorted=Object.entries(edifCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  if(_anCharts.edificios)_anCharts.edificios.destroy();
   if(edifSorted.length){
-    _anCharts.edificios=new Chart(document.getElementById('chart-edificios'),{
-      type:'bar',
-      data:{
-        labels:edifSorted.map(([e])=>e),
-        datasets:[{label:'Veces enviado',data:edifSorted.map(([,v])=>v),backgroundColor:isDark?edifSorted.map((_,i)=>`rgba(77,147,255,${Math.max(0.35,1-i*0.07)})`):edifSorted.map((_,i)=>`rgba(28,84,244,${Math.max(0.25,1-i*0.08)})`),borderRadius:3,borderWidth:0,hoverBackgroundColor:isDark?'#72AEFF':'#1C54F4'}]
-      },
-      options:{
-        indexAxis:'y',responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} veces enviado`}}},
-        scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}}}
-      }
-    });
+    const max=edifSorted[0][1]||1;
+    document.getElementById('an-body-edificios').innerHTML=`<div class="an-edif-list">${
+      edifSorted.map(([name,count],i)=>`
+        <div class="an-edif-item">
+          <span class="an-edif-rank">${i+1}</span>
+          <span class="an-edif-name">${name}</span>
+          <div class="an-edif-bar-wrap"><div class="an-edif-bar" style="width:${Math.round(count/max*100)}%"></div></div>
+          <span class="an-edif-count">${count}</span>
+        </div>
+      `).join('')
+    }</div>`;
   }else{
     document.getElementById('an-body-edificios').innerHTML='<div class="an-empty">Sin datos de edificios aún.<br><small>Los nuevos PPTs incluyen este campo automáticamente.</small></div>';
   }
 
-  // Brokers
+  // Brokers — horizontal leaderboard (no chart)
   const brokerMap={};
   docs.forEach(d=>{
     const key=d.usuario||d.nombre||'Desconocido';
@@ -4571,36 +4649,15 @@ function renderAnalytics(docs){
     brokerMap[key].ppts++;
     brokerMap[key].alts+=Number(d.cantidad_alternativas)||0;
   });
-  const brokerList=Object.values(brokerMap).sort((a,b)=>b.ppts-a.ppts);
-  const maxPPTs=brokerList[0]?.ppts||1;
-  const rankCls=i=>i===0?'top1':i===1?'top2':i===2?'top3':'';
-  document.getElementById('an-brokers-lb').innerHTML=brokerList.slice(0,8).map((b,i)=>`
-    <div class="lb-item">
-      <div class="lb-rank ${rankCls(i)}">${i+1}</div>
-      <div class="lb-name">${b.nombre}</div>
-      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.round(b.ppts/maxPPTs*100)}%"></div></div>
-      <div class="lb-meta">${b.ppts} PPT${b.ppts!==1?'s':''} · ${b.ppts>0?Math.round(b.alts/b.ppts):0} alt. prom.</div>
-    </div>`).join('');
-
-  if(_anCharts.brokers)_anCharts.brokers.destroy();
-  if(brokerList.length){
-    const top10=brokerList.slice(0,10);
-    _anCharts.brokers=new Chart(document.getElementById('chart-brokers'),{
-      type:'bar',
-      data:{
-        labels:top10.map(b=>b.nombre.split(' ')[0]),
-        datasets:[
-          {label:'PPTs generados',data:top10.map(b=>b.ppts),backgroundColor:isDark?'#4D93FF':'rgba(28,84,244,.8)',borderWidth:0,borderRadius:4,hoverBackgroundColor:isDark?'#72AEFF':'#25408F'},
-          {label:'Alt. promedio',data:top10.map(b=>b.ppts>0?Math.round(b.alts/b.ppts):0),backgroundColor:isDark?'rgba(168,179,209,.25)':'rgba(195,230,255,.6)',borderWidth:0,borderRadius:4,hoverBackgroundColor:isDark?'rgba(168,179,209,.45)':'#4D93FF'}
-        ]
-      },
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{position:'bottom',labels:{color:textColor,font:{size:10},boxWidth:12}}},
-        scales:{x:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}}}
-      }
-    });
-  }
+  const brokersSorted=Object.values(brokerMap).sort((a,b)=>b.ppts-a.ppts).slice(0,10);
+  document.getElementById('an-brokers-lb').innerHTML=brokersSorted.map((b,i)=>`
+    <div class="an-broker-item">
+      <div class="an-broker-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
+      <div class="an-broker-name">${b.nombre}</div>
+      <div class="an-broker-count">${b.ppts}</div>
+    </div>
+  `).join('');
+  if(_anCharts.brokers){_anCharts.brokers.destroy();_anCharts.brokers=null;}
 }
 
 function show(id){
