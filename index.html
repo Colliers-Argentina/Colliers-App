@@ -558,6 +558,14 @@ body.dark .crm-new-footer{border-top-color:rgba(255,255,255,.06)}
 .crm-cancel-btn{background:transparent;border:1px solid #E2EAF4;color:#56648F;font-family:inherit;font-size:13px;padding:9px 16px;border-radius:8px;cursor:pointer;transition:all .15s}
 .crm-cancel-btn:hover{background:#F8FAFF}
 body.dark .crm-cancel-btn{border-color:rgba(255,255,255,.1);color:#8A9AC0}
+.crm-det-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 2rem;text-align:center;gap:.5rem}
+.crm-det-placeholder-icon{font-size:32px;opacity:.3;margin-bottom:.25rem}
+.crm-det-placeholder-title{font-size:14px;font-weight:700;color:#0A1B4D;letter-spacing:-.15px}
+body.dark .crm-det-placeholder-title{color:#fff}
+.crm-det-placeholder-sub{font-size:12px;color:#8A9AC0;line-height:1.7;max-width:340px}
+body.dark .crm-det-placeholder-sub{color:#6B7FA3}
+.crm-det-link-btn{background:none;border:none;color:#1C54F4;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px}
+body.dark .crm-det-link-btn{color:#4D93FF}
 /* legacy compat */
 .crm-list-kpis{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:.6rem .75rem;border-bottom:1px solid #EEF3FF;flex-shrink:0}
 body.dark .crm-list-kpis{border-bottom-color:rgba(255,255,255,.05)}
@@ -1299,22 +1307,26 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
     </div>
   </div>
   <nav class="sb-nav">
-    <div class="sb-nav-section">Módulos</div>
     <button class="sb-nav-item active" id="sbn-home" onclick="showModule('home')">
-      <span class="sb-nav-icon">🏠</span>Inicio
-    </button>
-    <button class="sb-nav-item" id="sbn-generator" onclick="showModule('generator')">
-      <span class="sb-nav-icon">🔍</span>Generador de Informes
-    </button>
-    <button class="sb-nav-item" id="sbn-buildings" onclick="showModule('buildings')">
-      <span class="sb-nav-icon">🏢</span>Edificios
+      <span class="sb-nav-icon">⊞</span>Dashboard
     </button>
     <button class="sb-nav-item" id="sbn-crm" onclick="showModule('crm')">
-      <span class="sb-nav-icon">👥</span>Clientes CRM
+      <span class="sb-nav-icon">👥</span>CRM
     </button>
-    <div class="sb-nav-section" id="sbn-analytics-section" style="display:none">Analítica</div>
     <button class="sb-nav-item" id="sbn-analytics" onclick="showModule('analytics')" style="display:none">
-      <span class="sb-nav-icon">📊</span>Analítica
+      <span class="sb-nav-icon">📊</span>Analytics
+    </button>
+    <button class="sb-nav-item" id="sbn-generator" onclick="showModule('generator')">
+      <span class="sb-nav-icon">📄</span>Generador PPTs
+    </button>
+    <button class="sb-nav-item" id="sbn-buildings" onclick="showModule('buildings')">
+      <span class="sb-nav-icon">🏢</span>Inventario
+    </button>
+    <button class="sb-nav-item" id="sbn-admin" onclick="showModule('admin')" style="display:none">
+      <span class="sb-nav-icon">🛡</span>Administrador
+    </button>
+    <button class="sb-nav-item" id="sbn-config" onclick="showModule('config')" style="display:none">
+      <span class="sb-nav-icon">⚙</span>Configuración
     </button>
   </nav>
   <div class="sb-footer">
@@ -3415,7 +3427,7 @@ function detTab(el,tabId){
   if(!right)return;
   right.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  right.querySelectorAll('#crm-dt-resumen,#crm-dt-notas').forEach(p=>p.style.display='none');
+  right.querySelectorAll('[id^="crm-dt-"]').forEach(p=>p.style.display='none');
   const target=right.querySelector('#'+tabId);
   if(target)target.style.display='';
 }
@@ -3445,9 +3457,9 @@ function openClientDetail(docId){
   document.getElementById('crm-det-right').innerHTML=`
     <div class="crm-det-tabs">
       <button class="crm-det-tab active" onclick="detTab(this,'crm-dt-resumen')">Resumen</button>
-      <button class="crm-det-tab" onclick="showModule('generator')">Búsquedas</button>
-      <button class="crm-det-tab" onclick="showModule('analytics')">PPTs generados</button>
-      <button class="crm-det-tab" onclick="showModule('analytics')">Alternativas enviadas</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-busquedas')">Búsquedas</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-ppts')">PPTs generados</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-alt')">Alternativas enviadas</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-notas')">Notas</button>
     </div>
     <div class="crm-det-tab-body">
@@ -3474,8 +3486,17 @@ function openClientDetail(docId){
         </div>
         ${d.edificiosEnviados?.length?`<div style="margin-top:1rem"><div class="crm-det-section-title" style="font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem">Edificios enviados</div><div class="crm-tags">${tags(d.edificiosEnviados)}</div></div>`:''}
       </div>
+      <div id="crm-dt-busquedas" style="display:none">
+        <div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🔍</div><div class="crm-det-placeholder-title">Búsquedas de este cliente</div><div class="crm-det-placeholder-sub">Las búsquedas de alternativas se registrarán aquí automáticamente.<br>Para iniciar una nueva búsqueda usá el <button class="crm-det-link-btn" onclick="showModule('generator')">Generador de Informes</button></div></div>
+      </div>
+      <div id="crm-dt-ppts" style="display:none">
+        <div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📄</div><div class="crm-det-placeholder-title">PPTs generados</div><div class="crm-det-placeholder-sub">${ppts>0?`Se generaron <strong>${ppts} PPT${ppts!==1?'s':''}</strong> para este cliente. Podés ver el historial completo en <button class="crm-det-link-btn" onclick="showModule(\'analytics\')">Analytics</button>`:'Aún no se generaron PPTs para este cliente.'}</div></div>
+      </div>
+      <div id="crm-dt-alt" style="display:none">
+        <div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Alternativas enviadas</div><div class="crm-det-placeholder-sub">${d.edificiosEnviados?.length?`<div class="crm-tags" style="justify-content:flex-start">${(d.edificiosEnviados||[]).map(e=>`<span class="crm-tag">${e}</span>`).join('')}</div>`:'Aún no se enviaron alternativas a este cliente.'}</div></div>
+      </div>
       <div id="crm-dt-notas" style="display:none">
-        <textarea class="crm-new-inp" style="min-height:120px;resize:vertical" placeholder="Notas sobre este cliente..."></textarea>
+        <textarea class="crm-new-inp" style="min-height:140px;resize:vertical;width:100%;max-width:540px" placeholder="Notas sobre este cliente..."></textarea>
       </div>
     </div>
   `;
