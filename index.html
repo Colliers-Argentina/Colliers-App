@@ -336,209 +336,221 @@ body.dark .rent-v{color:#C3E6FF!important}
 body.dark .cb{background:rgba(255,255,255,.15)!important;color:#C3E6FF!important}
 
 /* ===== ANALYTICS ===== */
-#analytics-panel{background:#F0F4FF}
-body.dark #analytics-panel{background:#050816}
-.an-wrap{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem}
-.an-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.an-title{color:#25408F;font-size:22px;font-weight:700}
-.an-subtitle{color:#7B8BBD;font-size:12px;margin-top:3px}
-body.dark .an-title{color:#FFFFFF}
-body.dark .an-subtitle{color:#A8B3D1}
-.an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+#analytics-panel{background:#F1F5FC;padding:1.5rem 2rem}
+body.dark #analytics-panel{background:#06091A}
+.an-wrap{max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:1rem}
+.an-hdr{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding-bottom:.75rem;border-bottom:1px solid #E0EAF8}
+body.dark .an-hdr{border-bottom-color:rgba(255,255,255,.06)}
+.an-hdr-l{display:flex;flex-direction:column;gap:2px}
+.an-title{color:#0A1B4D;font-size:18px;font-weight:700;letter-spacing:-.3px}
+.an-subtitle{color:#8A9AC0;font-size:11px}
+body.dark .an-title{color:#fff}
+body.dark .an-subtitle{color:#6B7FA3}
+.an-filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:1px solid #E0EAF8;border-radius:10px;padding:7px 12px}
+body.dark .an-filter-row{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)}
+.an-filter-lbl{font-size:10px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+body.dark .an-filter-lbl{color:#7B8BBD}
+.an-filter-inp{font-family:inherit;font-size:12px;padding:5px 9px;border:1px solid #E2EAF4;color:#000759;background:#F8FAFF;border-radius:6px;width:100px;-moz-appearance:textfield;transition:all .15s}
+.an-filter-inp::-webkit-outer-spin-button,.an-filter-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.an-filter-inp:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 2px rgba(28,84,244,.08);background:#fff}
+body.dark .an-filter-inp{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .an-filter-inp::placeholder{color:rgba(168,179,209,.4)}
+.an-filter-chip{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;background:transparent;color:#7B8BBD;border:1px solid #E2EAF4;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.an-filter-chip:hover{background:rgba(239,51,64,.06);color:#EF3340;border-color:rgba(239,51,64,.3)}
+body.dark .an-filter-chip{border-color:rgba(255,255,255,.1);color:#7B8BBD}
+body.dark .an-filter-chip:hover{background:rgba(239,51,64,.1);color:#EF3340;border-color:rgba(239,51,64,.3)}
+.an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
 @media(max-width:960px){.an-kpis{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.an-kpis{grid-template-columns:1fr}}
-.kpi-card{background:#fff;border-top:3px solid #25408F;padding:1.25rem 1.5rem;box-shadow:0 2px 12px rgba(0,7,89,.07)}
-body.dark .kpi-card{background:#101B52;border:1px solid rgba(255,255,255,.08);border-top:3px solid #1C54F4;box-shadow:0 4px 20px rgba(28,84,244,.12)}
-.kpi-label{font-size:10px;font-weight:700;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
-.kpi-val{font-size:34px;font-weight:700;color:#000759;line-height:1}
-.kpi-sub{font-size:11px;color:#56648F;margin-top:.35rem}
-body.dark .kpi-label{color:#A8B3D1}
-body.dark .kpi-val{color:#FFFFFF}
-body.dark .kpi-sub{color:#A8B3D1}
-.an-grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:480px){.an-kpis{grid-template-columns:1fr 1fr}}
+.kpi-card{background:#fff;border:1px solid #E8EFF8;border-radius:12px;padding:.85rem 1rem;display:flex;align-items:center;gap:.8rem;transition:all .18s;box-shadow:0 1px 3px rgba(0,7,89,.04)}
+.kpi-card:hover{box-shadow:0 4px 16px rgba(0,7,89,.08);transform:translateY(-1px);border-color:#CCDAFF}
+body.dark .kpi-card{background:rgba(12,22,72,.65);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(12px);box-shadow:0 2px 10px rgba(0,0,0,.25)}
+body.dark .kpi-card:hover{border-color:rgba(77,147,255,.22);box-shadow:0 6px 22px rgba(28,84,244,.14)}
+.kpi-icon-box{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.kpi-data{display:flex;flex-direction:column;gap:1px;min-width:0}
+.kpi-val{font-size:24px;font-weight:700;color:#0A1B4D;line-height:1;letter-spacing:-.5px}
+body.dark .kpi-val{color:#fff}
+.kpi-label{font-size:10px;font-weight:600;color:#8A9AC0;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+body.dark .kpi-label{color:#6B7FA3}
+.kpi-sub{font-size:10px;color:#A8B8D0;margin-top:2px}
+body.dark .kpi-sub{color:#49577A}
+.an-grid2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 @media(max-width:900px){.an-grid2{grid-template-columns:1fr}}
-.an-card{background:#fff;border-top:3px solid #25408F;box-shadow:0 2px 12px rgba(0,7,89,.07);overflow:hidden}
-body.dark .an-card{background:rgba(16,27,82,.78);backdrop-filter:blur(16px);border-top:3px solid #1C54F4;border-left:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 8px 32px rgba(5,8,22,.4)}
-.an-card-hd{background:#25408F;padding:.65rem 1rem}
-body.dark .an-card-hd{background:#0A1240;border-bottom:1px solid rgba(255,255,255,.08)}
-.an-card-title{color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em}
-.an-card-body{padding:1.25rem}
-.an-chart-wrap{position:relative;height:260px}
-.lb-list{display:flex;flex-direction:column;gap:.4rem;padding:0 1.25rem 1rem}
-.lb-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:4px}
+.an-card{background:#fff;border:1px solid #E8EFF8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,7,89,.04)}
+body.dark .an-card{background:rgba(8,15,55,.75);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.07);box-shadow:0 4px 18px rgba(3,5,20,.4)}
+.an-card-hd{padding:.55rem .9rem;border-bottom:1px solid #F0F4FF;display:flex;align-items:center;gap:.45rem}
+body.dark .an-card-hd{border-bottom-color:rgba(255,255,255,.05)}
+.an-card-accent{width:3px;height:12px;border-radius:2px;background:linear-gradient(180deg,#1C54F4,#72AEFF);flex-shrink:0}
+.an-card-title{color:#56648F;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+body.dark .an-card-title{color:#6B7FA3}
+.an-card-body{padding:.85rem}
+.an-chart-wrap{position:relative;height:195px}
+.lb-list{display:flex;flex-direction:column;gap:.25rem;padding:.4rem .85rem .65rem}
+.lb-item{display:flex;align-items:center;gap:.55rem;padding:.4rem .55rem;border-radius:6px;transition:background .12s}
 .lb-item:nth-child(odd){background:#F8FAFF}
-body.dark .lb-item:nth-child(odd){background:rgba(255,255,255,.04)}
-body.dark .lb-item:hover{background:rgba(77,147,255,.1)}
-.lb-rank{width:22px;height:22px;border-radius:50%;background:#1C54F4;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+body.dark .lb-item:nth-child(odd){background:rgba(255,255,255,.025)}
+body.dark .lb-item:hover{background:rgba(77,147,255,.07)}
+.lb-rank{width:18px;height:18px;border-radius:50%;background:#25408F;color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lb-rank.top1{background:#FFD400;color:#000759}
-.lb-rank.top2{background:#C0C0C0;color:#000759}
+.lb-rank.top2{background:#C0C0C0;color:#353E59}
 .lb-rank.top3{background:#CD7F32;color:#fff}
-.lb-name{flex:1;font-size:12px;font-weight:600;color:#000759;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-body.dark .lb-name{color:#FFFFFF}
-.lb-meta{font-size:11px;color:#56648F;white-space:nowrap}
-body.dark .lb-meta{color:#A8B3D1}
-.lb-bar-wrap{width:72px;height:4px;background:#EEF3FF;border-radius:2px;flex-shrink:0}
-body.dark .lb-bar-wrap{background:rgba(255,255,255,.1)}
-.lb-bar{height:4px;background:linear-gradient(90deg,#25408F,#1C54F4);border-radius:2px;transition:width .4s ease}
+.lb-name{flex:1;font-size:11px;font-weight:600;color:#0A1B4D;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+body.dark .lb-name{color:#C3E6FF}
+.lb-meta{font-size:10px;color:#56648F;white-space:nowrap}
+body.dark .lb-meta{color:#6B7FA3}
+.lb-bar-wrap{width:52px;height:3px;background:#EEF3FF;border-radius:2px;flex-shrink:0}
+body.dark .lb-bar-wrap{background:rgba(255,255,255,.07)}
+.lb-bar{height:3px;background:linear-gradient(90deg,#25408F,#4D93FF);border-radius:2px;transition:width .4s ease}
 body.dark .lb-bar{background:linear-gradient(90deg,#1C54F4,#72AEFF)}
-.an-empty{padding:3rem 1.25rem;text-align:center;color:#7B8BBD;font-size:13px}
-body.dark .an-empty{color:#A8B3D1}
-.an-skel{height:24px;background:linear-gradient(90deg,#EEF3FF 25%,#DBE5FF 50%,#EEF3FF 75%);background-size:200% 100%;animation:skelan 1.4s infinite;border-radius:2px;margin-bottom:.5rem}
-body.dark .an-skel{background:linear-gradient(90deg,rgba(16,27,82,.8) 25%,rgba(28,84,244,.15) 50%,rgba(16,27,82,.8) 75%);background-size:200% 100%}
+.an-empty{padding:2.5rem 1rem;text-align:center;color:#7B8BBD;font-size:12px}
+body.dark .an-empty{color:#6B7FA3}
+.an-skel{height:18px;background:linear-gradient(90deg,#EEF3FF 25%,#DBE5FF 50%,#EEF3FF 75%);background-size:200% 100%;animation:skelan 1.4s infinite;border-radius:6px;margin-bottom:.5rem}
+body.dark .an-skel{background:linear-gradient(90deg,rgba(12,22,72,.8) 25%,rgba(28,84,244,.1) 50%,rgba(12,22,72,.8) 75%);background-size:200% 100%}
 @keyframes skelan{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* ===== CRM ===== */
 #crm-panel{background:#F4F6FB}
 body.dark #crm-panel{background:#030B1E}
-.crm-wrap{max-width:1440px;margin:0 auto;padding:2rem 2.5rem;display:flex;flex-direction:column;gap:1.5rem}
-/* Header */
-.crm-hz{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-.crm-hz-l{display:flex;flex-direction:column;gap:4px}
-.crm-title{color:#0A1B4D;font-size:28px;font-weight:700;letter-spacing:-.5px}
-.crm-subtitle{color:#7B8BBD;font-size:13px}
+.crm-wrap{max-width:1440px;margin:0 auto;padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1rem}
+.crm-hz{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;padding-bottom:.75rem;border-bottom:1px solid #E0EAF8}
+body.dark .crm-hz{border-bottom-color:rgba(255,255,255,.06)}
+.crm-hz-l{display:flex;flex-direction:column;gap:2px}
+.crm-title{color:#0A1B4D;font-size:18px;font-weight:700;letter-spacing:-.3px}
+.crm-subtitle{color:#8A9AC0;font-size:11px}
 body.dark .crm-title{color:#fff}
-body.dark .crm-subtitle{color:#A8B3D1}
-.crm-hz-r{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
-/* Inputs/controls */
-.crm-input{font-family:inherit;font-size:12px;padding:9px 14px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;min-width:220px;transition:all .15s}
-.crm-input:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.1)}
-.crm-select{font-family:inherit;font-size:12px;padding:9px 12px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;cursor:pointer;transition:all .15s}
-.crm-select:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.1)}
+body.dark .crm-subtitle{color:#6B7FA3}
+.crm-hz-r{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.crm-input{font-family:inherit;font-size:12px;padding:7px 12px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;min-width:180px;transition:all .15s}
+.crm-input:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
+.crm-select{font-family:inherit;font-size:12px;padding:7px 10px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;cursor:pointer;transition:all .15s}
+.crm-select:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
 body.dark .crm-input{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
-body.dark .crm-input::placeholder{color:rgba(168,179,209,.55)}
-body.dark .crm-input:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.15)}
+body.dark .crm-input::placeholder{color:rgba(168,179,209,.45)}
+body.dark .crm-input:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.12)}
 body.dark .crm-select{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
 body.dark .crm-select option{background:#0A1B4D}
-body.dark .crm-select:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.15)}
-.crm-m2-inp{font-family:inherit;font-size:12px;padding:9px 10px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;width:96px;transition:all .15s;-moz-appearance:textfield}
+body.dark .crm-select:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.12)}
+.crm-m2-inp{font-family:inherit;font-size:12px;padding:7px 9px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:8px;width:90px;transition:all .15s;-moz-appearance:textfield}
 .crm-m2-inp::-webkit-outer-spin-button,.crm-m2-inp::-webkit-inner-spin-button{-webkit-appearance:none}
-.crm-m2-inp:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.1)}
+.crm-m2-inp:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
 body.dark .crm-m2-inp{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
-body.dark .crm-m2-inp::placeholder{color:rgba(168,179,209,.55)}
-.crm-m2-sep{font-size:12px;color:#7B8BBD;padding:0 2px;align-self:center;user-select:none}
-.an-filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
-.an-filter-inp{font-family:inherit;font-size:12px;padding:8px 10px;border:1px solid #D0DAF0;color:#000759;background:#fff;border-radius:8px;width:110px;-moz-appearance:textfield;transition:all .15s}
-.an-filter-inp::-webkit-outer-spin-button,.an-filter-inp::-webkit-inner-spin-button{-webkit-appearance:none}
-.an-filter-inp:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.1)}
-body.dark .an-filter-inp{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
-body.dark .an-filter-inp::placeholder{color:rgba(168,179,209,.55)}
-.an-filter-lbl{font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.04em}
-.an-filter-chip{font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;background:rgba(28,84,244,.08);color:#1C54F4;border:none;cursor:pointer;transition:all .15s}
-.an-filter-chip:hover{background:rgba(239,51,64,.08);color:#EF3340}
-body.dark .an-filter-chip{background:rgba(77,147,255,.12);color:#7FB3FF}
-.crm-close-btn{background:#fff;border:1px solid #E2EAF4;color:#56648F;font-family:inherit;font-size:13px;padding:9px 14px;cursor:pointer;border-radius:8px;transition:all .15s;white-space:nowrap;font-weight:500}
+body.dark .crm-m2-inp::placeholder{color:rgba(168,179,209,.4)}
+.crm-m2-sep{font-size:11px;color:#A8B3D1;padding:0 1px;align-self:center;user-select:none}
+.crm-close-btn{background:#fff;border:1px solid #E2EAF4;color:#56648F;font-family:inherit;font-size:12px;padding:7px 12px;cursor:pointer;border-radius:8px;transition:all .15s;white-space:nowrap;font-weight:500}
 .crm-close-btn:hover{background:#FFF0F0;border-color:#EF3340;color:#EF3340}
 body.dark .crm-close-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#A8B3D1}
 body.dark .crm-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(239,51,64,.35);color:#EF3340}
-/* KPI row */
-.crm-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.crm-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
 @media(max-width:960px){.crm-kpi-row{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.crm-kpi-row{grid-template-columns:1fr}}
-.crm-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:16px;padding:1.35rem 1.5rem;display:flex;flex-direction:column;gap:.35rem;transition:all .2s}
-.crm-kpi:hover{box-shadow:0 4px 20px rgba(0,7,89,.07);transform:translateY(-1px)}
-body.dark .crm-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(0,0,0,.2)}
-body.dark .crm-kpi:hover{box-shadow:0 12px 40px rgba(28,84,244,.18);border-color:rgba(77,147,255,.3);transform:translateY(-1px)}
-.crm-kpi-icon{font-size:20px;line-height:1;margin-bottom:2px}
-.crm-kpi-v{font-size:34px;font-weight:700;color:#0A1B4D;line-height:1}
+@media(max-width:480px){.crm-kpi-row{grid-template-columns:1fr 1fr}}
+.crm-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:12px;padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;transition:all .18s;box-shadow:0 1px 3px rgba(0,7,89,.04)}
+.crm-kpi:hover{box-shadow:0 4px 14px rgba(0,7,89,.08);transform:translateY(-1px);border-color:#CCDAFF}
+body.dark .crm-kpi{background:rgba(12,22,72,.6);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(12px)}
+body.dark .crm-kpi:hover{border-color:rgba(77,147,255,.22);box-shadow:0 6px 20px rgba(28,84,244,.13)}
+.crm-kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.crm-kpi-data{display:flex;flex-direction:column;gap:1px}
+.crm-kpi-v{font-size:22px;font-weight:700;color:#0A1B4D;line-height:1}
 body.dark .crm-kpi-v{color:#fff}
-.crm-kpi-l{font-size:11px;color:#7B8BBD;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:2px}
-body.dark .crm-kpi-l{color:#A8B3D1}
-/* Table wrapper */
-.crm-tbl-wrap{background:#fff;border:1px solid #E8EFF8;border-radius:16px;overflow:hidden}
-body.dark .crm-tbl-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(0,0,0,.25)}
-/* Table */
+.crm-kpi-l{font-size:10px;font-weight:600;color:#8A9AC0;text-transform:uppercase;letter-spacing:.05em}
+body.dark .crm-kpi-l{color:#6B7FA3}
+.crm-tbl-wrap{background:#fff;border:1px solid #E8EFF8;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,7,89,.04)}
+body.dark .crm-tbl-wrap{background:rgba(8,15,55,.7);border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(14px)}
 .crm-table{width:100%;border-collapse:collapse;font-size:12px}
-.crm-table thead tr{background:#F8FAFF}
-body.dark .crm-table thead tr{background:rgba(255,255,255,.04)}
-.crm-table th{padding:13px 18px;text-align:left;color:#7B8BBD;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;border-bottom:1px solid #EEF3FF}
-body.dark .crm-table th{color:#A8B3D1;border-bottom:1px solid rgba(255,255,255,.06)}
-.crm-table tbody tr{cursor:pointer;transition:all .12s;border-bottom:1px solid #F4F6FB}
+.crm-table thead tr{background:#F8FAFF;border-bottom:1px solid #EEF3FF}
+body.dark .crm-table thead tr{background:rgba(255,255,255,.03);border-bottom-color:rgba(255,255,255,.06)}
+.crm-table th{padding:10px 16px;text-align:left;color:#8A9AC0;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+body.dark .crm-table th{color:#49577A}
+.crm-table tbody tr{cursor:pointer;transition:background .12s;border-bottom:1px solid #F4F6FB}
 .crm-table tbody tr:last-child{border-bottom:none}
-.crm-table td{padding:15px 18px;color:#353E59;vertical-align:middle}
-.crm-table tbody tr:hover{background:#F0F6FF}
-body.dark .crm-table td{color:#DCE7FF;border-bottom:1px solid rgba(255,255,255,.04)}
-body.dark .crm-table tbody tr{border-bottom:1px solid rgba(255,255,255,.04)}
-body.dark .crm-table tbody tr:hover{background:rgba(77,147,255,.07)}
-.crm-client-name{font-size:13px;font-weight:700;color:#0A1B4D;margin-bottom:2px}
+.crm-table td{padding:10px 16px;color:#353E59;vertical-align:middle}
+.crm-table tbody tr:hover{background:#F5F8FF}
+body.dark .crm-table td{color:#C3E6FF;border-bottom:1px solid rgba(255,255,255,.03)}
+body.dark .crm-table tbody tr{border-bottom-color:rgba(255,255,255,.03)}
+body.dark .crm-table tbody tr:hover{background:rgba(77,147,255,.06)}
+.crm-client-cell{display:flex;align-items:center;gap:.6rem}
+.crm-avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
+.crm-client-info{display:flex;flex-direction:column;gap:1px}
+.crm-client-name{font-size:12px;font-weight:700;color:#0A1B4D}
 body.dark .crm-client-name{color:#fff}
-.crm-client-sub{font-size:10px;color:#7B8BBD}
-body.dark .crm-client-sub{color:#A8B3D1}
+.crm-client-sub{font-size:10px;color:#8A9AC0}
+body.dark .crm-client-sub{color:#49577A}
 .crm-broker-cell{font-size:12px;color:#56648F;font-weight:500}
-body.dark .crm-broker-cell{color:#A8B3D1}
-.crm-date{font-size:11px;color:#7B8BBD;white-space:nowrap}
-body.dark .crm-date{color:#A8B3D1}
-.crm-ppts{font-size:15px;font-weight:700;color:#1C54F4;text-align:center}
+body.dark .crm-broker-cell{color:#8A9AC0}
+.crm-date{font-size:11px;color:#8A9AC0;white-space:nowrap}
+body.dark .crm-date{color:#6B7FA3}
+.crm-ppts{font-size:13px;font-weight:700;color:#1C54F4;text-align:center}
 body.dark .crm-ppts{color:#4D93FF}
-.crm-zonas-cell{font-size:11px;color:#7B8BBD;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.dark .crm-zonas-cell{color:#A8B3D1}
-/* Pipeline badges */
-.estado-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:999px;white-space:nowrap;letter-spacing:.02em}
-.estado-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-.crm-action-btn{background:transparent;border:1px solid #E2EAF4;color:#25408F;font-family:inherit;font-size:11px;padding:5px 12px;cursor:pointer;border-radius:8px;white-space:nowrap;transition:all .15s;font-weight:500}
-.crm-action-btn:hover{background:#25408F;color:#fff;border-color:#25408F;box-shadow:0 4px 12px rgba(37,64,143,.2)}
-body.dark .crm-action-btn{border-color:rgba(255,255,255,.12);color:#A8B3D1}
-body.dark .crm-action-btn:hover{background:#1C54F4;border-color:#1C54F4;color:#fff;box-shadow:0 4px 14px rgba(28,84,244,.35)}
-.crm-empty{padding:5rem 2rem;text-align:center;color:#7B8BBD;font-size:13px;line-height:2}
-body.dark .crm-empty{color:#A8B3D1}
-/* CRM Modal */
-.crm-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:400;background:rgba(3,11,30,.75);backdrop-filter:blur(10px);align-items:flex-end;justify-content:center}
-@media(min-width:640px){.crm-modal{align-items:center}}
+.crm-zonas-cell{font-size:11px;color:#7B8BBD;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.dark .crm-zonas-cell{color:#6B7FA3}
+.estado-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.02em;white-space:nowrap}
+.crm-action-btn{background:transparent;border:1px solid #E2EAF4;color:#25408F;font-family:inherit;font-size:11px;padding:4px 11px;cursor:pointer;border-radius:6px;white-space:nowrap;transition:all .15s;font-weight:600}
+.crm-action-btn:hover{background:#25408F;color:#fff;border-color:#25408F}
+body.dark .crm-action-btn{border-color:rgba(255,255,255,.1);color:#8A9AC0}
+body.dark .crm-action-btn:hover{background:#1C54F4;border-color:#1C54F4;color:#fff}
+.crm-empty{padding:3rem 1rem;text-align:center;color:#8A9AC0;font-size:13px;font-style:italic}
+body.dark .crm-empty{color:#6B7FA3}
+.crm-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:400;background:rgba(3,8,25,.75);backdrop-filter:blur(10px);align-items:center;justify-content:center}
 .crm-modal.open{display:flex}
-.crm-modal-box{background:#fff;width:100%;max-width:740px;max-height:92vh;overflow-y:auto;border-radius:20px 20px 0 0;box-shadow:0 32px 80px rgba(0,0,0,.2)}
-@media(min-width:640px){.crm-modal-box{margin:1.5rem;border-radius:20px}}
-body.dark .crm-modal-box{background:#0A1B4D;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 100px rgba(0,0,0,.6)}
-/* Modal header */
-.crm-modal-hd{padding:1.75rem 1.75rem 0;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-.crm-modal-title{font-size:24px;font-weight:700;color:#0A1B4D;letter-spacing:-.4px;line-height:1.2}
+.crm-modal-box{background:#fff;width:calc(100% - 2rem);max-width:820px;max-height:92vh;overflow-y:auto;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.2)}
+body.dark .crm-modal-box{background:#0C1640;border:1px solid rgba(255,255,255,.1);box-shadow:0 32px 90px rgba(0,0,0,.6)}
+.crm-modal-layout{display:grid;grid-template-columns:200px 1fr}
+@media(max-width:600px){.crm-modal-layout{grid-template-columns:1fr}}
+.crm-modal-sidebar{padding:1.5rem 1.25rem 2rem;border-right:1px solid #EEF3FF;display:flex;flex-direction:column;gap:.9rem}
+body.dark .crm-modal-sidebar{border-right-color:rgba(255,255,255,.07)}
+.crm-modal-avatar-hero{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;color:#fff;text-transform:uppercase;flex-shrink:0}
+.crm-modal-name{font-size:15px;font-weight:700;color:#0A1B4D;letter-spacing:-.2px;line-height:1.25}
+body.dark .crm-modal-name{color:#fff}
+.crm-modal-email{font-size:10px;color:#7B8BBD;margin-top:2px;word-break:break-all}
+body.dark .crm-modal-email{color:#6B7FA3}
+.crm-modal-meta-list{display:flex;flex-direction:column;gap:.6rem;padding-top:.65rem;border-top:1px solid #EEF3FF}
+body.dark .crm-modal-meta-list{border-top-color:rgba(255,255,255,.06)}
+.crm-modal-field{display:flex;flex-direction:column;gap:3px}
+.crm-modal-lbl{font-size:9px;font-weight:700;color:#8A9AC0;text-transform:uppercase;letter-spacing:.07em}
+body.dark .crm-modal-lbl{color:#49577A}
+.crm-modal-val{font-size:12px;color:#0A1B4D;font-weight:600}
+body.dark .crm-modal-val{color:#C3E6FF}
+.crm-modal-right{display:flex;flex-direction:column}
+.crm-modal-hd{padding:1.1rem 1.4rem .7rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;border-bottom:1px solid #EEF3FF}
+body.dark .crm-modal-hd{border-bottom-color:rgba(255,255,255,.06)}
+.crm-modal-title{font-size:17px;font-weight:700;color:#0A1B4D;letter-spacing:-.25px}
 body.dark .crm-modal-title{color:#fff}
-.crm-modal-close{background:rgba(0,0,0,.05);border:none;color:#56648F;font-size:16px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.crm-modal-close{background:rgba(0,0,0,.05);border:none;color:#56648F;font-size:13px;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-family:inherit}
 .crm-modal-close:hover{background:rgba(239,51,64,.1);color:#EF3340}
-body.dark .crm-modal-close{background:rgba(255,255,255,.08);color:#A8B3D1}
-body.dark .crm-modal-close:hover{background:rgba(239,51,64,.2);color:#EF3340}
-/* Tabs */
-.crm-modal-tabs{display:flex;padding:0 1.75rem;border-bottom:1px solid #EEF3FF;margin-top:1rem}
-body.dark .crm-modal-tabs{border-bottom-color:rgba(255,255,255,.08)}
-.crm-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:#7B8BBD;font-family:inherit;font-size:12px;font-weight:600;padding:10px 14px;cursor:pointer;transition:all .15s;margin-bottom:-1px;letter-spacing:.01em}
-.crm-tab:hover{color:#25408F}
-.crm-tab.active{color:#1C54F4;border-bottom-color:#1C54F4}
-body.dark .crm-tab{color:rgba(168,179,209,.65)}
-body.dark .crm-tab:hover{color:#fff}
-body.dark .crm-tab.active{color:#4D93FF;border-bottom-color:#4D93FF}
-/* Modal body */
-.crm-modal-body{padding:1.5rem 1.75rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
-.crm-modal-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+body.dark .crm-modal-close{background:rgba(255,255,255,.07);color:#8A9AC0}
+.crm-stat-chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.45rem}
+.crm-stat-chip{background:#EEF3FF;border:1px solid #DBE5FF;color:#25408F;font-size:10px;font-weight:600;padding:3px 9px;border-radius:999px}
+body.dark .crm-stat-chip{background:rgba(28,84,244,.12);border-color:rgba(77,147,255,.2);color:#4D93FF}
+.crm-modal-tabs{display:flex;padding:0 1.4rem;border-bottom:1px solid #EEF3FF;gap:2px}
+body.dark .crm-modal-tabs{border-bottom-color:rgba(255,255,255,.06)}
+.crm-tab{background:none;border:none;font-family:inherit;font-size:12px;font-weight:600;color:#7B8BBD;padding:.6rem .7rem;cursor:pointer;position:relative;transition:color .15s;white-space:nowrap}
+.crm-tab.active{color:#1C54F4}
+.crm-tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#1C54F4;border-radius:2px 2px 0 0}
+body.dark .crm-tab{color:#6B7FA3}
+body.dark .crm-tab.active{color:#4D93FF}
+body.dark .crm-tab.active::after{background:#4D93FF}
+.crm-modal-body{padding:1.1rem 1.4rem 1.75rem;display:flex;flex-direction:column;gap:1.1rem}
+.crm-modal-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
 @media(max-width:520px){.crm-modal-meta{grid-template-columns:1fr 1fr}}
-.crm-modal-field{display:flex;flex-direction:column;gap:5px}
-.crm-modal-lbl{font-size:10px;font-weight:600;color:#7B8BBD;text-transform:uppercase;letter-spacing:.07em}
-body.dark .crm-modal-lbl{color:#A8B3D1}
-.crm-modal-val{font-size:13px;color:#0A1B4D;font-weight:600}
-body.dark .crm-modal-val{color:#fff}
-.crm-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
-.crm-tag{background:#EEF3FF;color:#25408F;font-size:11px;padding:5px 13px;border-radius:999px;font-weight:600}
-body.dark .crm-tag{background:rgba(77,147,255,.14);color:#C3E6FF;border:1px solid rgba(77,147,255,.2)}
-.crm-section-hd{font-size:11px;font-weight:700;color:#25408F;text-transform:uppercase;letter-spacing:.07em;padding-bottom:.5rem;border-bottom:1px solid #EEF3FF;margin-bottom:.25rem}
-body.dark .crm-section-hd{color:#4D93FF;border-bottom-color:rgba(255,255,255,.07)}
-/* Timeline */
-.crm-timeline{display:flex;flex-direction:column;gap:.85rem}
-.crm-tl-item{display:flex;gap:.85rem;align-items:flex-start}
-.crm-tl-dot{width:9px;height:9px;border-radius:50%;background:#1C54F4;border:2px solid rgba(28,84,244,.25);flex-shrink:0;margin-top:3px}
-body.dark .crm-tl-dot{background:#4D93FF;border-color:rgba(77,147,255,.25)}
-.crm-tl-content{font-size:12px;color:#353E59;flex:1;line-height:1.5}
-body.dark .crm-tl-content{color:#DCE7FF}
+.crm-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.35rem}
+.crm-tag{background:#EEF3FF;color:#25408F;font-size:10px;padding:3px 10px;border-radius:999px;font-weight:600}
+body.dark .crm-tag{background:rgba(77,147,255,.12);color:#C3E6FF;border:1px solid rgba(77,147,255,.15)}
+.crm-section-hd{font-size:10px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.15rem}
+body.dark .crm-section-hd{color:#49577A}
+.crm-timeline{display:flex;flex-direction:column;gap:.75rem;padding:.2rem 0}
+.crm-tl-item{display:flex;gap:.7rem;align-items:flex-start}
+.crm-tl-dot{width:8px;height:8px;border-radius:50%;background:#1C54F4;border:2px solid rgba(28,84,244,.2);flex-shrink:0;margin-top:3px}
+body.dark .crm-tl-dot{background:#4D93FF;border-color:rgba(77,147,255,.2)}
+.crm-tl-content{font-size:12px;color:#353E59;flex:1}
+body.dark .crm-tl-content{color:#C3E6FF}
 .crm-tl-title{font-size:12px;font-weight:600;color:#0A1B4D}
 body.dark .crm-tl-title{color:#fff}
-.crm-tl-date{font-size:10px;color:#7B8BBD;margin-top:2px}
-body.dark .crm-tl-date{color:#A8B3D1}
-/* Pipeline selector */
-.crm-estado-sel{font-family:inherit;font-size:12px;padding:8px 12px;border:1px solid #E2EAF4;color:#000759;background:#fff;cursor:pointer;border-radius:8px;width:100%;transition:all .15s}
-.crm-estado-sel:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.1)}
-body.dark .crm-estado-sel{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff}
+.crm-tl-date{font-size:10px;color:#8A9AC0;margin-top:1px}
+body.dark .crm-tl-date{color:#6B7FA3}
+.crm-estado-sel{font-family:inherit;font-size:12px;padding:6px 10px;border:1px solid #E2EAF4;color:#000759;background:#fff;cursor:pointer;border-radius:8px;width:100%;transition:all .15s}
+.crm-estado-sel:focus{outline:none;border-color:#1C54F4;box-shadow:0 0 0 2px rgba(28,84,244,.08)}
+body.dark .crm-estado-sel{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1);color:#fff}
 body.dark .crm-estado-sel option{background:#0A1B4D}
-body.dark .crm-estado-sel:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.15)}
-/* Stat chips in modal header */
-.crm-stat-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}
-.crm-stat-chip{background:#EEF3FF;border:1px solid #DBE5FF;color:#25408F;font-size:11px;font-weight:600;padding:4px 11px;border-radius:999px}
-body.dark .crm-stat-chip{background:rgba(28,84,244,.12);border-color:rgba(77,147,255,.2);color:#4D93FF}
+body.dark .crm-estado-sel:focus{border-color:#4D93FF}
 
 /* ===== CLIENT SELECTOR ===== */
 .client-mode-row{display:flex;gap:4px;margin-bottom:.35rem}
@@ -1257,46 +1269,48 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
 </div>
 
 <!-- ANALYTICS -->
-<div id="analytics-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:150;overflow-y:auto;padding:2rem">
+<div id="analytics-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:150;overflow-y:auto">
   <div class="an-wrap">
     <div class="an-hdr">
-      <div>
+      <div class="an-hdr-l">
         <div class="an-title">Analítica · Inteligencia Comercial</div>
         <div class="an-subtitle" id="an-last-update">Cargando datos...</div>
       </div>
-      <button onclick="toggleAnalytics()" class="nbtn" style="background:rgba(37,64,143,.15);border-color:rgba(37,64,143,.3);color:#25408F;margin-top:4px">✕ Cerrar</button>
+      <button onclick="showModule('home')" class="crm-close-btn">✕ Cerrar</button>
     </div>
     <div class="an-filter-row">
-      <span class="an-filter-lbl">Filtrar por m²:</span>
-      <input id="an-m2-min" type="number" min="0" step="100" placeholder="mín m²" class="an-filter-inp" oninput="refilterAnalytics()">
+      <span class="an-filter-lbl">m²:</span>
+      <input id="an-m2-min" type="number" min="0" step="100" placeholder="mín" class="an-filter-inp" oninput="refilterAnalytics()">
       <span class="crm-m2-sep">–</span>
-      <input id="an-m2-max" type="number" min="0" step="100" placeholder="máx m²" class="an-filter-inp" oninput="refilterAnalytics()">
+      <input id="an-m2-max" type="number" min="0" step="100" placeholder="máx" class="an-filter-inp" oninput="refilterAnalytics()">
       <button class="an-filter-chip" onclick="clearAnFilter()">✕ Limpiar</button>
     </div>
     <div class="an-kpis" id="an-kpis">
-      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
-      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
-      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
-      <div class="kpi-card"><div class="an-skel"></div><div class="an-skel" style="width:55%"></div></div>
+      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:48px;height:22px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:4px"></div></div></div>
+      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:48px;height:22px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:4px"></div></div></div>
+      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:48px;height:22px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:4px"></div></div></div>
+      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:48px;height:22px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:4px"></div></div></div>
     </div>
     <div class="an-grid2">
       <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-title">🗺 Zonas más demandadas</div></div>
+        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Zonas más demandadas</div></div>
         <div class="an-card-body" id="an-body-zonas"><div class="an-chart-wrap"><canvas id="chart-zonas"></canvas></div></div>
       </div>
       <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-title">📐 Rangos de m² demandados</div></div>
+        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Rangos de m² demandados</div></div>
         <div class="an-card-body" id="an-body-m2"><div class="an-chart-wrap"><canvas id="chart-m2"></canvas></div></div>
       </div>
     </div>
-    <div class="an-card">
-      <div class="an-card-hd"><div class="an-card-title">🏢 Top 10 Edificios más enviados</div></div>
-      <div class="an-card-body" id="an-body-edificios"><div class="an-chart-wrap" style="height:300px"><canvas id="chart-edificios"></canvas></div></div>
-    </div>
-    <div class="an-card">
-      <div class="an-card-hd"><div class="an-card-title">🏆 Brokers más activos · Leaderboard</div></div>
-      <div id="an-brokers-lb" class="lb-list"></div>
-      <div class="an-card-body" style="padding-top:0"><div class="an-chart-wrap"><canvas id="chart-brokers"></canvas></div></div>
+    <div class="an-grid2">
+      <div class="an-card">
+        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Top 10 Edificios más enviados</div></div>
+        <div class="an-card-body" id="an-body-edificios"><div class="an-chart-wrap" style="height:260px"><canvas id="chart-edificios"></canvas></div></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Brokers más activos · Leaderboard</div></div>
+        <div id="an-brokers-lb" class="lb-list"></div>
+        <div class="an-card-body" style="padding-top:0"><div class="an-chart-wrap"><canvas id="chart-brokers"></canvas></div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1318,7 +1332,7 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
         <select id="crm-filter-estado" class="crm-select" onchange="filterCRM()">
           <option value="">Todos los estados</option><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option>
         </select>
-        <button onclick="toggleCRM()" class="crm-close-btn">✕ Cerrar</button>
+        <button onclick="showModule('home')" class="crm-close-btn">✕ Cerrar</button>
       </div>
     </div>
     <div class="crm-kpi-row" id="crm-kpi-row"></div>
@@ -3230,10 +3244,10 @@ function renderCRMKPIs(docs){
   const totalPPTs=docs.reduce((s,d)=>s+(d.cantidadPPTs||0),0);
   const negociacion=docs.filter(d=>d.estado==='Negociación').length;
   row.innerHTML=`
-    <div class="crm-kpi"><div class="crm-kpi-icon">👥</div><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Clientes totales</div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon">✅</div><div class="crm-kpi-v">${activos}</div><div class="crm-kpi-l">Activos</div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon">📊</div><div class="crm-kpi-v">${totalPPTs}</div><div class="crm-kpi-l">PPTs generados</div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon">🤝</div><div class="crm-kpi-v">${negociacion}</div><div class="crm-kpi-l">En negociación</div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">👥</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Clientes totales</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${activos}</div><div class="crm-kpi-l">Activos</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">📄</div><div class="crm-kpi-data"><div class="crm-kpi-v">${totalPPTs}</div><div class="crm-kpi-l">PPTs generados</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FFF7EC">🤝</div><div class="crm-kpi-data"><div class="crm-kpi-v">${negociacion}</div><div class="crm-kpi-l">En negociación</div></div></div>
   `;
 }
 
@@ -3247,11 +3261,14 @@ function renderCRMTable(docs){
   let h='<div style="overflow-x:auto"><table class="crm-table"><thead><tr>';
   ['Cliente','Broker','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>{h+=`<th>${col}</th>`;});
   h+='</tr></thead><tbody>';
-  docs.forEach(d=>{
+  const AVATAR_COLORS=['#1C54F4','#25408F','#0E7AC7','#0D9488','#7C3AED','#B45309','#DC2626','#16A34A'];
+  docs.forEach((d,i)=>{
     const zonas=(d.zonasInteres||[]).slice(0,2).join(', ')+(d.zonasInteres?.length>2?'…':'');
-    const sub=d.broker_email||'';
+    const nombre=d.nombre||d._id;
+    const initials=nombre.split(' ').slice(0,2).map(w=>w[0]?.toUpperCase()||'').join('');
+    const avatarBg=AVATAR_COLORS[nombre.charCodeAt(0)%AVATAR_COLORS.length];
     h+=`<tr onclick="openClientDetail('${d._id}')">
-      <td><div class="crm-client-name">${d.nombre||d._id}</div>${sub?`<div class="crm-client-sub">${sub}</div>`:''}</td>
+      <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${avatarBg}">${initials}</div><div class="crm-client-info"><div class="crm-client-name">${nombre}</div>${d.broker_email?`<div class="crm-client-sub">${d.broker_email}</div>`:''}</div></div></td>
       <td><div class="crm-broker-cell">${d.broker||'–'}</div></td>
       <td class="crm-date">${fmtDate(d.ultimaActividad)}</td>
       <td class="crm-ppts">${d.cantidadPPTs||0}</td>
@@ -3281,40 +3298,54 @@ function openClientDetail(docId){
   let tlHtml='';
   if(ppts>0)tlHtml+=`<div class="crm-tl-item"><div class="crm-tl-dot"></div><div class="crm-tl-content"><div class="crm-tl-title">Último PPT enviado</div><div class="crm-tl-date">${fmtDate(d.ultimaActividad)}</div></div></div>`;
   if(d.fechaCreacion)tlHtml+=`<div class="crm-tl-item"><div class="crm-tl-dot" style="background:#22C55E;border-color:rgba(34,197,94,.25)"></div><div class="crm-tl-content"><div class="crm-tl-title">Cliente creado</div><div class="crm-tl-date">${fmtDate(d.fechaCreacion)}</div></div></div>`;
+  const AVATAR_COLORS=['#1C54F4','#25408F','#0E7AC7','#0D9488','#7C3AED','#B45309','#DC2626','#16A34A'];
+  const nombre=d.nombre||d._id;
+  const initials=nombre.split(' ').slice(0,2).map(w=>w[0]?.toUpperCase()||'').join('');
+  const avatarBg=AVATAR_COLORS[nombre.charCodeAt(0)%AVATAR_COLORS.length];
   document.getElementById('crm-modal-box').innerHTML=`
-    <div class="crm-modal-hd">
-      <div>
-        <div class="crm-modal-title">${d.nombre||d._id}</div>
-        <div class="crm-stat-chips">
-          ${estadoBadge(d.estado||'Activo')}
-          <span class="crm-stat-chip" style="background:rgba(28,84,244,.08);color:#1C54F4;border:1px solid rgba(28,84,244,.15)">${ppts} PPT${ppts!==1?'s':''}</span>
-          ${d.broker?`<span class="crm-stat-chip">${d.broker}</span>`:''}
+    <div class="crm-modal-layout">
+      <div class="crm-modal-sidebar">
+        <div class="crm-modal-avatar-hero" style="background:${avatarBg}">${initials}</div>
+        <div>
+          <div class="crm-modal-name">${nombre}</div>
+          ${d.broker_email?`<div class="crm-modal-email">${d.broker_email}</div>`:''}
         </div>
-      </div>
-      <button class="crm-modal-close" onclick="closeCRMModal()">✕</button>
-    </div>
-    <div class="crm-modal-tabs">
-      <button class="crm-tab active" onclick="crmTab(this,'crm-tab-info')">Información</button>
-      <button class="crm-tab" onclick="crmTab(this,'crm-tab-history')">Historial</button>
-    </div>
-    <div class="crm-modal-body">
-      <div id="crm-tab-info" class="crm-tab-panel">
-        <div class="crm-modal-meta">
-          <div class="crm-modal-field"><div class="crm-modal-lbl">Broker asignado</div><div class="crm-modal-val">${d.broker||'–'}</div></div>
-          <div class="crm-modal-field"><div class="crm-modal-lbl">Email broker</div><div class="crm-modal-val" style="font-size:11px;font-weight:400">${d.broker_email||'–'}</div></div>
+        <div class="crm-modal-meta-list">
           <div class="crm-modal-field"><div class="crm-modal-lbl">Pipeline</div>
             <select class="crm-estado-sel" onchange="saveClientEstado('${docId}',this.value)">${opts}</select>
           </div>
+          <div class="crm-modal-field"><div class="crm-modal-lbl">Broker</div><div class="crm-modal-val">${d.broker||'–'}</div></div>
+          <div class="crm-modal-field"><div class="crm-modal-lbl">PPTs generados</div><div class="crm-modal-val" style="color:#1C54F4;font-size:22px;font-weight:700">${ppts}</div></div>
           <div class="crm-modal-field"><div class="crm-modal-lbl">Última actividad</div><div class="crm-modal-val">${fmtDate(d.ultimaActividad)}</div></div>
           <div class="crm-modal-field"><div class="crm-modal-lbl">Cliente desde</div><div class="crm-modal-val">${fmtDate(d.fechaCreacion)}</div></div>
-          <div class="crm-modal-field"><div class="crm-modal-lbl">PPTs generados</div><div class="crm-modal-val" style="color:#1C54F4;font-size:22px">${ppts}</div></div>
         </div>
-        ${tags('Zonas de interés',d.zonasInteres)}
-        ${tags('Edificios enviados',d.edificiosEnviados)}
-        ${tags('Rangos m² solicitados',d.rangoM2)}
       </div>
-      <div id="crm-tab-history" class="crm-tab-panel" style="display:none">
-        ${tlHtml?`<div class="crm-timeline">${tlHtml}</div>`:'<div class="crm-empty" style="padding:2rem 0">Sin historial registrado.</div>'}
+      <div class="crm-modal-right">
+        <div class="crm-modal-hd">
+          <div>
+            <div class="crm-modal-title">${nombre}</div>
+            <div class="crm-stat-chips">
+              ${estadoBadge(d.estado||'Activo')}
+              <span class="crm-stat-chip" style="background:rgba(28,84,244,.08);color:#1C54F4;border:1px solid rgba(28,84,244,.15)">${ppts} PPT${ppts!==1?'s':''}</span>
+            </div>
+          </div>
+          <button class="crm-modal-close" onclick="closeCRMModal()">✕</button>
+        </div>
+        <div class="crm-modal-tabs">
+          <button class="crm-tab active" onclick="crmTab(this,'crm-tab-info')">Información</button>
+          <button class="crm-tab" onclick="crmTab(this,'crm-tab-history')">Historial</button>
+        </div>
+        <div class="crm-modal-body">
+          <div id="crm-tab-info" class="crm-tab-panel">
+            ${tags('Zonas de interés',d.zonasInteres)}
+            ${tags('Edificios enviados',d.edificiosEnviados)}
+            ${tags('Rangos m² solicitados',d.rangoM2)}
+            ${!d.zonasInteres?.length&&!d.edificiosEnviados?.length&&!d.rangoM2?.length?'<div class="crm-empty" style="padding:1.5rem 0">Sin datos detallados registrados.</div>':''}
+          </div>
+          <div id="crm-tab-history" class="crm-tab-panel" style="display:none">
+            ${tlHtml?`<div class="crm-timeline">${tlHtml}</div>`:'<div class="crm-empty" style="padding:2rem 0">Sin historial registrado.</div>'}
+          </div>
+        </div>
       </div>
     </div>`;
   document.getElementById('crm-modal').classList.add('open');
@@ -4322,24 +4353,20 @@ function renderAnalytics(docs){
   const totalAlternativas=docs.reduce((s,d)=>s+(Number(d.cantidad_alternativas)||0),0);
   document.getElementById('an-kpis').innerHTML=`
     <div class="kpi-card">
-      <div class="kpi-label">PPTs Generados</div>
-      <div class="kpi-val">${totalPPTs}</div>
-      <div class="kpi-sub">Total histórico</div>
+      <div class="kpi-icon-box" style="background:#EEF3FF">📄</div>
+      <div class="kpi-data"><div class="kpi-val">${totalPPTs}</div><div class="kpi-label">PPTs Generados</div><div class="kpi-sub">Total histórico</div></div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Clientes Únicos</div>
-      <div class="kpi-val">${clientesUnicos||'–'}</div>
-      <div class="kpi-sub">Clientes distintos atendidos</div>
+      <div class="kpi-icon-box" style="background:#EDFAF2">👥</div>
+      <div class="kpi-data"><div class="kpi-val">${clientesUnicos||'–'}</div><div class="kpi-label">Clientes Únicos</div><div class="kpi-sub">Distintos atendidos</div></div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Brokers Activos</div>
-      <div class="kpi-val">${brokersActivos||'–'}</div>
-      <div class="kpi-sub">Usuarios con actividad registrada</div>
+      <div class="kpi-icon-box" style="background:#FFF7EC">🏆</div>
+      <div class="kpi-data"><div class="kpi-val">${brokersActivos||'–'}</div><div class="kpi-label">Brokers Activos</div><div class="kpi-sub">Con actividad registrada</div></div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Alternativas Enviadas</div>
-      <div class="kpi-val">${totalAlternativas}</div>
-      <div class="kpi-sub">Edificios presentados en PPTs</div>
+      <div class="kpi-icon-box" style="background:#F3EEFF">🏢</div>
+      <div class="kpi-data"><div class="kpi-val">${totalAlternativas}</div><div class="kpi-label">Alternativas Enviadas</div><div class="kpi-sub">Edificios en PPTs</div></div>
     </div>`;
 
   // Zonas
