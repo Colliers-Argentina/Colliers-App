@@ -2473,6 +2473,7 @@ function parseRangoM2Str(str){
   return null;
 }
 
+window.generarPPT=async()=>{
   const sp=[...sel].map(i=>filt[i]).filter(Boolean);
   if(!sp.length)return;
   const btn=document.getElementById("bp");
@@ -3717,6 +3718,7 @@ function getBldFoto(d){
   }
   return'';
 }
+/**
  * Handles: "1 cada 60 m2", "1 c/60", "1 cada 60m2", "1/60", "1 every 60 sq. m", "60"
  * Returns the denominator as integer, or null if unparseable.
  */
@@ -4032,7 +4034,7 @@ async function saveBuildingEdits(){
     certificacion:gv('be-cert'),
     googleMaps:gv('be-maps'),
     foto:normalizeImageUrl(gv('be-foto')||''),
-    imagenes:normalizeImageUrl(gv('be-foto')||'')?[normalizeImageUrl(gv('be-foto')||'')]:[]
+    imagenes:normalizeImageUrl(gv('be-foto')||'')?[normalizeImageUrl(gv('be-foto')||'')]:[],
     descripcion:gv('be-desc'),
     amenities:gv('be-amenities'),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
@@ -4143,7 +4145,7 @@ async function syncSheetToFirestore(){
           pisos:p.pisos||'',
           cocheras:formatCocherasES(p.cocheras||''),
           foto:normalizeImageUrl(p.foto||''),
-          imagenes:normalizeImageUrl(p.foto||'')?[normalizeImageUrl(p.foto||'')]:[]
+          imagenes:normalizeImageUrl(p.foto||'')?[normalizeImageUrl(p.foto||'')]:[],
           googleMaps:'',
           estado:'Disponible',
           broker:user?.displayName||'',
