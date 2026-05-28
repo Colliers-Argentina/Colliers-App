@@ -3199,9 +3199,13 @@ function filterCRM(){
       const rangoStrs=(d.rangoM2||[]);
       const ranges=rangoStrs.map(s=>parseRangoM2Str(s)).filter(Boolean);
       if(!ranges.length){
+        // No rangoM2 stored — treat as unknown range, include the client
+        // (only exclude if we have an explicit numeric m2 value to compare)
         const fallback=parseFloat(d.m2)||0;
-        if(m2Min&&fallback<m2Min)return false;
-        if(m2Max&&fallback>m2Max)return false;
+        if(fallback>0){
+          if(m2Min&&fallback<m2Min)return false;
+          if(m2Max&&fallback>m2Max)return false;
+        }
       } else {
         const overlaps=ranges.some(r=>{
           const lo=r.min||0, hi=r.max===Infinity?Infinity:r.max;
@@ -4284,12 +4288,12 @@ function refilterAnalytics(){
   const m2Max=parseFloat(document.getElementById('an-m2-max')?.value)||0;
   if(!m2Min&&!m2Max){renderAnalytics(_anDocs);return;}
   const filtered=_anDocs.filter(d=>{
-    const mn=parseFloat(d.m2Min||d.m2)||0;
-    const mx=parseFloat(d.m2Max)||0;
-    const lo=mn, hi=mx||mn;
-    if(m2Max&&lo>m2Max)return false;
-    if(m2Min&&hi>0&&hi<m2Min)return false;
-    if(m2Min&&hi===0&&lo<m2Min)return false;
+    const lo=parseFloat(d.m2Min||d.m2)||0;
+    // Records without m2Max (old data) get Infinity — unknown upper bound
+    const hi=d.m2Max?parseFloat(d.m2Max)||Infinity:Infinity;
+    if(!lo&&hi===Infinity)return true; // no m2 data at all → include
+    if(m2Max&&lo>m2Max)return false;   // record min > filter max → no overlap
+    if(m2Min&&hi<m2Min)return false;   // record max < filter min → no overlap
     return true;
   });
   console.log('[refilterAnalytics] filteredResults:',filtered.length,'de',_anDocs.length,{m2Min,m2Max});
