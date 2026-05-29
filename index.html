@@ -696,7 +696,7 @@ body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.3
 /* ===== BUILDINGS ADMIN ===== */
 #buildings-panel{background:#F4F6FB}
 body.dark #buildings-panel{background:#030B1E}
-.bld-layout{display:grid;grid-template-columns:1fr;height:100%;transition:grid-template-columns .25s ease}
+.bld-layout{display:grid;grid-template-columns:1fr;height:100%;flex:1;min-height:0;transition:grid-template-columns .25s ease}
 .bld-layout.editor-open{grid-template-columns:1fr 420px}
 @media(max-width:1100px){.bld-layout.editor-open{grid-template-columns:1fr 360px}}
 .bld-main{display:flex;flex-direction:column;height:100%;overflow:hidden}
@@ -1120,9 +1120,21 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 #app-shell.active{display:flex;flex-direction:row}
 #main-content{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;height:100%}
 #main-content #as{flex:1;overflow-y:auto;min-width:0;height:100%}
-#main-content #analytics-panel,#main-content #crm-panel{flex:1;min-width:0;min-height:0}
-#app-shell.active #buildings-panel{left:280px!important;top:0!important}
-#app-shell.active #admin-panel{left:280px!important;top:0!important}
+#main-content #analytics-panel,#main-content #crm-panel,#main-content #admin-panel,#main-content #buildings-panel{flex:1;min-width:0;min-height:0}
+#admin-panel{background:#F4F6FB;display:flex;flex-direction:column}
+body.dark #admin-panel{background:#0D1733}
+#buildings-panel{display:flex;flex-direction:column}
+.adm-topbar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.5rem;background:#fff;border-bottom:1px solid #E8EFF8;flex-shrink:0}
+body.dark .adm-topbar{background:rgba(0,13,46,.7);border-bottom-color:rgba(77,147,255,.1)}
+.adm-page-title{font-size:15px;font-weight:700;color:#0A1B4D;letter-spacing:-.2px}
+body.dark .adm-page-title{color:#C3E6FF}
+.adm-page-sub{font-size:11px;color:#8A9AC0;margin-top:2px}
+.adm-body{flex:1;overflow-y:auto;padding:1.5rem 2rem}
+body.dark .adm-body{background:#0D1733}
+.mod-back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid #E2E8F5;color:#56648F;font-family:inherit;font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .15s}
+.mod-back-btn:hover{background:rgba(28,84,244,.05);border-color:#4D93FF;color:#1C54F4}
+body.dark .mod-back-btn{border-color:rgba(77,147,255,.2);color:#8A9AC0}
+body.dark .mod-back-btn:hover{border-color:#4D93FF;color:#C3E6FF}
 
 /* ===== MIN-WIDTH FIX (tablas) ===== */
 .app-grid{min-width:0}
@@ -1160,7 +1172,8 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
   #app-shell.active #analytics-panel{height:auto;min-height:100vh;flex:none!important;overflow-y:auto;flex-direction:column;display:flex!important}
   #app-shell.active #analytics-panel .an-body{overflow-y:visible;flex:none}
   #app-shell.active #crm-panel{height:auto;min-height:100vh;flex:none!important;display:flex!important}
-  #app-shell.active #buildings-panel,#app-shell.active #admin-panel{left:0!important;top:0!important}
+  #app-shell.active #buildings-panel{height:auto;min-height:100vh;flex:none!important;display:flex!important}
+  #app-shell.active #admin-panel{height:auto;min-height:100vh;flex:none!important;display:flex!important}
   .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:188}
   .sb-overlay.active{display:block}
 
@@ -1310,23 +1323,20 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
     <button class="sb-nav-item active" id="sbn-home" onclick="showModule('home')">
       <span class="sb-nav-icon">⊞</span>Dashboard
     </button>
-    <button class="sb-nav-item" id="sbn-crm" onclick="showModule('crm')">
-      <span class="sb-nav-icon">👥</span>CRM
-    </button>
-    <button class="sb-nav-item" id="sbn-analytics" onclick="showModule('analytics')" style="display:none">
-      <span class="sb-nav-icon">📊</span>Analytics
-    </button>
     <button class="sb-nav-item" id="sbn-generator" onclick="showModule('generator')">
       <span class="sb-nav-icon">📄</span>Generador PPTs
     </button>
     <button class="sb-nav-item" id="sbn-buildings" onclick="showModule('buildings')">
       <span class="sb-nav-icon">🏢</span>Inventario
     </button>
-    <button class="sb-nav-item" id="sbn-admin" onclick="showModule('admin')" style="display:none">
-      <span class="sb-nav-icon">🛡</span>Administrador
+    <button class="sb-nav-item" id="sbn-crm" onclick="showModule('crm')">
+      <span class="sb-nav-icon">👥</span>CRM
     </button>
-    <button class="sb-nav-item" id="sbn-config" onclick="showModule('config')" style="display:none">
-      <span class="sb-nav-icon">⚙</span>Configuración
+    <button class="sb-nav-item" id="sbn-analytics" onclick="showModule('analytics')" style="display:none">
+      <span class="sb-nav-icon">📊</span>Analytics
+    </button>
+    <button class="sb-nav-item" id="sbn-admin" onclick="showModule('admin')" style="display:none">
+      <span class="sb-nav-icon">🛡️</span>Administrador
     </button>
   </nav>
   <div class="sb-footer">
@@ -1377,12 +1387,17 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
 </div>
 
 <!-- ADMIN PANEL -->
-<div id="admin-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:#F0F4FF;z-index:150;overflow-y:auto;padding:2rem">
-  <div style="max-width:1400px;margin:0 auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
-      <h2 style="color:#25408F;font-size:20px;font-weight:700">Registros de descargas PPT</h2>
-      <button onclick="toggleAdmin()" style="background:#25408F;border:none;color:#fff;font-family:inherit;font-size:12px;padding:6px 16px;cursor:pointer">✕ Cerrar</button>
+<div id="admin-panel" style="display:none">
+  <div class="adm-topbar">
+    <div>
+      <div class="adm-page-title">Administrador</div>
+      <div class="adm-page-sub">Registros de descargas PPT</div>
     </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
+    </div>
+  </div>
+  <div class="adm-body">
     <div id="admin-table-wrap"><p style="color:#56648F;font-size:13px">Cargando...</p></div>
   </div>
 </div>
@@ -1401,6 +1416,7 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
         <span style="font-size:10px;color:#C8D5F0">–</span>
         <input id="an-m2-max" type="number" min="0" step="100" placeholder="máx" class="an-filter-inp" oninput="refilterAnalytics()">
         <button class="an-filter-chip" onclick="clearAnFilter()">✕ Limpiar</button>
+        <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
       </div>
     </div>
   </div>
@@ -1451,6 +1467,7 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
           <option value="">Todos los estados</option><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option>
         </select>
         <button class="crm-new-btn" onclick="openNewClientModal()">+ Nuevo cliente</button>
+        <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
       </div>
     </div>
     <div class="crm-list-body">
@@ -1486,7 +1503,7 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
 </div>
 
 <!-- BUILDINGS ADMIN -->
-<div id="buildings-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:150;overflow:hidden">
+<div id="buildings-panel" style="display:none">
   <div class="bld-layout" id="bld-layout">
     <div class="bld-main">
       <div class="bld-wrap">
@@ -1502,7 +1519,8 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
               <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
             </select>
             <button class="bld-btn bld-btn-primary" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
-            <button onclick="toggleBuildings()" class="bld-close-btn">✕ Cerrar</button>
+            <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
+            <button onclick="showModule('home')" class="bld-close-btn">✕ Cerrar</button>
           </div>
         </div>
         <div class="bld-kpi-row" id="bld-kpi-row"></div>
@@ -1571,7 +1589,10 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
 <div id="as">
   <div class="gen-topbar">
     <div class="gen-topbar-title">🔍 Generador de Informes</div>
-    <button class="gen-close-btn" onclick="showModule('home')">✕ Cerrar</button>
+    <div style="display:flex;gap:.5rem">
+      <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
+      <button class="gen-close-btn" onclick="showModule('home')">✕ Cerrar</button>
+    </div>
   </div>
   <div class="app-wrap">
     <div class="app-grid">
@@ -1978,10 +1999,10 @@ function onUserLoggedIn(){
   const greeting=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
   const firstName=(user.displayName||'').split(' ')[0]||'Broker';
   const greetEl=document.getElementById('hub-greeting');if(greetEl)greetEl.textContent='¡'+greeting+', '+firstName+'!';
-  // Show analytics sidebar items only for whitelist
+  // Show admin-only sidebar items only for whitelist
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
-  const sbAnSection=document.getElementById('sbn-analytics-section');if(sbAnSection)sbAnSection.style.display=isAdmin?'':'none';
   const sbAnBtn=document.getElementById('sbn-analytics');if(sbAnBtn)sbAnBtn.style.display=isAdmin?'':'none';
+  const sbAdmBtn=document.getElementById('sbn-admin');if(sbAdmBtn)sbAdmBtn.style.display=isAdmin?'':'none';
   // Render hub cards
   renderHubCards();
   // Show home hub
@@ -3050,8 +3071,8 @@ window.generarPPT=async()=>{
 
 window.toggleAdmin=()=>{
   const panel=document.getElementById('admin-panel');
-  if(panel.style.display==='none'){panel.style.display='block';cargarRegistros();}
-  else{panel.style.display='none';}
+  if(panel.style.display==='none'||!panel.style.display){showModule('admin');}
+  else{showModule('home');}
 };
 
 async function cargarRegistros(){
@@ -3591,11 +3612,9 @@ function showBldToast(msg,ms=2800){
 }
 
 window.toggleBuildings=()=>{
-  if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
   const panel=document.getElementById('buildings-panel');
-  const open=panel.style.display==='none'||!panel.style.display;
-  panel.style.display=open?'block':'none';
-  if(open)loadBuildings();
+  if(panel.style.display==='none'||!panel.style.display){showModule('buildings');}
+  else{showModule('home');}
 };
 
 async function loadBuildings(){
@@ -4682,12 +4701,12 @@ function renderAnalytics(docs){
 }
 
 function show(id){
-  ["ls","ds","as","home-hub","analytics-panel","crm-panel"].forEach(s=>{
+  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel"].forEach(s=>{
     const el=document.getElementById(s);
     if(!el)return;
     if(s==="ls")el.style.display=s===id?"grid":"none";
     else if(s==="ds")el.style.display=s===id?"flex":"none";
-    else if(s==="analytics-panel"||s==="crm-panel")el.style.display=s===id?"flex":"none";
+    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel")el.style.display=s===id?"flex":"none";
     else el.style.display=s===id?"block":"none";
   });
   const isApp=id!=="ls"&&id!=="ds";
@@ -4706,7 +4725,7 @@ function showModule(mod){
   const bldLayout=document.getElementById('bld-layout');
   if(bldLayout)bldLayout.classList.remove('editor-open');
   // Update sidebar active state
-  ['home','generator','buildings','crm','analytics'].forEach(m=>{
+  ['home','generator','buildings','crm','analytics','admin'].forEach(m=>{
     const btn=document.getElementById('sbn-'+m);
     if(btn)btn.classList.toggle('active',m===mod);
   });
@@ -4720,9 +4739,8 @@ function showModule(mod){
       console.table(masterBuildings.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
     });
   } else if(mod==='buildings'){
-    show('home-hub');
-    const bpanel=document.getElementById('buildings-panel');
-    if(bpanel){bpanel.style.display='block';loadBuildings();}
+    show('buildings-panel');
+    loadBuildings();
   } else if(mod==='crm'){
     show('crm-panel');
     loadCRM();
@@ -4730,6 +4748,10 @@ function showModule(mod){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
     show('analytics-panel');
     loadAnalytics();
+  } else if(mod==='admin'){
+    if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
+    show('admin-panel');
+    cargarRegistros();
   }
 }
 function renderHubCards(){
