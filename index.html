@@ -34,8 +34,10 @@ body{font-family:'Open Sans',Verdana,sans-serif;background:linear-gradient(135de
 .prop-name{color:#000759}
 .sup-val,.sv{color:#1C54F4}
 
-/* NAV */
-nav{background:#25408F;height:56px;display:none;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid #1C54F4;position:sticky;top:0;z-index:200}
+/* NAV (legacy topbar - now hidden) */
+#main-nav{background:#25408F;height:56px;display:none;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid #1C54F4;position:sticky;top:0;z-index:200}
+/* Sidebar nav must always be flex column, never hidden by the rule above */
+#app-sidebar nav.sb-nav{display:flex!important;flex-direction:column;flex:1;overflow-y:auto;padding:.75rem .75rem}
 .nb{display:flex;align-items:center;gap:14px}
 .nlogo{display:flex;flex-direction:column;gap:2px}
 .nlogo-name{color:#fff;font-size:18px;font-weight:700;letter-spacing:-.5px}
