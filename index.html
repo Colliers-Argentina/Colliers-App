@@ -1563,6 +1563,14 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <div class="cdr-lbl">Rubro</div>
         <input id="cdr-rubro" class="cdr-input" type="text" placeholder="Ej: Tecnología, Salud, Logística...">
       </div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Superficie buscada (m²)</div>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <input id="cdr-m2min" class="cdr-input" type="number" placeholder="600" min="0" style="flex:1">
+          <span style="font-size:12px;color:#8898C0;flex-shrink:0">hasta</span>
+          <input id="cdr-m2max" class="cdr-input" type="number" placeholder="1.000" min="0" style="flex:1">
+        </div>
+      </div>
     </div>
     <div class="cdr-footer">
       <button class="cdr-cancel" onclick="closeClientDrawer()">Cancelar</button>
@@ -3165,7 +3173,7 @@ async function cargarRegistros(){
       h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF">${d.nombre||'–'}</td>`;
       h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;color:#1C54F4">${d.email||'–'}</td>`;
       h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF">${d.zona||'–'}</td>`;
-      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;text-align:center">${d.m2?d.m2+' m²':'–'}</td>`;
+      h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;text-align:center;white-space:nowrap">${d.m2Range||fmtM2Range(d.m2Min||d.m2,d.m2Max)||'–'}</td>`;
       h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;font-weight:600">${d.empresa||'–'}</td>`;
       h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;white-space:nowrap;font-size:11px">${fecha}</td>`;
       h+=`<td style="padding:8px 12px;border-bottom:1px solid #DBE5FF;color:#353E59;font-size:11px">${(d.propiedades||[]).join(', ')}</td>`;
@@ -3491,16 +3499,18 @@ function renderCRMTable(docs){
     return;
   }
   let h='<table class="crm-table"><thead><tr>';
-  ['Cliente','Broker','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
+  ['Cliente','Broker','Superficie','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const nombre=d.nombre||d._id;
     const initials=crmInitials(nombre);
     const bg=crmAvatarBg(nombre);
     const zonas=(d.zonasInteres||[]).slice(0,2).join(', ')+(d.zonasInteres?.length>2?'…':'');
+    const supLabel=(d.rangoM2||[]).join(', ')||(d.m2?fmtM2Range(d.m2,null):'–');
     h+=`<tr onclick="openClientDetail('${d._id}')">
       <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${bg}">${initials}</div><div><div class="crm-client-name">${nombre}</div>${d.broker_email?`<div class="crm-client-sub">${d.broker_email}</div>`:''}</div></div></td>
       <td><div class="crm-broker-cell">${d.broker||'–'}</div></td>
+      <td class="crm-date" style="white-space:nowrap;font-size:11px;color:#56648F">${supLabel}</td>
       <td class="crm-date">${fmtDate(d.ultimaActividad)}</td>
       <td class="crm-ppts">${d.cantidadPPTs||0}</td>
       <td class="crm-zonas-cell">${zonas||'–'}</td>
@@ -3538,7 +3548,7 @@ function openClientDetail(docId){
     </div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker asignado</div><div class="crm-det-meta-val">${d.broker||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||(d.m2?fmtM2Range(d.m2,null):'–')}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">PPTs generados</div><div class="crm-det-meta-val" style="color:#1C54F4;font-size:20px">${ppts}</div></div>
@@ -3560,7 +3570,7 @@ function openClientDetail(docId){
             <div style="display:flex;flex-direction:column;gap:.5rem">
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Zonas de interés</div><div class="crm-tags" style="margin-top:.25rem">${tags(d.zonasInteres)}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||(d.m2?fmtM2Range(d.m2,null):'–')}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Presupuesto</div><div class="crm-det-meta-val">A definir</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Pipeline</div><select class="crm-estado-sel" style="margin-top:3px" onchange="saveClientEstado('${docId}',this.value)">${opts}</select></div>
             </div>
@@ -3612,6 +3622,8 @@ window.openClientDrawer=function(callbackFn){
   document.getElementById('cdr-nombre').value='';
   document.getElementById('cdr-categoria').value='';
   document.getElementById('cdr-rubro').value='';
+  document.getElementById('cdr-m2min').value='';
+  document.getElementById('cdr-m2max').value='';
   const btn=document.getElementById('cdr-save-btn');
   btn.textContent='Crear cliente';btn.disabled=false;
   document.getElementById('cdr-overlay').classList.add('open');
@@ -3633,10 +3645,17 @@ window.saveClientDrawer=async function(){
   const btn=document.getElementById('cdr-save-btn');
   btn.textContent='Guardando...';btn.disabled=true;
   try{
+    const m2Min=parseFloat(document.getElementById('cdr-m2min').value)||0;
+    const m2Max=parseFloat(document.getElementById('cdr-m2max').value)||0;
+    const m2RangeLabel=fmtM2Range(m2Min,m2Max);
     const data={
       nombre,
       categoria:document.getElementById('cdr-categoria').value||'',
       rubro:(document.getElementById('cdr-rubro').value||'').trim(),
+      m2Min:m2Min||null,
+      m2Max:m2Max||null,
+      m2Range:m2RangeLabel||'',
+      rangoM2:m2RangeLabel?[m2RangeLabel]:[],
       cantidadPPTs:0,
       fechaCreacion:firebase.firestore.Timestamp.now(),
       ultimaActividad:firebase.firestore.Timestamp.now(),
