@@ -1234,6 +1234,38 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
   .hub-wrap{padding:1rem}
   .side-panel{max-height:none}
 }
+/* ===== CLIENT DRAWER ===== */
+.cdr-overlay{position:fixed;inset:0;z-index:500;background:rgba(3,8,25,.45);opacity:0;transition:opacity .25s;pointer-events:none}
+.cdr-overlay.open{opacity:1;pointer-events:auto}
+.cdr-drawer{position:fixed;top:0;right:0;bottom:0;width:430px;z-index:501;background:#fff;box-shadow:-8px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.cdr-drawer.open{transform:translateX(0)}
+body.dark .cdr-drawer{background:#101c3b;color:#e0eaff}
+.cdr-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid #E8EFF8;flex-shrink:0}
+body.dark .cdr-hd{border-bottom-color:rgba(255,255,255,.08)}
+.cdr-title{font-size:17px;font-weight:700;color:#000759}
+body.dark .cdr-title{color:#c8d8ff}
+.cdr-close{background:none;border:none;cursor:pointer;font-size:18px;color:#8898C0;padding:4px 8px;border-radius:6px;line-height:1;transition:background .15s,color .15s}
+.cdr-close:hover{background:rgba(28,84,244,.07);color:#1C54F4}
+body.dark .cdr-close{color:#7b96d4}
+body.dark .cdr-close:hover{background:rgba(100,150,255,.1);color:#4D93FF}
+.cdr-body{flex:1;overflow-y:auto;padding:1.5rem}
+.cdr-field{margin-bottom:1.1rem}
+.cdr-lbl{font-size:12px;font-weight:600;color:#56648F;margin-bottom:.4rem;letter-spacing:.01em}
+body.dark .cdr-lbl{color:#8aabdc}
+.cdr-input,.cdr-select{width:100%;box-sizing:border-box;padding:.65rem .85rem;border:1.5px solid #E2E8F5;border-radius:9px;font-size:14px;color:#000759;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit}
+body.dark .cdr-input,body.dark .cdr-select{background:#1a2c52;border-color:rgba(255,255,255,.1);color:#e0eaff}
+.cdr-input:focus,.cdr-select:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.12)}
+.cdr-input::placeholder{color:#B0BDDA}
+body.dark .cdr-input::placeholder{color:#4a6080}
+.cdr-req{color:#ED1B34}
+.cdr-footer{display:flex;align-items:center;justify-content:flex-end;gap:.75rem;padding:1.1rem 1.5rem;border-top:1px solid #E8EFF8;flex-shrink:0}
+body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
+.cdr-cancel{background:none;border:1.5px solid #E2E8F5;color:#56648F;padding:.6rem 1.2rem;border-radius:9px;font-size:13.5px;cursor:pointer;font-family:inherit;transition:all .15s}
+.cdr-cancel:hover{border-color:#4D93FF;color:#1C54F4;background:rgba(28,84,244,.04)}
+.cdr-save{background:#1C54F4;color:#fff;border:none;padding:.65rem 1.4rem;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,opacity .15s}
+.cdr-save:hover:not(:disabled){background:#1548d4}
+.cdr-save:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:480px){.cdr-drawer{width:100vw}}
 </style>
 </head>
 <body>
@@ -1504,10 +1536,37 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
     </div>
   </div>
 
-  <!-- NEW CLIENT MODAL -->
-  <div id="crm-new-modal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(3,8,25,.7);backdrop-filter:blur(10px);align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
-    <div class="crm-new-box" id="crm-new-box">
-      <!-- filled by openNewClientModal() -->
+  <!-- CLIENT DRAWER (shared: CRM + Generator) -->
+  <div id="cdr-overlay" class="cdr-overlay" onclick="closeClientDrawer()"></div>
+  <div id="cdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nuevo Cliente">
+    <div class="cdr-hd">
+      <div class="cdr-title">Nuevo Cliente</div>
+      <button class="cdr-close" onclick="closeClientDrawer()" title="Cerrar">✕</button>
+    </div>
+    <div class="cdr-body">
+      <div class="cdr-field">
+        <div class="cdr-lbl">Nombre <span class="cdr-req">*</span></div>
+        <input id="cdr-nombre" class="cdr-input" type="text" placeholder="Ej: Empresa SA" autocomplete="off">
+      </div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Categoría</div>
+        <select id="cdr-categoria" class="cdr-select">
+          <option value="">— Seleccionar —</option>
+          <option>Empresa</option>
+          <option>Estudio profesional</option>
+          <option>Particular</option>
+          <option>Institución pública</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Rubro</div>
+        <input id="cdr-rubro" class="cdr-input" type="text" placeholder="Ej: Tecnología, Salud, Logística...">
+      </div>
+    </div>
+    <div class="cdr-footer">
+      <button class="cdr-cancel" onclick="closeClientDrawer()">Cancelar</button>
+      <button class="cdr-save" id="cdr-save-btn" onclick="saveClientDrawer()">Crear cliente</button>
     </div>
   </div>
 </div>
@@ -1725,7 +1784,7 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
               </select>
               <div class="pers-lbl" style="margin-top:.5rem">Preparado para <span style="color:#ED1B34">*</span></div>
               <div class="client-mode-row">
-                <button type="button" class="client-mode-btn active" id="btn-nuevo" onclick="setClientMode('nuevo')">＋ Nuevo</button>
+                <button type="button" class="client-mode-btn active" id="btn-nuevo" onclick="openDrawerFromGenerator()">＋ Nuevo</button>
                 <button type="button" class="client-mode-btn" id="btn-existente" onclick="setClientMode('existente')">↗ Existente</button>
               </div>
               <input type="text" id="kp" class="pers-input" placeholder="Ej: Securitas SA" style="margin-top:0">
@@ -3545,59 +3604,72 @@ window.closeCRMDetail=()=>{
   lv.style.flexDirection='column';
 };
 
-window.openNewClientModal=()=>{
-  const modal=document.getElementById('crm-new-modal');
-  document.getElementById('crm-new-box').innerHTML=`
-    <div class="crm-new-hd">
-      <div class="crm-new-title">Nuevo Cliente</div>
-      <button class="crm-new-close" onclick="document.getElementById('crm-new-modal').style.display='none'">✕</button>
-    </div>
-    <div class="crm-new-body">
-      <div class="crm-new-grid">
-        <div class="crm-new-field full"><div class="crm-new-lbl">Nombre del cliente *</div><input id="nc-nombre" class="crm-new-inp" placeholder="Ej: Empresa SA" type="text"></div>
-        <div class="crm-new-field"><div class="crm-new-lbl">Broker asignado</div><input id="nc-broker" class="crm-new-inp" placeholder="Nombre del broker" type="text"></div>
-        <div class="crm-new-field"><div class="crm-new-lbl">Email del broker</div><input id="nc-email" class="crm-new-inp" placeholder="email@colliers.com" type="email"></div>
-        <div class="crm-new-field"><div class="crm-new-lbl">Estado</div><select id="nc-estado" class="crm-new-sel"><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option></select></div>
-        <div class="crm-new-field"><div class="crm-new-lbl">m² mínimo</div><input id="nc-m2min" class="crm-new-inp" placeholder="900" type="number"></div>
-        <div class="crm-new-field full"><div class="crm-new-lbl">Zonas de interés (separadas por coma)</div><input id="nc-zonas" class="crm-new-inp" placeholder="Norte CABA, Microcentro, ..."></div>
-      </div>
-    </div>
-    <div class="crm-new-footer">
-      <button class="crm-cancel-btn" onclick="document.getElementById('crm-new-modal').style.display='none'">Cancelar</button>
-      <button class="crm-save-btn" onclick="saveNewClient()">Crear cliente</button>
-    </div>
-  `;
-  modal.style.display='flex';
+/* ===== CLIENT DRAWER ===== */
+let _cdrCallback=null;
+
+window.openClientDrawer=function(callbackFn){
+  _cdrCallback=callbackFn||null;
+  document.getElementById('cdr-nombre').value='';
+  document.getElementById('cdr-categoria').value='';
+  document.getElementById('cdr-rubro').value='';
+  const btn=document.getElementById('cdr-save-btn');
+  btn.textContent='Crear cliente';btn.disabled=false;
+  document.getElementById('cdr-overlay').classList.add('open');
+  document.getElementById('cdr-drawer').classList.add('open');
+  setTimeout(()=>document.getElementById('cdr-nombre').focus(),60);
 };
 
-window.saveNewClient=async()=>{
-  const nombre=(document.getElementById('nc-nombre')?.value||'').trim();
-  if(!nombre){alert('El nombre del cliente es obligatorio.');return;}
+window.closeClientDrawer=function(){
+  document.getElementById('cdr-overlay').classList.remove('open');
+  document.getElementById('cdr-drawer').classList.remove('open');
+  _cdrCallback=null;
+};
+
+window.saveClientDrawer=async function(){
+  const nombre=(document.getElementById('cdr-nombre').value||'').trim();
+  if(!nombre){document.getElementById('cdr-nombre').focus();document.getElementById('cdr-nombre').style.borderColor='#ED1B34';return;}
+  document.getElementById('cdr-nombre').style.borderColor='';
   if(!db){alert('Firebase no disponible.');return;}
-  const btn=document.querySelector('.crm-save-btn');
+  const btn=document.getElementById('cdr-save-btn');
   btn.textContent='Guardando...';btn.disabled=true;
   try{
-    const zonas=(document.getElementById('nc-zonas')?.value||'').split(',').map(z=>z.trim()).filter(Boolean);
-    const m2min=parseFloat(document.getElementById('nc-m2min')?.value)||0;
     const data={
       nombre,
-      broker:document.getElementById('nc-broker')?.value||'',
-      broker_email:document.getElementById('nc-email')?.value||'',
-      estado:document.getElementById('nc-estado')?.value||'Activo',
-      zonasInteres:zonas,
-      m2:m2min||null,
+      categoria:document.getElementById('cdr-categoria').value||'',
+      rubro:(document.getElementById('cdr-rubro').value||'').trim(),
       cantidadPPTs:0,
       fechaCreacion:firebase.firestore.Timestamp.now(),
       ultimaActividad:firebase.firestore.Timestamp.now(),
     };
-    await db.collection('clientes').add(data);
-    document.getElementById('crm-new-modal').style.display='none';
-    loadCRM();
+    const ref=await db.collection('clientes').add(data);
+    _clientesCache=[];
+    const cb=_cdrCallback;
+    closeClientDrawer();
+    if(typeof cb==='function')await cb(nombre,ref.id);
   }catch(e){
     alert('Error al crear cliente: '+e.message);
     btn.textContent='Crear cliente';btn.disabled=false;
   }
 };
+
+function selectClientByName(nombre){
+  document.getElementById('kp').value=nombre;
+  document.getElementById('kp-ac-q').value='';
+  document.getElementById('kp-ac-list').style.display='none';
+  const chip=document.getElementById('kp-chip');
+  chip.innerHTML=`<div class="kp-chip"><span>✓ ${nombre}</span><button type="button" class="kp-chip-clear" onclick="clearAcCliente()" title="Cambiar cliente">✕</button></div>`;
+  chip.style.display='block';
+}
+
+function openDrawerFromGenerator(){
+  openClientDrawer(async function(nombre){
+    await loadClientesParaSelector();
+    setClientMode('existente');
+    selectClientByName(nombre);
+  });
+}
+
+window.openNewClientModal=()=>openClientDrawer(()=>loadCRM());
 
 /* ===== BUILDINGS ADMIN ===== */
 const BLD_PAGE_SIZE=20;
