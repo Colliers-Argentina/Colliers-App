@@ -5166,7 +5166,7 @@ async function renderBldMap(docs){
   _updateMapStats(_bldDocs.length?_bldDocs:docs);
   if(!_bldMap){
     _bldMap=L.map('bld-map-el',{zoomControl:true}).setView([-34.6037,-58.3816],12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(_bldMap);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:20}).addTo(_bldMap);
   }
   if(_bldClusterGroup){_bldMap.removeLayer(_bldClusterGroup);_bldClusterGroup=null;}
   _bldMapMarkers=[];
