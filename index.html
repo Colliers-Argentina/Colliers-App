@@ -3895,7 +3895,7 @@ function openBuildingEditor(docId){
     </div>
     <div class="bld-det-sidebar-body">
       <div class="bld-det-kpis">
-        <div class="bld-det-kpi"><div class="bld-det-kpi-v">${d.superficieDisponible?d.superficieDisponible+'m²':'—'}</div><div class="bld-det-kpi-l">Sup. Disp.</div></div>
+        <div class="bld-det-kpi"><div class="bld-det-kpi-v" id="bld-kpi-sup-disp">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+'m²':'—'}</div><div class="bld-det-kpi-l">Sup. Disp.</div></div>
         <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.asking||d.rent||'—')}</div><div class="bld-det-kpi-l">Asking</div></div>
         <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.categoria||d.cat||'—')}</div><div class="bld-det-kpi-l">Categ.</div></div>
       </div>
@@ -3911,7 +3911,7 @@ function openBuildingEditor(docId){
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Superficies</div>
         <div class="bld-det-field-row">
-          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Disp. (m²)</div><input class="bld-det-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Disp. (m²) <span style="font-size:9px;font-weight:600;color:#1C54F4;background:rgba(28,84,244,.08);border-radius:4px;padding:1px 5px;vertical-align:middle">AUTO</span></div><input class="bld-det-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}" readonly title="Calculado automáticamente desde la tabla de Disponibilidades" style="background:rgba(28,84,244,.04);cursor:default;color:#1C54F4;font-weight:600"></div>
           <div class="bld-det-field"><div class="bld-det-lbl">Sup. Planta (m²)</div><input class="bld-det-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}"></div>
         </div>
         <div class="bld-det-field-row">
@@ -4168,6 +4168,19 @@ function unitEstadoBadge(e){
   return`<span class="unit-estado" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${e||'Disponible'}</span>`;
 }
 
+function _calcSupDispFromUnits(){
+  return _unitDocs.filter(u=>u.estado==='Disponible'||!u.estado).reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
+}
+
+async function recalcAndSaveSupDisp(buildingId){
+  if(!db||!buildingId||!_unitDocs.length)return;
+  const supDisp=_calcSupDispFromUnits();
+  const bld=_bldDocs.find(x=>x._id===buildingId);
+  if(bld){bld.superficieDisponible=supDisp;bld.supDisp=supDisp;}
+  try{await db.collection('buildings').doc(buildingId).update({superficieDisponible:supDisp});}
+  catch(e){console.error('[recalcSupDisp]',e);}
+}
+
 function _updateUnitStats(){
   const disp=_unitDocs.filter(u=>u.estado==='Disponible').length;
   const res=_unitDocs.filter(u=>u.estado==='Reservado').length;
@@ -4179,6 +4192,11 @@ function _updateUnitStats(){
     ${disp?`<span class="bld-det-stat disp">${disp} Disp.</span>`:''}
     ${res?`<span class="bld-det-stat res">${res} Res.</span>`:''}
     ${ocup?`<span class="bld-det-stat ocup">${ocup} Ocup.</span>`:''}`;
+  if(_unitDocs.length){
+    const supDisp=_calcSupDispFromUnits();
+    const el=document.getElementById('be-supDisp');if(el)el.value=supDisp||'';
+    const kpi=document.getElementById('bld-kpi-sup-disp');if(kpi)kpi.textContent=supDisp?supDisp.toLocaleString('es-AR')+'m²':'—';
+  }
 }
 
 let _unitSortCol='piso',_unitSortDir=1;
@@ -4282,6 +4300,7 @@ async function addUnit(buildingId){
     const ref=await db.collection('buildings').doc(buildingId).collection('units').add(newUnit);
     _unitDocs.push({...newUnit,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
     renderDetailUnits(buildingId);
+    recalcAndSaveSupDisp(buildingId);
     setTimeout(()=>{
       const rows=document.querySelectorAll('#bld-det-tbl-wrap table tbody tr');
       if(rows.length)rows[rows.length-1].querySelector('.du-inp')?.focus();
@@ -4313,6 +4332,7 @@ async function saveUnitField(buildingId,unitId,field,value,el){
     });
     const u=_unitDocs.find(x=>x._id===unitId);
     if(u)u[field]=value;
+    if(field==='m2'||field==='estado')recalcAndSaveSupDisp(buildingId);
     // flash green indicator on the cell
     if(el){
       const orig=el.style.borderColor;
@@ -4332,6 +4352,7 @@ async function deleteUnit(buildingId,unitId,rowEl){
   try{
     await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).delete();
     _unitDocs=_unitDocs.filter(x=>x._id!==unitId);
+    recalcAndSaveSupDisp(buildingId);
     if(rowEl){rowEl.style.opacity='0';rowEl.style.transition='opacity .25s';}
     setTimeout(()=>renderDetailUnits(buildingId),280);
   }catch(e){showBldToast('❌ Error al eliminar: '+e.message,3000);}
@@ -4392,7 +4413,7 @@ async function saveBuildingEdits(){
     zona:gv('be-zona'),
     submercado:gv('be-zona'),
     estado:gv('be-estado'),
-    superficieDisponible:parseFloat(gv('be-supDisp'))||0,
+    superficieDisponible:_unitDocs.length?_calcSupDispFromUnits():(parseFloat(gv('be-supDisp'))||0),
     superficiePlanta:parseFloat(gv('be-supPlanta'))||0,
     superficieMinima:parseFloat(gv('be-supMin'))||0,
     pisosDisponibles:gv('be-pisosDisp'),
