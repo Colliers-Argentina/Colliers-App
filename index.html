@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Colliers Nexus · Plataforma Inteligente de Real Estate</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
@@ -1234,6 +1236,76 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
   .hub-wrap{padding:1rem}
   .side-panel{max-height:none}
 }
+/* ===== CLIENT TIMELINE ===== */
+.clt-timeline{display:flex;flex-direction:column;position:relative;padding-left:1.4rem;padding-top:.25rem}
+.clt-timeline::before{content:'';position:absolute;left:5px;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,#1C54F4 0%,rgba(28,84,244,.1) 100%);border-radius:2px}
+.clt-event{display:flex;gap:.85rem;padding:.45rem 0;position:relative}
+.clt-event-dot{width:12px;height:12px;border-radius:50%;background:#1C54F4;border:2px solid #F4F6FB;box-shadow:0 0 0 2px rgba(28,84,244,.2);flex-shrink:0;margin-top:3px;position:absolute;left:-1.4rem}
+body.dark .clt-event-dot{border-color:#0D1733}
+.clt-event-inner{flex:1;padding-bottom:.55rem;border-bottom:1px solid #F0F4FF}
+.clt-event:last-child .clt-event-inner{border-bottom:none}
+body.dark .clt-event-inner{border-bottom-color:rgba(255,255,255,.05)}
+.clt-event-meta{display:flex;align-items:center;gap:.45rem;margin-bottom:2px;flex-wrap:wrap}
+.clt-event-date{font-size:10px;color:#8898C0;font-weight:600}
+.clt-event-user{font-size:10px;color:#1C54F4;font-weight:600;background:rgba(28,84,244,.07);padding:1px 6px;border-radius:4px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.dark .clt-event-user{color:#4D93FF;background:rgba(77,147,255,.1)}
+.clt-event-desc{font-size:12px;color:#0A1B4D;font-weight:500;line-height:1.4}
+body.dark .clt-event-desc{color:#DCE7FF}
+/* ===== BUILDING HISTORY ===== */
+.bld-det-main-tabs{display:flex;border-bottom:1px solid #E8EFF8;flex-shrink:0;padding:0 1rem;background:#FAFCFF}
+body.dark .bld-det-main-tabs{border-bottom-color:rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
+.bld-det-main-tab{background:none;border:none;border-bottom:2px solid transparent;color:#8898C0;font-family:inherit;font-size:12px;font-weight:600;padding:9px 12px;cursor:pointer;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+.bld-det-main-tab.active{color:#1C54F4;border-bottom-color:#1C54F4}
+.bld-det-main-tab:hover:not(.active){color:#25408F}
+body.dark .bld-det-main-tab{color:rgba(168,179,209,.6)}
+body.dark .bld-det-main-tab.active{color:#4D93FF;border-bottom-color:#4D93FF}
+#bld-det-panel-hist{display:none;flex-direction:column;flex:1;overflow-y:auto}
+.bld-hist-list{display:flex;flex-direction:column;gap:.65rem;padding:1rem}
+.bld-hist-entry{background:#F8FAFF;border:1px solid #E8EFF8;border-radius:10px;padding:.85rem 1rem}
+body.dark .bld-hist-entry{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07)}
+.bld-hist-entry-hd{display:flex;align-items:center;gap:.65rem;margin-bottom:.45rem}
+.bld-hist-date{font-size:11px;font-weight:700;color:#56648F}
+.bld-hist-user{font-size:11px;color:#1C54F4;background:rgba(28,84,244,.07);padding:1px 7px;border-radius:4px;font-weight:600;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.dark .bld-hist-user{color:#4D93FF;background:rgba(77,147,255,.1)}
+.bld-hist-change{display:flex;align-items:center;gap:.4rem;font-size:11px;padding:.2rem 0;margin-top:.2rem;border-top:1px dashed #EEF3FF}
+body.dark .bld-hist-change{border-top-color:rgba(255,255,255,.05)}
+.bld-hist-field{min-width:72px;font-weight:700;font-size:9px;color:#56648F;text-transform:uppercase;letter-spacing:.04em}
+.bld-hist-old{color:#B0BDDA;text-decoration:line-through;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bld-hist-arrow{color:#C8D5F0;flex-shrink:0}
+.bld-hist-new{color:#0A1B4D;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.dark .bld-hist-new{color:#DCE7FF}
+/* ===== MAP VIEW ===== */
+.bld-view-toggle{display:flex;border:1.5px solid #E2E8F5;border-radius:8px;overflow:hidden;flex-shrink:0}
+.bld-view-btn{background:none;border:none;padding:5px 13px;font-size:11px;font-weight:600;color:#56648F;cursor:pointer;transition:all .15s;font-family:inherit}
+.bld-view-btn.active{background:#1C54F4;color:#fff}
+.bld-view-btn:not(.active):hover{background:#EEF3FF;color:#1C54F4}
+body.dark .bld-view-toggle{border-color:rgba(255,255,255,.1)}
+body.dark .bld-view-btn.active{background:#1C54F4}
+body.dark .bld-view-btn:not(.active){color:rgba(168,179,209,.6)}
+#bld-map-container{display:none;flex:1;min-height:400px;border-radius:10px;overflow:hidden;position:relative;border:1px solid #E8EFF8}
+#bld-map-el{width:100%;height:100%}
+.bmp-inner{padding:.7rem;font-family:'Open Sans',sans-serif;min-width:190px}
+.bmp-img{width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:.45rem;background:#EEF3FF}
+.bmp-name{font-size:13px;font-weight:700;color:#000759;margin-bottom:2px;line-height:1.3}
+.bmp-addr{font-size:10px;color:#8898C0;margin-bottom:.45rem}
+.bmp-chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.bmp-chip{font-size:10px;background:#EEF3FF;color:#1C54F4;padding:2px 7px;border-radius:5px;font-weight:600}
+.bld-map-spinner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(244,246,251,.7);z-index:500;font-size:13px;color:#56648F}
+/* ===== TENDENCIAS ANALYTICS ===== */
+.an-tend-hdr{display:flex;align-items:center;justify-content:space-between;padding:.55rem .9rem;border-bottom:1px solid #F2F6FF}
+body.dark .an-tend-hdr{border-bottom-color:rgba(255,255,255,.05)}
+.an-period-row{display:flex;gap:.25rem;border:1.5px solid #E2E8F5;border-radius:7px;overflow:hidden}
+.an-period-btn{background:none;border:none;padding:4px 11px;font-size:10px;font-weight:700;color:#56648F;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:.02em}
+.an-period-btn.active{background:#1C54F4;color:#fff}
+.an-period-btn:not(.active):hover{background:#EEF3FF;color:#1C54F4}
+body.dark .an-period-row{border-color:rgba(255,255,255,.1)}
+body.dark .an-period-btn:not(.active){color:rgba(168,179,209,.6)}
+.an-tend-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;padding:.85rem}
+@media(max-width:900px){.an-tend-grid{grid-template-columns:1fr}}
+.an-tend-subcrd{background:#F8FAFF;border-radius:9px;padding:.75rem}
+body.dark .an-tend-subcrd{background:rgba(255,255,255,.03)}
+.an-tend-sub-title{font-size:10px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
+.an-evol-wrap{padding:.85rem;height:180px;position:relative}
 /* ===== CLIENT DRAWER ===== */
 .cdr-overlay{position:fixed;inset:0;z-index:500;background:rgba(3,8,25,.45);opacity:0;transition:opacity .25s;pointer-events:none}
 .cdr-overlay.open{opacity:1;pointer-events:auto}
@@ -1487,6 +1559,38 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Brokers más activos</div></div>
       <div id="an-brokers-lb" class="an-brokers-row"></div>
     </div>
+    <div class="an-card" id="an-tend-card">
+      <div class="an-tend-hdr">
+        <div style="display:flex;align-items:center;gap:.4rem"><div class="an-card-accent"></div><div class="an-card-title">Tendencias Comerciales</div></div>
+        <div class="an-period-row">
+          <button class="an-period-btn active" id="an-pd-30" onclick="setTendPeriodo(30)">30d</button>
+          <button class="an-period-btn" id="an-pd-90" onclick="setTendPeriodo(90)">90d</button>
+          <button class="an-period-btn" id="an-pd-365" onclick="setTendPeriodo(365)">12m</button>
+        </div>
+      </div>
+      <div class="an-tend-grid" id="an-tend-grid">
+        <div class="an-tend-subcrd">
+          <div class="an-tend-sub-title">Zonas más demandadas</div>
+          <div style="height:160px;position:relative"><canvas id="chart-tend-zonas"></canvas></div>
+        </div>
+        <div class="an-tend-subcrd">
+          <div class="an-tend-sub-title">Rangos m² buscados</div>
+          <div style="height:160px;position:relative"><canvas id="chart-tend-m2"></canvas></div>
+        </div>
+        <div class="an-tend-subcrd">
+          <div class="an-tend-sub-title">Edificios más enviados</div>
+          <div id="an-tend-edif" style="height:160px;overflow-y:auto"></div>
+        </div>
+        <div class="an-tend-subcrd">
+          <div class="an-tend-sub-title">Brokers más activos</div>
+          <div id="an-tend-brokers" style="height:160px;overflow-y:auto"></div>
+        </div>
+      </div>
+      <div style="padding:0 .85rem .85rem">
+        <div class="an-tend-sub-title" style="margin-bottom:.6rem">Evolución temporal</div>
+        <div class="an-evol-wrap"><canvas id="chart-tend-evol"></canvas></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1595,13 +1699,18 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
             <select id="bld-filter-estado" class="bld-select" onchange="filterBuildings()">
               <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
             </select>
+            <div class="bld-view-toggle">
+              <button class="bld-view-btn active" id="bld-view-grid-btn" onclick="toggleBldView('grid')">⊞ Grid</button>
+              <button class="bld-view-btn" id="bld-view-map-btn" onclick="toggleBldView('map')">🗺 Mapa</button>
+            </div>
             <button class="bld-btn bld-btn-primary" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
             <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
             <button onclick="showModule('home')" class="bld-close-btn">✕ Cerrar</button>
           </div>
         </div>
         <div class="bld-kpi-row" id="bld-kpi-row"></div>
-        <div class="bld-tbl-wrap">
+        <div id="bld-map-container"><div id="bld-map-el"></div></div>
+        <div class="bld-tbl-wrap" id="bld-tbl-wrap">
           <div class="bld-tbl-scroll">
             <div id="bld-table-wrap"><div class="bld-empty">Cargando edificios...</div></div>
           </div>
@@ -1644,19 +1753,25 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
   <div class="bld-det-body">
     <div class="bld-det-sidebar" id="bld-det-sidebar"></div>
     <div class="bld-det-main">
-      <div class="bld-det-main-hd">
-        <div class="bld-det-main-title">
-          Disponibilidades
-          <span class="bld-det-main-cnt" id="bld-det-unit-count">0</span>
+      <div class="bld-det-main-tabs">
+        <button class="bld-det-main-tab active" id="bld-main-tab-units" onclick="switchBldMainTab('units')">Disponibilidades <span class="bld-det-main-cnt" id="bld-det-unit-count">0</span></button>
+        <button class="bld-det-main-tab" id="bld-main-tab-hist" onclick="switchBldMainTab('hist')">Historial</button>
+      </div>
+      <div id="bld-det-panel-units" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+        <div class="bld-det-main-hd">
+          <div class="bld-det-main-title" style="opacity:0;pointer-events:none">·</div>
+          <div class="bld-det-tools">
+            <div class="bld-det-stats" id="bld-det-stats"></div>
+            <input type="text" class="bld-det-search" id="bld-det-search" placeholder="🔍 Buscar unidad..." oninput="renderDetailUnits(window._bldEditId,this.value)">
+            <button class="bld-det-add-btn" id="bld-det-add-btn" onclick="addUnit(window._bldEditId)">＋ Agregar unidad</button>
+          </div>
         </div>
-        <div class="bld-det-tools">
-          <div class="bld-det-stats" id="bld-det-stats"></div>
-          <input type="text" class="bld-det-search" id="bld-det-search" placeholder="🔍 Buscar unidad..." oninput="renderDetailUnits(window._bldEditId,this.value)">
-          <button class="bld-det-add-btn" id="bld-det-add-btn" onclick="addUnit(window._bldEditId)">＋ Agregar unidad</button>
+        <div class="bld-det-tbl-wrap" id="bld-det-tbl-wrap">
+          <div class="det-unit-empty">Cargando...</div>
         </div>
       </div>
-      <div class="bld-det-tbl-wrap" id="bld-det-tbl-wrap">
-        <div class="det-unit-empty">Cargando...</div>
+      <div id="bld-det-panel-hist">
+        <div id="bld-hist-body" style="padding:1rem"><div class="det-unit-empty">Cargando historial...</div></div>
       </div>
     </div>
   </div>
@@ -3561,6 +3676,7 @@ function openClientDetail(docId){
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-ppts')">PPTs generados</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-alt')">Alternativas enviadas</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-notas')">Notas</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-timeline');loadClientTimeline('${docId}')">Timeline</button>
     </div>
     <div class="crm-det-tab-body">
       <div id="crm-dt-resumen">
@@ -3597,6 +3713,9 @@ function openClientDetail(docId){
       </div>
       <div id="crm-dt-notas" style="display:none">
         <textarea class="crm-new-inp" style="min-height:140px;resize:vertical;width:100%;max-width:540px" placeholder="Notas sobre este cliente..."></textarea>
+      </div>
+      <div id="crm-dt-timeline" style="display:none">
+        <div id="crm-timeline-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Cargando timeline...</div></div></div>
       </div>
     </div>
   `;
@@ -3662,6 +3781,7 @@ window.saveClientDrawer=async function(){
     };
     const ref=await db.collection('clientes').add(data);
     _clientesCache=[];
+    addClientTimeline(ref.id,{tipo:'cliente_creado',descripcion:'Cliente creado'});
     const cb=_cdrCallback;
     closeClientDrawer();
     if(typeof cb==='function')await cb(nombre,ref.id);
@@ -3813,7 +3933,8 @@ function filterBuildings(){
   });
   _bldPage=0;
   renderBldKPIs(_bldFiltered);
-  renderBuildingsTable();
+  if(_bldMapView==='map')renderBldMap(_bldFiltered);
+  else renderBuildingsTable();
 }
 
 function renderBuildingsTable(){
@@ -4301,6 +4422,7 @@ async function addUnit(buildingId){
     _unitDocs.push({...newUnit,_id:ref.id,createdAt:new Date(),updatedAt:new Date()});
     renderDetailUnits(buildingId);
     recalcAndSaveSupDisp(buildingId);
+    addBuildingHistory(buildingId,[{campo:'Piso',anterior:'',nuevo:'Nueva unidad agregada'}]);
     setTimeout(()=>{
       const rows=document.querySelectorAll('#bld-det-tbl-wrap table tbody tr');
       if(rows.length)rows[rows.length-1].querySelector('.du-inp')?.focus();
@@ -4351,8 +4473,10 @@ async function deleteUnit(buildingId,unitId,rowEl){
   if(!confirm('¿Eliminar esta unidad?'))return;
   try{
     await db.collection('buildings').doc(buildingId).collection('units').doc(unitId).delete();
+    const delUnit=_unitDocs.find(x=>x._id===unitId);
     _unitDocs=_unitDocs.filter(x=>x._id!==unitId);
     recalcAndSaveSupDisp(buildingId);
+    if(delUnit)addBuildingHistory(buildingId,[{campo:'Piso',anterior:`${delUnit.piso||''} ${delUnit.unidad||''} (${delUnit.m2||0}m²)`,nuevo:'Eliminado'}]);
     if(rowEl){rowEl.style.opacity='0';rowEl.style.transition='opacity .25s';}
     setTimeout(()=>renderDetailUnits(buildingId),280);
   }catch(e){showBldToast('❌ Error al eliminar: '+e.message,3000);}
@@ -4407,6 +4531,7 @@ function gv(id){return document.getElementById(id)?.value||'';}
 
 async function saveBuildingEdits(){
   if(!db||!_bldEditId)return;
+  const old=_bldDocs.find(x=>x._id===_bldEditId)||{};
   const data={
     nombre:gv('be-nombre'),
     direccion:gv('be-direccion'),
@@ -4438,6 +4563,9 @@ async function saveBuildingEdits(){
     if(hdrName)hdrName.textContent=data.nombre||_bldEditId;
     showBldToast('✅ Guardado correctamente');
     filterBuildings();
+    const TRACK=[['nombre','Nombre'],['direccion','Dirección'],['asking','Asking Rent'],['broker','Broker'],['estado','Estado'],['categoria','Categoría'],['foto','Foto'],['zona','Zona']];
+    const cambios=TRACK.filter(([k])=>String(old[k]||'')!==String(data[k]||'')).map(([k,lbl])=>({campo:lbl,anterior:String(old[k]||''),nuevo:String(data[k]||'')}));
+    if(cambios.length)addBuildingHistory(_bldEditId,cambios);
   }catch(e){showBldToast('❌ Error: '+e.message,4000);}
 }
 
@@ -4584,6 +4712,7 @@ async function saveClientEstado(docId,estado){
     const d=_crmDocs.find(x=>x._id===docId);
     if(d)d.estado=estado;
     filterCRM();
+    addClientTimeline(docId,{tipo:'cambio_estado',descripcion:`Estado actualizado: ${estado}`});
   }catch(e){console.error('saveClientEstado:',e);}
 }
 
@@ -4628,6 +4757,8 @@ async function upsertCliente(datos){
         estado:'Activo'
       });
     }
+    const alts=Number(datos.cantidad_alternativas)||0;
+    addClientTimeline(docId,{tipo:'ppt_generado',descripcion:`PPT generado con ${alts} alternativa${alts!==1?'s':''}`});
     console.log('Cliente upserted:',docId);
   }catch(e){console.error('upsertCliente:',e);}
 }
@@ -4820,6 +4951,220 @@ function renderAnalytics(docs){
     </div>
   `).join('');
   if(_anCharts.brokers){_anCharts.brokers.destroy();_anCharts.brokers=null;}
+  renderTendencias(docs,_tendPeriodo);
+}
+
+/* ============================================================
+   FEATURE: TIMELINE DE CLIENTES
+   ============================================================ */
+async function addClientTimeline(docId,evento){
+  if(!db||!docId)return;
+  try{
+    await db.collection('clientes').doc(docId).collection('timeline').add({
+      ...evento,
+      fecha:firebase.firestore.Timestamp.now(),
+      usuario:user?.displayName||user?.email||'Sistema',
+      userEmail:user?.email||''
+    });
+  }catch(e){console.error('[timeline]',e);}
+}
+
+async function loadClientTimeline(docId){
+  const body=document.getElementById('crm-timeline-body');
+  if(!body)return;
+  if(!db){body.innerHTML='<div class="crm-det-placeholder-sub">Firebase no disponible.</div>';return;}
+  body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon" style="font-size:24px">⏳</div><div class="crm-det-placeholder-sub">Cargando...</div></div>';
+  try{
+    const snap=await db.collection('clientes').doc(docId).collection('timeline').orderBy('fecha','desc').limit(100).get();
+    if(snap.empty){
+      body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin eventos registrados</div><div class="crm-det-placeholder-sub">Las acciones sobre este cliente aparecerán aquí automáticamente.</div></div>';
+      return;
+    }
+    const TIPO_ICON={cliente_creado:'🟢',ppt_generado:'📄',cambio_estado:'🔄',cambio_zona:'📍',cambio_m2:'📐',cambio_broker:'👤',actualizacion:'✏️',alternativas_enviadas:'📧',ppt_descargado:'⬇️'};
+    body.innerHTML='<div class="clt-timeline">'+snap.docs.map(doc=>{
+      const d=doc.data();
+      const ts=d.fecha?.toDate?.()??new Date();
+      const fecha=ts.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+      const hora=ts.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+      const icon=TIPO_ICON[d.tipo]||'·';
+      return`<div class="clt-event"><div class="clt-event-dot"></div><div class="clt-event-inner"><div class="clt-event-meta"><span class="clt-event-date">${fecha} ${hora}</span><span class="clt-event-user">${d.usuario||'Sistema'}</span></div><div class="clt-event-desc">${icon} ${d.descripcion||d.tipo||'Evento'}</div></div></div>`;
+    }).join('')+'</div>';
+  }catch(e){body.innerHTML='<div class="crm-det-placeholder-sub">Error al cargar: '+e.message+'</div>';}
+}
+
+/* ============================================================
+   FEATURE: HISTORIAL DE EDIFICIOS
+   ============================================================ */
+async function addBuildingHistory(buildingId,cambios){
+  if(!db||!buildingId||!cambios||!cambios.length)return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('history').add({
+      usuario:user?.displayName||user?.email||'Sistema',
+      userEmail:user?.email||'',
+      fecha:firebase.firestore.Timestamp.now(),
+      cambios
+    });
+  }catch(e){console.error('[bldHistory]',e);}
+}
+
+async function loadBuildingHistory(buildingId){
+  const body=document.getElementById('bld-hist-body');
+  if(!body)return;
+  if(!db)return;
+  body.innerHTML='<div class="det-unit-empty">Cargando historial...</div>';
+  try{
+    const snap=await db.collection('buildings').doc(buildingId).collection('history').orderBy('fecha','desc').limit(80).get();
+    if(snap.empty){body.innerHTML='<div class="det-unit-empty">Sin historial de cambios aún.</div>';return;}
+    body.innerHTML='<div class="bld-hist-list">'+snap.docs.map(doc=>{
+      const d=doc.data();
+      const ts=d.fecha?.toDate?.()??new Date();
+      const fecha=ts.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+      const hora=ts.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+      return`<div class="bld-hist-entry">
+        <div class="bld-hist-entry-hd"><span class="bld-hist-date">${fecha} ${hora}</span><span class="bld-hist-user">${d.usuario||'Sistema'}</span></div>
+        ${(d.cambios||[]).map(c=>`<div class="bld-hist-change"><span class="bld-hist-field">${c.campo}</span>${c.anterior!=null&&c.anterior!==''?`<span class="bld-hist-old">${String(c.anterior).substring(0,40)}</span><span class="bld-hist-arrow">→</span>`:'<span class="bld-hist-arrow" style="color:#22C55E">nuevo</span>'}<span class="bld-hist-new">${String(c.nuevo||'').substring(0,50)}</span></div>`).join('')}
+      </div>`;
+    }).join('')+'</div>';
+  }catch(e){body.innerHTML='<div class="det-unit-empty">Error: '+e.message+'</div>';}
+}
+
+function switchBldMainTab(panel){
+  document.getElementById('bld-main-tab-units').classList.toggle('active',panel==='units');
+  document.getElementById('bld-main-tab-hist').classList.toggle('active',panel==='hist');
+  document.getElementById('bld-det-panel-units').style.display=panel==='units'?'flex':'none';
+  document.getElementById('bld-det-panel-hist').style.display=panel==='hist'?'flex':'none';
+}
+
+/* ============================================================
+   FEATURE: VISTA MAPA
+   ============================================================ */
+let _bldMap=null,_bldMapView='grid',_bldMapMarkers=[];
+
+function toggleBldView(view){
+  _bldMapView=view;
+  document.getElementById('bld-view-grid-btn').classList.toggle('active',view==='grid');
+  document.getElementById('bld-view-map-btn').classList.toggle('active',view==='map');
+  const tblWrap=document.getElementById('bld-tbl-wrap');
+  const mapCont=document.getElementById('bld-map-container');
+  const pagination=document.getElementById('bld-pagination');
+  if(view==='map'){
+    if(tblWrap)tblWrap.style.display='none';
+    if(mapCont)mapCont.style.display='flex';
+    if(pagination)pagination.style.display='none';
+    renderBldMap(_bldFiltered.length?_bldFiltered:_bldDocs);
+  }else{
+    if(tblWrap)tblWrap.style.display='';
+    if(mapCont)mapCont.style.display='none';
+    renderBuildingsTable();
+  }
+}
+
+async function geocodeBldAddress(direccion){
+  if(!direccion||direccion==='–')return null;
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(direccion+', Buenos Aires, Argentina')+'&format=json&limit=1',{headers:{'Accept-Language':'es','User-Agent':'ColliersNexus/1.0'}});
+    if(!r.ok)return null;
+    const j=await r.json();
+    return j&&j[0]?{lat:parseFloat(j[0].lat),lng:parseFloat(j[0].lon)}:null;
+  }catch(e){return null;}
+}
+
+async function renderBldMap(docs){
+  const container=document.getElementById('bld-map-el');
+  if(!container)return;
+  if(!_bldMap){
+    _bldMap=L.map('bld-map-el',{zoomControl:true}).setView([-34.6037,-58.3816],12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(_bldMap);
+  }else{
+    _bldMapMarkers.forEach(m=>m.remove());
+    _bldMapMarkers=[];
+  }
+  const pinIcon=L.divIcon({className:'',html:`<div style="background:#1C54F4;color:#fff;border-radius:50% 50% 50% 0;width:28px;height:28px;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(28,84,244,.4);border:2px solid #fff;display:flex;align-items:center;justify-content:center"><div style="transform:rotate(45deg);font-size:11px">🏢</div></div>`,iconSize:[28,28],iconAnchor:[14,28],popupAnchor:[0,-30]});
+  const toGeocode=[];
+  docs.forEach((d,i)=>{if(!d.lat&&d.direccion&&d.direccion!=='–')toGeocode.push({i,d});});
+  for(const {i,d} of toGeocode.slice(0,20)){
+    await new Promise(r=>setTimeout(r,350));
+    const c=await geocodeBldAddress(d.direccion);
+    if(c){d.lat=c.lat;d.lng=c.lng;try{if(db)db.collection('buildings').doc(d._id).update({lat:c.lat,lng:c.lng});}catch(e){}}
+  }
+  const bounds=[];
+  docs.forEach(d=>{
+    if(!d.lat||!d.lng)return;
+    bounds.push([d.lat,d.lng]);
+    const foto=getBldFoto(d);
+    const popup=L.popup({className:'',maxWidth:220}).setContent(`<div class="bmp-inner">${foto?`<img src="${esc(foto)}" class="bmp-img" onerror="this.style.display='none'">`:'<div class="bmp-img" style="display:flex;align-items:center;justify-content:center;font-size:32px">🏢</div>'}<div class="bmp-name">${esc(d.nombre||'Edificio')}</div><div class="bmp-addr">${esc(d.direccion||'')} · ${esc(d.zona||d.submercado||'')}</div><div class="bmp-chips">${d.superficieDisponible?`<span class="bmp-chip">${Number(d.superficieDisponible).toLocaleString('es-AR')} m²</span>`:''}${d.asking||d.rent?`<span class="bmp-chip">USD ${d.asking||d.rent}</span>`:''}${d.categoria||d.cat?`<span class="bmp-chip">${d.categoria||d.cat}</span>`:''}</div></div>`);
+    const m=L.marker([d.lat,d.lng],{icon:pinIcon}).bindPopup(popup);
+    m.addTo(_bldMap);
+    _bldMapMarkers.push(m);
+  });
+  if(bounds.length>1)_bldMap.fitBounds(bounds,{padding:[40,40]});
+  else if(bounds.length===1)_bldMap.setView(bounds[0],14);
+  setTimeout(()=>{if(_bldMap)_bldMap.invalidateSize();},200);
+}
+
+/* ============================================================
+   FEATURE: TENDENCIAS COMERCIALES
+   ============================================================ */
+let _tendPeriodo=30,_tendCharts={};
+
+function setTendPeriodo(dias){
+  _tendPeriodo=dias;
+  [30,90,365].forEach(d=>{
+    const btn=document.getElementById('an-pd-'+d);
+    if(btn)btn.classList.toggle('active',d===dias);
+  });
+  renderTendencias(_anDocs,dias);
+}
+
+function renderTendencias(allDocs,dias){
+  dias=dias||_tendPeriodo;
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-dias);
+  const docs=allDocs.filter(d=>{
+    const f=d.fecha?new Date(d.fecha):null;
+    return f&&f>=cutoff;
+  });
+  const isDark=document.body.classList.contains('dark');
+  const textColor=isDark?'#DCE7FF':'#353E59';
+  const gridColor=isDark?'rgba(255,255,255,.06)':'rgba(37,64,143,.08)';
+
+  if(!docs.length){
+    const g=document.getElementById('an-tend-grid');
+    if(g)g.innerHTML='<div class="an-empty" style="grid-column:1/-1;padding:2rem">Sin datos en este período.</div>';
+    return;
+  }
+
+  // Zonas tend
+  const zCount={};docs.forEach(d=>{let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);zs.forEach(z=>{if(z&&z!=='Todas')zCount[z]=(zCount[z]||0)+1;});});
+  const zSorted=Object.entries(zCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(_tendCharts.zonas){_tendCharts.zonas.destroy();_tendCharts.zonas=null;}
+  if(zSorted.length){_tendCharts.zonas=new Chart(document.getElementById('chart-tend-zonas'),{type:'bar',data:{labels:zSorted.map(([z])=>z),datasets:[{label:'Búsquedas',data:zSorted.map(([,v])=>v),backgroundColor:isDark?'#4D93FF':'#1C54F4',borderRadius:3,borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:9}}},y:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:9},maxRotation:0}}}}})}
+
+  // M² tend (donut)
+  const m2R={'<500':0,'500-1k':0,'1k-3k':0,'3k+':0};
+  docs.forEach(d=>{const m=parseFloat(d.m2Min||d.m2)||0;if(m>0){if(m<500)m2R['<500']++;else if(m<1000)m2R['500-1k']++;else if(m<3000)m2R['1k-3k']++;else m2R['3k+']++;}});
+  if(_tendCharts.m2){_tendCharts.m2.destroy();_tendCharts.m2=null;}
+  const m2Vals=Object.values(m2R);
+  if(m2Vals.some(v=>v>0)){_tendCharts.m2=new Chart(document.getElementById('chart-tend-m2'),{type:'doughnut',data:{labels:Object.keys(m2R),datasets:[{data:m2Vals,backgroundColor:['#000759','#25408F','#1C54F4','#4D93FF'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:textColor,font:{size:9},boxWidth:10,padding:8}}}}})}
+
+  // Edificios tend
+  const eCount={};docs.forEach(d=>{(d.edificios||d.propiedades||[]).forEach(e=>{if(e)eCount[e]=(eCount[e]||0)+1;});});
+  const eSorted=Object.entries(eCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const eEl=document.getElementById('an-tend-edif');
+  if(eEl){const eMax=eSorted[0]?.[1]||1;eEl.innerHTML=eSorted.length?eSorted.map(([name,cnt],i)=>`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem"><span style="font-size:9px;font-weight:700;color:#8898C0;min-width:14px">${i+1}</span><div style="flex:1;overflow:hidden"><div style="font-size:10px;font-weight:600;color:${isDark?'#DCE7FF':'#0A1B4D'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</div><div style="height:4px;background:${isDark?'rgba(77,147,255,.15)':'#EEF3FF'};border-radius:2px;margin-top:2px"><div style="height:4px;background:#1C54F4;border-radius:2px;width:${Math.round(cnt/eMax*100)}%"></div></div></div><span style="font-size:9px;color:#8898C0;font-weight:600">${cnt}</span></div>`).join(''):'<div class="an-empty" style="font-size:11px;padding:.5rem">Sin datos</div>';}
+
+  // Brokers tend
+  const bMap={};docs.forEach(d=>{const k=d.usuario||d.nombre||'?';if(!bMap[k])bMap[k]={n:k,ppts:0,alts:0};bMap[k].ppts++;bMap[k].alts+=Number(d.cantidad_alternativas)||0;});
+  const bSorted=Object.values(bMap).sort((a,b)=>b.ppts-a.ppts).slice(0,6);
+  const bEl=document.getElementById('an-tend-brokers');
+  if(bEl){bEl.innerHTML=bSorted.length?bSorted.map((b,i)=>`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem"><span style="font-size:9px;font-weight:700;color:${i===0?'#F59E0B':i===1?'#94A3B8':i===2?'#CD7F32':'#8898C0'};min-width:14px">${i+1}</span><div style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:10px;font-weight:600;color:${isDark?'#DCE7FF':'#0A1B4D'}">${b.n}</div><span style="font-size:9px;color:#1C54F4;font-weight:700">${b.ppts} PPT</span></div>`).join(''):'<div class="an-empty" style="font-size:11px;padding:.5rem">Sin datos</div>';}
+
+  // Evolución temporal (mes a mes)
+  const now=new Date();const meses={};
+  for(let i=Math.min(dias<=31?1:dias<=91?3:11,11);i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const k=d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');meses[k]=0;}
+  docs.forEach(d=>{const f=d.fecha?new Date(d.fecha):null;if(f){const k=f.getFullYear()+'-'+(f.getMonth()+1).toString().padStart(2,'0');if(k in meses)meses[k]++;}});
+  if(_tendCharts.evol){_tendCharts.evol.destroy();_tendCharts.evol=null;}
+  const evolLabels=Object.keys(meses).map(k=>{const[y,m]=k.split('-');return new Date(y,m-1,1).toLocaleDateString('es-AR',{month:'short',year:'2-digit'});});
+  _tendCharts.evol=new Chart(document.getElementById('chart-tend-evol'),{type:'line',data:{labels:evolLabels,datasets:[{label:'PPTs',data:Object.values(meses),borderColor:'#1C54F4',backgroundColor:'rgba(28,84,244,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#1C54F4',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} PPTs`}}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10},precision:0}}}}});
 }
 
 function show(id){
