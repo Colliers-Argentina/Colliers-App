@@ -1285,8 +1285,18 @@ body.dark .bld-hist-new{color:#DCE7FF}
 body.dark .bld-view-toggle{border-color:rgba(255,255,255,.1)}
 body.dark .bld-view-btn.active{background:#1C54F4}
 body.dark .bld-view-btn:not(.active){color:rgba(168,179,209,.6)}
-#bld-map-container{display:none;flex:1;min-height:400px;border-radius:10px;overflow:hidden;position:relative;border:1px solid #E8EFF8}
-#bld-map-el{width:100%;height:100%}
+#bld-map-container{display:none;flex-direction:column;flex:1;min-height:400px;border-radius:10px;overflow:hidden;position:relative;border:1px solid #E8EFF8}
+#bld-map-el{flex:1;min-height:0;width:100%}
+#bld-map-toolbar{display:flex;align-items:center;gap:.55rem;padding:.45rem .75rem;background:#fff;border-bottom:1px solid #E8EFF8;flex-shrink:0;flex-wrap:wrap}
+body.dark #bld-map-toolbar{background:#0d1731;border-bottom-color:rgba(255,255,255,.07)}
+.bld-map-stat{font-size:11px;display:flex;align-items:center;gap:.3rem}
+.bld-map-stat-val{font-weight:700;color:#1C54F4}
+.bld-map-stat-lbl{color:#8898C0}
+.bld-map-vsep{width:1px;height:14px;background:#E2E8F5;flex-shrink:0}
+body.dark .bld-map-vsep{background:rgba(255,255,255,.08)}
+#bld-map-recalc-btn{margin-left:auto;padding:4px 12px;font-size:11px;font-weight:600;border:1.5px solid #1C54F4;border-radius:6px;background:none;color:#1C54F4;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0}
+#bld-map-recalc-btn:hover:not(:disabled){background:#1C54F4;color:#fff}
+#bld-map-recalc-btn:disabled{opacity:.45;cursor:not-allowed}
 .bmp-inner{padding:.7rem;font-family:'Open Sans',sans-serif;min-width:190px}
 .bmp-img{width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:.45rem;background:#EEF3FF}
 .bmp-name{font-size:13px;font-weight:700;color:#000759;margin-bottom:2px;line-height:1.3}
@@ -1712,7 +1722,17 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           </div>
         </div>
         <div class="bld-kpi-row" id="bld-kpi-row"></div>
-        <div id="bld-map-container"><div id="bld-map-el"></div></div>
+        <div id="bld-map-container">
+          <div id="bld-map-toolbar">
+            <div class="bld-map-stat"><span class="bld-map-stat-val" id="bld-map-stat-total">—</span><span class="bld-map-stat-lbl">total</span></div>
+            <div class="bld-map-vsep"></div>
+            <div class="bld-map-stat"><span class="bld-map-stat-val" id="bld-map-stat-ok" style="color:#22C55E">—</span><span class="bld-map-stat-lbl">con coords</span></div>
+            <div class="bld-map-vsep"></div>
+            <div class="bld-map-stat"><span class="bld-map-stat-val" id="bld-map-stat-nok" style="color:#F59E0B">—</span><span class="bld-map-stat-lbl">sin coords</span></div>
+            <button id="bld-map-recalc-btn" onclick="recalcAllCoords()">⟳ Recalcular coordenadas</button>
+          </div>
+          <div id="bld-map-el"></div>
+        </div>
         <div class="bld-tbl-wrap" id="bld-tbl-wrap">
           <div class="bld-tbl-scroll">
             <div id="bld-table-wrap"><div class="bld-empty">Cargando edificios...</div></div>
@@ -5073,9 +5093,21 @@ async function geocodeBldAddress(direccion){
   }catch(e){return null;}
 }
 
+function _updateMapStats(allDocs){
+  const total=allDocs.length;
+  const ok=allDocs.filter(d=>d.lat&&d.lng).length;
+  const nok=total-ok;
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('bld-map-stat-total',total);
+  el('bld-map-stat-ok',ok);
+  el('bld-map-stat-nok',nok);
+}
+
 async function renderBldMap(docs){
   const container=document.getElementById('bld-map-el');
   if(!container)return;
+  // Use _bldDocs for stats (always full set, not filtered)
+  _updateMapStats(_bldDocs.length?_bldDocs:docs);
   if(!_bldMap){
     _bldMap=L.map('bld-map-el',{zoomControl:true}).setView([-34.6037,-58.3816],12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(_bldMap);
@@ -5083,9 +5115,9 @@ async function renderBldMap(docs){
   if(_bldClusterGroup){_bldMap.removeLayer(_bldClusterGroup);_bldClusterGroup=null;}
   _bldMapMarkers=[];
   const pinIcon=L.divIcon({className:'',html:`<div style="background:#1C54F4;color:#fff;border-radius:50% 50% 50% 0;width:28px;height:28px;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(28,84,244,.4);border:2px solid #fff;display:flex;align-items:center;justify-content:center"><div style="transform:rotate(45deg);font-size:11px">🏢</div></div>`,iconSize:[28,28],iconAnchor:[14,28],popupAnchor:[0,-30]});
+  const withCoords=docs.filter(d=>d.lat&&d.lng);
   const toGeocode=docs.filter(d=>!d.lat&&d.direccion&&d.direccion!=='–');
-  console.log('[renderBldMap] total:',docs.length,'con coords:',docs.filter(d=>d.lat&&d.lng).length,'sin coords (a geocodificar):',toGeocode.length);
-  // Show existing pins immediately while geocoding proceeds
+  console.log('[renderBldMap] total en vista:',docs.length,'| con coords:',withCoords.length,'| sin coords:',toGeocode.length);
   const addMarkers=(subset)=>{
     if(!_bldClusterGroup){
       _bldClusterGroup=L.markerClusterGroup({chunkedLoading:true,maxClusterRadius:60,showCoverageOnHover:false});
@@ -5103,22 +5135,63 @@ async function renderBldMap(docs){
     });
     return bounds;
   };
-  // First render: buildings already having coordinates
-  const withCoords=docs.filter(d=>d.lat&&d.lng);
   const initialBounds=addMarkers(withCoords);
   if(initialBounds.length>1)_bldMap.fitBounds(initialBounds,{padding:[40,40]});
   else if(initialBounds.length===1)_bldMap.setView(initialBounds[0],14);
   setTimeout(()=>{if(_bldMap)_bldMap.invalidateSize();},200);
-  // Then geocode remaining ones (rate-limited) and add pins as they resolve
   for(const d of toGeocode.slice(0,20)){
     await new Promise(r=>setTimeout(r,400));
     const c=await geocodeBldAddress(d.direccion);
     if(c){
       d.lat=c.lat;d.lng=c.lng;
-      console.log('[geocode] OK:',d.nombre,'→',c.lat,c.lng);
+      console.log('[geocode] ✓',d.nombre,'|',d.direccion,'→',c.lat,c.lng);
       addMarkers([d]);
+      _updateMapStats(_bldDocs.length?_bldDocs:docs);
       try{if(db)db.collection('buildings').doc(d._id).update({lat:c.lat,lng:c.lng});}catch(e){}
-    }else{console.log('[geocode] sin resultado:',d.direccion);}
+    }else{
+      console.log('[geocode] ✗ sin resultado:',d.nombre,'|',d.direccion);
+    }
+  }
+}
+
+async function recalcAllCoords(){
+  const btn=document.getElementById('bld-map-recalc-btn');
+  if(btn){btn.disabled=true;btn.textContent='Recalculando...';}
+  const all=_bldDocs||[];
+  const sinCoords=all.filter(d=>!d.lat||!d.lng);
+  console.group('[recalcAllCoords] Diagnóstico de coordenadas');
+  console.log('Total edificios:',all.length);
+  console.log('Con coordenadas:',all.filter(d=>d.lat&&d.lng).length);
+  console.log('Sin coordenadas:',sinCoords.length);
+  if(sinCoords.length){
+    console.group('Edificios sin coords:');
+    sinCoords.forEach(d=>console.log(' ✗',d.nombre,'|',d.direccion||'(sin dirección)'));
+    console.groupEnd();
+  }
+  console.groupEnd();
+  let ok=0,fail=0;
+  for(const d of sinCoords){
+    if(!d.direccion||d.direccion==='–'){
+      console.log('[geocode] sin dirección —',d.nombre);
+      fail++;continue;
+    }
+    await new Promise(r=>setTimeout(r,400));
+    const c=await geocodeBldAddress(d.direccion);
+    if(c){
+      d.lat=c.lat;d.lng=c.lng;ok++;
+      console.log('[geocode] ✓',d.nombre,'|',d.direccion,'→',c.lat,c.lng);
+      try{if(db)await db.collection('buildings').doc(d._id).update({lat:c.lat,lng:c.lng});}catch(e){console.warn('[geocode] error guardando coords:',e);}
+    }else{
+      fail++;
+      console.log('[geocode] ✗ sin resultado —',d.nombre,'|',d.direccion);
+    }
+  }
+  console.log(`[recalcAllCoords] Finalizado: ${ok} geocodificados, ${fail} fallidos`);
+  _updateMapStats(all);
+  if(btn){btn.disabled=false;btn.textContent='⟳ Recalcular coordenadas';}
+  if(_bldMapView==='map'){
+    const vista=(_bldFiltered&&_bldFiltered.length)?_bldFiltered:_bldDocs;
+    renderBldMap(vista);
   }
 }
 
