@@ -6,7 +6,10 @@
 <title>Colliers Nexus · Plataforma Inteligente de Real Estate</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async></script>
@@ -4951,7 +4954,7 @@ function renderAnalytics(docs){
     </div>
   `).join('');
   if(_anCharts.brokers){_anCharts.brokers.destroy();_anCharts.brokers=null;}
-  renderTendencias(docs,_tendPeriodo);
+  renderTendencias(_anDocs.length?_anDocs:docs,_tendPeriodo);
 }
 
 /* ============================================================
@@ -5033,12 +5036,13 @@ function switchBldMainTab(panel){
   document.getElementById('bld-main-tab-hist').classList.toggle('active',panel==='hist');
   document.getElementById('bld-det-panel-units').style.display=panel==='units'?'flex':'none';
   document.getElementById('bld-det-panel-hist').style.display=panel==='hist'?'flex':'none';
+  if(panel==='hist')loadBuildingHistory(window._bldEditId);
 }
 
 /* ============================================================
    FEATURE: VISTA MAPA
    ============================================================ */
-let _bldMap=null,_bldMapView='grid',_bldMapMarkers=[];
+let _bldMap=null,_bldMapView='grid',_bldMapMarkers=[],_bldClusterGroup=null;
 
 function toggleBldView(view){
   _bldMapView=view;
@@ -5075,31 +5079,47 @@ async function renderBldMap(docs){
   if(!_bldMap){
     _bldMap=L.map('bld-map-el',{zoomControl:true}).setView([-34.6037,-58.3816],12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(_bldMap);
-  }else{
-    _bldMapMarkers.forEach(m=>m.remove());
-    _bldMapMarkers=[];
   }
+  if(_bldClusterGroup){_bldMap.removeLayer(_bldClusterGroup);_bldClusterGroup=null;}
+  _bldMapMarkers=[];
   const pinIcon=L.divIcon({className:'',html:`<div style="background:#1C54F4;color:#fff;border-radius:50% 50% 50% 0;width:28px;height:28px;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(28,84,244,.4);border:2px solid #fff;display:flex;align-items:center;justify-content:center"><div style="transform:rotate(45deg);font-size:11px">🏢</div></div>`,iconSize:[28,28],iconAnchor:[14,28],popupAnchor:[0,-30]});
-  const toGeocode=[];
-  docs.forEach((d,i)=>{if(!d.lat&&d.direccion&&d.direccion!=='–')toGeocode.push({i,d});});
-  for(const {i,d} of toGeocode.slice(0,20)){
-    await new Promise(r=>setTimeout(r,350));
-    const c=await geocodeBldAddress(d.direccion);
-    if(c){d.lat=c.lat;d.lng=c.lng;try{if(db)db.collection('buildings').doc(d._id).update({lat:c.lat,lng:c.lng});}catch(e){}}
-  }
-  const bounds=[];
-  docs.forEach(d=>{
-    if(!d.lat||!d.lng)return;
-    bounds.push([d.lat,d.lng]);
-    const foto=getBldFoto(d);
-    const popup=L.popup({className:'',maxWidth:220}).setContent(`<div class="bmp-inner">${foto?`<img src="${esc(foto)}" class="bmp-img" onerror="this.style.display='none'">`:'<div class="bmp-img" style="display:flex;align-items:center;justify-content:center;font-size:32px">🏢</div>'}<div class="bmp-name">${esc(d.nombre||'Edificio')}</div><div class="bmp-addr">${esc(d.direccion||'')} · ${esc(d.zona||d.submercado||'')}</div><div class="bmp-chips">${d.superficieDisponible?`<span class="bmp-chip">${Number(d.superficieDisponible).toLocaleString('es-AR')} m²</span>`:''}${d.asking||d.rent?`<span class="bmp-chip">USD ${d.asking||d.rent}</span>`:''}${d.categoria||d.cat?`<span class="bmp-chip">${d.categoria||d.cat}</span>`:''}</div></div>`);
-    const m=L.marker([d.lat,d.lng],{icon:pinIcon}).bindPopup(popup);
-    m.addTo(_bldMap);
-    _bldMapMarkers.push(m);
-  });
-  if(bounds.length>1)_bldMap.fitBounds(bounds,{padding:[40,40]});
-  else if(bounds.length===1)_bldMap.setView(bounds[0],14);
+  const toGeocode=docs.filter(d=>!d.lat&&d.direccion&&d.direccion!=='–');
+  console.log('[renderBldMap] total:',docs.length,'con coords:',docs.filter(d=>d.lat&&d.lng).length,'sin coords (a geocodificar):',toGeocode.length);
+  // Show existing pins immediately while geocoding proceeds
+  const addMarkers=(subset)=>{
+    if(!_bldClusterGroup){
+      _bldClusterGroup=L.markerClusterGroup({chunkedLoading:true,maxClusterRadius:60,showCoverageOnHover:false});
+      _bldMap.addLayer(_bldClusterGroup);
+    }
+    const bounds=[];
+    subset.forEach(d=>{
+      if(!d.lat||!d.lng)return;
+      bounds.push([d.lat,d.lng]);
+      const foto=getBldFoto(d);
+      const popup=L.popup({className:'',maxWidth:220}).setContent(`<div class="bmp-inner">${foto?`<img src="${esc(foto)}" class="bmp-img" onerror="this.style.display='none'">`:'<div class="bmp-img" style="display:flex;align-items:center;justify-content:center;font-size:32px">🏢</div>'}<div class="bmp-name">${esc(d.nombre||'Edificio')}</div><div class="bmp-addr">${esc(d.direccion||'')} · ${esc(d.zona||d.submercado||'')}</div><div class="bmp-chips">${d.superficieDisponible?`<span class="bmp-chip">${Number(d.superficieDisponible).toLocaleString('es-AR')} m²</span>`:''}${d.asking||d.rent?`<span class="bmp-chip">USD ${d.asking||d.rent}</span>`:''}${d.categoria||d.cat?`<span class="bmp-chip">${d.categoria||d.cat}</span>`:''}</div></div>`);
+      const m=L.marker([d.lat,d.lng],{icon:pinIcon}).bindPopup(popup);
+      _bldClusterGroup.addLayer(m);
+      _bldMapMarkers.push(m);
+    });
+    return bounds;
+  };
+  // First render: buildings already having coordinates
+  const withCoords=docs.filter(d=>d.lat&&d.lng);
+  const initialBounds=addMarkers(withCoords);
+  if(initialBounds.length>1)_bldMap.fitBounds(initialBounds,{padding:[40,40]});
+  else if(initialBounds.length===1)_bldMap.setView(initialBounds[0],14);
   setTimeout(()=>{if(_bldMap)_bldMap.invalidateSize();},200);
+  // Then geocode remaining ones (rate-limited) and add pins as they resolve
+  for(const d of toGeocode.slice(0,20)){
+    await new Promise(r=>setTimeout(r,400));
+    const c=await geocodeBldAddress(d.direccion);
+    if(c){
+      d.lat=c.lat;d.lng=c.lng;
+      console.log('[geocode] OK:',d.nombre,'→',c.lat,c.lng);
+      addMarkers([d]);
+      try{if(db)db.collection('buildings').doc(d._id).update({lat:c.lat,lng:c.lng});}catch(e){}
+    }else{console.log('[geocode] sin resultado:',d.direccion);}
+  }
 }
 
 /* ============================================================
@@ -5116,11 +5136,12 @@ function setTendPeriodo(dias){
   renderTendencias(_anDocs,dias);
 }
 
+function _tsToDate(ts){if(!ts)return null;if(ts.toDate)return ts.toDate();if(ts.seconds)return new Date(ts.seconds*1000);return new Date(ts);}
 function renderTendencias(allDocs,dias){
   dias=dias||_tendPeriodo;
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-dias);
   const docs=allDocs.filter(d=>{
-    const f=d.fecha?new Date(d.fecha):null;
+    const f=_tsToDate(d.fecha);
     return f&&f>=cutoff;
   });
   const isDark=document.body.classList.contains('dark');
@@ -5161,7 +5182,7 @@ function renderTendencias(allDocs,dias){
   // Evolución temporal (mes a mes)
   const now=new Date();const meses={};
   for(let i=Math.min(dias<=31?1:dias<=91?3:11,11);i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const k=d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');meses[k]=0;}
-  docs.forEach(d=>{const f=d.fecha?new Date(d.fecha):null;if(f){const k=f.getFullYear()+'-'+(f.getMonth()+1).toString().padStart(2,'0');if(k in meses)meses[k]++;}});
+  docs.forEach(d=>{const f=_tsToDate(d.fecha);if(f){const k=f.getFullYear()+'-'+(f.getMonth()+1).toString().padStart(2,'0');if(k in meses)meses[k]++;}});
   if(_tendCharts.evol){_tendCharts.evol.destroy();_tendCharts.evol=null;}
   const evolLabels=Object.keys(meses).map(k=>{const[y,m]=k.split('-');return new Date(y,m-1,1).toLocaleDateString('es-AR',{month:'short',year:'2-digit'});});
   _tendCharts.evol=new Chart(document.getElementById('chart-tend-evol'),{type:'line',data:{labels:evolLabels,datasets:[{label:'PPTs',data:Object.values(meses),borderColor:'#1C54F4',backgroundColor:'rgba(28,84,244,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#1C54F4',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} PPTs`}}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10},precision:0}}}}});
