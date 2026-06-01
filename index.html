@@ -2357,6 +2357,34 @@ async function cargarOverview(){
   console.error('Overview: all proxies failed');
 }
 
+/*
+ * CAMPOS IMPORTADOS DESDE GOOGLE SHEETS (parseCSV)
+ * ─────────────────────────────────────────────────
+ * Columna Sheet              → campo JS         → campo Firestore
+ * "Nombre Edificio"          → nombre           → nombre
+ * "Dirección"                → direccion        → direccion
+ * "Google Maps Address"      → gMapsAddr        → gMapsAddr        ← NUEVO
+ * "Latitud"                  → lat (número)     → lat              ← NUEVO
+ * "Longitud"                 → lng (número)     → lng              ← NUEVO
+ * "Submercado"               → submercado       → zona / submercado
+ * "Categoría"                → cat              → categoria / certificacion
+ * "Año Construcción"         → anio             → anio
+ * "Pisos Totales"            → pisos            → pisos
+ * "Ratio Cocheras"           → cocheras         → cocheras
+ * "Superficie Disponible m²" → supDisp          → superficieDisponible
+ * "Pisos Disponibles"        → pisosDisp        → pisosDisponibles
+ * "Sup. Promedio Planta m²"  → supPlanta        → superficiePlanta
+ * "Sup. Mínima Divisible m²" → supMinima        → superficieMinima
+ * "Asking Rent (USD/m²)"     → rent             → asking
+ * "Comentarios / Amenities"  → comentarios      → descripcion / amenities
+ * "URL Foto" (variantes)     → foto             → foto / imagenes
+ *
+ * PRIORIDAD DE GEOCODIFICACIÓN
+ * 1. lat + lng en Sheet → se usan directamente, sin llamar a Nominatim
+ * 2. "Google Maps Address" → se pasa a Nominatim (dirección larga y precisa)
+ * 3. "Dirección"          → fallback a Nominatim
+ * Coords geocodificadas se preservan en Firestore entre re-sincronizaciones.
+ */
 function parseCSV(csv){
   const lines=csv.split("\n").filter(l=>l.trim());
   if(lines.length<2)return[];
@@ -2366,13 +2394,20 @@ function parseCSV(csv){
   const ci=h=>{const hl=h.toLowerCase();return hdrs.findIndex(x=>x.toLowerCase()===hl);};
   // Try multiple column name variants, return first non-empty value
   const any=(...names)=>{for(const n of names){const i=ci(n);if(i>=0&&v[i])return v[i];}return'';};
+  // Parse a lat/lng string safely
+  const parseLoc=s=>{const f=parseFloat((s||'').replace(',','.'));return isFinite(f)&&f!==0?f:null;};
   return lines.slice(1).map(line=>{
     const v=parseLine(line);
     if(!v[c("Nombre Edificio")])return null;
     if((v[c("Activo (SI/NO)")]||"SI").toUpperCase()==="NO")return null;
+    const rawLat=any("Latitud","Lat","lat");
+    const rawLng=any("Longitud","Lng","lng","Lon","lon");
     const obj={
       nombre:v[c("Nombre Edificio")]||"–",
       direccion:v[c("Dirección")]||"–",
+      gMapsAddr:any("Google Maps Address","Google Maps Dirección","Dirección Google Maps","GMaps Address","gmaps_address")||'',
+      lat:parseLoc(rawLat),
+      lng:parseLoc(rawLng),
       submercado:v[c("Submercado")]||"–",
       cat:v[c("Categoría")]||"–",
       anio:v[c("Año Construcción")]||"–",
@@ -4633,6 +4668,9 @@ async function syncSheetToFirestore(){
   try{
     // Step 1: DELETE all sheet-sourced buildings (clean slate)
     const existing=await db.collection('buildings').where('_source','==','sheets').get();
+    // Preserve geocoded lat/lng so they survive a re-sync when the sheet doesn't provide them
+    const _prevCoords=new Map();
+    existing.docs.forEach(d=>{const f=d.data();if(f.lat&&f.lng)_prevCoords.set(d.id,{lat:f.lat,lng:f.lng});});
     if(!existing.empty){
       // 1a: Delete building docs
       for(let i=0;i<existing.docs.length;i+=CHUNK){
@@ -4640,7 +4678,7 @@ async function syncSheetToFirestore(){
         existing.docs.slice(i,i+CHUNK).forEach(d=>b.delete(d.ref));
         await b.commit();
       }
-      console.log('syncSheet: eliminados',existing.docs.length,'docs previos de sheets');
+      console.log('syncSheet: eliminados',existing.docs.length,'docs previos de sheets','| coords preservadas:',_prevCoords.size);
       // 1b: Delete _source:sheets units in those buildings' subcollections
       for(const bldDoc of existing.docs){
         try{
@@ -4667,9 +4705,17 @@ async function syncSheetToFirestore(){
       const batch=db.batch();
       unique.slice(i,i+CHUNK).forEach(p=>{
         const ref=db.collection('buildings').doc(toId(p.nombre));
+        // Coord priority: (1) explicit Sheet lat/lng  (2) previously geocoded  (3) null
+        const bldId=toId(p.nombre);
+        const sheetHasCoords=p.lat!=null&&p.lng!=null;
+        const prev=_prevCoords.get(bldId);
+        const finalLat=sheetHasCoords?p.lat:(prev?prev.lat:null);
+        const finalLng=sheetHasCoords?p.lng:(prev?prev.lng:null);
+        if(p.gMapsAddr||p.lat!=null)console.log('syncSheet coords:',p.nombre,'| gMapsAddr:',p.gMapsAddr||'–','| Sheet lat/lng:',p.lat!=null?`${p.lat},${p.lng}`:'–','| final:',finalLat!=null?`${finalLat},${finalLng}`:'sin coords');
         batch.set(ref,{
           nombre:p.nombre,
           direccion:p.direccion||'',
+          gMapsAddr:p.gMapsAddr||'',
           zona:p.submercado||'',
           submercado:p.submercado||'',
           superficieDisponible:p.supDisp||0,
@@ -4689,6 +4735,8 @@ async function syncSheetToFirestore(){
           foto:normalizeImageUrl(p.foto||''),
           imagenes:normalizeImageUrl(p.foto||'')?[normalizeImageUrl(p.foto||'')]:[],
           googleMaps:'',
+          lat:finalLat,
+          lng:finalLng,
           estado:'Disponible',
           broker:user?.displayName||'',
           activo:true,
@@ -5083,6 +5131,14 @@ function toggleBldView(view){
   }
 }
 
+// Returns the best address string for geocoding a building doc.
+// Priority: gMapsAddr (longer, more precise) → direccion → null
+function _geocodeAddr(d){
+  if(d.gMapsAddr&&d.gMapsAddr.trim()&&d.gMapsAddr!=='–')return{addr:d.gMapsAddr,src:'gMapsAddr'};
+  if(d.direccion&&d.direccion.trim()&&d.direccion!=='–')return{addr:d.direccion,src:'direccion'};
+  return null;
+}
+
 async function geocodeBldAddress(direccion){
   if(!direccion||direccion==='–')return null;
   try{
@@ -5116,8 +5172,8 @@ async function renderBldMap(docs){
   _bldMapMarkers=[];
   const pinIcon=L.divIcon({className:'',html:`<div style="background:#1C54F4;color:#fff;border-radius:50% 50% 50% 0;width:28px;height:28px;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(28,84,244,.4);border:2px solid #fff;display:flex;align-items:center;justify-content:center"><div style="transform:rotate(45deg);font-size:11px">🏢</div></div>`,iconSize:[28,28],iconAnchor:[14,28],popupAnchor:[0,-30]});
   const withCoords=docs.filter(d=>d.lat&&d.lng);
-  const toGeocode=docs.filter(d=>!d.lat&&d.direccion&&d.direccion!=='–');
-  console.log('[renderBldMap] total en vista:',docs.length,'| con coords:',withCoords.length,'| sin coords:',toGeocode.length);
+  const toGeocode=docs.filter(d=>!d.lat&&_geocodeAddr(d));
+  console.log('[renderBldMap] total en vista:',docs.length,'| con coords:',withCoords.length,'| a geocodificar:',toGeocode.length);
   const addMarkers=(subset)=>{
     if(!_bldClusterGroup){
       _bldClusterGroup=L.markerClusterGroup({chunkedLoading:true,maxClusterRadius:60,showCoverageOnHover:false});
@@ -5140,16 +5196,18 @@ async function renderBldMap(docs){
   else if(initialBounds.length===1)_bldMap.setView(initialBounds[0],14);
   setTimeout(()=>{if(_bldMap)_bldMap.invalidateSize();},200);
   for(const d of toGeocode.slice(0,20)){
+    const addrInfo=_geocodeAddr(d);
+    if(!addrInfo)continue;
     await new Promise(r=>setTimeout(r,400));
-    const c=await geocodeBldAddress(d.direccion);
+    const c=await geocodeBldAddress(addrInfo.addr);
     if(c){
       d.lat=c.lat;d.lng=c.lng;
-      console.log('[geocode] ✓',d.nombre,'|',d.direccion,'→',c.lat,c.lng);
+      console.log('[geocode] ✓',d.nombre,'| ['+addrInfo.src+']',addrInfo.addr,'→',c.lat,c.lng);
       addMarkers([d]);
       _updateMapStats(_bldDocs.length?_bldDocs:docs);
       try{if(db)db.collection('buildings').doc(d._id).update({lat:c.lat,lng:c.lng});}catch(e){}
     }else{
-      console.log('[geocode] ✗ sin resultado:',d.nombre,'|',d.direccion);
+      console.log('[geocode] ✗ sin resultado:',d.nombre,'| ['+addrInfo.src+']',addrInfo.addr);
     }
   }
 }
@@ -5165,25 +5223,30 @@ async function recalcAllCoords(){
   console.log('Sin coordenadas:',sinCoords.length);
   if(sinCoords.length){
     console.group('Edificios sin coords:');
-    sinCoords.forEach(d=>console.log(' ✗',d.nombre,'|',d.direccion||'(sin dirección)'));
+    sinCoords.forEach(d=>{
+      const a=_geocodeAddr(d);
+      console.log(' ✗',d.nombre,'| gMapsAddr:',d.gMapsAddr||'–','| direccion:',d.direccion||'–','→ usará:',a?('['+a.src+'] '+a.addr):'SIN DIRECCIÓN');
+    });
     console.groupEnd();
   }
   console.groupEnd();
   let ok=0,fail=0;
   for(const d of sinCoords){
-    if(!d.direccion||d.direccion==='–'){
+    const addrInfo=_geocodeAddr(d);
+    if(!addrInfo){
       console.log('[geocode] sin dirección —',d.nombre);
       fail++;continue;
     }
+    console.log('[geocode] intentando ['+addrInfo.src+']:',d.nombre,'→',addrInfo.addr);
     await new Promise(r=>setTimeout(r,400));
-    const c=await geocodeBldAddress(d.direccion);
+    const c=await geocodeBldAddress(addrInfo.addr);
     if(c){
       d.lat=c.lat;d.lng=c.lng;ok++;
-      console.log('[geocode] ✓',d.nombre,'|',d.direccion,'→',c.lat,c.lng);
+      console.log('[geocode] ✓',d.nombre,'→',c.lat,c.lng);
       try{if(db)await db.collection('buildings').doc(d._id).update({lat:c.lat,lng:c.lng});}catch(e){console.warn('[geocode] error guardando coords:',e);}
     }else{
       fail++;
-      console.log('[geocode] ✗ sin resultado —',d.nombre,'|',d.direccion);
+      console.log('[geocode] ✗ sin resultado —',d.nombre,'| ['+addrInfo.src+']',addrInfo.addr);
     }
   }
   console.log(`[recalcAllCoords] Finalizado: ${ok} geocodificados, ${fail} fallidos`);
