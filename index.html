@@ -1642,55 +1642,115 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 
 <!-- CRM -->
 <div id="crm-panel" style="display:none">
-  <!-- LIST VIEW -->
-  <div id="crm-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-    <div class="crm-topbar">
-      <div class="crm-topbar-l">
-        <div class="crm-page-title">Clientes</div>
-        <div class="crm-page-sub" id="crm-subtitle">Cargando...</div>
+  <!-- SUBNAV -->
+  <div class="crm-subnav">
+    <button class="crm-subnav-tab active" id="crm-snav-cuentas" onclick="switchCRMTab('cuentas')">🏢 Cuentas</button>
+    <button class="crm-subnav-tab" id="crm-snav-contactos" onclick="switchCRMTab('contactos')">👤 Contactos</button>
+    <button class="crm-subnav-tab" id="crm-snav-leads" onclick="switchCRMTab('leads')">🎯 Leads</button>
+    <div style="flex:1"></div>
+    <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
+  </div>
+
+  <!-- CUENTAS SECTION -->
+  <div id="crm-cuentas-section" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <!-- LIST VIEW -->
+    <div id="crm-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="crm-topbar">
+        <div class="crm-topbar-l">
+          <div class="crm-page-title">Cuentas</div>
+          <div class="crm-page-sub" id="crm-subtitle">Cargando...</div>
+        </div>
+        <div class="crm-topbar-r">
+          <input id="crm-search" type="text" placeholder="🔍 Buscar cuenta..." class="crm-search-inp" oninput="filterCRM()">
+          <input id="crm-m2-min" type="number" min="0" step="50" placeholder="m² mín" class="crm-m2-inp" oninput="filterCRM()">
+          <span class="crm-m2-sep">–</span>
+          <input id="crm-m2-max" type="number" min="0" step="50" placeholder="m² máx" class="crm-m2-inp" oninput="filterCRM()">
+          <select id="crm-filter-broker" class="crm-sel" onchange="filterCRM()"><option value="">Todos los brokers</option></select>
+          <select id="crm-filter-estado" class="crm-sel" onchange="filterCRM()">
+            <option value="">Todos los estados</option><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option>
+          </select>
+          <button class="crm-new-btn" onclick="openNewClientModal()">+ Nueva cuenta</button>
+        </div>
       </div>
-      <div class="crm-topbar-r">
-        <input id="crm-search" type="text" placeholder="🔍 Buscar cliente..." class="crm-search-inp" oninput="filterCRM()">
-        <input id="crm-m2-min" type="number" min="0" step="50" placeholder="m² mín" class="crm-m2-inp" oninput="filterCRM()">
-        <span class="crm-m2-sep">–</span>
-        <input id="crm-m2-max" type="number" min="0" step="50" placeholder="m² máx" class="crm-m2-inp" oninput="filterCRM()">
-        <select id="crm-filter-broker" class="crm-sel" onchange="filterCRM()"><option value="">Todos los brokers</option></select>
-        <select id="crm-filter-estado" class="crm-sel" onchange="filterCRM()">
-          <option value="">Todos los estados</option><option>Activo</option><option>Visitas</option><option>Negociación</option><option>Cerrado</option><option>Perdido</option>
-        </select>
-        <button class="crm-new-btn" onclick="openNewClientModal()">+ Nuevo cliente</button>
-        <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
+      <div class="crm-list-body">
+        <div class="crm-kpi-row" id="crm-kpi-row"></div>
+        <div class="crm-tbl-wrap">
+          <div id="crm-table-wrap">Cargando...</div>
+        </div>
       </div>
     </div>
-    <div class="crm-list-body">
-      <div class="crm-kpi-row" id="crm-kpi-row"></div>
-      <div class="crm-tbl-wrap">
-        <div id="crm-table-wrap">Cargando...</div>
+
+    <!-- DETAIL VIEW -->
+    <div id="crm-detail-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="crm-det-topbar">
+        <button class="crm-det-back-btn" onclick="closeCRMDetail()">← Volver a cuentas</button>
+        <div style="flex:1"></div>
+      </div>
+      <div class="crm-det-layout">
+        <div class="crm-det-left" id="crm-det-left"></div>
+        <div class="crm-det-right" id="crm-det-right"></div>
       </div>
     </div>
   </div>
 
-  <!-- DETAIL VIEW -->
-  <div id="crm-detail-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
-    <div class="crm-det-topbar">
-      <button class="crm-det-back-btn" onclick="closeCRMDetail()">← Volver a clientes</button>
-      <div style="flex:1"></div>
-    </div>
-    <div class="crm-det-layout">
-      <div class="crm-det-left" id="crm-det-left">
-        <!-- filled by openClientDetail() -->
+  <!-- CONTACTOS SECTION -->
+  <div id="crm-contactos-section" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div id="cto-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="crm-topbar">
+        <div class="crm-topbar-l">
+          <div class="crm-page-title">Contactos</div>
+          <div class="crm-page-sub" id="cto-subtitle">Cargando...</div>
+        </div>
+        <div class="crm-topbar-r">
+          <input id="cto-search" type="text" placeholder="🔍 Buscar contacto..." class="crm-search-inp" oninput="filterContactos()">
+          <select id="cto-filter-cargo" class="crm-sel" onchange="filterContactos()">
+            <option value="">Todos los cargos</option>
+            <option>CEO</option><option>CFO</option><option>Compras</option><option>Real Estate</option><option>Facilities</option>
+            <option>RRHH</option><option>Operaciones</option><option>IT</option><option>Administración</option><option>Marketing</option><option>Otro</option>
+          </select>
+          <select id="cto-filter-email" class="crm-sel" onchange="filterContactos()">
+            <option value="">Todos los emails</option>
+            <option value="funcional">🟢 Funcional</option>
+            <option value="sin_comprobar">🟡 Sin comprobar</option>
+            <option value="rebotado">🔴 Rebotado</option>
+          </select>
+          <button class="crm-new-btn" onclick="openContactoDrawer()">+ Nuevo contacto</button>
+        </div>
       </div>
-      <div class="crm-det-right" id="crm-det-right">
-        <!-- filled by openClientDetail() -->
+      <div class="crm-list-body">
+        <div class="crm-kpi-row" id="cto-kpi-row"></div>
+        <div class="crm-tbl-wrap">
+          <div id="cto-table-wrap">Cargando...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="cto-detail-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="crm-det-topbar">
+        <button class="crm-det-back-btn" onclick="closeContactoDetail()">← Volver a contactos</button>
+        <div style="flex:1"></div>
+      </div>
+      <div class="crm-det-layout">
+        <div class="crm-det-left" id="cto-det-left"></div>
+        <div class="crm-det-right" id="cto-det-right"></div>
       </div>
     </div>
   </div>
 
-  <!-- CLIENT DRAWER (shared: CRM + Generator) -->
+  <!-- LEADS SECTION -->
+  <div id="crm-leads-section" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div class="crm-leads-placeholder">
+      <div class="crm-leads-placeholder-icon">🎯</div>
+      <div class="crm-leads-placeholder-title">Leads</div>
+      <div class="crm-leads-placeholder-sub">Próximamente.<br>Acá vas a poder gestionar leads y oportunidades comerciales en etapa temprana.</div>
+    </div>
+  </div>
+
+  <!-- CUENTA DRAWER (shared: CRM + Generator) -->
   <div id="cdr-overlay" class="cdr-overlay" onclick="closeClientDrawer()"></div>
-  <div id="cdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nueva Ficha de Cliente">
+  <div id="cdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nueva Ficha de Cuenta">
     <div class="cdr-hd">
-      <div class="cdr-title">Nueva Ficha de Cliente</div>
+      <div class="cdr-title">Nueva Cuenta</div>
       <button class="cdr-close" onclick="closeClientDrawer()" title="Cerrar">✕</button>
     </div>
     <div class="cdr-body">
@@ -1844,9 +1904,165 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     </div>
     <div class="cdr-footer">
       <button class="cdr-cancel" onclick="closeClientDrawer()">Cancelar</button>
-      <button class="cdr-save" id="cdr-save-btn" onclick="saveClientDrawer()">Crear cliente</button>
+      <button class="cdr-save" id="cdr-save-btn" onclick="saveClientDrawer()">Crear cuenta</button>
     </div>
   </div>
+
+  <!-- CONTACTO DRAWER -->
+  <div id="ctdr-overlay" class="cdr-overlay" onclick="closeContactoDrawer()"></div>
+  <div id="ctdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nuevo Contacto">
+    <div class="cdr-hd">
+      <div class="cdr-title">Nuevo Contacto</div>
+      <button class="cdr-close" onclick="closeContactoDrawer()" title="Cerrar">✕</button>
+    </div>
+    <div class="cdr-body">
+
+      <!-- 1 · Información General -->
+      <div class="cdr-section">
+        <div class="cdr-section-hd">
+          <div class="cdr-section-num">1</div>
+          <div class="cdr-section-name">Información General</div>
+          <div class="cdr-section-line"></div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Cuenta asociada</div>
+          <div style="position:relative">
+            <input id="ctdr-cuenta-q" class="cdr-input" type="text" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctdrCuentaSearch(this.value)">
+            <div id="ctdr-cuenta-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+          </div>
+          <input id="ctdr-cuentaId" type="hidden">
+          <input id="ctdr-cuentaNombre" type="hidden">
+        </div>
+        <div class="cdr-row">
+          <div class="cdr-field">
+            <div class="cdr-lbl">Nombre <span class="cdr-req">*</span></div>
+            <input id="ctdr-nombre" class="cdr-input" type="text" placeholder="Nombre de pila" autocomplete="off">
+          </div>
+          <div class="cdr-field">
+            <div class="cdr-lbl">Apellidos <span class="cdr-req">*</span></div>
+            <input id="ctdr-apellidos" class="cdr-input" type="text" placeholder="Apellidos" autocomplete="off">
+          </div>
+        </div>
+        <div class="cdr-row">
+          <div class="cdr-field">
+            <div class="cdr-lbl">Cargo segmentado <span class="cdr-req">*</span></div>
+            <select id="ctdr-cargo" class="cdr-select">
+              <option value="">— Seleccionar —</option>
+              <option>CEO</option><option>CFO</option><option>Compras</option><option>Real Estate</option>
+              <option>Facilities</option><option>RRHH</option><option>Operaciones</option>
+              <option>IT</option><option>Administración</option><option>Marketing</option><option>Otro</option>
+            </select>
+          </div>
+          <div class="cdr-field">
+            <div class="cdr-lbl">Puesto (texto libre)</div>
+            <input id="ctdr-puesto" class="cdr-input" type="text" placeholder="Ej: Director Comercial">
+          </div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Propietario</div>
+          <div class="cdr-toggle-group">
+            <button type="button" class="cdr-toggle-btn" data-field="ctdrPropietario" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
+            <button type="button" class="cdr-toggle-btn active" data-field="ctdrPropietario" data-value="No" data-default onclick="cdrToggle(this)">No</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 · Datos de Contacto -->
+      <div class="cdr-section">
+        <div class="cdr-section-hd">
+          <div class="cdr-section-num">2</div>
+          <div class="cdr-section-name">Datos de Contacto</div>
+          <div class="cdr-section-line"></div>
+        </div>
+        <div class="cdr-row">
+          <div class="cdr-field">
+            <div class="cdr-lbl">Correo electrónico <span class="cdr-req">*</span></div>
+            <input id="ctdr-email" class="cdr-input" type="email" placeholder="nombre@empresa.com" autocomplete="off">
+          </div>
+          <div class="cdr-field">
+            <div class="cdr-lbl">Estado del correo</div>
+            <select id="ctdr-estadoCorreo" class="cdr-select">
+              <option value="sin_comprobar">🟡 Sin comprobar</option>
+              <option value="funcional">🟢 Funcional</option>
+              <option value="rebotado">🔴 Rebotado</option>
+            </select>
+          </div>
+        </div>
+        <div class="cdr-row">
+          <div class="cdr-field">
+            <div class="cdr-lbl">Teléfono</div>
+            <input id="ctdr-telefono" class="cdr-input" type="tel" placeholder="+54 11...">
+          </div>
+          <div class="cdr-field">
+            <div class="cdr-lbl">Interno</div>
+            <input id="ctdr-interno" class="cdr-input" type="text" placeholder="Ej: 2405">
+          </div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">LinkedIn</div>
+          <input id="ctdr-linkedin" class="cdr-input" type="url" placeholder="https://linkedin.com/in/...">
+        </div>
+      </div>
+
+      <!-- 3 · Perfil Comercial -->
+      <div class="cdr-section">
+        <div class="cdr-section-hd">
+          <div class="cdr-section-num">3</div>
+          <div class="cdr-section-name">Perfil Comercial</div>
+          <div class="cdr-section-line"></div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Inversor</div>
+          <div class="cdr-toggle-group">
+            <button type="button" class="cdr-toggle-btn" data-field="ctdrInversor" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
+            <button type="button" class="cdr-toggle-btn active" data-field="ctdrInversor" data-value="No" data-default onclick="cdrToggle(this)">No</button>
+          </div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Preferencia de inversión (multiselección)</div>
+          <div class="cdr-toggle-group" id="ctdr-prefs">
+            <button type="button" class="cto-pref-chip" data-pref="Oficinas" onclick="ctdrTogglePref(this)">Oficinas</button>
+            <button type="button" class="cto-pref-chip" data-pref="Industrial" onclick="ctdrTogglePref(this)">Industrial</button>
+            <button type="button" class="cto-pref-chip" data-pref="Retail" onclick="ctdrTogglePref(this)">Retail</button>
+            <button type="button" class="cto-pref-chip" data-pref="Logística" onclick="ctdrTogglePref(this)">Logística</button>
+            <button type="button" class="cto-pref-chip" data-pref="Terrenos" onclick="ctdrTogglePref(this)">Terrenos</button>
+            <button type="button" class="cto-pref-chip" data-pref="Residencial" onclick="ctdrTogglePref(this)">Residencial</button>
+            <button type="button" class="cto-pref-chip" data-pref="Hotelería" onclick="ctdrTogglePref(this)">Hotelería</button>
+          </div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Volumen de inversión</div>
+          <select id="ctdr-volumen" class="cdr-select">
+            <option value="">Sin información</option>
+            <option>Menos de USD 1M</option>
+            <option>USD 1M - 5M</option>
+            <option>USD 5M - 10M</option>
+            <option>USD 10M - 25M</option>
+            <option>USD 25M - 50M</option>
+            <option>Más de USD 50M</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 4 · Comentarios -->
+      <div class="cdr-section">
+        <div class="cdr-section-hd">
+          <div class="cdr-section-num">4</div>
+          <div class="cdr-section-name">Comentarios</div>
+          <div class="cdr-section-line"></div>
+        </div>
+        <div class="cdr-field">
+          <textarea id="ctdr-comentarios" class="cdr-input" rows="3" placeholder="Observaciones, contexto comercial..." style="resize:vertical;min-height:72px;line-height:1.5"></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="cdr-footer">
+      <button class="cdr-cancel" onclick="closeContactoDrawer()">Cancelar</button>
+      <button class="cdr-save" id="ctdr-save-btn" onclick="saveContactoDrawer()">Crear contacto</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- BUILDINGS ADMIN -->
@@ -3720,7 +3936,19 @@ function clearAcCliente(){
 }
 
 // ===== CRM =====
-let _crmDocs=[];
+let _crmDocs=[], _crmActiveTab='cuentas';
+
+function switchCRMTab(tab){
+  _crmActiveTab=tab;
+  ['cuentas','contactos','leads'].forEach(t=>{
+    const btn=document.getElementById('crm-snav-'+t);
+    if(btn)btn.classList.toggle('active',t===tab);
+    const sec=document.getElementById('crm-'+t+'-section');
+    if(sec)sec.style.display=t===tab?'flex':'none';
+  });
+  if(tab==='cuentas'&&!_crmDocs.length)loadCRM();
+  if(tab==='contactos')loadContactos();
+}
 
 const ESTADO_COLORS={
   'Activo'     :{bg:'rgba(28,84,244,.1)',   border:'rgba(28,84,244,.3)',   text:'#1C54F4'},
@@ -3740,7 +3968,7 @@ window.toggleCRM=()=>{
   const panel=document.getElementById('crm-panel');
   const open=panel.style.display==='none'||!panel.style.display;
   panel.style.display=open?'block':'none';
-  if(open)loadCRM();
+  if(open){switchCRMTab('cuentas');}
 };
 
 async function loadCRM(){
@@ -3749,7 +3977,7 @@ async function loadCRM(){
   try{
     const snap=await db.collection('clientes').orderBy('ultimaActividad','desc').get();
     _crmDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
-    document.getElementById('crm-subtitle').textContent=`${_crmDocs.length} cliente${_crmDocs.length!==1?'s':''} registrados`;
+    document.getElementById('crm-subtitle').textContent=`${_crmDocs.length} cuenta${_crmDocs.length!==1?'s':''} registradas`;
     const brokers=[...new Set(_crmDocs.map(d=>d.broker).filter(Boolean))].sort();
     const sel=document.getElementById('crm-filter-broker');
     sel.innerHTML='<option value="">Todos los brokers</option>'+brokers.map(b=>`<option value="${b}">${b}</option>`).join('');
@@ -3806,7 +4034,7 @@ function renderCRMKPIs(docs){
   const totalPPTs=docs.reduce((s,d)=>s+(d.cantidadPPTs||0),0);
   const negociacion=docs.filter(d=>d.estado==='Negociación').length;
   row.innerHTML=`
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">👥</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Clientes totales</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🏢</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Cuentas totales</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${activos}</div><div class="crm-kpi-l">Activos</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">📄</div><div class="crm-kpi-data"><div class="crm-kpi-v">${totalPPTs}</div><div class="crm-kpi-l">PPTs generados</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FFF7EC">🤝</div><div class="crm-kpi-data"><div class="crm-kpi-v">${negociacion}</div><div class="crm-kpi-l">En negociación</div></div></div>
@@ -3821,7 +4049,7 @@ function renderCRMTable(docs){
   renderCRMKPIs(_crmDocs);
   const wrap=document.getElementById('crm-table-wrap');
   if(!docs.length){
-    wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin clientes registrados.</div>';
+    wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin cuentas registradas.</div>';
     return;
   }
   let h='<table class="crm-table"><thead><tr>';
@@ -3888,6 +4116,7 @@ function openClientDetail(docId){
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-ppts')">PPTs generados</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-alt')">Alternativas enviadas</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-notas')">Notas</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-contactos');loadCuentaContactos('${docId}')">Contactos</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-timeline');loadClientTimeline('${docId}')">Timeline</button>
     </div>
     <div class="crm-det-tab-body">
@@ -3967,6 +4196,9 @@ function openClientDetail(docId){
       <div id="crm-dt-timeline" style="display:none">
         <div id="crm-timeline-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Cargando timeline...</div></div></div>
       </div>
+      <div id="crm-dt-contactos" style="display:none">
+        <div id="crm-dt-contactos-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Cargando contactos...</div></div></div>
+      </div>
     </div>
   `;
   // Switch views
@@ -3981,6 +4213,307 @@ window.closeCRMDetail=()=>{
   const lv=document.getElementById('crm-list-view');
   lv.style.display='flex';
   lv.style.flexDirection='column';
+  lv.style.flex='1';
+  lv.style.overflow='hidden';
+};
+
+// ===== CONTACTOS =====
+let _ctoDocs=[];
+
+async function loadContactos(){
+  if(!db){document.getElementById('cto-table-wrap').innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
+  document.getElementById('cto-table-wrap').innerHTML='<div class="crm-empty">Cargando...</div>';
+  try{
+    const snap=await db.collection('contactos').orderBy('ultimaActividad','desc').get();
+    _ctoDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    document.getElementById('cto-subtitle').textContent=`${_ctoDocs.length} contacto${_ctoDocs.length!==1?'s':''} registrados`;
+    filterContactos();
+  }catch(e){
+    console.error('Contactos load error:',e);
+    document.getElementById('cto-table-wrap').innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
+  }
+}
+
+function filterContactos(){
+  const q=(document.getElementById('cto-search')?.value||'').toLowerCase();
+  const cargo=document.getElementById('cto-filter-cargo')?.value||'';
+  const emailF=document.getElementById('cto-filter-email')?.value||'';
+  const filtered=_ctoDocs.filter(d=>{
+    const fullname=((d.nombre||'')+' '+(d.apellidos||'')).toLowerCase();
+    if(q&&!fullname.includes(q)&&!(d.email||'').toLowerCase().includes(q)&&!(d.cuentaNombre||'').toLowerCase().includes(q))return false;
+    if(cargo&&d.cargo!==cargo)return false;
+    if(emailF&&d.estadoCorreo!==emailF)return false;
+    return true;
+  });
+  renderContactosTable(filtered);
+}
+
+function renderContactosKPIs(docs){
+  const row=document.getElementById('cto-kpi-row');
+  if(!row)return;
+  const total=docs.length;
+  const funcionales=docs.filter(d=>d.estadoCorreo==='funcional').length;
+  const rebotados=docs.filter(d=>d.estadoCorreo==='rebotado').length;
+  const inversores=docs.filter(d=>d.inversor==='Sí').length;
+  row.innerHTML=`
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">👤</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Contactos totales</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">🟢</div><div class="crm-kpi-data"><div class="crm-kpi-v">${funcionales}</div><div class="crm-kpi-l">Emails funcionales</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FEF2F2">🔴</div><div class="crm-kpi-data"><div class="crm-kpi-v">${rebotados}</div><div class="crm-kpi-l">Emails rebotados</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FFF7EC">💼</div><div class="crm-kpi-data"><div class="crm-kpi-v">${inversores}</div><div class="crm-kpi-l">Inversores</div></div></div>
+  `;
+}
+
+function emailBadge(estado){
+  const map={funcional:'🟢 Funcional',sin_comprobar:'🟡 Sin comprobar',rebotado:'🔴 Rebotado'};
+  const cls=estado||'sin_comprobar';
+  return`<span class="email-badge ${cls}">${map[cls]||'🟡 Sin comprobar'}</span>`;
+}
+
+function renderContactosTable(docs){
+  renderContactosKPIs(_ctoDocs);
+  const wrap=document.getElementById('cto-table-wrap');
+  if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin contactos registrados.</div>';return;}
+  let h='<table class="crm-table"><thead><tr>';
+  ['Contacto','Cargo','Cuenta','Email','Estado correo',''].forEach(col=>h+=`<th>${col}</th>`);
+  h+='</tr></thead><tbody>';
+  docs.forEach(d=>{
+    const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
+    const bg=crmAvatarBg(fullname);
+    const ini=crmInitials(fullname);
+    h+=`<tr onclick="openContactoDetail('${d._id}')">
+      <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${bg}">${ini}</div><div><div class="crm-client-name">${fullname}</div><div class="crm-client-sub">${d.puesto||d.cargo||'–'}</div></div></div></td>
+      <td><div class="crm-broker-cell">${d.cargo||'–'}</div></td>
+      <td><div class="crm-broker-cell">${d.cuentaNombre||'–'}</div></td>
+      <td class="crm-date">${d.email||'–'}</td>
+      <td>${emailBadge(d.estadoCorreo)}</td>
+      <td><button class="crm-action-btn" onclick="event.stopPropagation();openContactoDetail('${d._id}')">Ver ficha →</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
+}
+
+function openContactoDetail(docId){
+  const d=_ctoDocs.find(x=>x._id===docId);
+  if(!d)return;
+  const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
+  const bg=crmAvatarBg(fullname);
+  const ini=crmInitials(fullname);
+  const prefs=(d.prefsInversion||[]).map(p=>`<span class="crm-tag">${p}</span>`).join('')||'–';
+  document.getElementById('cto-det-left').innerHTML=`
+    <div class="crm-det-av-wrap">
+      <div class="crm-det-av" style="background:${bg};border-radius:50%">${ini}</div>
+      <div class="crm-det-av-name">${fullname}</div>
+      <div class="crm-det-av-email">${d.cargo||''}${d.puesto?' · '+d.puesto:''}</div>
+    </div>
+    ${d.cuentaNombre?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta</div><div class="crm-det-meta-val" style="color:#1C54F4;cursor:pointer" onclick="openClientDetail('${d.cuentaId||''}')">${d.cuentaNombre}</div></div>`:''}
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado correo</div>${emailBadge(d.estadoCorreo)}</div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker responsable</div><div class="crm-det-meta-val">${d.brokerResponsable||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
+  `;
+  document.getElementById('cto-det-right').innerHTML=`
+    <div class="crm-det-tabs">
+      <button class="crm-det-tab active" onclick="ctoDetTab(this,'cto-dt-info')">Información</button>
+      <button class="crm-det-tab" onclick="ctoDetTab(this,'cto-dt-comercial')">Perfil Comercial</button>
+    </div>
+    <div class="crm-det-tab-body">
+      <div id="cto-dt-info">
+        <div style="display:flex;flex-direction:column;gap:1.2rem">
+          <div>
+            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Datos de Contacto</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado correo</div>${emailBadge(d.estadoCorreo)}</div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Interno</div><div class="crm-det-meta-val">${d.interno||'–'}</div></div>
+              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">LinkedIn</div><div class="crm-det-meta-val">${d.linkedin?`<a href="${d.linkedin}" target="_blank" rel="noopener" style="color:#1C54F4">${d.linkedin}</a>`:'–'}</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Datos Personales</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cargo segmentado</div><div class="crm-det-meta-val">${d.cargo||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Puesto</div><div class="crm-det-meta-val">${d.puesto||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario</div><div class="crm-det-meta-val">${d.propietario||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta asociada</div><div class="crm-det-meta-val">${d.cuentaNombre||'–'}</div></div>
+            </div>
+          </div>
+          ${d.comentarios?`<div><div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.65;white-space:pre-wrap">${d.comentarios}</div></div>`:''}
+        </div>
+      </div>
+      <div id="cto-dt-comercial" style="display:none">
+        <div style="display:flex;flex-direction:column;gap:1.2rem">
+          <div>
+            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Perfil de Inversión</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inversor</div><div class="crm-det-meta-val">${d.inversor||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Volumen</div><div class="crm-det-meta-val">${d.volumenInversion||'Sin información'}</div></div>
+              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">Preferencias</div><div class="crm-tags" style="margin-top:.3rem">${prefs}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('cto-list-view').style.display='none';
+  const dv=document.getElementById('cto-detail-view');
+  dv.style.display='flex';
+  dv.style.flexDirection='column';
+}
+
+window.closeContactoDetail=()=>{
+  document.getElementById('cto-detail-view').style.display='none';
+  const lv=document.getElementById('cto-list-view');
+  lv.style.display='flex';
+  lv.style.flexDirection='column';
+};
+
+function ctoDetTab(el,tabId){
+  const right=document.getElementById('cto-det-right');
+  if(!right)return;
+  right.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  right.querySelectorAll('[id^="cto-dt-"]').forEach(p=>p.style.display='none');
+  const target=right.querySelector('#'+tabId);
+  if(target)target.style.display='';
+}
+
+async function loadCuentaContactos(cuentaId){
+  const body=document.getElementById('crm-dt-contactos-body');
+  if(!body)return;
+  body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Cargando...</div></div>';
+  try{
+    const snap=await db.collection('contactos').where('cuentaId','==',cuentaId).get();
+    const docs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    if(!docs.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Sin contactos vinculados</div><div class="crm-det-placeholder-sub">Podés crear un contacto vinculado a esta cuenta desde la sección Contactos.</div></div>';return;}
+    let h=`<div style="display:flex;flex-direction:column;gap:.5rem;padding:.25rem 0">`;
+    docs.forEach(d=>{
+      const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
+      const bg=crmAvatarBg(fullname);
+      const ini=crmInitials(fullname);
+      h+=`<div style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;background:#F8FAFF;border-radius:9px;cursor:pointer;transition:background .12s" onclick="switchCRMTab('contactos');setTimeout(()=>openContactoDetail('${d._id}'),50)" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background='#F8FAFF'">
+        <div class="crm-avatar" style="background:${bg};border-radius:50%;width:32px;height:32px;font-size:11px;flex-shrink:0">${ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:#0A1B4D">${fullname}</div>
+          <div style="font-size:10px;color:#8A9AC0">${d.cargo||''}${d.puesto?' · '+d.puesto:''}</div>
+        </div>
+        ${emailBadge(d.estadoCorreo)}
+      </div>`;
+    });
+    h+='</div>';
+    body.innerHTML=h;
+  }catch(e){
+    body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
+  }
+}
+
+// ===== CONTACTO DRAWER =====
+let _ctdrAccountSelected=false;
+
+window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
+  _ctdrAccountSelected=false;
+  // Reset all fields
+  ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-interno','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ctdr-cargo','ctdr-estadoCorreo','ctdr-volumen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
+  document.getElementById('ctdr-cuentaId').value='';
+  document.getElementById('ctdr-cuentaNombre').value='';
+  document.getElementById('ctdr-comentarios').value='';
+  // Reset toggles
+  document.querySelectorAll('#ctdr-drawer .cdr-toggle-btn[data-default]').forEach(btn=>{
+    const field=btn.dataset.field;
+    document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+  // Reset pref chips
+  document.querySelectorAll('#ctdr-prefs .cto-pref-chip').forEach(c=>c.classList.remove('active'));
+  // Prefill cuenta if provided
+  if(prefillCuentaId&&prefillCuentaNombre){
+    document.getElementById('ctdr-cuentaId').value=prefillCuentaId;
+    document.getElementById('ctdr-cuentaNombre').value=prefillCuentaNombre;
+    document.getElementById('ctdr-cuenta-q').value=prefillCuentaNombre;
+    _ctdrAccountSelected=true;
+  }
+  const btn=document.getElementById('ctdr-save-btn');
+  btn.textContent='Crear contacto';btn.disabled=false;
+  document.getElementById('ctdr-overlay').classList.add('open');
+  document.getElementById('ctdr-drawer').classList.add('open');
+  setTimeout(()=>document.getElementById('ctdr-nombre').focus(),60);
+};
+
+window.closeContactoDrawer=function(){
+  document.getElementById('ctdr-overlay').classList.remove('open');
+  document.getElementById('ctdr-drawer').classList.remove('open');
+  document.getElementById('ctdr-cuenta-list').style.display='none';
+};
+
+window.ctdrCuentaSearch=function(q){
+  const list=document.getElementById('ctdr-cuenta-list');
+  const lq=q.toLowerCase().trim();
+  if(!lq){list.style.display='none';return;}
+  const matches=_crmDocs.filter(d=>(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
+  if(!matches.length){list.innerHTML='<div style="padding:10px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
+  list.innerHTML=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onclick="ctdrSelectCuenta('${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')"> ${d.nombre}</div>`).join('');
+  list.style.display='block';
+};
+
+window.ctdrSelectCuenta=function(id,nombre){
+  document.getElementById('ctdr-cuentaId').value=id;
+  document.getElementById('ctdr-cuentaNombre').value=nombre;
+  document.getElementById('ctdr-cuenta-q').value=nombre;
+  document.getElementById('ctdr-cuenta-list').style.display='none';
+  _ctdrAccountSelected=true;
+};
+
+window.ctdrTogglePref=function(btn){btn.classList.toggle('active');};
+
+window.saveContactoDrawer=async function(){
+  const nombre=(document.getElementById('ctdr-nombre').value||'').trim();
+  const apellidos=(document.getElementById('ctdr-apellidos').value||'').trim();
+  const cargo=document.getElementById('ctdr-cargo').value||'';
+  const email=(document.getElementById('ctdr-email').value||'').trim();
+  let valid=true;
+  if(!nombre){document.getElementById('ctdr-nombre').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-nombre').style.borderColor='';}
+  if(!apellidos){document.getElementById('ctdr-apellidos').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-apellidos').style.borderColor='';}
+  if(!cargo){document.getElementById('ctdr-cargo').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-cargo').style.borderColor='';}
+  if(!email){document.getElementById('ctdr-email').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-email').style.borderColor='';}
+  if(!valid)return;
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('ctdr-save-btn');
+  btn.textContent='Guardando...';btn.disabled=true;
+  try{
+    const prefs=[...document.querySelectorAll('#ctdr-prefs .cto-pref-chip.active')].map(c=>c.dataset.pref);
+    const now=firebase.firestore.Timestamp.now();
+    const data={
+      cuentaId:document.getElementById('ctdr-cuentaId').value||'',
+      cuentaNombre:document.getElementById('ctdr-cuentaNombre').value||'',
+      nombre,apellidos,
+      cargo,
+      puesto:(document.getElementById('ctdr-puesto').value||'').trim(),
+      propietario:cdrToggleVal('ctdrPropietario')||'No',
+      email,
+      estadoCorreo:document.getElementById('ctdr-estadoCorreo').value||'sin_comprobar',
+      telefono:(document.getElementById('ctdr-telefono').value||'').trim(),
+      interno:(document.getElementById('ctdr-interno').value||'').trim(),
+      linkedin:(document.getElementById('ctdr-linkedin').value||'').trim(),
+      inversor:cdrToggleVal('ctdrInversor')||'No',
+      prefsInversion:prefs,
+      volumenInversion:document.getElementById('ctdr-volumen').value||'',
+      comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
+      brokerResponsable:user?.displayName||user?.email||'',
+      fechaCreacion:now,
+      ultimoContacto:now,
+      ultimaActividad:now,
+    };
+    await db.collection('contactos').add(data);
+    _ctoDocs=[];
+    closeContactoDrawer();
+    if(_crmActiveTab==='contactos')await loadContactos();
+  }catch(e){
+    alert('Error al crear contacto: '+e.message);
+    btn.textContent='Crear contacto';btn.disabled=false;
+  }
 };
 
 /* ===== CLIENT DRAWER ===== */
