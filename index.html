@@ -7726,6 +7726,12 @@ function renderAnDemandMap(docs){
 
   if(!mapEl||typeof L==='undefined'){console.warn('[MAP] Abortando final: mapEl=',!!mapEl,'L=',typeof L);return;}
 
+  // DEBUG: make card visible
+  const dbgCard=document.getElementById('an-map-card');
+  if(dbgCard){dbgCard.style.border='4px solid red';dbgCard.style.background='#ffe0e0';}
+  mapEl.style.border='3px solid blue';mapEl.style.minHeight='400px';
+  console.log('[MAP] estilos debug aplicados al card y container');
+
   // Inicializar o limpiar mapa
   try{
     if(!window._anDemandMap){
