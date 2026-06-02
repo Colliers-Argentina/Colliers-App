@@ -830,6 +830,43 @@ body.dark .crm-inv-table td{color:#C3E6FF;border-bottom-color:rgba(255,255,255,.
 body.dark .crm-inv-table tr:hover td{background:rgba(255,255,255,.03)}
 body.dark .crm-inv-nav-btn{border-color:rgba(77,147,255,.3);color:#4D93FF}
 body.dark .crm-inv-nav-btn:hover{background:rgba(77,147,255,.08)}
+/* CRM Links migration modal */
+#crm-links-overlay{display:none;position:fixed;inset:0;background:rgba(0,7,89,.45);backdrop-filter:blur(4px);z-index:8000;align-items:center;justify-content:center}
+#crm-links-modal{background:#fff;border-radius:16px;width:min(900px,96vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,7,89,.3);overflow:hidden}
+body.dark #crm-links-modal{background:#0A1035;border:1px solid rgba(255,255,255,.08)}
+.crm-links-hd{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.5rem;border-bottom:1px solid #EEF3FF;flex-shrink:0}
+body.dark .crm-links-hd{border-bottom-color:rgba(255,255,255,.08)}
+.crm-links-title{font-size:15px;font-weight:700;color:#0A1B4D}
+body.dark .crm-links-title{color:#E8EEFF}
+.crm-links-close{background:none;border:none;font-size:16px;cursor:pointer;color:#7B8BBD;padding:4px 8px;border-radius:6px}
+.crm-links-close:hover{background:#EEF3FF}
+.crm-links-body{flex:1;overflow-y:auto;padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem}
+.crm-links-stats{display:flex;gap:.75rem;flex-wrap:wrap}
+.crm-links-stat{flex:1;min-width:130px;padding:.75rem 1rem;border-radius:10px;border:1.5px solid}
+.crm-links-stat-ok{background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.25)}
+.crm-links-stat-warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.3)}
+.crm-links-stat-err{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25)}
+.crm-links-stat-v{font-size:22px;font-weight:700;line-height:1}
+.crm-links-stat-ok .crm-links-stat-v{color:#16A34A}
+.crm-links-stat-warn .crm-links-stat-v{color:#D97706}
+.crm-links-stat-err .crm-links-stat-v{color:#DC2626}
+.crm-links-stat-l{font-size:11px;color:#56648F;margin-top:.3rem}
+body.dark .crm-links-stat-l{color:#8A9AC0}
+.crm-links-section-title{font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
+.crm-links-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.crm-links-tbl th{background:#F0F4FF;color:#56648F;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;text-align:left;border-bottom:2px solid #DBE5FF;white-space:nowrap}
+.crm-links-tbl td{padding:6px 8px;color:#0A1B4D;border-bottom:1px solid #EEF3FF;vertical-align:middle}
+.crm-links-tbl tr:last-child td{border-bottom:none}
+.crm-links-tbl tr:hover td{background:#F8FAFF}
+body.dark .crm-links-tbl th{background:rgba(28,84,244,.1);color:#6B7FA3;border-bottom-color:rgba(255,255,255,.08)}
+body.dark .crm-links-tbl td{color:#C3E6FF;border-bottom-color:rgba(255,255,255,.05)}
+body.dark .crm-links-tbl tr:hover td{background:rgba(255,255,255,.03)}
+.crm-links-ft{padding:.85rem 1.5rem;border-top:1px solid #EEF3FF;flex-shrink:0;display:flex;align-items:center;gap:.75rem;background:#FAFCFF;flex-wrap:wrap}
+body.dark .crm-links-ft{border-top-color:rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
+.crm-links-fix-btn{background:#1C54F4;color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:700;padding:.55rem 1.25rem;border-radius:9px;cursor:pointer;transition:background .15s}
+.crm-links-fix-btn:hover{background:#1645D4}
+.crm-links-fix-btn:disabled{background:#A0AEC0;cursor:not-allowed}
+.crm-links-note{font-size:11.5px;color:#7B8BBD;flex:1}
 .be-ac-item{padding:8px 11px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s}
 .be-ac-item:hover{background:#EEF3FF}
 body.dark .be-ac-item{color:#C3E6FF;border-bottom-color:rgba(255,255,255,.06)}
@@ -2458,6 +2495,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
               <button class="bld-view-btn" id="bld-view-map-btn" onclick="toggleBldView('map')">🗺 Mapa</button>
             </div>
             <button class="bld-btn bld-btn-primary" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
+            <button id="bld-crm-links-btn" class="bld-btn" style="display:none" onclick="openCrmLinksModal()">🔗 CRM Links</button>
             <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
             <button onclick="showModule('home')" class="bld-close-btn">✕ Cerrar</button>
           </div>
@@ -5870,6 +5908,142 @@ document.addEventListener('click',function(e){
   if(drop&&!drop.contains(e.target)&&!e.target.classList.contains('du-ac-inp'))drop.style.display='none';
 });
 
+/* ===== CRM LINKS MIGRATION ===== */
+let _crmLinksData=null;
+
+async function openCrmLinksModal(){
+  const overlay=document.getElementById('crm-links-overlay');
+  if(!overlay)return;
+  overlay.style.display='flex';
+  _crmLinksData=null;
+  document.getElementById('crm-links-fix-btn').disabled=true;
+  document.getElementById('crm-links-note').textContent='Escaneando disponibilidades...';
+  document.getElementById('crm-links-body').innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-title">Cargando diagnóstico...</div></div>';
+  try{
+    await _loadBldDocsIfNeeded();
+    if(!_crmDocs.length){
+      const s=await db.collection('clientes').orderBy('ultimaActividad','desc').get();
+      _crmDocs=s.docs.map(d=>({...d.data(),_id:d.id}));
+    }
+    if(!_ctoDocs.length){
+      const s=await db.collection('contactos').orderBy('ultimaActividad','desc').get();
+      _ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));
+    }
+    const linked=[],autoFix=[],conflicts=[],noMatch=[];
+    await Promise.all(_bldDocs.map(async bld=>{
+      const snap=await db.collection('buildings').doc(bld._id).collection('units').get();
+      snap.docs.forEach(d=>{
+        const u={...d.data(),_id:d.id,_bldId:bld._id,_bldNombre:bld.nombre||bld._id};
+        const checks=[
+          {field:'ocupante',textVal:u.ocupante,hasId:!!(u.occupierAccountId||u.occupierContactId),idField:'occupierAccountId',nameField:'occupierAccountName',role:'occ'},
+          {field:'propietario',textVal:u.propietario,hasId:!!(u.ownerAccountId||u.ownerContactId),idField:'ownerAccountId',nameField:'ownerAccountName',role:'own'},
+        ];
+        checks.forEach(c=>{
+          if(!c.textVal)return;
+          if(c.hasId){linked.push({...u,_campo:c.field,_texto:c.textVal});return;}
+          const q=c.textVal.trim().toLowerCase();
+          const matches=_crmDocs.filter(x=>(x.nombre||'').trim().toLowerCase()===q);
+          if(matches.length===1){
+            autoFix.push({...u,_campo:c.field,_texto:c.textVal,_idField:c.idField,_nameField:c.nameField,_role:c.role,_matchId:matches[0]._id,_matchNombre:matches[0].nombre});
+          } else if(matches.length>1){
+            conflicts.push({...u,_campo:c.field,_texto:c.textVal,_matches:matches});
+          } else {
+            noMatch.push({...u,_campo:c.field,_texto:c.textVal});
+          }
+        });
+      });
+    }));
+    _crmLinksData={linked,autoFix,conflicts,noMatch};
+    _renderCrmLinksBody();
+  }catch(e){
+    document.getElementById('crm-links-body').innerHTML=`<div class="crm-det-placeholder"><div class="crm-det-placeholder-title">Error: ${e.message}</div></div>`;
+  }
+}
+
+function _renderCrmLinksBody(){
+  if(!_crmLinksData)return;
+  const {linked,autoFix,conflicts,noMatch}=_crmLinksData;
+  const body=document.getElementById('crm-links-body');
+  let html=`<div class="crm-links-stats">
+    <div class="crm-links-stat crm-links-stat-ok"><div class="crm-links-stat-v">${linked.length}</div><div class="crm-links-stat-l">Vinculadas correctamente</div></div>
+    <div class="crm-links-stat crm-links-stat-warn"><div class="crm-links-stat-v">${autoFix.length}</div><div class="crm-links-stat-l">Corregibles automáticamente</div></div>
+    <div class="crm-links-stat crm-links-stat-err"><div class="crm-links-stat-v">${conflicts.length}</div><div class="crm-links-stat-l">Con conflictos (revisión manual)</div></div>
+    <div class="crm-links-stat crm-links-stat-err"><div class="crm-links-stat-v">${noMatch.length}</div><div class="crm-links-stat-l">Sin coincidencia</div></div>
+  </div>`;
+  if(autoFix.length){
+    html+=`<div><div class="crm-links-section-title">⚡ Corregibles automáticamente (${autoFix.length})</div><div style="overflow-x:auto"><table class="crm-links-tbl"><thead><tr><th>Edificio</th><th>Piso</th><th>Unidad</th><th>Campo</th><th>Texto actual</th><th>Cuenta encontrada</th></tr></thead><tbody>`;
+    autoFix.forEach(u=>{
+      html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td><span class="crm-inv-badge ${u._role==='occ'?'crm-inv-badge-occ':'crm-inv-badge-own'}">${u._campo}</span></td><td>${esc(u._texto)}</td><td style="color:#16A34A;font-weight:600">${esc(u._matchNombre)}</td></tr>`;
+    });
+    html+='</tbody></table></div></div>';
+  }
+  if(conflicts.length){
+    html+=`<div><div class="crm-links-section-title">⚠️ Conflictos — múltiples coincidencias (${conflicts.length})</div><div style="overflow-x:auto"><table class="crm-links-tbl"><thead><tr><th>Edificio</th><th>Piso</th><th>Unidad</th><th>Campo</th><th>Texto</th><th>Coincidencias</th></tr></thead><tbody>`;
+    conflicts.forEach(u=>{
+      html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td><span class="crm-inv-badge crm-inv-badge-own">${u._campo}</span></td><td>${esc(u._texto)}</td><td style="color:#D97706">${u._matches.map(m=>esc(m.nombre)).join(', ')}</td></tr>`;
+    });
+    html+='</tbody></table></div></div>';
+  }
+  if(noMatch.length){
+    html+=`<div><div class="crm-links-section-title">❌ Sin coincidencia en Cuentas (${noMatch.length})</div><div style="overflow-x:auto"><table class="crm-links-tbl"><thead><tr><th>Edificio</th><th>Piso</th><th>Unidad</th><th>Campo</th><th>Texto</th></tr></thead><tbody>`;
+    noMatch.forEach(u=>{
+      html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td>${esc(u._campo)}</td><td>${esc(u._texto)}</td></tr>`;
+    });
+    html+='</tbody></table></div></div>';
+  }
+  if(!autoFix.length&&!conflicts.length&&!noMatch.length&&linked.length){
+    html+=`<div style="text-align:center;padding:2rem;color:#16A34A;font-weight:700;font-size:14px">✅ Todas las disponibilidades con texto tienen ID CRM correcto</div>`;
+  }
+  body.innerHTML=html;
+  const fixBtn=document.getElementById('crm-links-fix-btn');
+  const note=document.getElementById('crm-links-note');
+  if(autoFix.length){
+    fixBtn.disabled=false;
+    note.textContent=`${autoFix.length} disponibilidad${autoFix.length!==1?'es':''} con coincidencia única — listas para corregir automáticamente.`;
+  } else {
+    fixBtn.disabled=true;
+    note.textContent=conflicts.length||noMatch.length?'No hay correcciones automáticas disponibles. Revisar manualmente los conflictos y sin coincidencia.':'Todo correcto.';
+  }
+}
+
+async function runCrmAutoFix(){
+  if(!_crmLinksData?.autoFix?.length)return;
+  const btn=document.getElementById('crm-links-fix-btn');
+  const note=document.getElementById('crm-links-note');
+  btn.disabled=true;
+  btn.textContent='Corrigiendo...';
+  const {autoFix}=_crmLinksData;
+  let fixed=0,errors=0;
+  await Promise.all(autoFix.map(async u=>{
+    try{
+      const update={updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+      if(u._role==='occ'){
+        update.ocupante=u._matchNombre;
+        update.occupierAccountId=u._matchId;
+        update.occupierAccountName=u._matchNombre;
+        update.occupierContactId='';
+        update.occupierContactName='';
+      } else {
+        update.propietario=u._matchNombre;
+        update.ownerAccountId=u._matchId;
+        update.ownerAccountName=u._matchNombre;
+        update.ownerContactId='';
+        update.ownerContactName='';
+      }
+      await db.collection('buildings').doc(u._bldId).collection('units').doc(u._id).update(update);
+      fixed++;
+    }catch(e){errors++;}
+  }));
+  note.textContent=`✅ ${fixed} corregidas${errors?` · ❌ ${errors} errores`:''}. Recargando diagnóstico...`;
+  btn.textContent='⚡ Corregir automáticamente';
+  await openCrmLinksModal();
+}
+
+function closeCrmLinksModal(){
+  const overlay=document.getElementById('crm-links-overlay');
+  if(overlay)overlay.style.display='none';
+}
+
 window.duAcDebug={
   get crmDocs(){return _crmDocs;},
   get ctoDocs(){return _ctoDocs;},
@@ -6023,6 +6197,7 @@ async function loadBuildings(){
     populateBldZonaFilter();
     filterBuildings();
     if(window._pendingBldOpen){const id=window._pendingBldOpen;window._pendingBldOpen=null;setTimeout(()=>openBuildingEditor(id),60);}
+    const _clBtn=document.getElementById('bld-crm-links-btn');if(_clBtn)_clBtn.style.display=ANALYTICS_ALLOWED.includes(user?.email)?'':'none';
   }catch(e){
     document.getElementById('bld-table-wrap').innerHTML=`<div class="bld-empty">Error: ${e.message}</div>`;
     document.getElementById('bld-subtitle').textContent='Error al cargar';
@@ -7522,6 +7697,23 @@ if(localStorage.getItem('colliers-theme')==='dark'){
 </script>
 <!-- UNIT CRM AUTOCOMPLETE DROPDOWN — outside all panels so position:fixed works from any module -->
 <div id="du-ac-dropdown"></div>
+
+<!-- CRM LINKS MIGRATION MODAL -->
+<div id="crm-links-overlay" onclick="if(event.target===this)closeCrmLinksModal()">
+  <div id="crm-links-modal">
+    <div class="crm-links-hd">
+      <div class="crm-links-title">🔗 CRM Links — Diagnóstico y Migración</div>
+      <button class="crm-links-close" onclick="closeCrmLinksModal()">✕</button>
+    </div>
+    <div class="crm-links-body" id="crm-links-body">
+      <div class="crm-det-placeholder"><div class="crm-det-placeholder-title">Cargando diagnóstico...</div></div>
+    </div>
+    <div class="crm-links-ft">
+      <button class="crm-links-fix-btn" id="crm-links-fix-btn" onclick="runCrmAutoFix()" disabled>⚡ Corregir automáticamente</button>
+      <div class="crm-links-note" id="crm-links-note">Escaneando disponibilidades...</div>
+    </div>
+  </div>
+</div>
 </body>
 
 </html>
