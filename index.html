@@ -1984,7 +1984,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
               <option>Llamado</option><option>Mail</option><option>Otro</option>
             </select>
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Broker asignado</div><input id="ldr-broker" class="cdr-input" type="text" placeholder="Nombre del broker"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Broker asignado <span class="cdr-req">*</span></div><select id="ldr-broker" class="cdr-select"><option value="">— Seleccionar —</option><option>Matienzo</option><option>Bartra</option><option>Farola</option><option>Troncoso</option><option>Giancontieri</option><option>Zuliani</option></select></div>
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Inmueble consultado</div>
@@ -5015,14 +5015,22 @@ async function loadLeadTimeline(docId){
 // LEAD DRAWER
 window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
   ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-bld-q','ldr-comentarios'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['ldr-tipoInmueble','ldr-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ldr-tipoInmueble','ldr-origen','ldr-broker'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ldr-buildingId').value='';
   document.getElementById('ldr-buildingName').value='';
-  document.getElementById('ldr-broker').value=prefillBroker||user?.displayName||'';
   if(prefillBuildingId){
     document.getElementById('ldr-buildingId').value=prefillBuildingId;
     document.getElementById('ldr-buildingName').value=prefillBuildingName||'';
     document.getElementById('ldr-bld-q').value=prefillBuildingName||'';
+  }
+  const brokerSel=document.getElementById('ldr-broker');
+  if(prefillBroker){
+    brokerSel.value=prefillBroker;
+  } else if(prefillBuildingId){
+    const bld=(_bldDocs.length?_bldDocs:masterBuildings).find(d=>(d._id||d.id)===prefillBuildingId);
+    const bBroker=bld?.brokerAsignado||'';
+    const validBrokers=['Matienzo','Bartra','Farola','Troncoso','Giancontieri','Zuliani'];
+    if(validBrokers.includes(bBroker))brokerSel.value=bBroker;
   }
   const btn=document.getElementById('ldr-save-btn');btn.textContent='Crear lead';btn.disabled=false;
   document.getElementById('ldr-overlay').classList.add('open');
@@ -5051,6 +5059,11 @@ window.ldrSelectBld=function(id,nombre){
   document.getElementById('ldr-buildingName').value=nombre;
   document.getElementById('ldr-bld-q').value=nombre;
   document.getElementById('ldr-bld-list').style.display='none';
+  const bld=(_bldDocs.length?_bldDocs:masterBuildings).find(d=>(d._id||d.id)===id);
+  const bBroker=bld?.brokerAsignado||'';
+  const validBrokers=['Matienzo','Bartra','Farola','Troncoso','Giancontieri','Zuliani'];
+  const brokerSel=document.getElementById('ldr-broker');
+  if(bBroker&&validBrokers.includes(bBroker)&&!brokerSel.value)brokerSel.value=bBroker;
 };
 
 window.saveLeadDrawer=async function(){
@@ -5058,8 +5071,9 @@ window.saveLeadDrawer=async function(){
   const apellido=(document.getElementById('ldr-apellido').value||'').trim();
   const email=(document.getElementById('ldr-email').value||'').trim();
   const origen=document.getElementById('ldr-origen').value||'';
+  const brokerAsignado=document.getElementById('ldr-broker').value||'';
   let ok=true;
-  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-origen',v:origen}].forEach(({id,v})=>{
+  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado}].forEach(({id,v})=>{
     const el=document.getElementById(id);if(!el)return;
     if(!v){el.style.borderColor='#ED1B34';ok=false;}else{el.style.borderColor='';}
   });
@@ -5076,7 +5090,7 @@ window.saveLeadDrawer=async function(){
       tipoInmueble:document.getElementById('ldr-tipoInmueble').value||'',
       buildingId:document.getElementById('ldr-buildingId').value||'',
       buildingName:document.getElementById('ldr-buildingName').value||'',
-      brokerAsignado:(document.getElementById('ldr-broker').value||'').trim(),
+      brokerAsignado:brokerAsignado,
       comentarios:(document.getElementById('ldr-comentarios').value||'').trim(),
       estado:'Nuevo',
       creadoPor:user?.displayName||user?.email||'',
@@ -5085,7 +5099,7 @@ window.saveLeadDrawer=async function(){
     };
     const ref=await db.collection('leads').add(data);
     await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen}`});
-    if(data.brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Asignado a ${data.brokerAsignado}`});
+    if(data.brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Lead asignado a ${data.brokerAsignado}`});
     _leadDocs.unshift({...data,_id:ref.id});
     showLeadNotification({...data,_id:ref.id});
     closeLeadDrawer();
