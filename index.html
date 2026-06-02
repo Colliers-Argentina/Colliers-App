@@ -1926,7 +1926,6 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <div class="an-chips-row" id="an-chips-row"></div>
   </div>
   <div class="an-body">
-    <div id="mapa-test-v2" style="background:red;color:white;padding:20px;font-size:20px;border-radius:8px">MAPA TEST V2</div>
     <div class="an-kpis" id="an-kpis">
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
@@ -7448,8 +7447,6 @@ function refilterAnalytics(){applyAnFilters();}
 function clearAnFilter(){clearAllAnFilters();}
 
 function renderAnalytics(docs){
-  console.log('[ANALYTICS] render principal ejecutado');
-  console.log('[ANALYTICS] versión MAPA V2 — docs:',docs.length);
   const isDark=document.body.classList.contains('dark');
   const textColor=isDark?'#DCE7FF':'#353E59';
   const gridColor=isDark?'rgba(255,255,255,.06)':'rgba(37,64,143,.08)';
@@ -7706,35 +7703,24 @@ function _heatColor(t){
 }
 
 function renderAnDemandMap(docs){
-  console.log('[MAP] render iniciado — docs recibidos:',docs.length);
   let mapEl=document.getElementById('an-demand-map');
-  console.log('[MAP] contenedor encontrado:',!!mapEl,'offsetWidth:',mapEl?.offsetWidth,'offsetHeight:',mapEl?.offsetHeight);
 
   if(!mapEl){
-    console.warn('[MAP] #an-demand-map ausente del DOM — creando dinámicamente');
     window._anDemandMap=null;
     const tendCard=document.getElementById('an-tend-card');
     const anBody=tendCard?.parentElement;
-    if(!anBody){console.error('[MAP] an-body no encontrado, abortando');return;}
+    if(!anBody)return;
     const card=document.createElement('div');
     card.className='an-card';card.id='an-map-card';
-    card.innerHTML='<div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">tamaño = intensidad</div></div><div style="padding:0"><div id="an-demand-map" style="height:300px;width:100%;border-radius:0 0 11px 11px;border:2px solid red"></div></div>';
+    card.innerHTML='<div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">tamaño = intensidad</div></div><div style="padding:0"><div id="an-demand-map" style="height:300px;width:100%;border-radius:0 0 11px 11px"></div></div>';
     anBody.insertBefore(card,tendCard);
     mapEl=document.getElementById('an-demand-map');
-    console.log('[MAP] card inyectado dinámicamente, mapEl ahora:',!!mapEl);
   }
 
-  if(!mapEl||typeof L==='undefined'){console.warn('[MAP] Abortando final: mapEl=',!!mapEl,'L=',typeof L);return;}
+  if(!mapEl||typeof L==='undefined')return;
 
-  // DEBUG: make card visible
-  const dbgCard=document.getElementById('an-map-card');
-  if(dbgCard){dbgCard.style.border='4px solid red';dbgCard.style.background='#ffe0e0';}
-  mapEl.style.border='3px solid blue';mapEl.style.minHeight='400px';
-  console.log('[MAP] estilos debug aplicados al card y container');
-
-  // Inicializar o limpiar mapa
-  try{
-    if(!window._anDemandMap){
+  if(!window._anDemandMap){
+    try{
       window._anDemandMap=L.map('an-demand-map',{zoomControl:true,scrollWheelZoom:false}).setView([-34.56,-58.43],11);
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:18}).addTo(window._anDemandMap);
       const lc=L.control({position:'bottomright'});
@@ -7744,21 +7730,19 @@ function renderAnDemandMap(docs){
         return d;
       };
       lc.addTo(window._anDemandMap);
-      console.log('[MAP] Leaflet inicializado. Contenedor:',mapEl.offsetWidth+'x'+mapEl.offsetHeight,'px');
-    }else{
-      const toRemove=[];
-      window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
-      toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
+    }catch(err){
+      window._anDemandMap=null;
+      return;
     }
-  }catch(err){
-    console.error('[MAP] Error inicializando Leaflet:',err);
-    return;
+  }else{
+    const toRemove=[];
+    window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
+    toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
   }
 
-  // Construir zonaCount
   const zonaCount={},zonaAlts={},zonaClientes={};
   docs.forEach(d=>{
-    let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
+    const zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
     const alts=Number(d.cantidad_alternativas)||0;
     const cli=d.cliente||'';
     zs.forEach(z=>{
@@ -7769,58 +7753,27 @@ function renderAnDemandMap(docs){
     });
   });
 
-  console.log('[MAP] zonas procesadas',zonaCount,'total zonas únicas:',Object.keys(zonaCount).length);
-  // ---- DIAGNOSTIC LOGS ----
-  const zonasSinCoordenadas=[];
-  const tablaZonas=Object.entries(zonaCount)
-    .sort((a,b)=>b[1]-a[1])
-    .map(([zona,cantidad])=>{
-      const tieneCoordenadas=!!_CABA_ZONE_COORDS[zona];
-      if(!tieneCoordenadas)zonasSinCoordenadas.push(zona);
-      return{zona,cantidad,tieneCoordenadas};
-    });
-  console.group('%c[MAP] Diagnóstico de zonas en Analytics','color:#1C54F4;font-weight:bold');
-  console.log('[MAP] docs recibidos:',docs.length,'| zonas únicas encontradas:',tablaZonas.length);
-  console.table(tablaZonas);
-  if(zonasSinCoordenadas.length){
-    console.warn('[MAP] zonas sin coordenadas (omitidas del mapa):',zonasSinCoordenadas);
-  }else{
-    console.log('[MAP] Todas las zonas tienen coordenadas ✓');
-  }
-  const circulosAGenerar=tablaZonas.filter(r=>r.tieneCoordenadas);
-  console.log('[MAP] Círculos a generar:',circulosAGenerar.length);
-  if(circulosAGenerar.length)console.table(circulosAGenerar);
-  console.groupEnd();
-  // -------------------------
-
   const maxCount=Math.max(...Object.values(zonaCount),1);
   const isSelected=z=>_anFilters.zonas.size===0||_anFilters.zonas.has(z);
-  let circulosAgregados=0;
   Object.entries(zonaCount).forEach(([zona,count])=>{
     const coords=_CABA_ZONE_COORDS[zona];
     if(!coords)return;
-    try{
-      const t=count/maxCount;
-      const col=_heatColor(t);
-      const radius=14+Math.round(t*26);
-      const sel=isSelected(zona);
-      const circle=L.circleMarker(coords,{radius,fillColor:col.fill,fillOpacity:sel?0.75:0.35,color:sel?col.stroke:'#ccc',weight:sel?2:1,interactive:true});
-      circle._anCircle=true;
-      const clientes=(zonaClientes[zona]||new Set()).size;
-      const alts=zonaAlts[zona]||0;
-      const ttHtml=`<div style="font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:3px">${zona}</div><div style="font-size:11px;color:#56648F;line-height:1.7">Demandas: <b style="color:#1C54F4">${count}</b><br>Alternativas: <b style="color:#1C54F4">${alts}</b><br>Clientes: <b style="color:#1C54F4">${clientes}</b></div>`;
-      circle.bindTooltip(ttHtml,{permanent:false,sticky:true,direction:'top',offset:[0,-radius-4],className:'an-tt'});
-      circle.on('click',()=>toggleAnZona(zona));
-      circle.addTo(window._anDemandMap);
-      circulosAgregados++;
-    }catch(err){
-      console.error('[MAP] Error creando círculo para "'+zona+'":',err);
-    }
+    const t=count/maxCount;
+    const col=_heatColor(t);
+    const radius=14+Math.round(t*26);
+    const sel=isSelected(zona);
+    const circle=L.circleMarker(coords,{radius,fillColor:col.fill,fillOpacity:sel?0.75:0.35,color:sel?col.stroke:'#ccc',weight:sel?2:1,interactive:true});
+    circle._anCircle=true;
+    const clientes=(zonaClientes[zona]||new Set()).size;
+    const alts=zonaAlts[zona]||0;
+    const ttHtml=`<div style="font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:3px">${zona}</div><div style="font-size:11px;color:#56648F;line-height:1.7">Demandas: <b style="color:#1C54F4">${count}</b><br>Alternativas: <b style="color:#1C54F4">${alts}</b><br>Clientes: <b style="color:#1C54F4">${clientes}</b></div>`;
+    circle.bindTooltip(ttHtml,{permanent:false,sticky:true,direction:'top',offset:[0,-radius-4],className:'an-tt'});
+    circle.on('click',()=>toggleAnZona(zona));
+    circle.addTo(window._anDemandMap);
   });
-  console.log('[MAP] Círculos efectivamente agregados al mapa:',circulosAgregados);
-  console.log('[MAP] mapa agregado al DOM — _anDemandMap:',!!window._anDemandMap);
+
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},200);
-  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},600);
+  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},800);
 }
 
 // Phase 5 — Export
