@@ -1575,6 +1575,64 @@ body.dark .an-period-btn:not(.active){color:rgba(168,179,209,.6)}
 body.dark .an-tend-subcrd{background:rgba(255,255,255,.03)}
 .an-tend-sub-title{font-size:10px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
 .an-evol-wrap{padding:.85rem;height:180px;position:relative}
+.an-fbar{background:#fff;border-bottom:1px solid #E8EFF8;padding:.55rem 1.5rem;display:flex;flex-direction:column;gap:.35rem;flex-shrink:0}
+body.dark .an-fbar{background:#080E30;border-bottom-color:rgba(255,255,255,.06)}
+.an-fbar-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.an-fbar-sel{font-family:inherit;font-size:11px;padding:4px 8px;border:1px solid #E2EAF4;color:#000759;background:#F8FAFF;border-radius:6px;cursor:pointer;transition:all .15s;max-width:160px}
+.an-fbar-sel:focus{outline:none;border-color:#1C54F4}
+body.dark .an-fbar-sel{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:#fff}
+.an-chips-row{display:flex;gap:.3rem;flex-wrap:wrap;min-height:0}
+.an-chips-row:empty{display:none}
+.an-chip-active{display:inline-flex;align-items:center;gap:.25rem;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;background:#EEF3FF;color:#1C54F4;border:1px solid rgba(28,84,244,.2);cursor:pointer;transition:all .12s}
+.an-chip-active:hover{background:#DBE5FF}
+body.dark .an-chip-active{background:rgba(28,84,244,.15);border-color:rgba(28,84,244,.3);color:#72AEFF}
+.an-clear-btn:hover{background:rgba(239,51,64,.08)!important;color:#EF3340!important;border-color:rgba(239,51,64,.3)!important}
+.an-export-btn{font-family:inherit;font-size:10px;font-weight:700;padding:5px 11px;border-radius:6px;background:#F0F4FF;color:#25408F;border:1px solid #D6E0F8;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.an-export-btn:hover{background:#25408F;color:#fff;border-color:#25408F}
+body.dark .an-export-btn{background:rgba(28,84,244,.12);color:#72AEFF;border-color:rgba(28,84,244,.25)}
+body.dark .an-export-btn:hover{background:#1C54F4;color:#fff}
+.an-card-hint{font-size:9px;color:#B0BEDB;font-weight:500;margin-left:auto;font-style:italic}
+body.dark .an-card-hint{color:#49577A}
+.an-insights-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem}
+@media(max-width:900px){.an-insights-row{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.an-insights-row{grid-template-columns:1fr}}
+.an-insight-card{background:#fff;border:1px solid #E8EFF8;border-radius:10px;padding:.8rem 1rem;display:flex;gap:.65rem;align-items:flex-start;box-shadow:0 1px 3px rgba(0,7,89,.04)}
+body.dark .an-insight-card{background:rgba(10,18,60,.65);border-color:rgba(255,255,255,.07)}
+.an-insight-icon{font-size:20px;flex-shrink:0;line-height:1}
+.an-insight-text{font-size:11px;color:#353E59;line-height:1.5}
+body.dark .an-insight-text{color:#C3E6FF}
+.an-insight-text strong{color:#0A1B4D;font-weight:700}
+body.dark .an-insight-text strong{color:#fff}
+.an-bld-panel{position:fixed;inset:0;z-index:2000;display:flex;justify-content:flex-end}
+.an-bld-panel-inner{width:340px;max-width:90vw;background:#fff;height:100%;display:flex;flex-direction:column;box-shadow:-6px 0 32px rgba(0,7,89,.13);animation:slideInRight .22s ease}
+body.dark .an-bld-panel-inner{background:#080E30}
+@keyframes slideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.an-bld-panel-hd{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px solid #E8EFF8;flex-shrink:0}
+body.dark .an-bld-panel-hd{border-bottom-color:rgba(255,255,255,.07)}
+.an-bld-panel-title{font-size:14px;font-weight:700;color:#0A1B4D;line-height:1.3}
+body.dark .an-bld-panel-title{color:#fff}
+.an-bld-panel-close{background:none;border:none;font-size:16px;color:#8A9AC0;cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .12s}
+.an-bld-panel-close:hover{background:#FFF0F0;color:#EF3340}
+.an-bld-panel-body{flex:1;overflow-y:auto;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.75rem}
+.an-bld-stat{display:flex;align-items:center;justify-content:space-between;padding:.5rem .7rem;background:#F8FAFF;border-radius:7px}
+body.dark .an-bld-stat{background:rgba(255,255,255,.04)}
+.an-bld-stat-lbl{font-size:11px;color:#56648F}
+body.dark .an-bld-stat-lbl{color:#8A9AC0}
+.an-bld-stat-val{font-size:14px;font-weight:700;color:#0A1B4D}
+body.dark .an-bld-stat-val{color:#fff}
+.an-bld-sec-title{font-size:10px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.05em;margin-top:.25rem}
+body.dark .an-bld-sec-title{color:#6B7FA3}
+.an-bld-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:#EEF3FF;color:#1C54F4;margin:.15rem .1rem}
+body.dark .an-bld-tag{background:rgba(28,84,244,.15);color:#72AEFF}
+.an-bld-nav-btn{width:100%;padding:.6rem;border-radius:8px;background:#1C54F4;color:#fff;font-family:inherit;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .15s;margin-top:auto}
+.an-bld-nav-btn:hover{background:#25408F}
+@media print{
+  #app-shell>*:not(#analytics-panel){display:none!important}
+  #analytics-panel{display:block!important;position:static}
+  .an-topbar-r,.an-fbar,.mod-back-btn,.an-export-btn{display:none!important}
+  .an-body{overflow:visible!important;padding:.5rem!important}
+  .an-bld-panel,#an-bld-panel{display:none!important}
+}
 /* ===== CLIENT DRAWER ===== */
 .cdr-drawer{position:fixed;top:0;right:0;bottom:0;width:500px;z-index:501;background:#fff;box-shadow:-8px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
 .cdr-drawer.open{transform:translateX(0)}
@@ -1805,15 +1863,32 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="an-subtitle" id="an-last-update">Cargando datos...</div>
     </div>
     <div class="an-topbar-r">
-      <div class="an-filter-row">
-        <span class="an-filter-lbl">m²:</span>
-        <input id="an-m2-min" type="number" min="0" step="100" placeholder="mín" class="an-filter-inp" oninput="refilterAnalytics()">
-        <span style="font-size:10px;color:#C8D5F0">–</span>
-        <input id="an-m2-max" type="number" min="0" step="100" placeholder="máx" class="an-filter-inp" oninput="refilterAnalytics()">
-        <button class="an-filter-chip" onclick="clearAnFilter()">✕ Limpiar</button>
-        <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
+      <div class="an-period-row">
+        <button class="an-period-btn active" id="an-gp-0" onclick="setAnGlobalPeriod(0)">Todo</button>
+        <button class="an-period-btn" id="an-gp-7" onclick="setAnGlobalPeriod(7)">7d</button>
+        <button class="an-period-btn" id="an-gp-30" onclick="setAnGlobalPeriod(30)">30d</button>
+        <button class="an-period-btn" id="an-gp-90" onclick="setAnGlobalPeriod(90)">90d</button>
+        <button class="an-period-btn" id="an-gp-365" onclick="setAnGlobalPeriod(365)">1a</button>
       </div>
+      <button class="an-export-btn" onclick="exportAnPDF()" title="Exportar PDF">⬇ PDF</button>
+      <button class="an-export-btn" onclick="exportAnPPT()" title="Exportar PPT">⬇ PPT</button>
+      <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
     </div>
+  </div>
+  <div class="an-fbar" id="an-fbar">
+    <div class="an-fbar-row">
+      <select class="an-fbar-sel" id="an-f-zona" onchange="applyAnFilters()"><option value="">Todas las zonas</option></select>
+      <select class="an-fbar-sel" id="an-f-ejecutivo" onchange="applyAnFilters()"><option value="">Todos los ejecutivos</option></select>
+      <select class="an-fbar-sel" id="an-f-edificio" onchange="applyAnFilters()"><option value="">Todos los edificios</option></select>
+      <div style="display:flex;align-items:center;gap:.3rem">
+        <span class="an-filter-lbl">m²:</span>
+        <input id="an-m2-min" type="number" min="0" step="100" placeholder="mín" class="an-filter-inp" oninput="applyAnFilters()">
+        <span style="font-size:10px;color:#C8D5F0">–</span>
+        <input id="an-m2-max" type="number" min="0" step="100" placeholder="máx" class="an-filter-inp" oninput="applyAnFilters()">
+      </div>
+      <button class="an-filter-chip an-clear-btn" id="an-clear-all-btn" onclick="clearAllAnFilters()" style="display:none">✕ Limpiar todo</button>
+    </div>
+    <div class="an-chips-row" id="an-chips-row"></div>
   </div>
   <div class="an-body">
     <div class="an-kpis" id="an-kpis">
@@ -1821,24 +1896,31 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
+      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
+      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
     </div>
+    <div class="an-insights-row" id="an-insights"></div>
     <div class="an-charts-row">
       <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Zonas más demandadas</div></div>
+        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Zonas más demandadas</div><div class="an-card-hint">click para filtrar</div></div>
         <div class="an-card-body" id="an-body-zonas"><div class="an-chart-wrap"><canvas id="chart-zonas"></canvas></div></div>
       </div>
       <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Rangos de m² demandados</div></div>
+        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Rangos de m² demandados</div><div class="an-card-hint">click para filtrar</div></div>
         <div class="an-card-body" id="an-body-m2"><div class="an-chart-wrap"><canvas id="chart-m2"></canvas></div></div>
       </div>
       <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Top 10 Edificios más enviados</div></div>
+        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Top Edificios más enviados</div></div>
         <div class="an-card-body" id="an-body-edificios"><div class="an-empty">Cargando...</div></div>
       </div>
     </div>
     <div class="an-card">
       <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ejecutivos Comerciales más activos</div></div>
       <div id="an-brokers-lb" class="an-brokers-row"></div>
+    </div>
+    <div class="an-card" id="an-map-card">
+      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">tamaño = intensidad</div></div>
+      <div style="padding:0"><div id="an-demand-map" style="height:300px;width:100%;border-radius:0 0 11px 11px"></div></div>
     </div>
     <div class="an-card" id="an-tend-card">
       <div class="an-tend-hdr">
@@ -1850,22 +1932,10 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         </div>
       </div>
       <div class="an-tend-grid" id="an-tend-grid">
-        <div class="an-tend-subcrd">
-          <div class="an-tend-sub-title">Zonas más demandadas</div>
-          <div style="height:160px;position:relative"><canvas id="chart-tend-zonas"></canvas></div>
-        </div>
-        <div class="an-tend-subcrd">
-          <div class="an-tend-sub-title">Rangos m² buscados</div>
-          <div style="height:160px;position:relative"><canvas id="chart-tend-m2"></canvas></div>
-        </div>
-        <div class="an-tend-subcrd">
-          <div class="an-tend-sub-title">Edificios más enviados</div>
-          <div id="an-tend-edif" style="height:160px;overflow-y:auto"></div>
-        </div>
-        <div class="an-tend-subcrd">
-          <div class="an-tend-sub-title">Ejecutivos Comerciales más activos</div>
-          <div id="an-tend-brokers" style="height:160px;overflow-y:auto"></div>
-        </div>
+        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Zonas más demandadas</div><div style="height:160px;position:relative"><canvas id="chart-tend-zonas"></canvas></div></div>
+        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Rangos m² buscados</div><div style="height:160px;position:relative"><canvas id="chart-tend-m2"></canvas></div></div>
+        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Edificios más enviados</div><div id="an-tend-edif" style="height:160px;overflow-y:auto"></div></div>
+        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Ejecutivos Comerciales más activos</div><div id="an-tend-brokers" style="height:160px;overflow-y:auto"></div></div>
       </div>
       <div style="padding:0 .85rem .85rem">
         <div class="an-tend-sub-title" style="margin-bottom:.6rem">Evolución temporal</div>
@@ -1883,6 +1953,16 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Motivos de Descarte</div></div><div class="an-card-body" id="an-leads-descarte" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
       </div>
     </div>
+  </div>
+</div>
+<!-- ANALYTICS BUILDING SIDE PANEL -->
+<div id="an-bld-panel" class="an-bld-panel" style="display:none" onclick="if(event.target===this)closeAnBldPanel()">
+  <div class="an-bld-panel-inner">
+    <div class="an-bld-panel-hd">
+      <div class="an-bld-panel-title" id="an-bld-panel-title">Edificio</div>
+      <button class="an-bld-panel-close" onclick="closeAnBldPanel()">✕</button>
+    </div>
+    <div class="an-bld-panel-body" id="an-bld-panel-body"></div>
   </div>
 </div>
 
@@ -7137,7 +7217,9 @@ async function upsertCliente(datos){
 // ===== ANALYTICS =====
 const _anCharts={};
 let _anDocs=[];
+window._anDemandMap=null;
 const ANALYTICS_ALLOWED=['mazaretto@gmail.com','matias.azaretto@colliers.com','colliers.arg@gmail.com'];
+const _anFilters={periodo:0,zona:'',ejecutivo:'',edificio:'',m2min:0,m2max:0};
 
 window.toggleAnalytics=()=>{
   if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
@@ -7157,7 +7239,8 @@ async function loadAnalytics(){
     const snap=await db.collection('descargas').orderBy('fecha','desc').get();
     const docs=snap.docs.map(d=>({...d.data(),_id:d.id}));
     _anDocs=docs;
-    renderAnalytics(docs);
+    _populateAnSelects(docs);
+    applyAnFilters();
     loadLeadsAnalytics();
     const last=docs[0];
     if(last&&last.fecha){
@@ -7173,30 +7256,87 @@ async function loadAnalytics(){
   }
 }
 
-function refilterAnalytics(){
-  const m2Min=parseFloat(document.getElementById('an-m2-min')?.value)||0;
-  const m2Max=parseFloat(document.getElementById('an-m2-max')?.value)||0;
-  if(!m2Min&&!m2Max){renderAnalytics(_anDocs);return;}
-  const filtered=_anDocs.filter(d=>{
-    const lo=parseFloat(d.m2Min||d.m2)||0;
-    // Records without m2Max (old data) get Infinity — unknown upper bound
-    const hi=d.m2Max?parseFloat(d.m2Max)||Infinity:Infinity;
-    if(!lo&&hi===Infinity)return true; // no m2 data at all → include
-    if(m2Max&&lo>m2Max)return false;   // record min > filter max → no overlap
-    if(m2Min&&hi<m2Min)return false;   // record max < filter min → no overlap
-    return true;
+function _populateAnSelects(docs){
+  const zonas=new Set(),ejecutivos=new Set(),edificios=new Set();
+  docs.forEach(d=>{
+    let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
+    zs.forEach(z=>{if(z&&z!=='Todas')zonas.add(z);});
+    const ej=d.usuario||d.nombre;if(ej)ejecutivos.add(ej);
+    (d.edificios||d.propiedades||[]).forEach(e=>{if(e)edificios.add(e);});
   });
-  console.log('[refilterAnalytics] filteredResults:',filtered.length,'de',_anDocs.length,{m2Min,m2Max});
-  renderAnalytics(filtered);
+  const fill=(id,set,placeholder)=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML=`<option value="">${placeholder}</option>`+[...set].sort().map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('');
+    if(cur&&[...set].includes(cur))el.value=cur;
+  };
+  fill('an-f-zona',zonas,'Todas las zonas');
+  fill('an-f-ejecutivo',ejecutivos,'Todos los ejecutivos');
+  fill('an-f-edificio',edificios,'Todos los edificios');
 }
 
-function clearAnFilter(){
-  const minEl=document.getElementById('an-m2-min');
-  const maxEl=document.getElementById('an-m2-max');
-  if(minEl)minEl.value='';
-  if(maxEl)maxEl.value='';
-  renderAnalytics(_anDocs);
+function _filterAnDocs(docs){
+  return docs.filter(d=>{
+    if(_anFilters.periodo>0){
+      const cutoff=new Date();cutoff.setDate(cutoff.getDate()-_anFilters.periodo);
+      const f=_tsToDate(d.fecha);
+      if(!f||f<cutoff)return false;
+    }
+    if(_anFilters.zona){
+      const zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
+      if(!zs.includes(_anFilters.zona))return false;
+    }
+    if(_anFilters.ejecutivo&&(d.usuario||d.nombre||'')!==_anFilters.ejecutivo)return false;
+    if(_anFilters.edificio&&!(d.edificios||d.propiedades||[]).includes(_anFilters.edificio))return false;
+    const lo=parseFloat(d.m2Min||d.m2)||0;
+    const hi=d.m2Max?parseFloat(d.m2Max)||Infinity:Infinity;
+    if(!lo&&hi===Infinity)return true;
+    if(_anFilters.m2max&&lo>_anFilters.m2max)return false;
+    if(_anFilters.m2min&&hi<_anFilters.m2min)return false;
+    return true;
+  });
 }
+
+function applyAnFilters(){
+  _anFilters.zona=document.getElementById('an-f-zona')?.value||'';
+  _anFilters.ejecutivo=document.getElementById('an-f-ejecutivo')?.value||'';
+  _anFilters.edificio=document.getElementById('an-f-edificio')?.value||'';
+  _anFilters.m2min=parseFloat(document.getElementById('an-m2-min')?.value)||0;
+  _anFilters.m2max=parseFloat(document.getElementById('an-m2-max')?.value)||0;
+  _renderAnChips();
+  renderAnalytics(_filterAnDocs(_anDocs));
+}
+
+function setAnGlobalPeriod(dias){
+  _anFilters.periodo=dias;
+  [0,7,30,90,365].forEach(d=>{const b=document.getElementById('an-gp-'+d);if(b)b.classList.toggle('active',d===dias);});
+  applyAnFilters();
+}
+
+function _renderAnChips(){
+  const chips=[];
+  const hasFilter=_anFilters.zona||_anFilters.ejecutivo||_anFilters.edificio||_anFilters.m2min||_anFilters.m2max;
+  if(_anFilters.zona)chips.push({lbl:'Zona: '+_anFilters.zona,clear:()=>{document.getElementById('an-f-zona').value='';applyAnFilters();}});
+  if(_anFilters.ejecutivo)chips.push({lbl:'Ejec.: '+_anFilters.ejecutivo,clear:()=>{document.getElementById('an-f-ejecutivo').value='';applyAnFilters();}});
+  if(_anFilters.edificio)chips.push({lbl:'Edif.: '+_anFilters.edificio,clear:()=>{document.getElementById('an-f-edificio').value='';applyAnFilters();}});
+  if(_anFilters.m2min||_anFilters.m2max)chips.push({lbl:'m²: '+(_anFilters.m2min||'?')+' – '+(_anFilters.m2max||'∞'),clear:()=>{document.getElementById('an-m2-min').value='';document.getElementById('an-m2-max').value='';applyAnFilters();}});
+  const row=document.getElementById('an-chips-row');
+  if(row)row.innerHTML=chips.map((c,i)=>`<span class="an-chip-active" onclick="window._anChipClear[${i}]()">${c.lbl} ✕</span>`).join('');
+  window._anChipClear=chips.map(c=>c.clear);
+  const clearBtn=document.getElementById('an-clear-all-btn');
+  if(clearBtn)clearBtn.style.display=hasFilter?'':'none';
+}
+
+function clearAllAnFilters(){
+  ['an-f-zona','an-f-ejecutivo','an-f-edificio'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['an-m2-min','an-m2-max'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  Object.assign(_anFilters,{zona:'',ejecutivo:'',edificio:'',m2min:0,m2max:0});
+  _renderAnChips();
+  renderAnalytics(_filterAnDocs(_anDocs));
+}
+
+function refilterAnalytics(){applyAnFilters();}
+function clearAnFilter(){clearAllAnFilters();}
 
 function renderAnalytics(docs){
   const isDark=document.body.classList.contains('dark');
@@ -7205,41 +7345,70 @@ function renderAnalytics(docs){
   const barColor=isDark?'#4D93FF':'rgba(37,64,143,.75)';
   const barHover=isDark?'#72AEFF':'#1C54F4';
 
-  // KPIs
+  // Delta helpers — compare current 30d vs previous 30d
+  const now=new Date();
+  const cut30=new Date(now);cut30.setDate(cut30.getDate()-30);
+  const cut60=new Date(now);cut60.setDate(cut60.getDate()-60);
+  const cur30=docs.filter(d=>{const f=_tsToDate(d.fecha);return f&&f>=cut30;});
+  const prv30=docs.filter(d=>{const f=_tsToDate(d.fecha);return f&&f>=cut60&&f<cut30;});
+  const delta=(c,p)=>{if(!p)return c>0?'nuevo':'–';const pct=Math.round((c-p)/p*100);return(pct>=0?'↑ +':'↓ ')+pct+'%';};
+  const deltaColor=(c,p)=>p===0&&c>0?'#22C55E':c>=p?'#22C55E':'#EF4444';
+
   const totalPPTs=docs.length;
   const clientesUnicos=new Set(docs.map(d=>d.cliente).filter(Boolean)).size;
   const brokersActivos=new Set(docs.map(d=>d.usuario||d.nombre).filter(Boolean)).size;
   const totalAlternativas=docs.reduce((s,d)=>s+(Number(d.cantidad_alternativas)||0),0);
+  const avgAlts=totalPPTs?Math.round(totalAlternativas/totalPPTs*10)/10:0;
+  const zonaCountAll={};docs.forEach(d=>{let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);zs.forEach(z=>{if(z&&z!=='Todas')zonaCountAll[z]=(zonaCountAll[z]||0)+1;});});
+  const topZona=Object.entries(zonaCountAll).sort((a,b)=>b[1]-a[1])[0]?.[0]||'–';
+
+  const d30=delta(cur30.length,prv30.length);
+  const d30Color=deltaColor(cur30.length,prv30.length);
+  const clCur=new Set(cur30.map(d=>d.cliente).filter(Boolean)).size;
+  const clPrv=new Set(prv30.map(d=>d.cliente).filter(Boolean)).size;
+  const dCl=delta(clCur,clPrv);const dClColor=deltaColor(clCur,clPrv);
+
   document.getElementById('an-kpis').innerHTML=`
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#EEF3FF">📄</div>
-      <div class="kpi-data"><div class="kpi-val">${totalPPTs}</div><div class="kpi-label">PPTs Generados</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
+      <div class="kpi-data"><div class="kpi-val">${totalPPTs}</div><div class="kpi-label">PPTs Generados</div><div class="kpi-delta" style="color:${d30Color}">${d30} <span class="kpi-delta-lbl">30d</span></div></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#EDFAF2">👥</div>
-      <div class="kpi-data"><div class="kpi-val">${clientesUnicos||'–'}</div><div class="kpi-label">Clientes Únicos</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
+      <div class="kpi-data"><div class="kpi-val">${clientesUnicos||'–'}</div><div class="kpi-label">Clientes Únicos</div><div class="kpi-delta" style="color:${dClColor}">${dCl} <span class="kpi-delta-lbl">30d</span></div></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#FFF7EC">🏆</div>
-      <div class="kpi-data"><div class="kpi-val">${brokersActivos||'–'}</div><div class="kpi-label">Ejec. Comerciales Activos</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
+      <div class="kpi-data"><div class="kpi-val">${brokersActivos||'–'}</div><div class="kpi-label">Ejec. Comerciales</div><div class="kpi-delta"><span class="kpi-delta-lbl">activos en período</span></div></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#F3EEFF">🏢</div>
-      <div class="kpi-data"><div class="kpi-val">${totalAlternativas}</div><div class="kpi-label">Alternativas Enviadas</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
+      <div class="kpi-data"><div class="kpi-val">${totalAlternativas}</div><div class="kpi-label">Alternativas Enviadas</div><div class="kpi-delta"><span class="kpi-delta-lbl">prom. ${avgAlts}/PPT</span></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon-box" style="background:#FFFBEA">📍</div>
+      <div class="kpi-data"><div class="kpi-val" style="font-size:16px;letter-spacing:-.3px">${topZona}</div><div class="kpi-label">Zona más demandada</div><div class="kpi-delta"><span class="kpi-delta-lbl">${zonaCountAll[topZona]||0} búsquedas</span></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon-box" style="background:#FFEEF2">📅</div>
+      <div class="kpi-data"><div class="kpi-val">${cur30.length}</div><div class="kpi-label">PPTs este mes</div><div class="kpi-delta" style="color:${d30Color}">${d30} <span class="kpi-delta-lbl">vs anterior</span></div></div>
     </div>`;
 
-  // Zonas
+  // Insights (Phase 6)
+  const insightsEl=document.getElementById('an-insights');
+  if(insightsEl)insightsEl.innerHTML=generateInsights(docs);
+
+  // Zonas chart with click filter
   const zonaCount={};
   docs.forEach(d=>{
-    let zs=[];
-    if(Array.isArray(d.zonas))zs=d.zonas;
-    else if(d.zonas&&typeof d.zonas==='string')zs=d.zonas.split(',').map(z=>z.trim()).filter(Boolean);
-    else if(d.zona&&typeof d.zona==='string')zs=d.zona.split(',').map(z=>z.trim()).filter(Boolean);
+    let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
     zs.forEach(z=>{if(z&&z!=='Todas')zonaCount[z]=(zonaCount[z]||0)+1;});
   });
   const zonaSorted=Object.entries(zonaCount).sort((a,b)=>b[1]-a[1]);
   if(_anCharts.zonas)_anCharts.zonas.destroy();
   if(zonaSorted.length){
+    const bodyEl=document.getElementById('an-body-zonas');
+    if(bodyEl)bodyEl.innerHTML='<div class="an-chart-wrap"><canvas id="chart-zonas"></canvas></div>';
     _anCharts.zonas=new Chart(document.getElementById('chart-zonas'),{
       type:'bar',
       data:{
@@ -7249,27 +7418,30 @@ function renderAnalytics(docs){
       options:{
         indexAxis:'y',responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} búsquedas`}}},
-        scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}}}
+        scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}}},
+        onClick:(e,els)=>{
+          if(!els.length)return;
+          const zona=zonaSorted[els[0].index][0];
+          const sel=document.getElementById('an-f-zona');
+          if(sel){sel.value=zona;applyAnFilters();}
+        }
       }
     });
   }else{
     document.getElementById('an-body-zonas').innerHTML='<div class="an-empty">Sin datos de zonas registrados aún.</div>';
   }
 
-  // M² ranges
-  const m2R={'0–200':0,'200–500':0,'500–1000':0,'1000–3000':0,'3000+':0};
+  // M² chart with click filter
+  const m2Buckets=[['0–200',0,200],['200–500',200,500],['500–1000',500,1000],['1000–3000',1000,3000],['3000+',3000,Infinity]];
+  const m2R={};m2Buckets.forEach(([k])=>m2R[k]=0);
   docs.forEach(d=>{
     const m2=parseFloat(d.m2Min||d.m2)||0;
-    if(m2>0){
-      if(m2<200)m2R['0–200']++;
-      else if(m2<500)m2R['200–500']++;
-      else if(m2<1000)m2R['500–1000']++;
-      else if(m2<3000)m2R['1000–3000']++;
-      else m2R['3000+']++;
-    }
+    if(m2>0){const b=m2Buckets.find(([,lo,hi])=>m2>=lo&&m2<hi);if(b)m2R[b[0]]++;}
   });
   if(_anCharts.m2)_anCharts.m2.destroy();
   const m2Total=Object.values(m2R).reduce((s,v)=>s+v,0);
+  const bodyM2=document.getElementById('an-body-m2');
+  if(bodyM2)bodyM2.innerHTML='<div class="an-chart-wrap"><canvas id="chart-m2"></canvas></div>';
   _anCharts.m2=new Chart(document.getElementById('chart-m2'),{
     type:'bar',
     data:{
@@ -7279,22 +7451,31 @@ function renderAnalytics(docs){
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} búsquedas${m2Total?` (${Math.round(ctx.raw/m2Total*100)}%)`:''}` }}},
-      scales:{x:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}}}
+      scales:{x:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}}},
+      onClick:(e,els)=>{
+        if(!els.length)return;
+        const bkt=m2Buckets[els[0].index];
+        const minEl=document.getElementById('an-m2-min');
+        const maxEl=document.getElementById('an-m2-max');
+        if(minEl)minEl.value=bkt[1]===0?'':bkt[1];
+        if(maxEl)maxEl.value=bkt[2]===Infinity?'':bkt[2];
+        applyAnFilters();
+      }
     }
   });
 
-  // Edificios — ranked list (no chart)
+  // Edificios ranked list (clickable → side panel)
   const edifCount={};
   docs.forEach(d=>{
     const eds=d.edificios||d.propiedades||[];
     if(Array.isArray(eds))eds.forEach(e=>{if(e)edifCount[e]=(edifCount[e]||0)+1;});
   });
-  const edifSorted=Object.entries(edifCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const edifSorted=Object.entries(edifCount).sort((a,b)=>b[1]-a[1]).slice(0,12);
   if(edifSorted.length){
     const max=edifSorted[0][1]||1;
     document.getElementById('an-body-edificios').innerHTML=`<div class="an-edif-list">${
       edifSorted.map(([name,count],i)=>`
-        <div class="an-edif-item">
+        <div class="an-edif-item" style="cursor:pointer" onclick="openAnBldPanel('${name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
           <span class="an-edif-rank">${i+1}</span>
           <span class="an-edif-name">${name}</span>
           <div class="an-edif-bar-wrap"><div class="an-edif-bar" style="width:${Math.round(count/max*100)}%"></div></div>
@@ -7306,7 +7487,7 @@ function renderAnalytics(docs){
     document.getElementById('an-body-edificios').innerHTML='<div class="an-empty">Sin datos de edificios aún.<br><small>Los nuevos PPTs incluyen este campo automáticamente.</small></div>';
   }
 
-  // Brokers — horizontal leaderboard (no chart)
+  // Brokers leaderboard
   const brokerMap={};
   docs.forEach(d=>{
     const key=d.usuario||d.nombre||'Desconocido';
@@ -7316,14 +7497,179 @@ function renderAnalytics(docs){
   });
   const brokersSorted=Object.values(brokerMap).sort((a,b)=>b.ppts-a.ppts).slice(0,10);
   document.getElementById('an-brokers-lb').innerHTML=brokersSorted.map((b,i)=>`
-    <div class="an-broker-item">
+    <div class="an-broker-item" style="cursor:pointer" onclick="const s=document.getElementById('an-f-ejecutivo');if(s){s.value='${b.nombre.replace(/'/g,"\\'").replace(/"/g,'&quot;')}';applyAnFilters();}">
       <div class="an-broker-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
       <div class="an-broker-name">${b.nombre}</div>
       <div class="an-broker-count">${b.ppts}</div>
     </div>
   `).join('');
   if(_anCharts.brokers){_anCharts.brokers.destroy();_anCharts.brokers=null;}
+
+  // CABA demand map (Phase 4)
+  renderAnDemandMap(docs);
+
   renderTendencias(_anDocs.length?_anDocs:docs,_tendPeriodo);
+}
+
+// Phase 6 — auto insights
+function generateInsights(docs){
+  if(!docs.length)return'';
+  const zonaCount={};
+  docs.forEach(d=>{let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);zs.forEach(z=>{if(z&&z!=='Todas')zonaCount[z]=(zonaCount[z]||0)+1;});});
+  const topZonas=Object.entries(zonaCount).sort((a,b)=>b[1]-a[1]);
+  const brokerMap={};
+  docs.forEach(d=>{const k=d.usuario||d.nombre||'?';if(!brokerMap[k])brokerMap[k]=0;brokerMap[k]++;});
+  const topBrokers=Object.entries(brokerMap).sort((a,b)=>b[1]-a[1]);
+  const edifCount={};
+  docs.forEach(d=>{(d.edificios||d.propiedades||[]).forEach(e=>{if(e)edifCount[e]=(edifCount[e]||0)+1;});});
+  const topEdif=Object.entries(edifCount).sort((a,b)=>b[1]-a[1]);
+  const now=new Date();
+  const cut30=new Date(now);cut30.setDate(cut30.getDate()-30);
+  const cut60=new Date(now);cut60.setDate(cut60.getDate()-60);
+  const cur30=docs.filter(d=>{const f=_tsToDate(d.fecha);return f&&f>=cut30;}).length;
+  const prv30=docs.filter(d=>{const f=_tsToDate(d.fecha);return f&&f>=cut60&&f<cut30;}).length;
+  const m2vals=docs.map(d=>parseFloat(d.m2Min||d.m2)||0).filter(v=>v>0);
+  const avgM2=m2vals.length?Math.round(m2vals.reduce((s,v)=>s+v,0)/m2vals.length):0;
+  const insights=[];
+  if(topZonas[0])insights.push({icon:'📍',text:`La zona más demandada es <strong>${topZonas[0][0]}</strong> con <strong>${topZonas[0][1]}</strong> búsquedas${topZonas[1]?`, seguida de ${topZonas[1][0]} (${topZonas[1][1]})`:''}. `});
+  if(topBrokers[0])insights.push({icon:'🏆',text:`<strong>${topBrokers[0][0]}</strong> lidera con <strong>${topBrokers[0][1]} PPTs</strong> generados${topBrokers.length>1?`, seguido de ${topBrokers[1][0]} (${topBrokers[1][1]})`:''}. `});
+  if(prv30>0){const pct=Math.round((cur30-prv30)/prv30*100);const trend=pct>=0?`aumentó un <strong>${pct}%</strong>`:`cayó un <strong>${Math.abs(pct)}%</strong>`;insights.push({icon:pct>=0?'📈':'📉',text:`La actividad del último mes <strong>(${cur30} PPTs)</strong> ${trend} respecto al mes anterior (${prv30} PPTs). `});}
+  else if(cur30>0)insights.push({icon:'📈',text:`Se generaron <strong>${cur30} PPTs</strong> en los últimos 30 días. Es el primer período con datos disponibles para comparar. `});
+  if(avgM2>0)insights.push({icon:'📐',text:`El promedio de superficie buscada es <strong>${avgM2.toLocaleString('es-AR')} m²</strong>, con mayor concentración en el rango <strong>500–1.000 m²</strong>. `});
+  if(topEdif[0])insights.push({icon:'🏢',text:`El edificio más enviado es <strong>${topEdif[0][0]}</strong> (${topEdif[0][1]} veces)${topEdif[1]?`, seguido de ${topEdif[1][0]} (${topEdif[1][1]})`:''}. `});
+  return insights.map(i=>`<div class="an-insight-card"><div class="an-insight-icon">${i.icon}</div><div class="an-insight-text">${i.text}</div></div>`).join('');
+}
+
+// Phase 3 — Building side panel
+function openAnBldPanel(name){
+  const docs=_filterAnDocs(_anDocs).filter(d=>(d.edificios||d.propiedades||[]).includes(name));
+  const panel=document.getElementById('an-bld-panel');
+  const title=document.getElementById('an-bld-panel-title');
+  const body=document.getElementById('an-bld-panel-body');
+  if(!panel||!body)return;
+  title.textContent=name;
+  const brokers={},clientes=new Set();
+  docs.forEach(d=>{
+    const b=d.usuario||d.nombre||'?';
+    if(!brokers[b])brokers[b]=0;brokers[b]++;
+    if(d.cliente)clientes.add(d.cliente);
+  });
+  const brokersSorted=Object.entries(brokers).sort((a,b)=>b[1]-a[1]);
+  const lastDate=docs.reduce((last,d)=>{const f=_tsToDate(d.fecha);return f&&(!last||f>last)?f:last;},null);
+  body.innerHTML=`
+    <div class="an-bld-stat"><span class="an-bld-stat-lbl">PPTs enviados</span><span class="an-bld-stat-val">${docs.length}</span></div>
+    <div class="an-bld-stat"><span class="an-bld-stat-lbl">Clientes distintos</span><span class="an-bld-stat-val">${clientes.size}</span></div>
+    ${lastDate?`<div class="an-bld-stat"><span class="an-bld-stat-lbl">Último envío</span><span class="an-bld-stat-val" style="font-size:12px">${lastDate.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}</span></div>`:''}
+    <div class="an-bld-sec-title">Ejecutivos que lo enviaron</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.3rem">${brokersSorted.map(([n,c])=>`<span class="an-bld-tag">${n} · ${c}</span>`).join('')||'<span style="font-size:11px;color:#8A9AC0">Sin datos</span>'}</div>
+    ${clientes.size?`<div class="an-bld-sec-title">Clientes que lo recibieron</div><div style="display:flex;flex-wrap:wrap;gap:.3rem">${[...clientes].map(c=>`<span class="an-bld-tag" style="background:#EDFAF2;color:#16A34A">${c}</span>`).join('')}</div>`:''}
+    <button class="an-bld-nav-btn" onclick="closeAnBldPanel();const sel=document.getElementById('an-f-edificio');if(sel){sel.value='${name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}';applyAnFilters();}">Filtrar por este edificio</button>
+  `;
+  panel.style.display='flex';
+}
+
+function closeAnBldPanel(){
+  const p=document.getElementById('an-bld-panel');
+  if(p)p.style.display='none';
+}
+
+// Phase 4 — CABA demand map
+const _CABA_ZONE_COORDS={
+  'Microcentro':[-34.6037,-58.3739],'Catalinas':[-34.5973,-58.3745],'Puerto Madero':[-34.6135,-58.3617],
+  'Palermo':[-34.5797,-58.4239],'Belgrano':[-34.5594,-58.4578],'Macrocentro':[-34.6150,-58.3900],
+  'Barrio Norte':[-34.5883,-58.3941],'Retiro':[-34.5953,-58.3770],'San Telmo':[-34.6211,-58.3711],
+  'Flores':[-34.6258,-58.4642],'Monserrat':[-34.6155,-58.3783],'Barracas':[-34.6469,-58.3760],
+  'Almagro':[-34.6058,-58.4194],'Caballito':[-34.6186,-58.4430],'Once':[-34.6087,-58.4097],
+  'Villa Urquiza':[-34.5756,-58.4775],'Saavedra':[-34.5630,-58.4785],'Villa del Parque':[-34.6033,-58.4816],
+  'Núñez':[-34.5500,-58.4668],'Colegiales':[-34.5706,-58.4495],'Chacarita':[-34.5853,-58.4555],
+  'Villa Crespo':[-34.5958,-58.4438],'Boedo':[-34.6283,-58.4178],'Constitución':[-34.6306,-58.3858],
+  'San Cristóbal':[-34.6194,-58.3969],'Parque Patricios':[-34.6408,-58.3981]
+};
+
+function renderAnDemandMap(docs){
+  const mapEl=document.getElementById('an-demand-map');
+  if(!mapEl||typeof L==='undefined')return;
+  if(!_anDemandMap){
+    window._anDemandMap=L.map('an-demand-map',{zoomControl:true,scrollWheelZoom:false}).setView([-34.608,-58.415],12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:18}).addTo(window._anDemandMap);
+  }else{
+    window._anDemandMap.eachLayer(l=>{if(l instanceof L.CircleMarker||l._anLabel)window._anDemandMap.removeLayer(l);});
+  }
+  const zonaCount={};
+  docs.forEach(d=>{let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);zs.forEach(z=>{if(z&&z!=='Todas')zonaCount[z]=(zonaCount[z]||0)+1;});});
+  const maxCount=Math.max(...Object.values(zonaCount),1);
+  Object.entries(zonaCount).forEach(([zona,count])=>{
+    const coords=_CABA_ZONE_COORDS[zona];
+    if(!coords)return;
+    const radius=8+Math.round(count/maxCount*30);
+    const opacity=0.35+count/maxCount*0.5;
+    const circle=L.circleMarker(coords,{radius,fillColor:'#1C54F4',fillOpacity:opacity,color:'#fff',weight:1.5})
+      .bindPopup(`<b>${zona}</b><br>${count} búsquedas`)
+      .on('click',()=>{const sel=document.getElementById('an-f-zona');if(sel){sel.value=zona;applyAnFilters();}});
+    circle.addTo(window._anDemandMap);
+  });
+  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},150);
+}
+
+// Phase 5 — Export
+function exportAnPDF(){window.print();}
+
+function exportAnPPT(){
+  if(typeof PptxGenJS==='undefined'){alert('PptxGenJS no disponible.');return;}
+  const docs=_filterAnDocs(_anDocs);
+  const pptx=new PptxGenJS();
+  pptx.layout='LAYOUT_WIDE';
+  const BLUE='1C54F4',DARK='0A1B4D',LIGHT='F8FAFF';
+
+  // Slide 1 — Cover
+  const s1=pptx.addSlide();
+  s1.background={color:DARK};
+  s1.addText('Inteligencia Comercial',{x:.5,y:1.5,w:12,fontSize:32,bold:true,color:'FFFFFF',fontFace:'Calibri'});
+  s1.addText('Colliers Argentina — Analytics Report',{x:.5,y:2.5,w:12,fontSize:16,color:'8A9AC0',fontFace:'Calibri'});
+  s1.addText(new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'}),{x:.5,y:3.1,w:12,fontSize:13,color:'6B7FA3',fontFace:'Calibri'});
+
+  // Slide 2 — KPIs
+  const s2=pptx.addSlide();
+  s2.background={color:LIGHT};
+  s2.addText('Métricas Principales',{x:.5,y:.3,w:12,fontSize:20,bold:true,color:DARK,fontFace:'Calibri'});
+  const totalPPTs=docs.length;
+  const clientesUnicos=new Set(docs.map(d=>d.cliente).filter(Boolean)).size;
+  const brokersActivos=new Set(docs.map(d=>d.usuario||d.nombre).filter(Boolean)).size;
+  const totalAlts=docs.reduce((s,d)=>s+(Number(d.cantidad_alternativas)||0),0);
+  [[totalPPTs,'PPTs Generados',0],[clientesUnicos||0,'Clientes Únicos',3],[brokersActivos||0,'Ejec. Activos',6],[totalAlts,'Alternativas',9]].forEach(([val,lbl,x])=>{
+    s2.addShape(pptx.ShapeType.roundRect,{x,y:1.2,w:2.8,h:1.8,fill:{color:'FFFFFF'},line:{color:'E2EAF4',width:1}});
+    s2.addText(String(val),{x,y:1.5,w:2.8,fontSize:28,bold:true,color:BLUE,align:'center',fontFace:'Calibri'});
+    s2.addText(lbl,{x,y:2.5,w:2.8,fontSize:11,color:'56648F',align:'center',fontFace:'Calibri'});
+  });
+
+  // Slide 3 — Top Zonas
+  const s3=pptx.addSlide();
+  s3.background={color:LIGHT};
+  s3.addText('Zonas más Demandadas',{x:.5,y:.3,w:12,fontSize:20,bold:true,color:DARK,fontFace:'Calibri'});
+  const zonaCount={};docs.forEach(d=>{let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);zs.forEach(z=>{if(z&&z!=='Todas')zonaCount[z]=(zonaCount[z]||0)+1;});});
+  const zonaSorted=Object.entries(zonaCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxZ=zonaSorted[0]?.[1]||1;
+  zonaSorted.forEach(([z,c],i)=>{
+    const y=1.1+i*.48;const bw=Math.round(c/maxZ*7);
+    s3.addText(`${i+1}. ${z}`,{x:.5,y,w:4,fontSize:11,color:DARK,fontFace:'Calibri'});
+    s3.addShape(pptx.ShapeType.rect,{x:4.7,y:y+.05,w:bw,h:.3,fill:{color:BLUE}});
+    s3.addText(String(c),{x:4.7+bw+.1,y,w:1,fontSize:11,color:BLUE,fontFace:'Calibri'});
+  });
+
+  // Slide 4 — Top Brokers + Buildings
+  const s4=pptx.addSlide();
+  s4.background={color:LIGHT};
+  s4.addText('Ranking Ejecutivos y Edificios',{x:.5,y:.3,w:12,fontSize:20,bold:true,color:DARK,fontFace:'Calibri'});
+  const brokerMap={};docs.forEach(d=>{const k=d.usuario||d.nombre||'?';if(!brokerMap[k])brokerMap[k]=0;brokerMap[k]++;});
+  const topBrokers=Object.entries(brokerMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  s4.addText('Ejecutivos',{x:.5,y:.9,w:5.5,fontSize:13,bold:true,color:'56648F',fontFace:'Calibri'});
+  topBrokers.forEach(([n,c],i)=>{s4.addText(`${i+1}. ${n} — ${c} PPTs`,{x:.5,y:1.3+i*.45,w:5.5,fontSize:11,color:DARK,fontFace:'Calibri'});});
+  const edifCount={};docs.forEach(d=>{(d.edificios||d.propiedades||[]).forEach(e=>{if(e)edifCount[e]=(edifCount[e]||0)+1;});});
+  const topEdif=Object.entries(edifCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  s4.addText('Edificios',{x:7,y:.9,w:5.5,fontSize:13,bold:true,color:'56648F',fontFace:'Calibri'});
+  topEdif.forEach(([n,c],i)=>{s4.addText(`${i+1}. ${n} — ${c}x`,{x:7,y:1.3+i*.45,w:5.5,fontSize:11,color:DARK,fontFace:'Calibri'});});
+
+  pptx.writeFile({fileName:`Colliers_Analytics_${new Date().toISOString().slice(0,10)}.pptx`});
 }
 
 /* ============================================================
