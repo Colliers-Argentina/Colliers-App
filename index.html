@@ -1852,27 +1852,14 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           <input id="cdr-nombre" class="cdr-input" type="text" placeholder="Ej: Empresa SA" autocomplete="off">
         </div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Razón social</div>
-          <input id="cdr-razonSocial" class="cdr-input" type="text" placeholder="Ej: Empresa SA SACIFI" autocomplete="off">
-        </div>
-        <div class="cdr-row">
-          <div class="cdr-field">
-            <div class="cdr-lbl">Categoría</div>
-            <select id="cdr-categoria" class="cdr-select">
-              <option value="">— Seleccionar —</option>
-              <option>Tenant</option>
-              <option>Propietario</option>
-              <option>Inversor</option>
-              <option>Desarrollador</option>
-              <option>Fondo</option>
-              <option>Gobierno</option>
-              <option>Otro</option>
-            </select>
-          </div>
-          <div class="cdr-field">
-            <div class="cdr-lbl">Ubicación principal</div>
-            <input id="cdr-ubicacion" class="cdr-input" type="text" placeholder="Ej: CABA, GBA Norte...">
-          </div>
+          <div class="cdr-lbl">Categoría</div>
+          <select id="cdr-categoria" class="cdr-select">
+            <option value="">— Seleccionar —</option>
+            <option>A</option>
+            <option>B</option>
+            <option>C</option>
+            <option>No Aplica</option>
+          </select>
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Cliente Colliers</div>
@@ -1944,7 +1931,11 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">BU (Business Unit)</div>
-          <input id="cdr-bu" class="cdr-input" type="text" placeholder="Ej: Capital Markets, Occupier Services...">
+          <div class="cdr-toggle-group" id="cdr-bu-chips">
+            <button type="button" class="cto-pref-chip" data-bu="Oficina" onclick="this.classList.toggle('active')">Oficina</button>
+            <button type="button" class="cto-pref-chip" data-bu="Industria" onclick="this.classList.toggle('active')">Industria</button>
+            <button type="button" class="cto-pref-chip" data-bu="Retail" onclick="this.classList.toggle('active')">Retail</button>
+          </div>
         </div>
         <div class="cdr-row" style="row-gap:.65rem">
           <div class="cdr-field" style="margin-bottom:0">
@@ -4210,9 +4201,7 @@ function openClientDetail(docId){
           <div>
             <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">1</span> Información General</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Razón social</div><div class="crm-det-meta-val">${d.razonSocial||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Categoría</div><div class="crm-det-meta-val">${d.categoria||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ubicación principal</div><div class="crm-det-meta-val">${d.ubicacionPrincipal||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cliente Colliers</div><div class="crm-det-meta-val">${d.clienteColliers||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario / Ocupante</div><div class="crm-det-meta-val">${d.propietarioOcupante||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker creador</div><div class="crm-det-meta-val">${d.brokerCreador||'–'}</div></div>
@@ -4233,7 +4222,7 @@ function openClientDetail(docId){
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-det-meta-val">${d.rubro||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-det-meta-val">${d.subRubro||'–'}</div></div>
-              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">BU</div><div class="crm-det-meta-val">${d.bu||'–'}</div></div>
+              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">BU</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean).map(b=>`<span class="crm-tag">${b}</span>`).join('')||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker</div><div class="crm-det-meta-val">${d.esBroker||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta corporativa</div><div class="crm-det-meta-val">${d.cuentaCorporativa||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Desarrollador</div><div class="crm-det-meta-val">${d.esDesarrollador||'–'}</div></div>
@@ -4615,10 +4604,11 @@ window.cdrToggle=function(btn){
 window.openClientDrawer=function(callbackFn){
   _cdrCallback=callbackFn||null;
   // Reset text/select/number inputs
-  ['cdr-nombre','cdr-razonSocial','cdr-ubicacion','cdr-contactoPrincipal','cdr-cargo',
-   'cdr-email','cdr-telefono','cdr-sitioWeb','cdr-rubro','cdr-subRubro','cdr-bu',
+  ['cdr-nombre','cdr-contactoPrincipal','cdr-cargo',
+   'cdr-email','cdr-telefono','cdr-sitioWeb','cdr-rubro','cdr-subRubro',
    'cdr-m2min','cdr-m2max'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('cdr-categoria').value='';
+  document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
   // Reset toggles to their data-default button
   document.querySelectorAll('.cdr-toggle-btn[data-default]').forEach(btn=>{
     const field=btn.dataset.field;
@@ -4652,9 +4642,7 @@ window.saveClientDrawer=async function(){
     const now=firebase.firestore.Timestamp.now();
     const data={
       nombre,
-      razonSocial:cdrVal('cdr-razonSocial')||'',
       categoria:document.getElementById('cdr-categoria').value||'',
-      ubicacionPrincipal:cdrVal('cdr-ubicacion')||'',
       clienteColliers:cdrToggleVal('clienteColliers')||'Sí',
       propietarioOcupante:cdrToggleVal('propOcup')||'Ocupante',
       contactoPrincipal:cdrVal('cdr-contactoPrincipal')||'',
@@ -4664,7 +4652,7 @@ window.saveClientDrawer=async function(){
       sitioWeb:cdrVal('cdr-sitioWeb')||'',
       rubro:cdrVal('cdr-rubro')||'',
       subRubro:cdrVal('cdr-subRubro')||'',
-      bu:cdrVal('cdr-bu')||'',
+      bu:[...document.querySelectorAll('#cdr-bu-chips .cto-pref-chip.active')].map(c=>c.dataset.bu),
       esBroker:cdrToggleVal('esBroker')||'No',
       cuentaCorporativa:cdrToggleVal('cuentaCorp')||'No',
       esDesarrollador:cdrToggleVal('esDesarrollador')||'No',
