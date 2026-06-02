@@ -790,6 +790,18 @@ body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.3
 .kp-chip-clear{background:none;border:none;color:#56648F;cursor:pointer;font-size:15px;line-height:1;padding:0;display:flex;align-items:center}
 .kp-chip-clear:hover{color:#EF3340}
 
+/* ===== BUILDING CRM AUTOCOMPLETE ===== */
+.be-ac-wrap{position:relative}
+.be-ac-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:700;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)}
+body.dark .be-ac-list{background:#0C1640;border-color:rgba(255,255,255,.12)}
+.be-ac-item{padding:8px 11px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s}
+.be-ac-item:hover{background:#EEF3FF}
+body.dark .be-ac-item{color:#C3E6FF;border-bottom-color:rgba(255,255,255,.06)}
+body.dark .be-ac-item:hover{background:rgba(255,255,255,.06)}
+.be-ac-actions{display:flex;gap:.4rem;margin-top:.35rem}
+.be-ac-link{font-size:11px;font-weight:600;color:#1C54F4;background:rgba(28,84,244,.08);border:none;border-radius:5px;padding:3px 8px;cursor:pointer;transition:background .15s;font-family:inherit}
+.be-ac-link:hover{background:rgba(28,84,244,.16)}
+
 /* ===== BUILDINGS ADMIN ===== */
 #buildings-panel{background:#F4F6FB}
 body.dark #buildings-panel{background:#030B1E}
@@ -1752,7 +1764,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       </div>
     </div>
     <div class="an-card">
-      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Brokers más activos</div></div>
+      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ejecutivos Comerciales más activos</div></div>
       <div id="an-brokers-lb" class="an-brokers-row"></div>
     </div>
     <div class="an-card" id="an-tend-card">
@@ -1778,7 +1790,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           <div id="an-tend-edif" style="height:160px;overflow-y:auto"></div>
         </div>
         <div class="an-tend-subcrd">
-          <div class="an-tend-sub-title">Brokers más activos</div>
+          <div class="an-tend-sub-title">Ejecutivos Comerciales más activos</div>
           <div id="an-tend-brokers" style="height:160px;overflow-y:auto"></div>
         </div>
       </div>
@@ -1794,7 +1806,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="leads-an-grid">
         <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Funnel</div></div><div class="an-card-body" id="an-leads-funnel" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
         <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Origen de Leads</div></div><div class="an-card-body" id="an-leads-origen" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
-        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ranking Brokers</div></div><div class="an-card-body" id="an-leads-brokers" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
+        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ranking Ejecutivos Comerciales</div></div><div class="an-card-body" id="an-leads-brokers" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
         <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Motivos de Descarte</div></div><div class="an-card-body" id="an-leads-descarte" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
       </div>
     </div>
@@ -1990,7 +2002,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
               <option>Llamado</option><option>Mail</option><option>Otro</option>
             </select>
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Broker asignado <span class="cdr-req">*</span></div><select id="ldr-broker" class="cdr-select"><option value="">— Seleccionar —</option><option>Matienzo</option><option>Bartra</option><option>Farola</option><option>Troncoso</option><option>Giancontieri</option><option>Zuliani</option></select></div>
+          <div class="cdr-field"><div class="cdr-lbl">Ejecutivo Comercial asignado <span class="cdr-req">*</span></div><select id="ldr-broker" class="cdr-select"><option value="">— Seleccionar —</option><option>Matienzo</option><option>Bartra</option><option>Farola</option><option>Troncoso</option><option>Giancontieri</option><option>Zuliani</option></select></div>
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Inmueble consultado</div>
@@ -2163,7 +2175,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         </div>
         <div class="cdr-row" style="row-gap:.65rem">
           <div class="cdr-field" style="margin-bottom:0">
-            <div class="cdr-lbl">Broker</div>
+            <div class="cdr-lbl">Es Ejecutivo Comercial</div>
             <div class="cdr-toggle-group">
               <button type="button" class="cdr-toggle-btn" data-field="esBroker" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
               <button type="button" class="cdr-toggle-btn active" data-field="esBroker" data-value="No" data-default onclick="cdrToggle(this)">No</button>
@@ -2190,6 +2202,18 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
               <button type="button" class="cdr-toggle-btn active" data-field="esAdmin" data-value="No" data-default onclick="cdrToggle(this)">No</button>
             </div>
           </div>
+        </div>
+        <div class="cdr-field" style="margin-top:.75rem">
+          <div class="cdr-lbl">Ejecutivo Comercial</div>
+          <select id="cdr-ejecutivo" class="cdr-select">
+            <option value="">— Sin asignar —</option>
+            <option>Matienzo</option>
+            <option>Bartra</option>
+            <option>Farola</option>
+            <option>Troncoso</option>
+            <option>Giancontieri</option>
+            <option>Zuliani</option>
+          </select>
         </div>
         <div class="cdr-field" style="margin-top:.75rem">
           <div class="cdr-lbl">Superficie buscada (m²)</div>
@@ -2340,6 +2364,18 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
             <option>USD 10M - 25M</option>
             <option>USD 25M - 50M</option>
             <option>Más de USD 50M</option>
+          </select>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Ejecutivo Comercial responsable</div>
+          <select id="ctdr-ejecutivo" class="cdr-select">
+            <option value="">— Sin asignar —</option>
+            <option>Matienzo</option>
+            <option>Bartra</option>
+            <option>Farola</option>
+            <option>Troncoso</option>
+            <option>Giancontieri</option>
+            <option>Zuliani</option>
           </select>
         </div>
       </div>
@@ -4355,7 +4391,7 @@ function renderCRMTable(docs){
     return;
   }
   let h='<table class="crm-table"><thead><tr>';
-  ['Cliente','Broker','Superficie','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
+  ['Cliente','Ejecutivo Comercial','Superficie','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const nombre=d.nombre||d._id;
@@ -4402,7 +4438,8 @@ function openClientDetail(docId){
       <div class="crm-det-av-name">${nombre}</div>
       ${d.broker_email?`<div class="crm-det-av-email">${d.broker_email}</div>`:''}
     </div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker asignado</div><div class="crm-det-meta-val">${d.broker||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${d.broker||'–'}</div></div>
+    ${d.ejecutivoComercial?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.ejecutivoComercial}</div></div>`:''}
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||(d.m2?fmtM2Range(d.m2,null):'–')}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
@@ -4431,7 +4468,8 @@ function openClientDetail(docId){
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Categoría</div><div class="crm-det-meta-val">${d.categoria||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cliente Colliers</div><div class="crm-det-meta-val">${d.clienteColliers||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario / Ocupante</div><div class="crm-det-meta-val">${d.propietarioOcupante||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker creador</div><div class="crm-det-meta-val">${d.brokerCreador||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial creador</div><div class="crm-det-meta-val">${d.brokerCreador||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.ejecutivoComercial||'–'}</div></div>
             </div>
           </div>
           <div>
@@ -4450,7 +4488,7 @@ function openClientDetail(docId){
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-det-meta-val">${d.rubro||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-det-meta-val">${d.subRubro||'–'}</div></div>
               <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">BU</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean).map(b=>`<span class="crm-tag">${b}</span>`).join('')||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker</div><div class="crm-det-meta-val">${d.esBroker||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Es Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.esBroker||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta corporativa</div><div class="crm-det-meta-val">${d.cuentaCorporativa||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Desarrollador</div><div class="crm-det-meta-val">${d.esDesarrollador||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Administradora</div><div class="crm-det-meta-val">${d.esAdministradora||'–'}</div></div>
@@ -4616,7 +4654,8 @@ function openContactoDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado correo</div>${emailBadge(d.estadoCorreo)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker responsable</div><div class="crm-det-meta-val">${d.brokerResponsable||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial responsable</div><div class="crm-det-meta-val">${d.brokerResponsable||'–'}</div></div>
+    ${d.ejecutivoComercial?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.ejecutivoComercial}</div></div>`:''}
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
   `;
   document.getElementById('cto-det-right').innerHTML=`
@@ -4735,7 +4774,7 @@ window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
   _ctdrEditId=null;
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-interno','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['ctdr-cargo','ctdr-estadoCorreo','ctdr-volumen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
+  ['ctdr-cargo','ctdr-estadoCorreo','ctdr-volumen','ctdr-ejecutivo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
   document.getElementById('ctdr-cuentaId').value='';
   document.getElementById('ctdr-cuentaNombre').value='';
   document.getElementById('ctdr-comentarios').value='';
@@ -4771,6 +4810,7 @@ window.openContactoDrawer_edit=function(docId){
   document.getElementById('ctdr-cargo').value=d.cargo||'';
   document.getElementById('ctdr-estadoCorreo').value=d.estadoCorreo||'sin_comprobar';
   document.getElementById('ctdr-volumen').value=d.volumenInversion||'';
+  document.getElementById('ctdr-ejecutivo').value=d.ejecutivoComercial||'';
   const setToggle=(field,val)=>{
     document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{b.classList.toggle('active',b.dataset.value===val);});
   };
@@ -4839,11 +4879,12 @@ window.saveContactoDrawer=async function(){
       inversor:cdrToggleVal('ctdrInversor')||'No',
       prefsInversion:prefs,
       volumenInversion:document.getElementById('ctdr-volumen').value||'',
+      ejecutivoComercial:document.getElementById('ctdr-ejecutivo').value||'',
       comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
     };
     if(_ctdrEditId){
       const oldD=_ctoDocs.find(x=>x._id===_ctdrEditId)||{};
-      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',inversor:'Inversor',cuentaNombre:'Cuenta'};
+      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',inversor:'Inversor',cuentaNombre:'Cuenta',ejecutivoComercial:'Ejecutivo Comercial'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('contactos').doc(_ctdrEditId).update(updatePayload);
@@ -4935,7 +4976,7 @@ function renderLeadsTable(docs){
   const wrap=document.getElementById('lead-table-wrap');
   if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin leads registrados.</div>';return;}
   let h='<table class="crm-table"><thead><tr>';
-  ['Lead','Empresa','Origen','Estado','Inmueble','Broker','Fecha',''].forEach(c=>h+=`<th>${c}</th>`);
+  ['Lead','Empresa','Origen','Estado','Inmueble','Ejecutivo Comercial','Fecha',''].forEach(c=>h+=`<th>${c}</th>`);
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
@@ -4976,7 +5017,7 @@ function openLeadDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${leadEstadoBadge(d.estado)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Origen</div>${leadOrigenBadge(d.origen)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${d.empresa||'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker asignado</div><div class="crm-det-meta-val">${d.brokerAsignado||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${d.brokerAsignado||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.buildingName||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     ${d.ultimaModificacion?`<div class="crm-det-meta-item" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF3FF"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${fmtDate(d.ultimaModificacion)}${d.usuarioUltimaModificacion?' · '+d.usuarioUltimaModificacion:''}</div></div>`:''}
@@ -5187,7 +5228,7 @@ window.saveLeadDrawer=async function(){
     };
     if(_ldrEditId){
       const oldD=_leadDocs.find(x=>x._id===_ldrEditId)||{};
-      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Broker',comentarios:'Comentarios',buildingName:'Inmueble'};
+      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',comentarios:'Comentarios',buildingName:'Inmueble'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('leads').doc(_ldrEditId).update(updatePayload);
@@ -5204,7 +5245,7 @@ window.saveLeadDrawer=async function(){
       const createData={...newData,estado:'Nuevo',estadoRegistro:'activo',creadoPor:user?.displayName||user?.email||'',fechaCreacion:now,ultimaActividad:now};
       const ref=await db.collection('leads').add(createData);
       await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen}`});
-      if(brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Lead asignado a ${brokerAsignado}`});
+      if(brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Ejecutivo Comercial asignado: ${brokerAsignado}`});
       _leadDocs.unshift({...createData,_id:ref.id});
       showLeadNotification({...createData,_id:ref.id});
       closeLeadDrawer();
@@ -5442,6 +5483,7 @@ window.openClientDrawer=function(callbackFn){
    'cdr-email','cdr-telefono','cdr-sitioWeb','cdr-rubro','cdr-subRubro',
    'cdr-m2min','cdr-m2max'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('cdr-categoria').value='';
+  document.getElementById('cdr-ejecutivo').value='';
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('.cdr-toggle-btn[data-default]').forEach(btn=>{
     const field=btn.dataset.field;
@@ -5467,6 +5509,7 @@ window.openClientDrawer_edit=function(docId){
   setV('cdr-rubro',d.rubro);setV('cdr-subRubro',d.subRubro);
   setV('cdr-m2min',d.m2Min||'');setV('cdr-m2max',d.m2Max||'');
   document.getElementById('cdr-categoria').value=d.categoria||'';
+  document.getElementById('cdr-ejecutivo').value=d.ejecutivoComercial||'';
   const buArr=Array.isArray(d.bu)?d.bu:[d.bu].filter(Boolean);
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',buArr.includes(c.dataset.bu));});
   const setToggle=(field,val)=>{
@@ -5526,6 +5569,7 @@ window.saveClientDrawer=async function(){
       subRubro:cdrVal('cdr-subRubro')||'',
       bu:[...document.querySelectorAll('#cdr-bu-chips .cto-pref-chip.active')].map(c=>c.dataset.bu),
       esBroker:cdrToggleVal('esBroker')||'No',
+      ejecutivoComercial:document.getElementById('cdr-ejecutivo').value||'',
       cuentaCorporativa:cdrToggleVal('cuentaCorp')||'No',
       esDesarrollador:cdrToggleVal('esDesarrollador')||'No',
       esAdministradora:cdrToggleVal('esAdmin')||'No',
@@ -5536,7 +5580,7 @@ window.saveClientDrawer=async function(){
     };
     if(_cdrEditId){
       const oldD=_crmDocs.find(x=>x._id===_cdrEditId)||{};
-      const labels={nombre:'Nombre',categoria:'Categoría',clienteColliers:'Cliente Colliers',propietarioOcupante:'Prop/Ocup',contactoPrincipal:'Contacto principal',cargo:'Cargo',emailContacto:'Email',telefono:'Teléfono',sitioWeb:'Sitio web',rubro:'Rubro',subRubro:'Sub rubro',esBroker:'Es Broker',cuentaCorporativa:'Cuenta corporativa',esDesarrollador:'Es Desarrollador',esAdministradora:'Es Administradora'};
+      const labels={nombre:'Nombre',categoria:'Categoría',clienteColliers:'Cliente Colliers',propietarioOcupante:'Prop/Ocup',contactoPrincipal:'Contacto principal',cargo:'Cargo',emailContacto:'Email',telefono:'Teléfono',sitioWeb:'Sitio web',rubro:'Rubro',subRubro:'Sub rubro',esBroker:'Es Ejecutivo Comercial',ejecutivoComercial:'Ejecutivo Comercial',cuentaCorporativa:'Cuenta corporativa',esDesarrollador:'Es Desarrollador',esAdministradora:'Es Administradora'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('clientes').doc(_cdrEditId).update(updatePayload);
@@ -5583,6 +5627,53 @@ function openDrawerFromGenerator(){
 }
 
 window.openNewClientModal=()=>openClientDrawer(()=>loadCRM());
+
+/* ===== BUILDING CRM AUTOCOMPLETE ===== */
+function beAcSearch(role,q){
+  const listEl=document.getElementById(`be-${role}-list`);
+  if(!listEl)return;
+  if(!q.trim()){listEl.style.display='none';return;}
+  if(!_crmDocs.length){
+    db.collection('clientes').orderBy('ultimaActividad','desc').get().then(s=>{
+      _crmDocs=s.docs.map(d=>({...d.data(),_id:d.id}));
+      beAcSearch(role,q);
+    });
+    return;
+  }
+  const lq=q.toLowerCase();
+  const matches=_crmDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
+  if(!matches.length){
+    listEl.innerHTML=`<div style="padding:8px 11px;font-size:11px;color:#7B8BBD">Sin resultados</div>`;
+    listEl.style.display='block';return;
+  }
+  listEl.innerHTML=matches.map(d=>`<div class="be-ac-item" onclick="beAcSelect('${role}','${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')"> ${d.nombre}</div>`).join('');
+  listEl.style.display='block';
+}
+
+function beAcSelect(role,id,nombre){
+  document.getElementById(`be-${role}-id`).value=id;
+  document.getElementById(`be-${role}-name`).value=nombre;
+  document.getElementById(`be-${role}-q`).value=nombre;
+  document.getElementById(`be-${role}-list`).style.display='none';
+}
+
+function beAcCreate(role,tipo){
+  if(tipo==='cuenta'){
+    openClientDrawer(function(nombre,newId){
+      if(newId)beAcSelect(role,newId,nombre);
+      loadCRM();
+    });
+  } else {
+    openContactoDrawer();
+  }
+}
+
+document.addEventListener('click',function(e){
+  ['be-owner-list','be-occupier-list'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&!el.closest('.be-ac-wrap')?.contains(e.target))el.style.display='none';
+  });
+});
 
 /* ===== BUILDINGS ADMIN ===== */
 const BLD_PAGE_SIZE=20;
@@ -5739,7 +5830,7 @@ function renderBuildingsTable(){
           <div class="bld-meta-item"><span class="bld-meta-val">${d.zona||d.submercado||'–'}</span><span class="bld-meta-lbl">Zona</span></div>
           <div class="bld-meta-item"><span class="bld-meta-val">${d.asking||d.rent||'–'}</span><span class="bld-meta-lbl">Asking</span></div>
           <div class="bld-meta-item"><span class="bld-meta-val">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+' m²':'–'}</span><span class="bld-meta-lbl">Disponible</span></div>
-          <div class="bld-meta-item"><span class="bld-meta-val">${d.broker||'–'}</span><span class="bld-meta-lbl">Broker</span></div>
+          <div class="bld-meta-item"><span class="bld-meta-val">${d.broker||'–'}</span><span class="bld-meta-lbl">Ejec. Comercial</span></div>
         </div>
         <div class="bld-card-footer">
           ${bldEstadoBadge(d.estado||'Disponible')}
@@ -5827,7 +5918,35 @@ function openBuildingEditor(docId){
       </div>
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Operación</div>
-        <div class="bld-det-field"><div class="bld-det-lbl">Broker responsable</div><input class="bld-det-inp" id="be-broker" value="${esc(d.broker||'')}"></div>
+        <div class="bld-det-field"><div class="bld-det-lbl">Ejecutivo Comercial responsable</div><input class="bld-det-inp" id="be-broker" value="${esc(d.broker||'')}"></div>
+        <div class="bld-det-field">
+          <div class="bld-det-lbl">Propietario (Cuenta CRM)</div>
+          <div class="be-ac-wrap">
+            <input class="bld-det-inp" id="be-owner-q" placeholder="Buscar cuenta..." autocomplete="off" value="${esc(d.ownerAccountName||d.propietario||'')}" oninput="beAcSearch('owner',this.value)">
+            <div class="be-ac-list" id="be-owner-list"></div>
+          </div>
+          <input type="hidden" id="be-owner-id" value="${esc(d.ownerAccountId||'')}">
+          <input type="hidden" id="be-owner-name" value="${esc(d.ownerAccountName||'')}">
+          <div class="be-ac-actions">
+            <button type="button" class="be-ac-link" onclick="beAcCreate('owner','cuenta')">+ Crear Cuenta</button>
+            <button type="button" class="be-ac-link" onclick="beAcCreate('owner','contacto')">+ Crear Contacto</button>
+          </div>
+          ${d.ownerAccountId?`<div style="margin-top:.25rem;font-size:11px;color:#22C55E">✓ Vinculado: ${esc(d.ownerAccountName||'')}</div>`:''}
+        </div>
+        <div class="bld-det-field">
+          <div class="bld-det-lbl">Ocupante (Cuenta CRM)</div>
+          <div class="be-ac-wrap">
+            <input class="bld-det-inp" id="be-occupier-q" placeholder="Buscar cuenta..." autocomplete="off" value="${esc(d.occupierAccountName||d.ocupante||'')}" oninput="beAcSearch('occupier',this.value)">
+            <div class="be-ac-list" id="be-occupier-list"></div>
+          </div>
+          <input type="hidden" id="be-occupier-id" value="${esc(d.occupierAccountId||'')}">
+          <input type="hidden" id="be-occupier-name" value="${esc(d.occupierAccountName||'')}">
+          <div class="be-ac-actions">
+            <button type="button" class="be-ac-link" onclick="beAcCreate('occupier','cuenta')">+ Crear Cuenta</button>
+            <button type="button" class="be-ac-link" onclick="beAcCreate('occupier','contacto')">+ Crear Contacto</button>
+          </div>
+          ${d.occupierAccountId?`<div style="margin-top:.25rem;font-size:11px;color:#22C55E">✓ Vinculado: ${esc(d.occupierAccountName||'')}</div>`:''}
+        </div>
         <div class="bld-det-field-row">
           <div class="bld-det-field"><div class="bld-det-lbl">Certificación</div><input class="bld-det-inp" id="be-cert" value="${esc(d.certificacion||'')}"></div>
           <div class="bld-det-field"><div class="bld-det-lbl">URL Foto</div><input class="bld-det-inp" id="be-foto" value="${esc(hasFoto)}"></div>
@@ -6151,7 +6270,7 @@ function renderDetailUnits(buildingId,filterQ=''){
     ${th('m2','m²')}
     ${th('askingRent','Asking Rent')}
     ${th('propietario','Propietario')}
-    ${th('brokerAsignado','Broker Asig.')}
+    ${th('brokerAsignado','Ejec. Comercial')}
     <th>Observaciones</th>
     <th class="col-actions"></th>
   </tr></thead><tbody>`;
@@ -6321,6 +6440,10 @@ async function saveBuildingEdits(){
     moneda:gv('be-moneda'),
     categoria:gv('be-cat'),
     broker:gv('be-broker'),
+    ownerAccountId:document.getElementById('be-owner-id')?.value||'',
+    ownerAccountName:document.getElementById('be-owner-name')?.value||document.getElementById('be-owner-q')?.value||'',
+    occupierAccountId:document.getElementById('be-occupier-id')?.value||'',
+    occupierAccountName:document.getElementById('be-occupier-name')?.value||document.getElementById('be-occupier-q')?.value||'',
     certificacion:gv('be-cert'),
     googleMaps:gv('be-maps'),
     foto:normalizeImageUrl(gv('be-foto')||''),
@@ -6337,7 +6460,7 @@ async function saveBuildingEdits(){
     if(hdrName)hdrName.textContent=data.nombre||_bldEditId;
     showBldToast('✅ Guardado correctamente');
     filterBuildings();
-    const TRACK=[['nombre','Nombre'],['direccion','Dirección'],['asking','Asking Rent'],['broker','Broker'],['estado','Estado'],['categoria','Categoría'],['foto','Foto'],['zona','Zona']];
+    const TRACK=[['nombre','Nombre'],['direccion','Dirección'],['asking','Asking Rent'],['broker','Ejecutivo Comercial'],['estado','Estado'],['categoria','Categoría'],['foto','Foto'],['zona','Zona']];
     const cambios=TRACK.filter(([k])=>String(old[k]||'')!==String(data[k]||'')).map(([k,lbl])=>({campo:lbl,anterior:String(old[k]||''),nuevo:String(data[k]||'')}));
     if(cambios.length)addBuildingHistory(_bldEditId,cambios);
   }catch(e){showBldToast('❌ Error: '+e.message,4000);}
@@ -6637,7 +6760,7 @@ function renderAnalytics(docs){
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#FFF7EC">🏆</div>
-      <div class="kpi-data"><div class="kpi-val">${brokersActivos||'–'}</div><div class="kpi-label">Brokers Activos</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
+      <div class="kpi-data"><div class="kpi-val">${brokersActivos||'–'}</div><div class="kpi-label">Ejec. Comerciales Activos</div><div class="kpi-delta"><span>↑</span> +0% <span class="kpi-delta-lbl">vs mes anterior</span></div></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-icon-box" style="background:#F3EEFF">🏢</div>
