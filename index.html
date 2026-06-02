@@ -808,6 +808,28 @@ body.dark .du-ac-footer{background:rgba(255,255,255,.03);border-top-color:rgba(2
 .du-linked-dot{width:6px;height:6px;border-radius:50%;background:#1C54F4;flex-shrink:0;display:inline-block;margin-left:2px;vertical-align:middle}
 .be-ac-list{display:none;position:fixed;background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:9999;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.18);min-width:200px}
 body.dark .be-ac-list{background:#0C1640;border-color:rgba(255,255,255,.12)}
+/* CRM → Inventario tab */
+.crm-inv-kpi-row{display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+.crm-inv-kpi{background:#F0F4FF;border-radius:10px;padding:.65rem 1rem;flex:1;min-width:90px}
+.crm-inv-kpi-v{font-size:18px;font-weight:700;color:#1C54F4;line-height:1}
+.crm-inv-kpi-l{font-size:10.5px;color:#56648F;margin-top:.25rem}
+.crm-inv-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.crm-inv-table th{background:#F0F4FF;color:#56648F;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;text-align:left;border-bottom:2px solid #DBE5FF;white-space:nowrap}
+.crm-inv-table td{padding:6px 8px;color:#0A1B4D;border-bottom:1px solid #EEF3FF;vertical-align:middle;white-space:nowrap}
+.crm-inv-table tr:last-child td{border-bottom:none}
+.crm-inv-table tr:hover td{background:#F8FAFF}
+.crm-inv-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px}
+.crm-inv-badge-occ{background:rgba(22,163,74,.12);color:#16A34A}
+.crm-inv-badge-own{background:rgba(28,84,244,.12);color:#1C54F4}
+.crm-inv-nav-btn{background:none;border:1px solid #DBE5FF;color:#1C54F4;font-size:11px;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;font-family:inherit;transition:background .1s}
+.crm-inv-nav-btn:hover{background:#EEF3FF}
+body.dark .crm-inv-kpi{background:rgba(28,84,244,.1)}
+body.dark .crm-inv-kpi-v{color:#4D93FF}
+body.dark .crm-inv-table th{background:rgba(28,84,244,.1);color:#6B7FA3;border-bottom-color:rgba(255,255,255,.08)}
+body.dark .crm-inv-table td{color:#C3E6FF;border-bottom-color:rgba(255,255,255,.05)}
+body.dark .crm-inv-table tr:hover td{background:rgba(255,255,255,.03)}
+body.dark .crm-inv-nav-btn{border-color:rgba(77,147,255,.3);color:#4D93FF}
+body.dark .crm-inv-nav-btn:hover{background:rgba(77,147,255,.08)}
 .be-ac-item{padding:8px 11px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s}
 .be-ac-item:hover{background:#EEF3FF}
 body.dark .be-ac-item{color:#C3E6FF;border-bottom-color:rgba(255,255,255,.06)}
@@ -4472,6 +4494,7 @@ function openClientDetail(docId){
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-notas')">Notas</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-contactos');loadCuentaContactos('${docId}')">Contactos</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-timeline');loadClientTimeline('${docId}')">Timeline</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-inventario');loadCuentaInventario('${docId}')">Inventario</button>
     </div>
     <div class="crm-det-tab-body">
       <div id="crm-dt-info">
@@ -4551,6 +4574,9 @@ function openClientDetail(docId){
       </div>
       <div id="crm-dt-contactos" style="display:none">
         <div id="crm-dt-contactos-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Cargando contactos...</div></div></div>
+      </div>
+      <div id="crm-dt-inventario" style="display:none">
+        <div id="crm-dt-inventario-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Cargando inventario...</div></div></div>
       </div>
     </div>
   `;
@@ -4676,6 +4702,7 @@ function openContactoDetail(docId){
     <div class="crm-det-tabs">
       <button class="crm-det-tab active" onclick="ctoDetTab(this,'cto-dt-info')">Información</button>
       <button class="crm-det-tab" onclick="ctoDetTab(this,'cto-dt-comercial')">Perfil Comercial</button>
+      <button class="crm-det-tab" onclick="ctoDetTab(this,'cto-dt-inventario');loadContactoInventario('${docId}')">Inventario</button>
     </div>
     <div class="crm-det-tab-body">
       <div id="cto-dt-info">
@@ -4713,6 +4740,9 @@ function openContactoDetail(docId){
             </div>
           </div>
         </div>
+      </div>
+      <div id="cto-dt-inventario" style="display:none">
+        <div id="cto-dt-inventario-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Cargando inventario...</div></div></div>
       </div>
     </div>
   `;
@@ -4779,6 +4809,92 @@ async function loadCuentaContactos(cuentaId){
   }catch(e){
     body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
   }
+}
+
+/* ===== CRM → INVENTARIO ===== */
+function _renderInvTable(units,bodyId,showBldCount){
+  const body=document.getElementById(bodyId);
+  if(!body)return;
+  if(!units.length){
+    body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Sin disponibilidades vinculadas</div><div class="crm-det-placeholder-sub">Vinculá unidades desde el módulo Inventario → Disponibilidades.</div></div>';
+    return;
+  }
+  const bldIds=[...new Set(units.map(u=>u._bldId))];
+  const totalM2=units.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
+  let html='<div class="crm-inv-kpi-row">';
+  if(showBldCount)html+=`<div class="crm-inv-kpi"><div class="crm-inv-kpi-v">${bldIds.length}</div><div class="crm-inv-kpi-l">Edificios</div></div>`;
+  html+=`<div class="crm-inv-kpi"><div class="crm-inv-kpi-v">${units.length}</div><div class="crm-inv-kpi-l">Disponibilidades</div></div>`;
+  html+=`<div class="crm-inv-kpi"><div class="crm-inv-kpi-v">${totalM2.toLocaleString('es-AR')} m²</div><div class="crm-inv-kpi-l">Total m²</div></div></div>`;
+  html+=`<div style="overflow-x:auto"><table class="crm-inv-table"><thead><tr><th>Edificio</th><th>Piso</th><th>Unidad</th><th>Rol</th><th>m²</th><th>Estado</th><th>Asking Rent</th><th>Ejecutivo Comercial</th><th></th></tr></thead><tbody>`;
+  units.forEach(u=>{
+    const rolCls=u._rol==='Ocupante'?'crm-inv-badge-occ':'crm-inv-badge-own';
+    html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td><span class="crm-inv-badge ${rolCls}">${u._rol}</span></td><td>${u.m2?Number(u.m2).toLocaleString('es-AR'):'–'}</td><td>${esc(u.estado||'–')}</td><td>${esc(u.askingRent||'–')}</td><td>${esc(u.brokerAsignado||u._bldEjec||'–')}</td><td><button class="crm-inv-nav-btn" onclick="navToBuilding('${u._bldId}')">Ver edificio →</button></td></tr>`;
+  });
+  html+='</tbody></table></div>';
+  body.innerHTML=html;
+}
+
+async function _loadBldDocsIfNeeded(){
+  if(!_bldDocs.length){
+    const snap=await db.collection('buildings').orderBy('nombre').get();
+    _bldDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+  }
+}
+
+async function _queryUnitsForId(idField,idValue){
+  const units=[];
+  await Promise.all(_bldDocs.map(async bld=>{
+    const snap=await db.collection('buildings').doc(bld._id).collection('units').where(idField,'==',idValue).get();
+    snap.docs.forEach(d=>units.push({...d.data(),_id:d.id,_bldId:bld._id,_bldNombre:bld.nombre||bld._id,_bldEjec:bld.ejecutivoComercial||bld.brokerAsignado||'–'}));
+  }));
+  return units;
+}
+
+async function loadCuentaInventario(cuentaId){
+  const body=document.getElementById('crm-dt-inventario-body');
+  if(!body)return;
+  body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Cargando...</div></div>';
+  try{
+    await _loadBldDocsIfNeeded();
+    const [occ,own]=await Promise.all([
+      _queryUnitsForId('occupierAccountId',cuentaId),
+      _queryUnitsForId('ownerAccountId',cuentaId),
+    ]);
+    occ.forEach(u=>u._rol='Ocupante');
+    own.forEach(u=>u._rol='Propietario');
+    const seen=new Set();
+    occ.forEach(u=>seen.add(u._bldId+'/'+u._id));
+    const units=[...occ,...own.filter(u=>{const k=u._bldId+'/'+u._id;if(seen.has(k))return false;seen.add(k);return true;})];
+    _renderInvTable(units,'crm-dt-inventario-body',true);
+  }catch(e){
+    if(body)body.innerHTML=`<div class="crm-det-placeholder"><div class="crm-det-placeholder-title">Error: ${e.message}</div></div>`;
+  }
+}
+
+async function loadContactoInventario(contactoId){
+  const body=document.getElementById('cto-dt-inventario-body');
+  if(!body)return;
+  body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Cargando...</div></div>';
+  try{
+    await _loadBldDocsIfNeeded();
+    const [occ,own]=await Promise.all([
+      _queryUnitsForId('occupierContactId',contactoId),
+      _queryUnitsForId('ownerContactId',contactoId),
+    ]);
+    occ.forEach(u=>u._rol='Ocupante');
+    own.forEach(u=>u._rol='Propietario');
+    const seen=new Set();
+    occ.forEach(u=>seen.add(u._bldId+'/'+u._id));
+    const units=[...occ,...own.filter(u=>{const k=u._bldId+'/'+u._id;if(seen.has(k))return false;seen.add(k);return true;})];
+    _renderInvTable(units,'cto-dt-inventario-body',false);
+  }catch(e){
+    if(body)body.innerHTML=`<div class="crm-det-placeholder"><div class="crm-det-placeholder-title">Error: ${e.message}</div></div>`;
+  }
+}
+
+function navToBuilding(bldId){
+  window._pendingBldOpen=bldId;
+  showModule('buildings');
 }
 
 // ===== CONTACTO DRAWER =====
@@ -5879,6 +5995,7 @@ async function loadBuildings(){
     renderBldKPIs();
     populateBldZonaFilter();
     filterBuildings();
+    if(window._pendingBldOpen){const id=window._pendingBldOpen;window._pendingBldOpen=null;setTimeout(()=>openBuildingEditor(id),60);}
   }catch(e){
     document.getElementById('bld-table-wrap').innerHTML=`<div class="bld-empty">Error: ${e.message}</div>`;
     document.getElementById('bld-subtitle').textContent='Error al cargar';
