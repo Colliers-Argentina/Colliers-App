@@ -4493,7 +4493,7 @@ function detTab(el,tabId){
   if(!right)return;
   right.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  right.querySelectorAll('[id^="crm-dt-"]').forEach(p=>p.style.display='none');
+  right.querySelectorAll('.crm-det-tab-body > [id^="crm-dt-"]').forEach(p=>p.style.display='none');
   const target=right.querySelector('#'+tabId);
   if(target)target.style.display='';
 }
@@ -4815,7 +4815,7 @@ function ctoDetTab(el,tabId){
   if(!right)return;
   right.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  right.querySelectorAll('[id^="cto-dt-"]').forEach(p=>p.style.display='none');
+  right.querySelectorAll('.crm-det-tab-body > [id^="cto-dt-"]').forEach(p=>p.style.display='none');
   const target=right.querySelector('#'+tabId);
   if(target)target.style.display='';
 }
