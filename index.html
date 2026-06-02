@@ -7705,23 +7705,31 @@ function _heatColor(t){
 function renderAnDemandMap(docs){
   const mapEl=document.getElementById('an-demand-map');
   if(!mapEl||typeof L==='undefined'){console.warn('[MAP] Abortando: mapEl=',!!mapEl,'L=',typeof L);return;}
-  if(!window._anDemandMap){
-    window._anDemandMap=L.map('an-demand-map',{zoomControl:true,scrollWheelZoom:false}).setView([-34.56,-58.43],11);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:18}).addTo(window._anDemandMap);
-    // Add legend once
-    const lc=L.control({position:'bottomright'});
-    lc.onAdd=()=>{
-      const d=L.DomUtil.create('div','an-map-legend');
-      d.innerHTML='<div class="an-map-legend-title">Demanda</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#FDE68A;border-color:#F59E0B"></div>Baja</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#FCA5A5;border-color:#EF4444"></div>Media</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#F97316;border-color:#C2410C"></div>Alta</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#DC2626;border-color:#7F1D1D"></div>Muy alta</div><div style="font-size:9px;color:#8A9AC0;margin-top:.35rem">Click = filtrar</div>';
-      return d;
-    };
-    lc.addTo(window._anDemandMap);
-    console.log('[MAP] Leaflet inicializado. Tamaño contenedor:',mapEl.offsetWidth+'x'+mapEl.offsetHeight);
-  }else{
-    const toRemove=[];
-    window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
-    toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
+
+  // Inicializar o limpiar mapa
+  try{
+    if(!window._anDemandMap){
+      window._anDemandMap=L.map('an-demand-map',{zoomControl:true,scrollWheelZoom:false}).setView([-34.56,-58.43],11);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:18}).addTo(window._anDemandMap);
+      const lc=L.control({position:'bottomright'});
+      lc.onAdd=()=>{
+        const d=L.DomUtil.create('div','an-map-legend');
+        d.innerHTML='<div class="an-map-legend-title">Demanda</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#FDE68A;border-color:#F59E0B"></div>Baja</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#FCA5A5;border-color:#EF4444"></div>Media</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#F97316;border-color:#C2410C"></div>Alta</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#DC2626;border-color:#7F1D1D"></div>Muy alta</div><div style="font-size:9px;color:#8A9AC0;margin-top:.35rem">Click = filtrar</div>';
+        return d;
+      };
+      lc.addTo(window._anDemandMap);
+      console.log('[MAP] Leaflet inicializado. Contenedor:',mapEl.offsetWidth+'x'+mapEl.offsetHeight,'px');
+    }else{
+      const toRemove=[];
+      window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
+      toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
+    }
+  }catch(err){
+    console.error('[MAP] Error inicializando Leaflet:',err);
+    return;
   }
+
+  // Construir zonaCount
   const zonaCount={},zonaAlts={},zonaClientes={};
   docs.forEach(d=>{
     let zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
@@ -7736,43 +7744,53 @@ function renderAnDemandMap(docs){
   });
 
   // ---- DIAGNOSTIC LOGS ----
-  const sinCoords=[],conCoords=[];
-  Object.entries(zonaCount).forEach(([z,c])=>{
-    if(_CABA_ZONE_COORDS[z])conCoords.push({zona:z,registros:c,alts:zonaAlts[z]||0,clientes:(zonaClientes[z]||new Set()).size});
-    else sinCoords.push({zona:z,registros:c});
-  });
-  console.group('%c[MAP] Diagnóstico de zonas','color:#1C54F4;font-weight:bold');
-  console.log('[MAP] docs procesados:',docs.length,'| zonas únicas:',Object.keys(zonaCount).length);
-  console.log('[MAP] Zonas encontradas en datos:');
-  console.table(Object.entries(zonaCount).sort((a,b)=>b[1]-a[1]).map(([zona,registros])=>({zona,registros,'en_coords':!!_CABA_ZONE_COORDS[zona]})));
-  if(sinCoords.length){
-    console.warn('[MAP] Sin coordenadas (no aparecerán en el mapa):', sinCoords.map(x=>`"${x.zona}" (${x.registros})`).join(', '));
+  const zonasSinCoordenadas=[];
+  const tablaZonas=Object.entries(zonaCount)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([zona,cantidad])=>{
+      const tieneCoordenadas=!!_CABA_ZONE_COORDS[zona];
+      if(!tieneCoordenadas)zonasSinCoordenadas.push(zona);
+      return{zona,cantidad,tieneCoordenadas};
+    });
+  console.group('%c[MAP] Diagnóstico de zonas en Analytics','color:#1C54F4;font-weight:bold');
+  console.log('[MAP] docs recibidos:',docs.length,'| zonas únicas encontradas:',tablaZonas.length);
+  console.table(tablaZonas);
+  if(zonasSinCoordenadas.length){
+    console.warn('[MAP] zonas sin coordenadas (omitidas del mapa):',zonasSinCoordenadas);
   }else{
     console.log('[MAP] Todas las zonas tienen coordenadas ✓');
   }
-  console.log('[MAP] Círculos a generar:',conCoords.length);
-  if(conCoords.length)console.table(conCoords);
+  const circulosAGenerar=tablaZonas.filter(r=>r.tieneCoordenadas);
+  console.log('[MAP] Círculos a generar:',circulosAGenerar.length);
+  if(circulosAGenerar.length)console.table(circulosAGenerar);
   console.groupEnd();
   // -------------------------
 
   const maxCount=Math.max(...Object.values(zonaCount),1);
   const isSelected=z=>_anFilters.zonas.size===0||_anFilters.zonas.has(z);
+  let circulosAgregados=0;
   Object.entries(zonaCount).forEach(([zona,count])=>{
     const coords=_CABA_ZONE_COORDS[zona];
     if(!coords)return;
-    const t=count/maxCount;
-    const col=_heatColor(t);
-    const radius=14+Math.round(t*26);
-    const sel=isSelected(zona);
-    const circle=L.circleMarker(coords,{radius,fillColor:col.fill,fillOpacity:sel?.75:.35,color:sel?col.stroke:'#ccc',weight:sel?2:1,interactive:true});
-    circle._anCircle=true;
-    const clientes=(zonaClientes[zona]||new Set()).size;
-    const alts=zonaAlts[zona]||0;
-    const ttHtml=`<div style="font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:3px">${zona}</div><div style="font-size:11px;color:#56648F;line-height:1.7">Demandas: <b style="color:#1C54F4">${count}</b><br>Alternativas: <b style="color:#1C54F4">${alts}</b><br>Clientes: <b style="color:#1C54F4">${clientes}</b></div>`;
-    circle.bindTooltip(ttHtml,{permanent:false,sticky:true,direction:'top',offset:[0,-radius-4],className:'an-tt'});
-    circle.on('click',()=>toggleAnZona(zona));
-    circle.addTo(window._anDemandMap);
+    try{
+      const t=count/maxCount;
+      const col=_heatColor(t);
+      const radius=14+Math.round(t*26);
+      const sel=isSelected(zona);
+      const circle=L.circleMarker(coords,{radius,fillColor:col.fill,fillOpacity:sel?0.75:0.35,color:sel?col.stroke:'#ccc',weight:sel?2:1,interactive:true});
+      circle._anCircle=true;
+      const clientes=(zonaClientes[zona]||new Set()).size;
+      const alts=zonaAlts[zona]||0;
+      const ttHtml=`<div style="font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:3px">${zona}</div><div style="font-size:11px;color:#56648F;line-height:1.7">Demandas: <b style="color:#1C54F4">${count}</b><br>Alternativas: <b style="color:#1C54F4">${alts}</b><br>Clientes: <b style="color:#1C54F4">${clientes}</b></div>`;
+      circle.bindTooltip(ttHtml,{permanent:false,sticky:true,direction:'top',offset:[0,-radius-4],className:'an-tt'});
+      circle.on('click',()=>toggleAnZona(zona));
+      circle.addTo(window._anDemandMap);
+      circulosAgregados++;
+    }catch(err){
+      console.error('[MAP] Error creando círculo para "'+zona+'":',err);
+    }
   });
+  console.log('[MAP] Círculos efectivamente agregados al mapa:',circulosAgregados);
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},200);
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},600);
 }
