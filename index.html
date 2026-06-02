@@ -1260,6 +1260,91 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
   .hub-wrap{padding:1rem}
   .side-panel{max-height:none}
 }
+/* ===== MOBILE RESPONSIVE SUPPLEMENTS ===== */
+
+/* ── Tablet ≤768px ── */
+@media(max-width:768px){
+  /* CRM/Contactos panels: let content flow naturally (no overflow clip) */
+  #crm-cuentas-section,#crm-contactos-section,#crm-leads-section{flex:none!important;overflow:visible!important;height:auto}
+  #crm-list-view,#cto-list-view{flex:none!important;overflow:visible!important;height:auto}
+  #crm-detail-view,#cto-detail-view{flex:none!important;overflow:visible!important;height:auto}
+  .crm-det-layout{overflow:visible}
+  .crm-det-left{max-height:220px;overflow-y:auto;border-right:none;border-bottom:1px solid #EEF3FF}
+  body.dark .crm-det-left{border-bottom-color:rgba(255,255,255,.06)}
+  .crm-det-right{overflow:visible;display:flex;flex-direction:column}
+  .crm-det-tab-body{overflow:visible;flex:none;padding:.85rem 1rem 2.5rem}
+  .crm-list-body{overflow:visible;flex:none;padding:.75rem .85rem}
+
+  /* Subnav: compact */
+  .crm-subnav{padding:.4rem .85rem;gap:.2rem}
+  .crm-subnav-tab{padding:.38rem .65rem;font-size:11px}
+  .crm-subnav .mod-back-btn{font-size:11px;padding:4px 10px}
+
+  /* CRM/Contactos topbars: wrap */
+  .crm-topbar{flex-direction:column;gap:.5rem;align-items:stretch}
+  .crm-topbar-r{flex-wrap:wrap;gap:.35rem}
+  .crm-topbar-r .crm-search-inp{flex:1;min-width:140px;width:auto}
+  .crm-topbar-l{padding-left:.1rem}
+
+  /* KPI row: 2×2 */
+  .crm-kpi-row{grid-template-columns:repeat(2,1fr)}
+
+  /* Tables: horizontal scroll */
+  .crm-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .crm-table{min-width:560px}
+
+  /* Detail tabs: swipeable horizontal scroll */
+  .crm-det-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding:0 .75rem;-ms-overflow-style:none;scrollbar-width:none}
+  .crm-det-tabs::-webkit-scrollbar{display:none}
+  .crm-det-tab{flex-shrink:0;padding:.6rem .7rem;font-size:11px}
+
+  /* Buildings topbar */
+  .bld-hz{flex-direction:column;gap:.65rem;align-items:stretch}
+  .bld-hz-r{flex-wrap:wrap;gap:.4rem;width:100%}
+  .bld-input{min-width:0!important;flex:1}
+  .bld-select{min-width:0;flex:1}
+  #bld-map-container{min-height:280px}
+
+  /* Analytics topbar */
+  .an-topbar{flex-wrap:wrap;gap:.5rem;padding:.75rem .85rem}
+  .an-kpis{grid-template-columns:repeat(2,1fr)}
+  .an-charts-row{grid-template-columns:1fr}
+  .an-tend-grid{grid-template-columns:1fr}
+
+  /* Leads placeholder */
+  .crm-leads-placeholder{padding:2.5rem 1.5rem}
+  .crm-leads-placeholder-icon{font-size:36px}
+}
+
+/* ── Small mobile ≤480px ── */
+@media(max-width:480px){
+  /* Hide m² range filters: rarely used on mobile */
+  .crm-topbar-r .crm-m2-inp,.crm-topbar-r .crm-m2-sep{display:none}
+  .crm-topbar-r .crm-sel{flex:1;min-width:90px;font-size:11px}
+  .crm-new-btn{font-size:11px;padding:6px 10px}
+
+  /* KPI compact */
+  .crm-kpi{padding:.6rem .7rem;gap:.5rem}
+  .crm-kpi-icon{width:28px;height:28px;font-size:13px}
+  .crm-kpi-v{font-size:18px}
+
+  /* Subnav: very tight */
+  .crm-subnav-tab{padding:.32rem .5rem;font-size:10.5px}
+  .crm-subnav .mod-back-btn{display:none}
+
+  /* Cuentas drawer full-width */
+  .cdr-drawer{width:100vw!important}
+
+  /* Buildings: single-col KPI on very small */
+  .bld-kpi-row{grid-template-columns:repeat(2,1fr)}
+
+  /* Map toolbar: compact */
+  #bld-map-toolbar{padding:.35rem .6rem;gap:.35rem;font-size:10px}
+  .bld-map-stat-val{font-size:13px}
+  .bld-map-stat-lbl{font-size:9px}
+  #bld-map-recalc-btn{padding:3px 8px;font-size:10px}
+}
+
 /* ===== CLIENT TIMELINE ===== */
 .clt-timeline{display:flex;flex-direction:column;position:relative;padding-left:1.4rem;padding-top:.25rem}
 .clt-timeline::before{content:'';position:absolute;left:5px;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,#1C54F4 0%,rgba(28,84,244,.1) 100%);border-radius:2px}
@@ -6100,6 +6185,7 @@ function show(id){
   if(nav)nav.style.display="none";
 }
 function showModule(mod){
+  closeMobileSidebar();
   // Close all overlays (including CRM)
   ['analytics-panel','buildings-panel','admin-panel','crm-panel'].forEach(id=>{
     const el=document.getElementById(id);
