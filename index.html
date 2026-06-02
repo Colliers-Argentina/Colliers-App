@@ -5760,6 +5760,7 @@ window.openNewClientModal=()=>openClientDrawer(()=>loadCRM());
 
 /* ===== UNIT CRM AUTOCOMPLETE ===== */
 let _duAcState={};
+let _duAcBlurGuard=false;
 
 function duAcSearch(inputEl){
   const bld=inputEl.dataset.bld;
@@ -5775,23 +5776,23 @@ function duAcSearch(inputEl){
     const contactos=_ctoDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(`${d.nombre||''} ${d.apellidos||''}`).toLowerCase().includes(q)).slice(0,5);
     console.log('[DU-AC] crm docs:',_crmDocs.length,'| cto docs:',_ctoDocs.length,'| resultados:',cuentas.length+contactos.length);
     const r=inputEl.getBoundingClientRect();
-    console.log('[DU-AC] input rect:',r.top,r.bottom,r.left,'| drop position: top='+(r.bottom+3)+' left='+r.left);
     drop.style.top=(r.bottom+3)+'px';
     drop.style.left=r.left+'px';
     drop.style.width=Math.max(r.width,230)+'px';
     let html='';
     cuentas.forEach(c=>{
-      html+=`<div class="du-ac-item" onmousedown="event.preventDefault();duAcSelect('cuenta','${c._id}','${(c.nombre||'').replace(/'/g,"\\'")}')"><span class="du-ac-tipo-cta">Cuenta</span>${c.nombre}</div>`;
+      const n=(c.nombre||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      html+=`<div class="du-ac-item" onmousedown="event.preventDefault();_duAcBlurGuard=true;duAcSelect('cuenta','${c._id}','${n}','${bld}','${uid}','${role}')"><span class="du-ac-tipo-cta">Cuenta</span>${c.nombre}</div>`;
     });
     contactos.forEach(c=>{
-      const n=`${c.nombre||''} ${c.apellidos||''}`.trim();
-      html+=`<div class="du-ac-item" onmousedown="event.preventDefault();duAcSelect('contacto','${c._id}','${n.replace(/'/g,"\\'")}')"><span class="du-ac-tipo-cto">Contacto</span>${n}</div>`;
+      const n=`${c.nombre||''} ${c.apellidos||''}`.trim().replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      html+=`<div class="du-ac-item" onmousedown="event.preventDefault();_duAcBlurGuard=true;duAcSelect('contacto','${c._id}','${n}','${bld}','${uid}','${role}')"><span class="du-ac-tipo-cto">Contacto</span>${c.nombre||''} ${c.apellidos||''}</div>`;
     });
     if(!cuentas.length&&!contactos.length)html+=`<div style="padding:7px 10px;font-size:11px;color:#7B8BBD">Sin resultados</div>`;
     html+=`<div class="du-ac-footer"><button class="be-ac-link" onmousedown="event.preventDefault();duAcCreateNew('cuenta')">+ Nueva Cuenta</button><button class="be-ac-link" onmousedown="event.preventDefault();duAcCreateNew('contacto')">+ Nuevo Contacto</button></div>`;
     drop.innerHTML=html;
     drop.style.display='block';
-    console.log('[DU-AC] dropdown abierto | display:',drop.style.display,'| innerHTML length:',drop.innerHTML.length);
+    console.log('[DU-AC] dropdown abierto');
   };
   const needCrm=!_crmDocs.length, needCto=!_ctoDocs.length;
   if(needCrm||needCto){
@@ -5803,10 +5804,12 @@ function duAcSearch(inputEl){
   } else {_render();}
 }
 
-function duAcSelect(tipo,id,nombre){
-  console.log('[DU-AC] seleccionando:',tipo,id,nombre);
-  const {bld,uid,role,el}=_duAcState;
-  if(!bld||!uid)return;
+// bld, uid, role vienen directamente del handler — sin dependencia de _duAcState global
+function duAcSelect(tipo,id,nombre,bld,uid,role){
+  console.log('[DU-AC] seleccionando:',tipo,id,nombre,'| bld:',bld,'| uid:',uid,'| role:',role);
+  setTimeout(()=>{_duAcBlurGuard=false;},150);
+  if(!bld||!uid){console.warn('[DU-AC] bld/uid vacíos — abortando');return;}
+  const el=document.querySelector(`.du-ac-inp[data-bld="${bld}"][data-uid="${uid}"][data-role="${role}"]`);
   if(el)el.value=nombre;
   const update={updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
   if(role==='occ'){
@@ -5822,12 +5825,19 @@ function duAcSelect(tipo,id,nombre){
     .then(()=>{
       const u=_unitDocs.find(x=>x._id===uid);if(u)Object.assign(u,update);
       if(el){el.style.borderColor='#16A34A';el.style.boxShadow='0 0 0 2px rgba(22,163,74,.12)';setTimeout(()=>{el.style.borderColor='';el.style.boxShadow='';},900);}
+      console.log('[DU-AC] guardado OK | occupierAccountId/ownerAccountId:',update.occupierAccountId||update.ownerAccountId||update.occupierContactId||update.ownerContactId);
     })
     .catch(e=>showBldToast('❌ Error: '+e.message));
   document.getElementById('du-ac-dropdown').style.display='none';
+  // Mantener _duAcState sincronizado para duAcCreateNew
+  _duAcState={bld,uid,role,el};
 }
 
 function duAcBlurSave(inputEl){
+  if(_duAcBlurGuard){
+    console.log('[DU-AC] blur ignorado — selección en curso');
+    return;
+  }
   const bld=inputEl.dataset.bld,uid=inputEl.dataset.uid,role=inputEl.dataset.role;
   const val=inputEl.value.trim();
   const field=role==='occ'?'ocupante':'propietario';
@@ -5847,9 +5857,7 @@ function duAcCreateNew(tipo){
   if(tipo==='cuenta'){
     openClientDrawer(function(nombre,newId){
       if(!newId)return;
-      _duAcState.bld=bld;_duAcState.uid=uid;_duAcState.role=role;
-      _duAcState.el=document.querySelector(`.du-ac-inp[data-uid="${uid}"][data-role="${role}"]`);
-      duAcSelect('cuenta',newId,nombre);
+      duAcSelect('cuenta',newId,nombre,bld,uid,role);
       loadCRM();
     });
   } else {
@@ -5866,8 +5874,27 @@ window.duAcDebug={
   get crmDocs(){return _crmDocs;},
   get ctoDocs(){return _ctoDocs;},
   get state(){return _duAcState;},
-  search:duAcSearch,
-  checkDrop(){const d=document.getElementById('du-ac-dropdown');console.log('drop:',d,'parent:',d?.parentElement,'display:',d?.style.display,'computed:',d?getComputedStyle(d).display:'N/A');return d;}
+  get blurGuard(){return _duAcBlurGuard;},
+  checkDrop(){const d=document.getElementById('du-ac-dropdown');console.log('drop:',d,'parent:',d?.parentElement,'display:',d?.style.display,'computed:',d?getComputedStyle(d).display:'N/A');return d;},
+  async findUnlinked(){
+    console.log('[DU-AC MIGRATION] Buscando disponibilidades sin vínculo CRM...');
+    await _loadBldDocsIfNeeded();
+    const results=[];
+    await Promise.all(_bldDocs.map(async bld=>{
+      const snap=await db.collection('buildings').doc(bld._id).collection('units').get();
+      snap.docs.forEach(d=>{
+        const data=d.data();
+        const issues=[];
+        if(data.ocupante&&!data.occupierAccountId&&!data.occupierContactId)issues.push('ocupante sin ID');
+        if(data.propietario&&!data.ownerAccountId&&!data.ownerContactId)issues.push('propietario sin ID');
+        if(issues.length)results.push({edificio:bld.nombre||bld._id,bldId:bld._id,unitId:d.id,piso:data.piso||'–',unidad:data.unidad||'–',ocupante:data.ocupante||'',propietario:data.propietario||'',problema:issues.join(', ')});
+      });
+    }));
+    if(!results.length){console.log('[DU-AC MIGRATION] ✅ No hay disponibilidades sin vínculo CRM.');return results;}
+    console.warn(`[DU-AC MIGRATION] ⚠️ ${results.length} disponibilidades con texto pero sin ID CRM:`);
+    console.table(results);
+    return results;
+  }
 };
 
 /* ===== BUILDING CRM AUTOCOMPLETE ===== */
