@@ -7704,7 +7704,7 @@ function _heatColor(t){
 
 function renderAnDemandMap(docs){
   const mapEl=document.getElementById('an-demand-map');
-  if(!mapEl||typeof L==='undefined')return;
+  if(!mapEl||typeof L==='undefined'){console.warn('[MAP] Abortando: mapEl=',!!mapEl,'L=',typeof L);return;}
   if(!window._anDemandMap){
     window._anDemandMap=L.map('an-demand-map',{zoomControl:true,scrollWheelZoom:false}).setView([-34.56,-58.43],11);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:18}).addTo(window._anDemandMap);
@@ -7716,6 +7716,7 @@ function renderAnDemandMap(docs){
       return d;
     };
     lc.addTo(window._anDemandMap);
+    console.log('[MAP] Leaflet inicializado. Tamaño contenedor:',mapEl.offsetWidth+'x'+mapEl.offsetHeight);
   }else{
     const toRemove=[];
     window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
@@ -7733,6 +7734,27 @@ function renderAnDemandMap(docs){
       if(cli){if(!zonaClientes[z])zonaClientes[z]=new Set();zonaClientes[z].add(cli);}
     });
   });
+
+  // ---- DIAGNOSTIC LOGS ----
+  const sinCoords=[],conCoords=[];
+  Object.entries(zonaCount).forEach(([z,c])=>{
+    if(_CABA_ZONE_COORDS[z])conCoords.push({zona:z,registros:c,alts:zonaAlts[z]||0,clientes:(zonaClientes[z]||new Set()).size});
+    else sinCoords.push({zona:z,registros:c});
+  });
+  console.group('%c[MAP] Diagnóstico de zonas','color:#1C54F4;font-weight:bold');
+  console.log('[MAP] docs procesados:',docs.length,'| zonas únicas:',Object.keys(zonaCount).length);
+  console.log('[MAP] Zonas encontradas en datos:');
+  console.table(Object.entries(zonaCount).sort((a,b)=>b[1]-a[1]).map(([zona,registros])=>({zona,registros,'en_coords':!!_CABA_ZONE_COORDS[zona]})));
+  if(sinCoords.length){
+    console.warn('[MAP] Sin coordenadas (no aparecerán en el mapa):', sinCoords.map(x=>`"${x.zona}" (${x.registros})`).join(', '));
+  }else{
+    console.log('[MAP] Todas las zonas tienen coordenadas ✓');
+  }
+  console.log('[MAP] Círculos a generar:',conCoords.length);
+  if(conCoords.length)console.table(conCoords);
+  console.groupEnd();
+  // -------------------------
+
   const maxCount=Math.max(...Object.values(zonaCount),1);
   const isSelected=z=>_anFilters.zonas.size===0||_anFilters.zonas.has(z);
   Object.entries(zonaCount).forEach(([zona,count])=>{
