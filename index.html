@@ -369,8 +369,37 @@ body.dark .an-filter-inp::placeholder{color:rgba(168,179,209,.4)}
 .an-filter-chip:hover{background:rgba(239,51,64,.06);color:#EF3340;border-color:rgba(239,51,64,.3)}
 body.dark .an-filter-chip{border-color:rgba(255,255,255,.1);color:#7B8BBD}
 .an-body{padding:1.1rem 1.5rem;display:flex;flex-direction:column;gap:.9rem;overflow-y:auto;flex:1}
-.an-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem}
+.an-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:.65rem}
+@media(max-width:1280px){.an-kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:960px){.an-kpis{grid-template-columns:repeat(2,1fr)}}
+.mz-dd{position:relative;flex-shrink:0}
+.mz-dd-btn{font-family:inherit;font-size:12px;padding:6px 10px;border:1px solid #E2EAF4;color:#000759;background:#fff;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:.35rem;line-height:1.2}
+.mz-dd-btn:focus{outline:none;border-color:#1C54F4}
+.mz-dd-btn.has-sel{border-color:#1C54F4;background:#F0F4FF;color:#1C54F4;font-weight:700}
+body.dark .mz-dd-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#fff}
+body.dark .mz-dd-btn.has-sel{background:rgba(28,84,244,.15);border-color:rgba(28,84,244,.4);color:#72AEFF}
+.mz-dd-panel{position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1px solid #E2EAF4;border-radius:8px;box-shadow:0 6px 24px rgba(0,7,89,.12);z-index:800;min-width:210px;max-height:280px;overflow-y:auto;display:none}
+body.dark .mz-dd-panel{background:#0A1B4D;border-color:rgba(255,255,255,.1)}
+.mz-dd-panel.open{display:block}
+.mz-dd-item{display:flex;align-items:center;gap:.5rem;padding:.4rem .8rem;cursor:pointer;font-size:11px;color:#0A1B4D;transition:background .1s;user-select:none}
+.mz-dd-item:hover{background:#F8FAFF}
+body.dark .mz-dd-item{color:#C3E6FF}
+body.dark .mz-dd-item:hover{background:rgba(255,255,255,.04)}
+.mz-dd-item input[type=checkbox]{accent-color:#1C54F4;width:13px;height:13px;flex-shrink:0;cursor:pointer}
+.mz-dd-footer{padding:.45rem .8rem;border-top:1px solid #F2F6FF;display:flex;justify-content:flex-end;position:sticky;bottom:0;background:#fff}
+body.dark .mz-dd-footer{border-top-color:rgba(255,255,255,.06);background:#0A1B4D}
+.mz-dd-clear-btn{font-size:10px;font-weight:700;color:#EF4444;cursor:pointer;background:none;border:none;font-family:inherit;padding:2px 4px;letter-spacing:.01em}
+.mz-dd-clear-btn:hover{text-decoration:underline}
+.an-map-legend{position:absolute;bottom:30px;right:10px;background:rgba(255,255,255,.93);border:1px solid #E2EAF4;border-radius:8px;padding:.55rem .75rem;z-index:600;backdrop-filter:blur(8px);pointer-events:none}
+body.dark .an-map-legend{background:rgba(8,14,50,.9);border-color:rgba(255,255,255,.1)}
+.an-map-legend-title{font-size:9px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem}
+body.dark .an-map-legend-title{color:#6B7FA3}
+.an-map-legend-item{display:flex;align-items:center;gap:.4rem;font-size:10px;color:#353E59;margin-bottom:.18rem}
+body.dark .an-map-legend-item{color:#C3E6FF}
+.an-map-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1.5px solid rgba(255,255,255,.6)}
+.leaflet-tooltip.an-tt{background:#fff;border:1px solid #E2EAF4;border-radius:8px;padding:.45rem .65rem;box-shadow:0 4px 16px rgba(0,7,89,.12);pointer-events:none}
+body.dark .leaflet-tooltip.an-tt{background:#0A1B4D;border-color:rgba(255,255,255,.1)}
+.leaflet-tooltip.an-tt::before{display:none}
 .kpi-card{background:#fff;border:1px solid #E8EFF8;border-radius:12px;padding:.85rem 1rem;display:flex;align-items:center;gap:.8rem;transition:box-shadow .18s,transform .18s;box-shadow:0 1px 3px rgba(0,7,89,.04)}
 .kpi-card:hover{box-shadow:0 4px 18px rgba(0,7,89,.09);transform:translateY(-1px)}
 body.dark .kpi-card{background:rgba(10,18,60,.65);border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(12px)}
@@ -1877,7 +1906,13 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
   </div>
   <div class="an-fbar" id="an-fbar">
     <div class="an-fbar-row">
-      <select class="an-fbar-sel" id="an-f-zona" onchange="applyAnFilters()"><option value="">Todas las zonas</option></select>
+      <div class="mz-dd" id="an-zona-dd">
+        <button class="an-fbar-sel mz-dd-btn" id="an-zona-btn" onclick="toggleAnZonaDD(event)" type="button">Todas las zonas ▾</button>
+        <div class="mz-dd-panel" id="an-zona-panel">
+          <div id="an-zona-list"></div>
+          <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearAnZonas()">✕ Limpiar</button></div>
+        </div>
+      </div>
       <select class="an-fbar-sel" id="an-f-ejecutivo" onchange="applyAnFilters()"><option value="">Todos los ejecutivos</option></select>
       <select class="an-fbar-sel" id="an-f-edificio" onchange="applyAnFilters()"><option value="">Todos los edificios</option></select>
       <div style="display:flex;align-items:center;gap:.3rem">
@@ -2566,7 +2601,13 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           </div>
           <div class="bld-hz-r">
             <input id="bld-search" type="text" placeholder="🔍 Buscar edificio..." class="bld-input" oninput="filterBuildings()">
-            <select id="bld-filter-zona" class="bld-select" onchange="filterBuildings()"><option value="">Todas las zonas</option></select>
+            <div class="mz-dd" id="bld-zona-dd">
+              <button class="bld-select mz-dd-btn" id="bld-zona-btn" onclick="toggleBldZonaDD(event)" type="button">Todas las zonas ▾</button>
+              <div class="mz-dd-panel" id="bld-zona-panel">
+                <div id="bld-zona-list"></div>
+                <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldZonas()">✕ Limpiar</button></div>
+              </div>
+            </div>
             <select id="bld-filter-estado" class="bld-select" onchange="filterBuildings()">
               <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
             </select>
@@ -6249,6 +6290,7 @@ document.addEventListener('click',function(e){
 /* ===== BUILDINGS ADMIN ===== */
 const BLD_PAGE_SIZE=20;
 let _bldDocs=[], _bldFiltered=[], _bldPage=0, _bldEditId=null;
+let _bldZonasSel=new Set();
 
 const BLD_ESTADO_COLORS={
   'Disponible' :{bg:'rgba(34,197,94,.1)',  border:'rgba(34,197,94,.3)',  text:'#16A34A'},
@@ -6342,30 +6384,53 @@ function renderBldKPIs(docs){
 }
 
 function populateBldZonaFilter(){
-  const sel=document.getElementById('bld-filter-zona');
   const zonas=[...new Set(_bldDocs.map(d=>d.zona||d.submercado).filter(Boolean))].sort();
-  sel.innerHTML='<option value="">Todas las zonas</option>'+zonas.map(z=>`<option value="${z}">${z}</option>`).join('');
+  const list=document.getElementById('bld-zona-list');
+  if(!list)return;
+  list.innerHTML=zonas.map(z=>`<label class="mz-dd-item"><input type="checkbox" id="bld-zchk-${z.replace(/[\s/]/g,'_')}" ${_bldZonasSel.has(z)?'checked':''} onchange="toggleBldZona('${z.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" onclick="event.stopPropagation()"><span>${z}</span></label>`).join('');
+  _updateBldZonaBtn();
+}
+
+function _updateBldZonaBtn(){
+  const btn=document.getElementById('bld-zona-btn');
+  if(!btn)return;
+  if(_bldZonasSel.size===0){btn.textContent='Todas las zonas ▾';btn.classList.remove('has-sel');}
+  else{btn.textContent=_bldZonasSel.size+' zona'+(_bldZonasSel.size>1?'s':'')+' ▾';btn.classList.add('has-sel');}
+}
+
+function toggleBldZona(zona){
+  if(_bldZonasSel.has(zona))_bldZonasSel.delete(zona);else _bldZonasSel.add(zona);
+  _updateBldZonaBtn();
+  filterBuildings();
+}
+
+function toggleBldZonaDD(e){
+  e&&e.stopPropagation();
+  const panel=document.getElementById('bld-zona-panel');
+  if(!panel)return;
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')){
+    const closeOnOut=ev=>{if(!document.getElementById('bld-zona-dd')?.contains(ev.target)){panel.classList.remove('open');document.removeEventListener('click',closeOnOut);}};
+    setTimeout(()=>document.addEventListener('click',closeOnOut),10);
+  }
+}
+
+function clearBldZonas(){
+  _bldZonasSel.clear();
+  _updateBldZonaBtn();
+  document.querySelectorAll('[id^="bld-zchk-"]').forEach(cb=>cb.checked=false);
+  filterBuildings();
 }
 
 function filterBuildings(){
   const q=(document.getElementById('bld-search')?.value||'').toLowerCase().trim();
-  const zona=document.getElementById('bld-filter-zona')?.value||'';
   const estado=document.getElementById('bld-filter-estado')?.value||'';
   _bldFiltered=_bldDocs.filter(d=>{
     if(q){
-      // Search by name, address, zone, broker — any field that could match
-      const haystack=[
-        d.nombre||'',
-        d.direccion||'',
-        d.zona||'',
-        d.submercado||'',
-        d.broker||'',
-        d.descripcion||'',
-        d.amenities||'',
-      ].join(' ').toLowerCase();
+      const haystack=[d.nombre||'',d.direccion||'',d.zona||'',d.submercado||'',d.broker||'',d.descripcion||'',d.amenities||''].join(' ').toLowerCase();
       if(!haystack.includes(q))return false;
     }
-    if(zona&&(d.zona||d.submercado)!==zona)return false;
+    if(_bldZonasSel.size>0&&!_bldZonasSel.has(d.zona||d.submercado))return false;
     if(estado&&d.estado!==estado)return false;
     return true;
   });
@@ -7219,7 +7284,7 @@ const _anCharts={};
 let _anDocs=[];
 window._anDemandMap=null;
 const ANALYTICS_ALLOWED=['mazaretto@gmail.com','matias.azaretto@colliers.com','colliers.arg@gmail.com'];
-const _anFilters={periodo:0,zona:'',ejecutivo:'',edificio:'',m2min:0,m2max:0};
+const _anFilters={periodo:0,zonas:new Set(),ejecutivo:'',edificio:'',m2min:0,m2max:0};
 
 window.toggleAnalytics=()=>{
   if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
@@ -7282,9 +7347,9 @@ function _filterAnDocs(docs){
       const f=_tsToDate(d.fecha);
       if(!f||f<cutoff)return false;
     }
-    if(_anFilters.zona){
+    if(_anFilters.zonas.size>0){
       const zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
-      if(!zs.includes(_anFilters.zona))return false;
+      if(!zs.some(z=>_anFilters.zonas.has(z)))return false;
     }
     if(_anFilters.ejecutivo&&(d.usuario||d.nombre||'')!==_anFilters.ejecutivo)return false;
     if(_anFilters.edificio&&!(d.edificios||d.propiedades||[]).includes(_anFilters.edificio))return false;
@@ -7298,7 +7363,6 @@ function _filterAnDocs(docs){
 }
 
 function applyAnFilters(){
-  _anFilters.zona=document.getElementById('an-f-zona')?.value||'';
   _anFilters.ejecutivo=document.getElementById('an-f-ejecutivo')?.value||'';
   _anFilters.edificio=document.getElementById('an-f-edificio')?.value||'';
   _anFilters.m2min=parseFloat(document.getElementById('an-m2-min')?.value)||0;
@@ -7313,10 +7377,45 @@ function setAnGlobalPeriod(dias){
   applyAnFilters();
 }
 
+function _updateAnZonaBtn(){
+  const btn=document.getElementById('an-zona-btn');
+  if(!btn)return;
+  if(_anFilters.zonas.size===0){btn.textContent='Todas las zonas ▾';btn.classList.remove('has-sel');}
+  else{btn.textContent=_anFilters.zonas.size+' zona'+(_anFilters.zonas.size>1?'s':'')+' ▾';btn.classList.add('has-sel');}
+}
+
+function toggleAnZona(zona){
+  if(_anFilters.zonas.has(zona))_anFilters.zonas.delete(zona);else _anFilters.zonas.add(zona);
+  _updateAnZonaBtn();
+  const chk=document.getElementById('an-zchk-'+zona.replace(/[\s/]/g,'_'));
+  if(chk)chk.checked=_anFilters.zonas.has(zona);
+  _renderAnChips();
+  renderAnalytics(_filterAnDocs(_anDocs));
+}
+
+function toggleAnZonaDD(e){
+  e&&e.stopPropagation();
+  const panel=document.getElementById('an-zona-panel');
+  if(!panel)return;
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')){
+    const closeOnOut=ev=>{if(!document.getElementById('an-zona-dd')?.contains(ev.target)){panel.classList.remove('open');document.removeEventListener('click',closeOnOut);}};
+    setTimeout(()=>document.addEventListener('click',closeOnOut),10);
+  }
+}
+
+function clearAnZonas(){
+  _anFilters.zonas.clear();
+  _updateAnZonaBtn();
+  document.querySelectorAll('[id^="an-zchk-"]').forEach(cb=>cb.checked=false);
+  _renderAnChips();
+  renderAnalytics(_filterAnDocs(_anDocs));
+}
+
 function _renderAnChips(){
   const chips=[];
-  const hasFilter=_anFilters.zona||_anFilters.ejecutivo||_anFilters.edificio||_anFilters.m2min||_anFilters.m2max;
-  if(_anFilters.zona)chips.push({lbl:'Zona: '+_anFilters.zona,clear:()=>{document.getElementById('an-f-zona').value='';applyAnFilters();}});
+  const hasFilter=_anFilters.zonas.size||_anFilters.ejecutivo||_anFilters.edificio||_anFilters.m2min||_anFilters.m2max;
+  if(_anFilters.zonas.size>0){const lbls=[..._anFilters.zonas].join(' · ');chips.push({lbl:'Zona: '+lbls,clear:()=>clearAnZonas()});}
   if(_anFilters.ejecutivo)chips.push({lbl:'Ejec.: '+_anFilters.ejecutivo,clear:()=>{document.getElementById('an-f-ejecutivo').value='';applyAnFilters();}});
   if(_anFilters.edificio)chips.push({lbl:'Edif.: '+_anFilters.edificio,clear:()=>{document.getElementById('an-f-edificio').value='';applyAnFilters();}});
   if(_anFilters.m2min||_anFilters.m2max)chips.push({lbl:'m²: '+(_anFilters.m2min||'?')+' – '+(_anFilters.m2max||'∞'),clear:()=>{document.getElementById('an-m2-min').value='';document.getElementById('an-m2-max').value='';applyAnFilters();}});
@@ -7328,9 +7427,12 @@ function _renderAnChips(){
 }
 
 function clearAllAnFilters(){
-  ['an-f-zona','an-f-ejecutivo','an-f-edificio'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  _anFilters.zonas.clear();
+  _updateAnZonaBtn();
+  document.querySelectorAll('[id^="an-zchk-"]').forEach(cb=>cb.checked=false);
+  ['an-f-ejecutivo','an-f-edificio'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['an-m2-min','an-m2-max'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  Object.assign(_anFilters,{zona:'',ejecutivo:'',edificio:'',m2min:0,m2max:0});
+  Object.assign(_anFilters,{ejecutivo:'',edificio:'',m2min:0,m2max:0});
   _renderAnChips();
   renderAnalytics(_filterAnDocs(_anDocs));
 }
@@ -7421,9 +7523,7 @@ function renderAnalytics(docs){
         scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:'transparent'},ticks:{color:textColor,font:{size:11}}}},
         onClick:(e,els)=>{
           if(!els.length)return;
-          const zona=zonaSorted[els[0].index][0];
-          const sel=document.getElementById('an-f-zona');
-          if(sel){sel.value=zona;applyAnFilters();}
+          toggleAnZona(zonaSorted[els[0].index][0]);
         }
       }
     });
