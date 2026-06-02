@@ -1846,6 +1846,8 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="crm-det-topbar">
         <button class="crm-det-back-btn" onclick="closeCRMDetail()">← Volver a cuentas</button>
         <div style="flex:1"></div>
+        <button id="crm-edit-cuenta-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF">✏️ Editar</button>
+        <button id="crm-archive-cuenta-btn" class="crm-action-btn" style="background:rgba(123,139,189,.1);color:#7B8BBD;border-color:rgba(123,139,189,.3)">📦 Archivar</button>
       </div>
       <div class="crm-det-layout">
         <div class="crm-det-left" id="crm-det-left"></div>
@@ -1890,6 +1892,8 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="crm-det-topbar">
         <button class="crm-det-back-btn" onclick="closeContactoDetail()">← Volver a contactos</button>
         <div style="flex:1"></div>
+        <button id="cto-edit-contacto-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF">✏️ Editar</button>
+        <button id="cto-archive-contacto-btn" class="crm-action-btn" style="background:rgba(123,139,189,.1);color:#7B8BBD;border-color:rgba(123,139,189,.3)">📦 Archivar</button>
       </div>
       <div class="crm-det-layout">
         <div class="crm-det-left" id="cto-det-left"></div>
@@ -1934,6 +1938,8 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <button class="crm-det-back-btn" onclick="closeLeadDetail()">← Volver a leads</button>
         <div style="flex:1"></div>
         <button id="lead-convert-btn" onclick="openConvertModal()" style="display:none;background:#16A34A;color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer">🔄 Convertir a contacto</button>
+        <button id="lead-edit-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF">✏️ Editar</button>
+        <button id="lead-archive-btn" class="crm-action-btn" style="background:rgba(123,139,189,.1);color:#7B8BBD;border-color:rgba(123,139,189,.3)">📦 Archivar</button>
       </div>
       <div class="crm-det-layout">
         <div class="crm-det-left" id="lead-det-left"></div>
@@ -4291,6 +4297,7 @@ function filterCRM(){
   const m2Min=parseFloat(document.getElementById('crm-m2-min')?.value)||0;
   const m2Max=parseFloat(document.getElementById('crm-m2-max')?.value)||0;
   const filtered=_crmDocs.filter(d=>{
+    if((d.estadoRegistro||'activo')==='archivado')return false;
     if(q&&!(d.nombre||'').toLowerCase().includes(q)&&!(d.broker||'').toLowerCase().includes(q))return false;
     if(broker&&d.broker!==broker)return false;
     if(estado&&d.estado!==estado)return false;
@@ -4401,6 +4408,7 @@ function openClientDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">PPTs generados</div><div class="crm-det-meta-val" style="color:#1C54F4;font-size:20px">${ppts}</div></div>
+    ${d.ultimaModificacion?`<div class="crm-det-meta-item" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF3FF"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${fmtDate(d.ultimaModificacion)}${d.usuarioUltimaModificacion?' · '+d.usuarioUltimaModificacion:''}</div></div>`:''}
   `;
   // Right panel
   document.getElementById('crm-det-right').innerHTML=`
@@ -4494,6 +4502,10 @@ function openClientDetail(docId){
       </div>
     </div>
   `;
+  const cdrEditBtn=document.getElementById('crm-edit-cuenta-btn');
+  if(cdrEditBtn)cdrEditBtn.onclick=()=>openClientDrawer_edit(docId);
+  const cdrArchiveBtn=document.getElementById('crm-archive-cuenta-btn');
+  if(cdrArchiveBtn)cdrArchiveBtn.onclick=()=>archiveCuenta(docId);
   // Switch views
   document.getElementById('crm-list-view').style.display='none';
   const dv=document.getElementById('crm-detail-view');
@@ -4532,6 +4544,7 @@ function filterContactos(){
   const cargo=document.getElementById('cto-filter-cargo')?.value||'';
   const emailF=document.getElementById('cto-filter-email')?.value||'';
   const filtered=_ctoDocs.filter(d=>{
+    if((d.estadoRegistro||'activo')==='archivado')return false;
     const fullname=((d.nombre||'')+' '+(d.apellidos||'')).toLowerCase();
     if(q&&!fullname.includes(q)&&!(d.email||'').toLowerCase().includes(q)&&!(d.cuentaNombre||'').toLowerCase().includes(q))return false;
     if(cargo&&d.cargo!==cargo)return false;
@@ -4650,11 +4663,24 @@ function openContactoDetail(docId){
       </div>
     </div>
   `;
+  const ctoEditBtn=document.getElementById('cto-edit-contacto-btn');
+  if(ctoEditBtn)ctoEditBtn.onclick=()=>openContactoDrawer_edit(docId);
+  const ctoArchiveBtn=document.getElementById('cto-archive-contacto-btn');
+  if(ctoArchiveBtn)ctoArchiveBtn.onclick=()=>archiveContacto(docId);
   document.getElementById('cto-list-view').style.display='none';
   const dv=document.getElementById('cto-detail-view');
   dv.style.display='flex';
   dv.style.flexDirection='column';
 }
+
+window.archiveContacto=async function(docId){
+  if(!confirm('¿Archivar este contacto?'))return;
+  const now=firebase.firestore.Timestamp.now();
+  await db.collection('contactos').doc(docId).update({estadoRegistro:'archivado',ultimaActividad:now});
+  const idx=_ctoDocs.findIndex(d=>d._id===docId);
+  if(idx>=0)_ctoDocs[idx].estadoRegistro='archivado';
+  loadContactos();
+};
 
 window.closeContactoDetail=()=>{
   document.getElementById('cto-detail-view').style.display='none';
@@ -4706,28 +4732,26 @@ async function loadCuentaContactos(cuentaId){
 let _ctdrAccountSelected=false;
 
 window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
+  _ctdrEditId=null;
   _ctdrAccountSelected=false;
-  // Reset all fields
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-interno','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['ctdr-cargo','ctdr-estadoCorreo','ctdr-volumen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
   document.getElementById('ctdr-cuentaId').value='';
   document.getElementById('ctdr-cuentaNombre').value='';
   document.getElementById('ctdr-comentarios').value='';
-  // Reset toggles
   document.querySelectorAll('#ctdr-drawer .cdr-toggle-btn[data-default]').forEach(btn=>{
     const field=btn.dataset.field;
     document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
-  // Reset pref chips
   document.querySelectorAll('#ctdr-prefs .cto-pref-chip').forEach(c=>c.classList.remove('active'));
-  // Prefill cuenta if provided
   if(prefillCuentaId&&prefillCuentaNombre){
     document.getElementById('ctdr-cuentaId').value=prefillCuentaId;
     document.getElementById('ctdr-cuentaNombre').value=prefillCuentaNombre;
     document.getElementById('ctdr-cuenta-q').value=prefillCuentaNombre;
     _ctdrAccountSelected=true;
   }
+  document.querySelector('#ctdr-drawer .cdr-title').textContent='Nuevo Contacto';
   const btn=document.getElementById('ctdr-save-btn');
   btn.textContent='Crear contacto';btn.disabled=false;
   document.getElementById('ctdr-overlay').classList.add('open');
@@ -4735,7 +4759,30 @@ window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
   setTimeout(()=>document.getElementById('ctdr-nombre').focus(),60);
 };
 
+window.openContactoDrawer_edit=function(docId){
+  const d=_ctoDocs.find(x=>x._id===docId);
+  if(!d)return;
+  window.openContactoDrawer(d.cuentaId,d.cuentaNombre);
+  _ctdrEditId=docId;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  set('ctdr-nombre',d.nombre);set('ctdr-apellidos',d.apellidos);set('ctdr-puesto',d.puesto);
+  set('ctdr-email',d.email);set('ctdr-telefono',d.telefono);set('ctdr-interno',d.interno);
+  set('ctdr-linkedin',d.linkedin);set('ctdr-comentarios',d.comentarios);
+  document.getElementById('ctdr-cargo').value=d.cargo||'';
+  document.getElementById('ctdr-estadoCorreo').value=d.estadoCorreo||'sin_comprobar';
+  document.getElementById('ctdr-volumen').value=d.volumenInversion||'';
+  const setToggle=(field,val)=>{
+    document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{b.classList.toggle('active',b.dataset.value===val);});
+  };
+  setToggle('ctdrPropietario',d.propietario);setToggle('ctdrInversor',d.inversor);
+  const prefs=d.prefsInversion||[];
+  document.querySelectorAll('#ctdr-prefs .cto-pref-chip').forEach(c=>{c.classList.toggle('active',prefs.includes(c.dataset.pref));});
+  document.querySelector('#ctdr-drawer .cdr-title').textContent='Editar Contacto';
+  const btn=document.getElementById('ctdr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
+};
+
 window.closeContactoDrawer=function(){
+  _ctdrEditId=null;
   document.getElementById('ctdr-overlay').classList.remove('open');
   document.getElementById('ctdr-drawer').classList.remove('open');
   document.getElementById('ctdr-cuenta-list').style.display='none';
@@ -4778,11 +4825,10 @@ window.saveContactoDrawer=async function(){
   try{
     const prefs=[...document.querySelectorAll('#ctdr-prefs .cto-pref-chip.active')].map(c=>c.dataset.pref);
     const now=firebase.firestore.Timestamp.now();
-    const data={
+    const newData={
       cuentaId:document.getElementById('ctdr-cuentaId').value||'',
       cuentaNombre:document.getElementById('ctdr-cuentaNombre').value||'',
-      nombre,apellidos,
-      cargo,
+      nombre,apellidos,cargo,
       puesto:(document.getElementById('ctdr-puesto').value||'').trim(),
       propietario:cdrToggleVal('ctdrPropietario')||'No',
       email,
@@ -4794,23 +4840,45 @@ window.saveContactoDrawer=async function(){
       prefsInversion:prefs,
       volumenInversion:document.getElementById('ctdr-volumen').value||'',
       comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
-      brokerResponsable:user?.displayName||user?.email||'',
-      fechaCreacion:now,
-      ultimoContacto:now,
-      ultimaActividad:now,
     };
-    await db.collection('contactos').add(data);
-    _ctoDocs=[];
-    closeContactoDrawer();
-    if(_crmActiveTab==='contactos')await loadContactos();
+    if(_ctdrEditId){
+      const oldD=_ctoDocs.find(x=>x._id===_ctdrEditId)||{};
+      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',inversor:'Inversor',cuentaNombre:'Cuenta'};
+      const diffs=_diffFields(oldD,newData,labels);
+      const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
+      await db.collection('contactos').doc(_ctdrEditId).update(updatePayload);
+      const idx=_ctoDocs.findIndex(d=>d._id===_ctdrEditId);
+      if(idx>=0)_ctoDocs[idx]={..._ctoDocs[idx],...updatePayload};
+      if(diffs.length){
+        const desc=diffs.map(d=>`${d.field}: ${d.before||'–'} → ${d.after||'–'}`).join('\n');
+        await db.collection('contactoTimeline').add({contactoId:_ctdrEditId,tipo:'actualizado',descripcion:`Contacto actualizado\n${desc}`,fecha:now,usuario:user?.displayName||user?.email||''});
+      }
+      closeContactoDrawer();
+      loadContactos();
+    } else {
+      const createData={...newData,estadoRegistro:'activo',brokerResponsable:user?.displayName||user?.email||'',fechaCreacion:now,ultimoContacto:now,ultimaActividad:now};
+      await db.collection('contactos').add(createData);
+      closeContactoDrawer();
+      loadContactos();
+    }
   }catch(e){
-    alert('Error al crear contacto: '+e.message);
-    btn.textContent='Crear contacto';btn.disabled=false;
+    alert('Error: '+e.message);
+    btn.textContent=_ctdrEditId?'Guardar cambios':'Crear contacto';btn.disabled=false;
   }
 };
 
+function _diffFields(oldD,newD,labels){
+  return Object.keys(labels).reduce((acc,k)=>{
+    const o=JSON.stringify(oldD[k]??'');
+    const n=JSON.stringify(newD[k]??'');
+    if(o!==n)acc.push({field:labels[k],before:oldD[k]??'',after:newD[k]??''});
+    return acc;
+  },[]);
+}
+
 // ===== LEADS =====
 let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente';
+let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null;
 
 const LEAD_ESTADOS=['Nuevo','Intento de contacto','Contactado','Calificado','Visita coordinada','Visita realizada','Propuesta enviada','Descartado','Convertido'];
 const LEAD_ESTADO_CLS={'Nuevo':'nuevo','Intento de contacto':'intento','Contactado':'contactado','Calificado':'calificado','Visita coordinada':'visita-c','Visita realizada':'visita-r','Propuesta enviada':'propuesta','Descartado':'descartado','Convertido':'convertido'};
@@ -4838,6 +4906,7 @@ function filterLeads(){
   const estado=document.getElementById('lead-filter-estado')?.value||'';
   const origen=document.getElementById('lead-filter-origen')?.value||'';
   const filtered=_leadDocs.filter(d=>{
+    if((d.estadoRegistro||'activo')==='archivado')return false;
     const full=((d.nombre||'')+' '+(d.apellido||'')+' '+(d.empresa||'')+' '+(d.email||'')).toLowerCase();
     if(q&&!full.includes(q))return false;
     if(estado&&d.estado!==estado)return false;
@@ -4894,6 +4963,10 @@ function openLeadDetail(docId){
   const bg=crmAvatarBg(fullname);const ini=crmInitials(fullname);
   const convertBtn=document.getElementById('lead-convert-btn');
   if(convertBtn)convertBtn.style.display=d.estado==='Convertido'?'none':'inline-block';
+  const editBtn=document.getElementById('lead-edit-btn');
+  if(editBtn){editBtn.onclick=()=>openLeadDrawer_edit(docId);}
+  const archiveBtn=document.getElementById('lead-archive-btn');
+  if(archiveBtn){archiveBtn.onclick=()=>archiveLead(docId);}
   document.getElementById('lead-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       <div class="crm-det-av" style="background:${bg}">${ini}</div>
@@ -4906,6 +4979,7 @@ function openLeadDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker asignado</div><div class="crm-det-meta-val">${d.brokerAsignado||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.buildingName||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+    ${d.ultimaModificacion?`<div class="crm-det-meta-item" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF3FF"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${fmtDate(d.ultimaModificacion)}${d.usuarioUltimaModificacion?' · '+d.usuarioUltimaModificacion:''}</div></div>`:''}
   `;
   const estadoOpts=LEAD_ESTADOS.map(e=>`<option${d.estado===e?' selected':''}>${e}</option>`).join('');
   const descarteRow=`<div id="lead-descarte-row" style="display:${d.estado==='Descartado'?'block':'none'};margin-top:.75rem">
@@ -4994,10 +5068,10 @@ async function addLeadTimeline(docId,evento){
 async function loadLeadTimeline(docId){
   const body=document.getElementById('lead-timeline-body');if(!body)return;
   try{
-    const snap=await db.collection('leadTimeline').where('leadId','==',docId).orderBy('fecha','desc').get();
-    const events=snap.docs.map(d=>d.data());
+    const snap=await db.collection('leadTimeline').where('leadId','==',docId).get();
+    const events=snap.docs.map(d=>d.data()).sort((a,b)=>_tsToDate(b.fecha)-_tsToDate(a.fecha));
     if(!events.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin eventos aún</div></div>';return;}
-    const iconMap={lead_creado:'🎯',broker_asignado:'👤',cambio_estado:'↗️',convertido:'✅'};
+    const iconMap={lead_creado:'🎯',broker_asignado:'👤',cambio_estado:'↗️',convertido:'✅',actualizado:'✏️',archivado:'📦'};
     body.innerHTML=`<div class="clt-timeline">${events.map(ev=>`
       <div class="clt-event">
         <div class="clt-event-dot" style="background:#1C54F4"></div>
@@ -5014,6 +5088,7 @@ async function loadLeadTimeline(docId){
 
 // LEAD DRAWER
 window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
+  _ldrEditId=null;
   ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-bld-q','ldr-comentarios'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['ldr-tipoInmueble','ldr-origen','ldr-broker'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ldr-buildingId').value='';
@@ -5032,13 +5107,30 @@ window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBrok
     const validBrokers=['Matienzo','Bartra','Farola','Troncoso','Giancontieri','Zuliani'];
     if(validBrokers.includes(bBroker))brokerSel.value=bBroker;
   }
+  document.querySelector('#ldr-drawer .cdr-title').textContent='Nuevo Lead';
   const btn=document.getElementById('ldr-save-btn');btn.textContent='Crear lead';btn.disabled=false;
   document.getElementById('ldr-overlay').classList.add('open');
   document.getElementById('ldr-drawer').classList.add('open');
   setTimeout(()=>document.getElementById('ldr-nombre').focus(),60);
 };
 
+window.openLeadDrawer_edit=function(docId){
+  const d=_leadDocs.find(x=>x._id===docId);
+  if(!d)return;
+  window.openLeadDrawer();
+  _ldrEditId=docId;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  set('ldr-nombre',d.nombre);set('ldr-apellido',d.apellido);set('ldr-email',d.email);
+  set('ldr-telefono',d.telefono);set('ldr-empresa',d.empresa);set('ldr-puesto',d.puesto);
+  set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
+  set('ldr-comentarios',d.comentarios);
+  if(d.buildingId){document.getElementById('ldr-buildingId').value=d.buildingId;document.getElementById('ldr-buildingName').value=d.buildingName||'';document.getElementById('ldr-bld-q').value=d.buildingName||'';}
+  document.querySelector('#ldr-drawer .cdr-title').textContent='Editar Lead';
+  const btn=document.getElementById('ldr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
+};
+
 window.closeLeadDrawer=function(){
+  _ldrEditId=null;
   document.getElementById('ldr-overlay').classList.remove('open');
   document.getElementById('ldr-drawer').classList.remove('open');
   document.getElementById('ldr-bld-list').style.display='none';
@@ -5082,7 +5174,7 @@ window.saveLeadDrawer=async function(){
   const btn=document.getElementById('ldr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
   try{
     const now=firebase.firestore.Timestamp.now();
-    const data={
+    const newData={
       nombre,apellido,email,origen,
       telefono:(document.getElementById('ldr-telefono').value||'').trim(),
       empresa:(document.getElementById('ldr-empresa').value||'').trim(),
@@ -5090,22 +5182,46 @@ window.saveLeadDrawer=async function(){
       tipoInmueble:document.getElementById('ldr-tipoInmueble').value||'',
       buildingId:document.getElementById('ldr-buildingId').value||'',
       buildingName:document.getElementById('ldr-buildingName').value||'',
-      brokerAsignado:brokerAsignado,
+      brokerAsignado,
       comentarios:(document.getElementById('ldr-comentarios').value||'').trim(),
-      estado:'Nuevo',
-      creadoPor:user?.displayName||user?.email||'',
-      fechaCreacion:now,
-      ultimaActividad:now,
     };
-    const ref=await db.collection('leads').add(data);
-    await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen}`});
-    if(data.brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Lead asignado a ${data.brokerAsignado}`});
-    _leadDocs.unshift({...data,_id:ref.id});
-    showLeadNotification({...data,_id:ref.id});
-    closeLeadDrawer();
-    filterLeads();
-    document.getElementById('lead-subtitle').textContent=`${_leadDocs.length} lead${_leadDocs.length!==1?'s':''} registrados`;
-  }catch(e){alert('Error: '+e.message);btn.textContent='Crear lead';btn.disabled=false;}
+    if(_ldrEditId){
+      const oldD=_leadDocs.find(x=>x._id===_ldrEditId)||{};
+      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Broker',comentarios:'Comentarios',buildingName:'Inmueble'};
+      const diffs=_diffFields(oldD,newData,labels);
+      const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
+      await db.collection('leads').doc(_ldrEditId).update(updatePayload);
+      const idx=_leadDocs.findIndex(d=>d._id===_ldrEditId);
+      if(idx>=0)_leadDocs[idx]={..._leadDocs[idx],...updatePayload};
+      if(diffs.length){
+        const desc=diffs.map(d=>`${d.field}: ${d.before||'–'} → ${d.after||'–'}`).join('\n');
+        await addLeadTimeline(_ldrEditId,{tipo:'actualizado',descripcion:`Lead actualizado\n${desc}`});
+      }
+      closeLeadDrawer();
+      if(_currentLeadId===_ldrEditId)openLeadDetail(_ldrEditId);
+      filterLeads();
+    } else {
+      const createData={...newData,estado:'Nuevo',estadoRegistro:'activo',creadoPor:user?.displayName||user?.email||'',fechaCreacion:now,ultimaActividad:now};
+      const ref=await db.collection('leads').add(createData);
+      await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen}`});
+      if(brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Lead asignado a ${brokerAsignado}`});
+      _leadDocs.unshift({...createData,_id:ref.id});
+      showLeadNotification({...createData,_id:ref.id});
+      closeLeadDrawer();
+      filterLeads();
+      document.getElementById('lead-subtitle').textContent=`${_leadDocs.length} lead${_leadDocs.length!==1?'s':''} registrados`;
+    }
+  }catch(e){alert('Error: '+e.message);btn.textContent=_ldrEditId?'Guardar cambios':'Crear lead';btn.disabled=false;}
+};
+
+window.archiveLead=async function(docId){
+  if(!confirm('¿Archivar este lead? No se eliminará, solo dejará de aparecer en la lista.'))return;
+  const now=firebase.firestore.Timestamp.now();
+  await db.collection('leads').doc(docId).update({estadoRegistro:'archivado',ultimaActividad:now});
+  await addLeadTimeline(docId,{tipo:'archivado',descripcion:'Lead archivado'});
+  const idx=_leadDocs.findIndex(d=>d._id===docId);
+  if(idx>=0)_leadDocs[idx].estadoRegistro='archivado';
+  closeLeadDetail();filterLeads();
 };
 
 function showLeadNotification(d){
@@ -5320,19 +5436,19 @@ window.cdrToggle=function(btn){
 };
 
 window.openClientDrawer=function(callbackFn){
+  _cdrEditId=null;
   _cdrCallback=callbackFn||null;
-  // Reset text/select/number inputs
   ['cdr-nombre','cdr-contactoPrincipal','cdr-cargo',
    'cdr-email','cdr-telefono','cdr-sitioWeb','cdr-rubro','cdr-subRubro',
    'cdr-m2min','cdr-m2max'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('cdr-categoria').value='';
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
-  // Reset toggles to their data-default button
   document.querySelectorAll('.cdr-toggle-btn[data-default]').forEach(btn=>{
     const field=btn.dataset.field;
     document.querySelectorAll(`.cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
+  document.querySelector('#cdr-drawer .cdr-title').textContent='Nueva Cuenta';
   const btn=document.getElementById('cdr-save-btn');
   btn.textContent='Crear cliente';btn.disabled=false;
   document.getElementById('cdr-overlay').classList.add('open');
@@ -5340,7 +5456,45 @@ window.openClientDrawer=function(callbackFn){
   setTimeout(()=>document.getElementById('cdr-nombre').focus(),60);
 };
 
+window.openClientDrawer_edit=function(docId){
+  const d=_crmDocs.find(x=>x._id===docId);
+  if(!d)return;
+  window.openClientDrawer();
+  _cdrEditId=docId;
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  setV('cdr-nombre',d.nombre);setV('cdr-contactoPrincipal',d.contactoPrincipal);setV('cdr-cargo',d.cargo);
+  setV('cdr-email',d.emailContacto);setV('cdr-telefono',d.telefono);setV('cdr-sitioWeb',d.sitioWeb);
+  setV('cdr-rubro',d.rubro);setV('cdr-subRubro',d.subRubro);
+  setV('cdr-m2min',d.m2Min||'');setV('cdr-m2max',d.m2Max||'');
+  document.getElementById('cdr-categoria').value=d.categoria||'';
+  const buArr=Array.isArray(d.bu)?d.bu:[d.bu].filter(Boolean);
+  document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',buArr.includes(c.dataset.bu));});
+  const setToggle=(field,val)=>{
+    document.querySelectorAll(`.cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{
+      b.classList.toggle('active',b.dataset.value===val);
+    });
+  };
+  setToggle('clienteColliers',d.clienteColliers);setToggle('propOcup',d.propietarioOcupante);
+  setToggle('esBroker',d.esBroker);setToggle('cuentaCorp',d.cuentaCorporativa);
+  setToggle('esDesarrollador',d.esDesarrollador);setToggle('esAdmin',d.esAdministradora);
+  document.querySelector('#cdr-drawer .cdr-title').textContent='Editar Cuenta';
+  const btn=document.getElementById('cdr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
+};
+
+window.archiveCuenta=async function(docId){
+  if(!confirm('¿Archivar esta cuenta? No se eliminará, solo dejará de aparecer en la lista.'))return;
+  const now=firebase.firestore.Timestamp.now();
+  await db.collection('clientes').doc(docId).update({estadoRegistro:'archivado',ultimaActividad:now});
+  addClientTimeline(docId,{tipo:'archivado',descripcion:'Cuenta archivada'});
+  const idx=_crmDocs.findIndex(d=>d._id===docId);
+  if(idx>=0)_crmDocs[idx].estadoRegistro='archivado';
+  document.getElementById('crm-detail-view').style.display='none';
+  document.getElementById('crm-list-view').style.display='flex';
+  filterCRM();
+};
+
 window.closeClientDrawer=function(){
+  _cdrEditId=null;
   document.getElementById('cdr-overlay').classList.remove('open');
   document.getElementById('cdr-drawer').classList.remove('open');
   _cdrCallback=null;
@@ -5358,7 +5512,7 @@ window.saveClientDrawer=async function(){
     const m2Max=parseFloat(document.getElementById('cdr-m2max').value)||0;
     const m2RangeLabel=fmtM2Range(m2Min,m2Max);
     const now=firebase.firestore.Timestamp.now();
-    const data={
+    const newData={
       nombre,
       categoria:document.getElementById('cdr-categoria').value||'',
       clienteColliers:cdrToggleVal('clienteColliers')||'Sí',
@@ -5379,21 +5533,35 @@ window.saveClientDrawer=async function(){
       m2Max:m2Max||null,
       m2Range:m2RangeLabel||'',
       rangoM2:m2RangeLabel?[m2RangeLabel]:[],
-      pptsGenerados:0,
-      cantidadPPTs:0,
-      brokerCreador:user?.displayName||user?.email||'',
-      fechaCreacion:now,
-      ultimaActividad:now,
     };
-    const ref=await db.collection('clientes').add(data);
-    _clientesCache=[];
-    addClientTimeline(ref.id,{tipo:'cliente_creado',descripcion:'Cliente creado'});
-    const cb=_cdrCallback;
-    closeClientDrawer();
-    if(typeof cb==='function')await cb(nombre,ref.id);
+    if(_cdrEditId){
+      const oldD=_crmDocs.find(x=>x._id===_cdrEditId)||{};
+      const labels={nombre:'Nombre',categoria:'Categoría',clienteColliers:'Cliente Colliers',propietarioOcupante:'Prop/Ocup',contactoPrincipal:'Contacto principal',cargo:'Cargo',emailContacto:'Email',telefono:'Teléfono',sitioWeb:'Sitio web',rubro:'Rubro',subRubro:'Sub rubro',esBroker:'Es Broker',cuentaCorporativa:'Cuenta corporativa',esDesarrollador:'Es Desarrollador',esAdministradora:'Es Administradora'};
+      const diffs=_diffFields(oldD,newData,labels);
+      const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
+      await db.collection('clientes').doc(_cdrEditId).update(updatePayload);
+      const idx=_crmDocs.findIndex(d=>d._id===_cdrEditId);
+      if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],...updatePayload};
+      if(diffs.length){
+        const desc=diffs.map(d=>`${d.field}: ${Array.isArray(d.before)?d.before.join(',')||'–':d.before||'–'} → ${Array.isArray(d.after)?d.after.join(',')||'–':d.after||'–'}`).join('\n');
+        addClientTimeline(_cdrEditId,{tipo:'cuenta_actualizada',descripcion:`Cuenta actualizada\n${desc}`});
+      }
+      _clientesCache=[];
+      closeClientDrawer();
+      openClientDetail(_cdrEditId);
+      filterCRM();
+    } else {
+      const createData={...newData,pptsGenerados:0,cantidadPPTs:0,estadoRegistro:'activo',brokerCreador:user?.displayName||user?.email||'',fechaCreacion:now,ultimaActividad:now};
+      const ref=await db.collection('clientes').add(createData);
+      _clientesCache=[];
+      addClientTimeline(ref.id,{tipo:'cliente_creado',descripcion:'Cliente creado'});
+      const cb=_cdrCallback;
+      closeClientDrawer();
+      if(typeof cb==='function')await cb(nombre,ref.id);
+    }
   }catch(e){
-    alert('Error al crear cliente: '+e.message);
-    btn.textContent='Crear cliente';btn.disabled=false;
+    alert('Error: '+e.message);
+    btn.textContent=_cdrEditId?'Guardar cambios':'Crear cliente';btn.disabled=false;
   }
 };
 
