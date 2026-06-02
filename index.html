@@ -792,7 +792,7 @@ body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.3
 
 /* ===== BUILDING CRM AUTOCOMPLETE ===== */
 .be-ac-wrap{position:relative}
-.be-ac-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:700;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)}
+.be-ac-list{display:none;position:fixed;background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:9999;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.18);min-width:200px}
 body.dark .be-ac-list{background:#0C1640;border-color:rgba(255,255,255,.12)}
 .be-ac-item{padding:8px 11px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s}
 .be-ac-item:hover{background:#EEF3FF}
@@ -5629,6 +5629,15 @@ function openDrawerFromGenerator(){
 window.openNewClientModal=()=>openClientDrawer(()=>loadCRM());
 
 /* ===== BUILDING CRM AUTOCOMPLETE ===== */
+function _beAcPosition(role){
+  const inp=document.getElementById(`be-${role}-q`);
+  const listEl=document.getElementById(`be-${role}-list`);
+  if(!inp||!listEl)return;
+  const r=inp.getBoundingClientRect();
+  listEl.style.top=(r.bottom+4)+'px';
+  listEl.style.left=r.left+'px';
+  listEl.style.width=r.width+'px';
+}
 function beAcSearch(role,q){
   const listEl=document.getElementById(`be-${role}-list`);
   if(!listEl)return;
@@ -5642,8 +5651,9 @@ function beAcSearch(role,q){
   }
   const lq=q.toLowerCase();
   const matches=_crmDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
+  _beAcPosition(role);
   if(!matches.length){
-    listEl.innerHTML=`<div style="padding:8px 11px;font-size:11px;color:#7B8BBD">Sin resultados</div>`;
+    listEl.innerHTML=`<div style="padding:8px 11px;font-size:11px;color:#7B8BBD">Sin resultados — ¿Crear cuenta?</div>`;
     listEl.style.display='block';return;
   }
   listEl.innerHTML=matches.map(d=>`<div class="be-ac-item" onclick="beAcSelect('${role}','${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')"> ${d.nombre}</div>`).join('');
@@ -5669,9 +5679,10 @@ function beAcCreate(role,tipo){
 }
 
 document.addEventListener('click',function(e){
-  ['be-owner-list','be-occupier-list'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el&&!el.closest('.be-ac-wrap')?.contains(e.target))el.style.display='none';
+  ['owner','occupier'].forEach(role=>{
+    const inp=document.getElementById(`be-${role}-q`);
+    const listEl=document.getElementById(`be-${role}-list`);
+    if(listEl&&e.target!==inp&&!listEl.contains(e.target))listEl.style.display='none';
   });
 });
 
