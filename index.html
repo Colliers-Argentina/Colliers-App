@@ -4883,7 +4883,11 @@ async function _queryUnitsForId(idField,idValue){
   const units=[];
   await Promise.all(_bldDocs.map(async bld=>{
     const snap=await db.collection('buildings').doc(bld._id).collection('units').where(idField,'==',idValue).get();
-    snap.docs.forEach(d=>units.push({...d.data(),_id:d.id,_bldId:bld._id,_bldNombre:bld.nombre||bld._id,_bldEjec:bld.ejecutivoComercial||bld.brokerAsignado||'–'}));
+    console.log(`[INV] ${bld.nombre||bld._id} → ${idField}=="${idValue}" → ${snap.docs.length} resultado(s)`);
+    snap.docs.forEach(d=>{
+      console.log(`[INV] unidad encontrada | bldId:${bld._id} | unitId:${d.id} | datos:`,JSON.stringify(d.data()));
+      units.push({...d.data(),_id:d.id,_bldId:bld._id,_bldNombre:bld.nombre||bld._id,_bldEjec:bld.ejecutivoComercial||bld.brokerAsignado||'–'});
+    });
   }));
   return units;
 }
@@ -4894,17 +4898,25 @@ async function loadCuentaInventario(cuentaId){
   body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Cargando...</div></div>';
   try{
     await _loadBldDocsIfNeeded();
+    console.log('[INV] Cuenta:',cuentaId);
+    console.log('[INV] Edificios a consultar:',_bldDocs.length,_bldDocs.map(b=>b.nombre||b._id));
     const [occ,own]=await Promise.all([
       _queryUnitsForId('occupierAccountId',cuentaId),
       _queryUnitsForId('ownerAccountId',cuentaId),
     ]);
+    console.log('[INV] Resultado occupier:',occ.length);
+    console.log('[INV] Resultado owner:',own.length);
+    console.log('[INV] Datos occupier:',occ);
+    console.log('[INV] Datos owner:',own);
     occ.forEach(u=>u._rol='Ocupante');
     own.forEach(u=>u._rol='Propietario');
     const seen=new Set();
     occ.forEach(u=>seen.add(u._bldId+'/'+u._id));
     const units=[...occ,...own.filter(u=>{const k=u._bldId+'/'+u._id;if(seen.has(k))return false;seen.add(k);return true;})];
+    console.log('[INV] Total unidades a mostrar:',units.length);
     _renderInvTable(units,'crm-dt-inventario-body',true);
   }catch(e){
+    console.error('[INV] Error:',e);
     if(body)body.innerHTML=`<div class="crm-det-placeholder"><div class="crm-det-placeholder-title">Error: ${e.message}</div></div>`;
   }
 }
@@ -6049,6 +6061,31 @@ window.duAcDebug={
   get ctoDocs(){return _ctoDocs;},
   get state(){return _duAcState;},
   get blurGuard(){return _duAcBlurGuard;},
+  // Inspeccionar un documento de unidad directamente desde Firestore
+  async inspectUnit(bldId,unitId){
+    const d=await db.collection('buildings').doc(bldId).collection('units').doc(unitId).get();
+    if(!d.exists){console.warn('[INSPECT] Documento no encontrado');return null;}
+    const data=d.data();
+    console.log('[INSPECT] Documento completo:',JSON.stringify(data,null,2));
+    console.table({
+      ocupante:data.ocupante||'(vacío)',
+      occupierAccountId:data.occupierAccountId||'(AUSENTE)',
+      occupierAccountName:data.occupierAccountName||'(AUSENTE)',
+      occupierContactId:data.occupierContactId||'(vacío)',
+      propietario:data.propietario||'(vacío)',
+      ownerAccountId:data.ownerAccountId||'(AUSENTE)',
+      ownerAccountName:data.ownerAccountName||'(AUSENTE)',
+      ownerContactId:data.ownerContactId||'(vacío)',
+    });
+    return data;
+  },
+  // Ver todos los units de un edificio
+  async inspectBuilding(bldId){
+    const snap=await db.collection('buildings').doc(bldId).collection('units').get();
+    console.log(`[INSPECT] ${snap.docs.length} unidades en building ${bldId}`);
+    snap.docs.forEach(d=>console.log(' →',d.id,JSON.stringify(d.data())));
+    return snap.docs.map(d=>({id:d.id,...d.data()}));
+  },
   checkDrop(){const d=document.getElementById('du-ac-dropdown');console.log('drop:',d,'parent:',d?.parentElement,'display:',d?.style.display,'computed:',d?getComputedStyle(d).display:'N/A');return d;},
   async findUnlinked(){
     console.log('[DU-AC MIGRATION] Buscando disponibilidades sin vínculo CRM...');
