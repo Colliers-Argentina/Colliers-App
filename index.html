@@ -7685,14 +7685,14 @@ const _CABA_ZONE_COORDS={
   'Plaza Roma':[-34.5997,-58.3758],'Retiro':[-34.5953,-58.3770],'Macrocentro':[-34.6150,-58.3900],
   'Macrocentro Sur':[-34.6260,-58.3950],'Palermo':[-34.5797,-58.4239],'Belgrano':[-34.5594,-58.4578],
   'Norte CABA':[-34.5700,-58.4350],'Libertador':[-34.5750,-58.4180],'Barrio Norte':[-34.5883,-58.3941],
-  'San Telmo':[-34.6211,-58.3711],'Flores':[-34.6258,-58.4642],'Monserrat':[-34.6155,-58.3783],
-  'Barracas':[-34.6469,-58.3760],'Almagro':[-34.6058,-58.4194],'Caballito':[-34.6186,-58.4430],
-  'Once':[-34.6087,-58.4097],'Villa Urquiza':[-34.5756,-58.4775],'Saavedra':[-34.5630,-58.4785],
-  'Villa del Parque':[-34.6033,-58.4816],'Núñez':[-34.5500,-58.4668],'Colegiales':[-34.5706,-58.4495],
-  'Chacarita':[-34.5853,-58.4555],'Villa Crespo':[-34.5958,-58.4438],'Boedo':[-34.6283,-58.4178],
-  'Constitución':[-34.6306,-58.3858],'San Cristóbal':[-34.6194,-58.3969],'Parque Patricios':[-34.6408,-58.3981],
-  'Vicente López':[-34.5225,-58.4731],'San Isidro':[-34.4723,-58.5070],'Panamericana':[-34.5050,-58.5200],
-  'Norte GBA':[-34.5050,-58.5200],'GBA Norte':[-34.5050,-58.5200]
+  'Sur CABA':[-34.6450,-58.3920],'San Telmo':[-34.6211,-58.3711],'Flores':[-34.6258,-58.4642],
+  'Monserrat':[-34.6155,-58.3783],'Barracas':[-34.6469,-58.3760],'Almagro':[-34.6058,-58.4194],
+  'Caballito':[-34.6186,-58.4430],'Once':[-34.6087,-58.4097],'Villa Urquiza':[-34.5756,-58.4775],
+  'Saavedra':[-34.5630,-58.4785],'Villa del Parque':[-34.6033,-58.4816],'Núñez':[-34.5500,-58.4668],
+  'Colegiales':[-34.5706,-58.4495],'Chacarita':[-34.5853,-58.4555],'Villa Crespo':[-34.5958,-58.4438],
+  'Boedo':[-34.6283,-58.4178],'Constitución':[-34.6306,-58.3858],'San Cristóbal':[-34.6194,-58.3969],
+  'Parque Patricios':[-34.6408,-58.3981],'Vicente López':[-34.5225,-58.4731],'San Isidro':[-34.4723,-58.5070],
+  'Panamericana':[-34.5050,-58.5200],'Norte GBA':[-34.5050,-58.5200],'GBA Norte':[-34.5050,-58.5200]
 };
 
 function _heatColor(t){
@@ -7717,7 +7717,9 @@ function renderAnDemandMap(docs){
     };
     lc.addTo(window._anDemandMap);
   }else{
-    window._anDemandMap.eachLayer(l=>{if(l._anCircle)window._anDemandMap.removeLayer(l);});
+    const toRemove=[];
+    window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
+    toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
   }
   const zonaCount={},zonaAlts={},zonaClientes={};
   docs.forEach(d=>{
@@ -7749,7 +7751,8 @@ function renderAnDemandMap(docs){
     circle.on('click',()=>toggleAnZona(zona));
     circle.addTo(window._anDemandMap);
   });
-  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},150);
+  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},200);
+  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},600);
 }
 
 // Phase 5 — Export
