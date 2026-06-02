@@ -697,6 +697,71 @@ body.dark .crm-subnav-tab.active{background:rgba(28,84,244,.15);color:#4D93FF}
 body.dark .crm-leads-placeholder-title{color:#fff}
 .crm-leads-placeholder-sub{font-size:13px;color:#8A9AC0;line-height:1.7}
 
+/* ===== LEADS MODULE ===== */
+.lead-estado{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.02em;white-space:nowrap}
+.lead-estado.nuevo{background:rgba(28,84,244,.1);color:#1C54F4;border:1px solid rgba(28,84,244,.25)}
+.lead-estado.intento{background:rgba(245,158,11,.1);color:#B45309;border:1px solid rgba(245,158,11,.25)}
+.lead-estado.contactado{background:rgba(0,174,239,.1);color:#0090C7;border:1px solid rgba(0,174,239,.25)}
+.lead-estado.calificado{background:rgba(139,92,246,.1);color:#7C3AED;border:1px solid rgba(139,92,246,.25)}
+.lead-estado.visita-c{background:rgba(251,146,60,.1);color:#EA580C;border:1px solid rgba(251,146,60,.25)}
+.lead-estado.visita-r{background:rgba(20,184,166,.1);color:#0D9488;border:1px solid rgba(20,184,166,.25)}
+.lead-estado.propuesta{background:rgba(99,102,241,.1);color:#4F46E5;border:1px solid rgba(99,102,241,.25)}
+.lead-estado.descartado{background:rgba(239,51,64,.1);color:#DC2626;border:1px solid rgba(239,51,64,.25)}
+.lead-estado.convertido{background:rgba(34,197,94,.1);color:#16A34A;border:1px solid rgba(34,197,94,.25)}
+.lead-origen{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;background:#EEF3FF;color:#25408F;border:1px solid #DBE5FF;white-space:nowrap;display:inline-block}
+body.dark .lead-origen{background:rgba(28,84,244,.12);color:#C3E6FF;border-color:rgba(77,147,255,.2)}
+#lead-notification{position:fixed;bottom:1.5rem;right:1.5rem;z-index:600;background:#fff;border-left:4px solid #1C54F4;border-radius:10px;box-shadow:0 8px 32px rgba(0,7,89,.18);padding:1rem 1.25rem 1rem;min-width:280px;max-width:340px;display:none;animation:slideUp .25s ease}
+body.dark #lead-notification{background:#0C1640}
+.ln-title{font-size:11px;font-weight:700;color:#1C54F4;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem}
+.ln-row{font-size:12px;color:#353E59;font-weight:600;line-height:1.55}
+body.dark .ln-row{color:#C3E6FF}
+.ln-btn{margin-top:.65rem;background:#1C54F4;color:#fff;border:none;font-family:inherit;font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;transition:background .15s}
+.ln-btn:hover{background:#1548d4}
+#lead-convert-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:550;display:none;align-items:center;justify-content:center;padding:1rem}
+#lead-convert-overlay.open{display:flex}
+.lc-modal{background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.2);width:100%;max-width:440px;overflow:hidden}
+body.dark .lc-modal{background:#0C1640;border:1px solid rgba(255,255,255,.1)}
+.lc-hd{padding:1.1rem 1.4rem .8rem;border-bottom:1px solid #EEF3FF;display:flex;align-items:center;justify-content:space-between}
+body.dark .lc-hd{border-bottom-color:rgba(255,255,255,.06)}
+.lc-title{font-size:14px;font-weight:700;color:#0A1B4D}
+body.dark .lc-title{color:#fff}
+.lc-close{background:rgba(0,0,0,.05);border:none;color:#56648F;font-size:12px;width:26px;height:26px;border-radius:50%;cursor:pointer;font-family:inherit}
+.lc-body{padding:1.1rem 1.4rem}
+.lc-opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.85rem}
+.lc-opt{padding:.8rem 1rem;border:2px solid #E2EAF4;border-radius:10px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.65rem}
+.lc-opt:hover,.lc-opt.sel{border-color:#1C54F4;background:#EEF3FF}
+body.dark .lc-opt{border-color:rgba(255,255,255,.1)}
+body.dark .lc-opt:hover,body.dark .lc-opt.sel{background:rgba(28,84,244,.15);border-color:#4D93FF}
+.lc-opt-icon{font-size:18px;flex-shrink:0}
+.lc-opt-title{font-size:13px;font-weight:700;color:#0A1B4D}
+body.dark .lc-opt-title{color:#fff}
+.lc-opt-sub{font-size:11px;color:#8A9AC0;margin-top:1px}
+.lc-footer{padding:.65rem 1.4rem 1.1rem;display:flex;gap:.5rem;justify-content:flex-end;border-top:1px solid #EEF3FF}
+body.dark .lc-footer{border-top-color:rgba(255,255,255,.06)}
+.funnel-step{display:flex;align-items:center;gap:.65rem;padding:.4rem .5rem;border-radius:7px;cursor:default}
+.funnel-step:hover{background:#F8FAFF}
+body.dark .funnel-step:hover{background:rgba(255,255,255,.03)}
+.funnel-bar-wrap{flex:1;height:18px;background:#EEF3FF;border-radius:4px;overflow:hidden}
+body.dark .funnel-bar-wrap{background:rgba(255,255,255,.06)}
+.funnel-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#1C54F4,#4D93FF);transition:width .5s ease}
+.funnel-lbl{font-size:11px;font-weight:600;color:#56648F;width:120px;flex-shrink:0}
+body.dark .funnel-lbl{color:#8A9AC0}
+.funnel-n{font-size:12px;font-weight:700;color:#0A1B4D;width:26px;text-align:right;flex-shrink:0}
+body.dark .funnel-n{color:#fff}
+.funnel-pct{font-size:10px;color:#8A9AC0;width:34px;text-align:right;flex-shrink:0}
+.leads-an-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+@media(max-width:768px){.leads-an-grid{grid-template-columns:1fr}}
+.an-rank-row{display:flex;align-items:center;gap:.6rem;padding:.4rem .5rem;border-radius:7px}
+.an-rank-row:hover{background:#F8FAFF}
+body.dark .an-rank-row:hover{background:rgba(255,255,255,.03)}
+.an-rank-pos{font-size:11px;font-weight:700;color:#8A9AC0;width:18px;text-align:right;flex-shrink:0}
+.an-rank-name{flex:1;font-size:12px;font-weight:600;color:#0A1B4D}
+body.dark .an-rank-name{color:#fff}
+.an-rank-val{font-size:12px;font-weight:700;color:#1C54F4}
+.an-rank-pct{font-size:10px;color:#8A9AC0;margin-left:.2rem}
+.lead-an-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:.9rem}
+@media(max-width:480px){.lead-an-kpis{grid-template-columns:repeat(2,1fr)}}
+
 /* ===== CLIENT SELECTOR ===== */
 .client-mode-row{display:flex;gap:4px;margin-bottom:.35rem}
 .client-mode-btn{font-family:inherit;font-size:11px;padding:5px 10px;border:1px solid #DBE5FF;color:#56648F;background:#fff;cursor:pointer;transition:all .12s;flex:1;font-weight:600;text-align:center}
@@ -1722,6 +1787,17 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <div class="an-evol-wrap"><canvas id="chart-tend-evol"></canvas></div>
       </div>
     </div>
+    <!-- LEADS ANALYTICS -->
+    <div id="an-leads-section">
+      <div style="display:flex;align-items:center;gap:.4rem;margin:-.1rem 0 .65rem"><div class="an-card-accent"></div><div class="an-card-title" style="font-size:13px;font-weight:700;color:#0A1B4D">Comercial · Funnel de Leads</div></div>
+      <div class="lead-an-kpis" id="an-lead-kpis"></div>
+      <div class="leads-an-grid">
+        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Funnel</div></div><div class="an-card-body" id="an-leads-funnel" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
+        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Origen de Leads</div></div><div class="an-card-body" id="an-leads-origen" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
+        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ranking Brokers</div></div><div class="an-card-body" id="an-leads-brokers" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
+        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Motivos de Descarte</div></div><div class="an-card-body" id="an-leads-descarte" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1824,10 +1900,152 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 
   <!-- LEADS SECTION -->
   <div id="crm-leads-section" style="display:none;flex-direction:column;flex:1;overflow:hidden">
-    <div class="crm-leads-placeholder">
-      <div class="crm-leads-placeholder-icon">🎯</div>
-      <div class="crm-leads-placeholder-title">Leads</div>
-      <div class="crm-leads-placeholder-sub">Próximamente.<br>Acá vas a poder gestionar leads y oportunidades comerciales en etapa temprana.</div>
+    <!-- LEADS LIST VIEW -->
+    <div id="lead-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="crm-topbar">
+        <div class="crm-topbar-l">
+          <div class="crm-page-title">Leads</div>
+          <div class="crm-page-sub" id="lead-subtitle">Cargando...</div>
+        </div>
+        <div class="crm-topbar-r">
+          <input id="lead-search" type="text" placeholder="🔍 Buscar lead..." class="crm-search-inp" oninput="filterLeads()">
+          <select id="lead-filter-estado" class="crm-sel" onchange="filterLeads()">
+            <option value="">Todos los estados</option>
+            <option>Nuevo</option><option>Intento de contacto</option><option>Contactado</option>
+            <option>Calificado</option><option>Visita coordinada</option><option>Visita realizada</option>
+            <option>Propuesta enviada</option><option>Descartado</option><option>Convertido</option>
+          </select>
+          <select id="lead-filter-origen" class="crm-sel" onchange="filterLeads()">
+            <option value="">Todos los orígenes</option>
+            <option>Zonaprop</option><option>Mercado Libre</option><option>Web</option>
+            <option>Llamado</option><option>Mail</option><option>Otro</option>
+          </select>
+          <button class="crm-new-btn" onclick="openLeadDrawer()">+ Nuevo lead</button>
+        </div>
+      </div>
+      <div class="crm-list-body">
+        <div class="crm-kpi-row" id="lead-kpi-row"></div>
+        <div class="crm-tbl-wrap"><div id="lead-table-wrap">Cargando...</div></div>
+      </div>
+    </div>
+    <!-- LEADS DETAIL VIEW -->
+    <div id="lead-detail-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="crm-det-topbar">
+        <button class="crm-det-back-btn" onclick="closeLeadDetail()">← Volver a leads</button>
+        <div style="flex:1"></div>
+        <button id="lead-convert-btn" onclick="openConvertModal()" style="display:none;background:#16A34A;color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer">🔄 Convertir a contacto</button>
+      </div>
+      <div class="crm-det-layout">
+        <div class="crm-det-left" id="lead-det-left"></div>
+        <div class="crm-det-right" id="lead-det-right"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEAD DRAWER -->
+  <div id="ldr-overlay" class="cdr-overlay" onclick="closeLeadDrawer()"></div>
+  <div id="ldr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nuevo Lead">
+    <div class="cdr-hd">
+      <div class="cdr-title">Nuevo Lead</div>
+      <button class="cdr-close" onclick="closeLeadDrawer()" title="Cerrar">✕</button>
+    </div>
+    <div class="cdr-body">
+      <div class="cdr-section">
+        <div class="cdr-section-hd"><div class="cdr-section-num">1</div><div class="cdr-section-name">Datos del Lead</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-row">
+          <div class="cdr-field"><div class="cdr-lbl">Nombre <span class="cdr-req">*</span></div><input id="ldr-nombre" class="cdr-input" type="text" placeholder="Nombre" autocomplete="off"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Apellido <span class="cdr-req">*</span></div><input id="ldr-apellido" class="cdr-input" type="text" placeholder="Apellido" autocomplete="off"></div>
+        </div>
+        <div class="cdr-row">
+          <div class="cdr-field"><div class="cdr-lbl">Email <span class="cdr-req">*</span></div><input id="ldr-email" class="cdr-input" type="email" placeholder="nombre@empresa.com" autocomplete="off"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Teléfono móvil</div><input id="ldr-telefono" class="cdr-input" type="tel" placeholder="+54 9 11..."></div>
+        </div>
+        <div class="cdr-row">
+          <div class="cdr-field"><div class="cdr-lbl">Empresa</div><input id="ldr-empresa" class="cdr-input" type="text" placeholder="Nombre de empresa" autocomplete="off"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Puesto</div><input id="ldr-puesto" class="cdr-input" type="text" placeholder="Ej: Gerente de RRHH"></div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Tipo de inmueble</div>
+          <select id="ldr-tipoInmueble" class="cdr-select">
+            <option value="">— Seleccionar —</option>
+            <option>Oficina</option><option>Industria</option><option>Retail</option>
+            <option>Depósito / Logística</option><option>Terreno</option><option>Otro</option>
+          </select>
+        </div>
+      </div>
+      <div class="cdr-section">
+        <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Origen e Inmueble</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-row">
+          <div class="cdr-field">
+            <div class="cdr-lbl">Origen <span class="cdr-req">*</span></div>
+            <select id="ldr-origen" class="cdr-select">
+              <option value="">— Seleccionar —</option>
+              <option>Zonaprop</option><option>Mercado Libre</option><option>Web</option>
+              <option>Llamado</option><option>Mail</option><option>Otro</option>
+            </select>
+          </div>
+          <div class="cdr-field"><div class="cdr-lbl">Broker asignado</div><input id="ldr-broker" class="cdr-input" type="text" placeholder="Nombre del broker"></div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Inmueble consultado</div>
+          <div style="position:relative">
+            <input id="ldr-bld-q" class="cdr-input" type="text" placeholder="Buscar edificio..." autocomplete="off" oninput="ldrBldSearch(this.value)">
+            <div id="ldr-bld-list" style="display:none;position:absolute;left:0;right:0;top:calc(100%+2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+          </div>
+          <input id="ldr-buildingId" type="hidden"><input id="ldr-buildingName" type="hidden">
+        </div>
+      </div>
+      <div class="cdr-section">
+        <div class="cdr-section-hd"><div class="cdr-section-num">3</div><div class="cdr-section-name">Comentarios</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-field">
+          <textarea id="ldr-comentarios" class="cdr-input" rows="3" placeholder="Observaciones, superficie buscada, urgencia..." style="resize:vertical;min-height:72px;line-height:1.5"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="cdr-footer">
+      <button class="cdr-cancel" onclick="closeLeadDrawer()">Cancelar</button>
+      <button class="cdr-save" id="ldr-save-btn" onclick="saveLeadDrawer()">Crear lead</button>
+    </div>
+  </div>
+
+  <!-- LEAD NOTIFICATION -->
+  <div id="lead-notification">
+    <button onclick="document.getElementById('lead-notification').style.display='none'" style="position:absolute;top:.4rem;right:.5rem;background:none;border:none;color:#8A9AC0;cursor:pointer;font-size:15px;line-height:1;padding:2px">✕</button>
+    <div class="ln-title">🎯 Nuevo Lead recibido</div>
+    <div class="ln-row" id="ln-content"></div>
+    <button class="ln-btn" id="ln-view-btn">Ver Lead →</button>
+  </div>
+
+  <!-- LEAD CONVERSION MODAL -->
+  <div id="lead-convert-overlay" onclick="if(event.target===this)closeConvertModal()">
+    <div class="lc-modal" onclick="event.stopPropagation()">
+      <div class="lc-hd">
+        <div class="lc-title">Convertir Lead a Contacto</div>
+        <button class="lc-close" onclick="closeConvertModal()">✕</button>
+      </div>
+      <div class="lc-body">
+        <div class="lc-opts">
+          <div class="lc-opt sel" id="lc-opt-existente" onclick="lcSelectOpt('existente')">
+            <div class="lc-opt-icon">🏢</div>
+            <div class="lc-opt-text"><div class="lc-opt-title">Vincular a Cuenta existente</div><div class="lc-opt-sub">Buscar y asociar a una cuenta ya registrada</div></div>
+          </div>
+          <div class="lc-opt" id="lc-opt-nueva" onclick="lcSelectOpt('nueva')">
+            <div class="lc-opt-icon">✨</div>
+            <div class="lc-opt-text"><div class="lc-opt-title">Crear nueva Cuenta</div><div class="lc-opt-sub">Se crea automáticamente con los datos del lead</div></div>
+          </div>
+        </div>
+        <div id="lc-search-wrap">
+          <div style="position:relative">
+            <input id="lc-cuenta-q" class="cdr-input" type="text" placeholder="Buscar cuenta existente..." oninput="lcCuentaSearch(this.value)">
+            <div id="lc-cuenta-list" style="display:none;position:absolute;left:0;right:0;top:calc(100%+2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:660;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+          </div>
+          <input id="lc-cuentaId" type="hidden"><input id="lc-cuentaNombre" type="hidden">
+        </div>
+      </div>
+      <div class="lc-footer">
+        <button class="cdr-cancel" onclick="closeConvertModal()">Cancelar</button>
+        <button class="cdr-save" id="lc-save-btn" onclick="executeLeadConversion()">Convertir</button>
+      </div>
     </div>
   </div>
 
@@ -4024,6 +4242,7 @@ function switchCRMTab(tab){
   });
   if(tab==='cuentas'&&!_crmDocs.length)loadCRM();
   if(tab==='contactos')loadContactos();
+  if(tab==='leads')loadLeads();
 }
 
 const ESTADO_COLORS={
@@ -4589,6 +4808,491 @@ window.saveContactoDrawer=async function(){
     btn.textContent='Crear contacto';btn.disabled=false;
   }
 };
+
+// ===== LEADS =====
+let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente';
+
+const LEAD_ESTADOS=['Nuevo','Intento de contacto','Contactado','Calificado','Visita coordinada','Visita realizada','Propuesta enviada','Descartado','Convertido'];
+const LEAD_ESTADO_CLS={'Nuevo':'nuevo','Intento de contacto':'intento','Contactado':'contactado','Calificado':'calificado','Visita coordinada':'visita-c','Visita realizada':'visita-r','Propuesta enviada':'propuesta','Descartado':'descartado','Convertido':'convertido'};
+const LEAD_DESCARTE=['No responde','No interesado','Ya cerró operación','Fuera de presupuesto','Datos inválidos','Otro'];
+
+function leadEstadoBadge(e){const cls=LEAD_ESTADO_CLS[e]||'nuevo';return`<span class="lead-estado ${cls}">${e||'Nuevo'}</span>`;}
+function leadOrigenBadge(o){return o?`<span class="lead-origen">${o}</span>`:'–';}
+
+async function loadLeads(){
+  if(!db){document.getElementById('lead-table-wrap').innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
+  document.getElementById('lead-table-wrap').innerHTML='<div class="crm-empty">Cargando...</div>';
+  try{
+    const snap=await db.collection('leads').orderBy('fechaCreacion','desc').get();
+    _leadDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    document.getElementById('lead-subtitle').textContent=`${_leadDocs.length} lead${_leadDocs.length!==1?'s':''} registrados`;
+    filterLeads();
+  }catch(e){
+    document.getElementById('lead-table-wrap').innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
+    document.getElementById('lead-subtitle').textContent='Error al cargar';
+  }
+}
+
+function filterLeads(){
+  const q=(document.getElementById('lead-search')?.value||'').toLowerCase();
+  const estado=document.getElementById('lead-filter-estado')?.value||'';
+  const origen=document.getElementById('lead-filter-origen')?.value||'';
+  const filtered=_leadDocs.filter(d=>{
+    const full=((d.nombre||'')+' '+(d.apellido||'')+' '+(d.empresa||'')+' '+(d.email||'')).toLowerCase();
+    if(q&&!full.includes(q))return false;
+    if(estado&&d.estado!==estado)return false;
+    if(origen&&d.origen!==origen)return false;
+    return true;
+  });
+  renderLeadsTable(filtered);
+}
+
+function renderLeadsKPIs(docs){
+  const row=document.getElementById('lead-kpi-row');if(!row)return;
+  const total=docs.length;
+  const nuevos=docs.filter(d=>d.estado==='Nuevo').length;
+  const convertidos=docs.filter(d=>d.estado==='Convertido').length;
+  const descartados=docs.filter(d=>d.estado==='Descartado').length;
+  row.innerHTML=`
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🎯</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Total leads</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🆕</div><div class="crm-kpi-data"><div class="crm-kpi-v">${nuevos}</div><div class="crm-kpi-l">Nuevos</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${convertidos}</div><div class="crm-kpi-l">Convertidos</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FEF2F2">🗑️</div><div class="crm-kpi-data"><div class="crm-kpi-v">${descartados}</div><div class="crm-kpi-l">Descartados</div></div></div>
+  `;
+}
+
+function renderLeadsTable(docs){
+  renderLeadsKPIs(_leadDocs);
+  const wrap=document.getElementById('lead-table-wrap');
+  if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin leads registrados.</div>';return;}
+  let h='<table class="crm-table"><thead><tr>';
+  ['Lead','Empresa','Origen','Estado','Inmueble','Broker','Fecha',''].forEach(c=>h+=`<th>${c}</th>`);
+  h+='</tr></thead><tbody>';
+  docs.forEach(d=>{
+    const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
+    const bg=crmAvatarBg(fullname);const ini=crmInitials(fullname);
+    h+=`<tr onclick="openLeadDetail('${d._id}')">
+      <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${bg}">${ini}</div><div><div class="crm-client-name">${fullname}</div><div class="crm-client-sub">${d.email||''}</div></div></div></td>
+      <td><div class="crm-broker-cell">${d.empresa||'–'}</div></td>
+      <td>${leadOrigenBadge(d.origen)}</td>
+      <td>${leadEstadoBadge(d.estado)}</td>
+      <td><div class="crm-broker-cell">${d.buildingName||'–'}</div></td>
+      <td><div class="crm-broker-cell">${d.brokerAsignado||'–'}</div></td>
+      <td class="crm-date">${fmtDate(d.fechaCreacion)}</td>
+      <td><button class="crm-action-btn" onclick="event.stopPropagation();openLeadDetail('${d._id}')">Ver ficha →</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
+}
+
+function openLeadDetail(docId){
+  const d=_leadDocs.find(x=>x._id===docId);
+  if(!d)return;
+  _currentLeadId=docId;
+  const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
+  const bg=crmAvatarBg(fullname);const ini=crmInitials(fullname);
+  const convertBtn=document.getElementById('lead-convert-btn');
+  if(convertBtn)convertBtn.style.display=d.estado==='Convertido'?'none':'inline-block';
+  document.getElementById('lead-det-left').innerHTML=`
+    <div class="crm-det-av-wrap">
+      <div class="crm-det-av" style="background:${bg}">${ini}</div>
+      <div class="crm-det-av-name">${fullname}</div>
+      <div class="crm-det-av-email">${d.email||''}</div>
+    </div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${leadEstadoBadge(d.estado)}</div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Origen</div>${leadOrigenBadge(d.origen)}</div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${d.empresa||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Broker asignado</div><div class="crm-det-meta-val">${d.brokerAsignado||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.buildingName||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+  `;
+  const estadoOpts=LEAD_ESTADOS.map(e=>`<option${d.estado===e?' selected':''}>${e}</option>`).join('');
+  const descarteRow=`<div id="lead-descarte-row" style="display:${d.estado==='Descartado'?'block':'none'};margin-top:.75rem">
+    <div class="crm-det-meta-lbl" style="margin-bottom:.35rem">Motivo de descarte</div>
+    <select class="crm-estado-sel" onchange="updateLeadMotivo('${docId}',this.value)">
+      <option value="">— Seleccionar —</option>
+      ${LEAD_DESCARTE.map(m=>`<option${d.motivoDescarte===m?' selected':''}>${m}</option>`).join('')}
+    </select>
+  </div>`;
+  document.getElementById('lead-det-right').innerHTML=`
+    <div class="crm-det-tabs">
+      <button class="crm-det-tab active" onclick="leadDetTab(this,'ldt-info')">Información</button>
+      <button class="crm-det-tab" onclick="leadDetTab(this,'ldt-timeline');loadLeadTimeline('${docId}')">Timeline</button>
+    </div>
+    <div class="crm-det-tab-body">
+      <div id="ldt-info">
+        <div style="margin-bottom:1rem">
+          <div class="crm-det-meta-lbl" style="margin-bottom:.35rem">Pipeline</div>
+          <select class="crm-estado-sel" onchange="updateLeadEstado('${docId}',this.value)">${estadoOpts}</select>
+          ${descarteRow}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
+          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Nombre</div><div class="crm-det-meta-val">${d.nombre||'–'}</div></div>
+          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Apellido</div><div class="crm-det-meta-val">${d.apellido||'–'}</div></div>
+          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
+          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
+          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Puesto</div><div class="crm-det-meta-val">${d.puesto||'–'}</div></div>
+          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Tipo inmueble</div><div class="crm-det-meta-val">${d.tipoInmueble||'–'}</div></div>
+        </div>
+        ${d.comentarios?`<div style="margin-top:.85rem"><div class="crm-det-meta-lbl" style="margin-bottom:.35rem">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap">${d.comentarios}</div></div>`:''}
+      </div>
+      <div id="ldt-timeline" style="display:none">
+        <div id="lead-timeline-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Cargando...</div></div></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('lead-list-view').style.display='none';
+  const dv=document.getElementById('lead-detail-view');
+  dv.style.display='flex';dv.style.flexDirection='column';
+}
+
+window.closeLeadDetail=()=>{
+  _currentLeadId=null;
+  document.getElementById('lead-detail-view').style.display='none';
+  const lv=document.getElementById('lead-list-view');
+  lv.style.display='flex';lv.style.flexDirection='column';
+};
+
+function leadDetTab(el,tabId){
+  const right=document.getElementById('lead-det-right');if(!right)return;
+  right.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  right.querySelectorAll('[id^="ldt-"]').forEach(p=>p.style.display='none');
+  const t=right.querySelector('#'+tabId);if(t)t.style.display='';
+}
+
+async function updateLeadEstado(docId,nuevoEstado){
+  try{
+    await db.collection('leads').doc(docId).update({estado:nuevoEstado,ultimaActividad:firebase.firestore.Timestamp.now()});
+    await addLeadTimeline(docId,{tipo:'cambio_estado',descripcion:`Estado → ${nuevoEstado}`});
+    const idx=_leadDocs.findIndex(d=>d._id===docId);
+    if(idx>=0)_leadDocs[idx].estado=nuevoEstado;
+    const row=document.getElementById('lead-descarte-row');
+    if(row)row.style.display=nuevoEstado==='Descartado'?'block':'none';
+    const convertBtn=document.getElementById('lead-convert-btn');
+    if(convertBtn)convertBtn.style.display=nuevoEstado==='Convertido'?'none':'inline-block';
+    const leftPanel=document.getElementById('lead-det-left');
+    if(leftPanel){const badge=leftPanel.querySelector('.lead-estado');if(badge)badge.outerHTML=leadEstadoBadge(nuevoEstado);}
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function updateLeadMotivo(docId,motivo){
+  try{await db.collection('leads').doc(docId).update({motivoDescarte:motivo});}catch(e){console.error(e);}
+}
+
+async function addLeadTimeline(docId,evento){
+  try{
+    await db.collection('leadTimeline').add({
+      leadId:docId,...evento,
+      fecha:firebase.firestore.Timestamp.now(),
+      usuario:user?.displayName||user?.email||''
+    });
+  }catch(e){console.warn('Lead timeline error:',e);}
+}
+
+async function loadLeadTimeline(docId){
+  const body=document.getElementById('lead-timeline-body');if(!body)return;
+  try{
+    const snap=await db.collection('leadTimeline').where('leadId','==',docId).orderBy('fecha','desc').get();
+    const events=snap.docs.map(d=>d.data());
+    if(!events.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin eventos aún</div></div>';return;}
+    const iconMap={lead_creado:'🎯',broker_asignado:'👤',cambio_estado:'↗️',convertido:'✅'};
+    body.innerHTML=`<div class="clt-timeline">${events.map(ev=>`
+      <div class="clt-event">
+        <div class="clt-event-dot" style="background:#1C54F4"></div>
+        <div class="clt-event-inner">
+          <div class="clt-event-meta">
+            <span class="clt-event-date">${fmtDate(ev.fecha)}</span>
+            ${ev.usuario?`<span class="clt-event-user">${ev.usuario}</span>`:''}
+          </div>
+          <div class="clt-event-desc">${iconMap[ev.tipo]||'•'} ${ev.descripcion||''}</div>
+        </div>
+      </div>`).join('')}</div>`;
+  }catch(e){body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;}
+}
+
+// LEAD DRAWER
+window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
+  ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-bld-q','ldr-comentarios'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ldr-tipoInmueble','ldr-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('ldr-buildingId').value='';
+  document.getElementById('ldr-buildingName').value='';
+  document.getElementById('ldr-broker').value=prefillBroker||user?.displayName||'';
+  if(prefillBuildingId){
+    document.getElementById('ldr-buildingId').value=prefillBuildingId;
+    document.getElementById('ldr-buildingName').value=prefillBuildingName||'';
+    document.getElementById('ldr-bld-q').value=prefillBuildingName||'';
+  }
+  const btn=document.getElementById('ldr-save-btn');btn.textContent='Crear lead';btn.disabled=false;
+  document.getElementById('ldr-overlay').classList.add('open');
+  document.getElementById('ldr-drawer').classList.add('open');
+  setTimeout(()=>document.getElementById('ldr-nombre').focus(),60);
+};
+
+window.closeLeadDrawer=function(){
+  document.getElementById('ldr-overlay').classList.remove('open');
+  document.getElementById('ldr-drawer').classList.remove('open');
+  document.getElementById('ldr-bld-list').style.display='none';
+};
+
+window.ldrBldSearch=function(q){
+  const list=document.getElementById('ldr-bld-list');
+  if(!q.trim()){list.style.display='none';return;}
+  const lq=q.toLowerCase();
+  const matches=(_bldDocs.length?_bldDocs:masterBuildings).filter(d=>(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
+  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
+  list.innerHTML=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onclick="ldrSelectBld('${d._id||d.id||''}','${(d.nombre||'').replace(/'/g,"\\'")}')">${d.nombre}</div>`).join('');
+  list.style.display='block';
+};
+
+window.ldrSelectBld=function(id,nombre){
+  document.getElementById('ldr-buildingId').value=id;
+  document.getElementById('ldr-buildingName').value=nombre;
+  document.getElementById('ldr-bld-q').value=nombre;
+  document.getElementById('ldr-bld-list').style.display='none';
+};
+
+window.saveLeadDrawer=async function(){
+  const nombre=(document.getElementById('ldr-nombre').value||'').trim();
+  const apellido=(document.getElementById('ldr-apellido').value||'').trim();
+  const email=(document.getElementById('ldr-email').value||'').trim();
+  const origen=document.getElementById('ldr-origen').value||'';
+  let ok=true;
+  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-origen',v:origen}].forEach(({id,v})=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(!v){el.style.borderColor='#ED1B34';ok=false;}else{el.style.borderColor='';}
+  });
+  if(!ok)return;
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('ldr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    const data={
+      nombre,apellido,email,origen,
+      telefono:(document.getElementById('ldr-telefono').value||'').trim(),
+      empresa:(document.getElementById('ldr-empresa').value||'').trim(),
+      puesto:(document.getElementById('ldr-puesto').value||'').trim(),
+      tipoInmueble:document.getElementById('ldr-tipoInmueble').value||'',
+      buildingId:document.getElementById('ldr-buildingId').value||'',
+      buildingName:document.getElementById('ldr-buildingName').value||'',
+      brokerAsignado:(document.getElementById('ldr-broker').value||'').trim(),
+      comentarios:(document.getElementById('ldr-comentarios').value||'').trim(),
+      estado:'Nuevo',
+      creadoPor:user?.displayName||user?.email||'',
+      fechaCreacion:now,
+      ultimaActividad:now,
+    };
+    const ref=await db.collection('leads').add(data);
+    await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen}`});
+    if(data.brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Asignado a ${data.brokerAsignado}`});
+    _leadDocs.unshift({...data,_id:ref.id});
+    showLeadNotification({...data,_id:ref.id});
+    closeLeadDrawer();
+    filterLeads();
+    document.getElementById('lead-subtitle').textContent=`${_leadDocs.length} lead${_leadDocs.length!==1?'s':''} registrados`;
+  }catch(e){alert('Error: '+e.message);btn.textContent='Crear lead';btn.disabled=false;}
+};
+
+function showLeadNotification(d){
+  const notif=document.getElementById('lead-notification');
+  const content=document.getElementById('ln-content');
+  const viewBtn=document.getElementById('ln-view-btn');
+  if(!notif||!content)return;
+  content.innerHTML=`${d.nombre} ${d.apellido}<br><span style="font-weight:400;color:#8A9AC0">${d.empresa||''}${d.empresa&&d.origen?' · ':''}${d.origen||''}</span>${d.buildingName?`<br><span style="font-weight:400;color:#8A9AC0">${d.buildingName}</span>`:''}`;
+  if(viewBtn)viewBtn.onclick=()=>{notif.style.display='none';switchCRMTab('leads');setTimeout(()=>openLeadDetail(d._id),100);};
+  notif.style.display='block';
+  setTimeout(()=>{if(notif.style.display!=='none')notif.style.display='none';},8000);
+}
+
+// CONVERSION MODAL
+window.openConvertModal=function(){
+  _ldrConvertOpt='existente';
+  document.getElementById('lc-opt-existente').classList.add('sel');
+  document.getElementById('lc-opt-nueva').classList.remove('sel');
+  document.getElementById('lc-search-wrap').style.display='block';
+  document.getElementById('lc-cuenta-q').value='';
+  document.getElementById('lc-cuentaId').value='';
+  document.getElementById('lc-cuentaNombre').value='';
+  document.getElementById('lc-cuenta-list').style.display='none';
+  const btn=document.getElementById('lc-save-btn');btn.textContent='Convertir';btn.disabled=false;
+  document.getElementById('lead-convert-overlay').classList.add('open');
+};
+
+window.closeConvertModal=function(){
+  document.getElementById('lead-convert-overlay').classList.remove('open');
+};
+
+window.lcSelectOpt=function(opt){
+  _ldrConvertOpt=opt;
+  document.getElementById('lc-opt-existente').classList.toggle('sel',opt==='existente');
+  document.getElementById('lc-opt-nueva').classList.toggle('sel',opt==='nueva');
+  document.getElementById('lc-search-wrap').style.display=opt==='existente'?'block':'none';
+};
+
+window.lcCuentaSearch=function(q){
+  const list=document.getElementById('lc-cuenta-list');
+  const lq=(q||'').toLowerCase().trim();
+  if(!lq){list.style.display='none';return;}
+  const matches=_crmDocs.filter(d=>(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
+  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
+  list.innerHTML=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onclick="lcSelectCuenta('${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')">${d.nombre}</div>`).join('');
+  list.style.display='block';
+};
+
+window.lcSelectCuenta=function(id,nombre){
+  document.getElementById('lc-cuentaId').value=id;
+  document.getElementById('lc-cuentaNombre').value=nombre;
+  document.getElementById('lc-cuenta-q').value=nombre;
+  document.getElementById('lc-cuenta-list').style.display='none';
+};
+
+window.executeLeadConversion=async function(){
+  if(!_currentLeadId){closeConvertModal();return;}
+  const lead=_leadDocs.find(d=>d._id===_currentLeadId);
+  if(!lead)return;
+  const btn=document.getElementById('lc-save-btn');btn.textContent='Convirtiendo...';btn.disabled=true;
+  try{
+    let cuentaId='',cuentaNombre='';
+    if(_ldrConvertOpt==='existente'){
+      cuentaId=document.getElementById('lc-cuentaId').value;
+      cuentaNombre=document.getElementById('lc-cuentaNombre').value;
+    }else{
+      const ref=await db.collection('clientes').add({
+        nombre:lead.empresa||((lead.nombre||'')+' '+(lead.apellido||'')).trim(),
+        fechaCreacion:firebase.firestore.Timestamp.now(),
+        ultimaActividad:firebase.firestore.Timestamp.now(),
+        brokerCreador:user?.displayName||user?.email||'',
+        pptsGenerados:0,cantidadPPTs:0
+      });
+      cuentaId=ref.id;
+      cuentaNombre=lead.empresa||((lead.nombre||'')+' '+(lead.apellido||'')).trim();
+      _crmDocs=[];_clientesCache=[];
+    }
+    const now=firebase.firestore.Timestamp.now();
+    const contactRef=await db.collection('contactos').add({
+      cuentaId,cuentaNombre,
+      nombre:lead.nombre||'',apellidos:lead.apellido||'',
+      cargo:'Otro',puesto:lead.puesto||'',
+      email:lead.email||'',estadoCorreo:'sin_comprobar',
+      telefono:lead.telefono||'',
+      comentarios:lead.comentarios||'',
+      brokerResponsable:lead.brokerAsignado||user?.displayName||'',
+      fechaCreacion:now,ultimoContacto:now,ultimaActividad:now,
+      inversor:'No',prefsInversion:[],
+    });
+    await db.collection('leads').doc(_currentLeadId).update({estado:'Convertido',contactoId:contactRef.id,cuentaId,ultimaActividad:now});
+    await addLeadTimeline(_currentLeadId,{tipo:'convertido',descripcion:`Convertido → Contacto${cuentaNombre?' en '+cuentaNombre:''}`});
+    const idx=_leadDocs.findIndex(d=>d._id===_currentLeadId);
+    if(idx>=0){_leadDocs[idx].estado='Convertido';_leadDocs[idx].contactoId=contactRef.id;}
+    _ctoDocs=[];
+    closeConvertModal();
+    openLeadDetail(_currentLeadId);
+  }catch(e){alert('Error al convertir: '+e.message);btn.textContent='Convertir';btn.disabled=false;}
+};
+
+// LEADS ANALYTICS
+async function loadLeadsAnalytics(){
+  if(!document.getElementById('an-lead-kpis'))return;
+  try{
+    const snap=await db.collection('leads').get();
+    const leads=snap.docs.map(d=>d.data());
+    renderLeadsAnalytics(leads);
+  }catch(e){console.warn('Leads analytics:',e);}
+}
+
+function renderLeadsAnalytics(leads){
+  const total=leads.length;
+  const convertidos=leads.filter(d=>d.estado==='Convertido').length;
+  const contactados=leads.filter(d=>!['Nuevo','Intento de contacto','Descartado'].includes(d.estado)).length;
+  const pct=n=>total?Math.round(n/total*100)+'%':'0%';
+
+  const kpiEl=document.getElementById('an-lead-kpis');
+  if(kpiEl)kpiEl.innerHTML=`
+    <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF">🎯</div><div class="kpi-data"><div class="kpi-v">${total}</div><div class="kpi-l">Leads totales</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon-box" style="background:#E8F8F0">✅</div><div class="kpi-data"><div class="kpi-v">${convertidos}</div><div class="kpi-l">Convertidos · ${pct(convertidos)}</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF">📞</div><div class="kpi-data"><div class="kpi-v">${contactados}</div><div class="kpi-l">Contactados</div></div></div>
+  `;
+
+  const funnelSteps=[
+    ['Leads recibidos', total],
+    ['Contactados', leads.filter(d=>['Contactado','Calificado','Visita coordinada','Visita realizada','Propuesta enviada','Convertido'].includes(d.estado)).length],
+    ['Calificados', leads.filter(d=>['Calificado','Visita coordinada','Visita realizada','Propuesta enviada','Convertido'].includes(d.estado)).length],
+    ['Visitas realizadas', leads.filter(d=>['Visita realizada','Propuesta enviada','Convertido'].includes(d.estado)).length],
+    ['Propuestas enviadas', leads.filter(d=>['Propuesta enviada','Convertido'].includes(d.estado)).length],
+    ['Convertidos', convertidos],
+  ];
+  const funnelEl=document.getElementById('an-leads-funnel');
+  if(funnelEl){
+    if(!total){funnelEl.innerHTML='<div class="an-empty">Sin datos de leads</div>';
+    }else{
+      funnelEl.innerHTML=funnelSteps.map(([lbl,n])=>`
+        <div class="funnel-step">
+          <div class="funnel-lbl">${lbl}</div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${total?Math.round(n/total*100):0}%"></div></div>
+          <div class="funnel-n">${n}</div>
+          <div class="funnel-pct">${pct(n)}</div>
+        </div>`).join('');
+    }
+  }
+
+  const origenEl=document.getElementById('an-leads-origen');
+  if(origenEl){
+    const origenes={};
+    leads.forEach(d=>{const o=d.origen||'Sin dato';origenes[o]=(origenes[o]||0)+1;});
+    const sorted=Object.entries(origenes).sort((a,b)=>b[1]-a[1]);
+    if(!sorted.length){origenEl.innerHTML='<div class="an-empty">Sin datos</div>';
+    }else{
+      const max=sorted[0][1];
+      origenEl.innerHTML=sorted.map(([o,n],i)=>`
+        <div class="an-rank-row">
+          <div class="an-rank-pos">${i+1}</div>
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span class="an-rank-name">${o}</span><span class="an-rank-val">${n}</span></div>
+            <div style="height:5px;background:#EEF3FF;border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.round(n/max*100)}%;background:#1C54F4;border-radius:3px"></div></div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  const brokersEl=document.getElementById('an-leads-brokers');
+  if(brokersEl){
+    const bmap={};
+    leads.forEach(d=>{
+      const b=d.brokerAsignado||'Sin asignar';
+      if(!bmap[b])bmap[b]={total:0,conv:0};
+      bmap[b].total++;
+      if(d.estado==='Convertido')bmap[b].conv++;
+    });
+    const sorted=Object.entries(bmap).sort((a,b)=>b[1].total-a[1].total).slice(0,6);
+    if(!sorted.length){brokersEl.innerHTML='<div class="an-empty">Sin datos</div>';
+    }else{
+      brokersEl.innerHTML=sorted.map(([b,v],i)=>`
+        <div class="an-rank-row">
+          <div class="an-rank-pos">${i+1}</div>
+          <div class="an-rank-name">${b}</div>
+          <div><span class="an-rank-val">${v.total}</span><span class="an-rank-pct">leads</span></div>
+          <div style="margin-left:.5rem"><span class="an-rank-val" style="color:#16A34A">${v.conv}</span><span class="an-rank-pct">conv.</span></div>
+        </div>`).join('');
+    }
+  }
+
+  const descarteEl=document.getElementById('an-leads-descarte');
+  if(descarteEl){
+    const desc={};
+    leads.filter(d=>d.estado==='Descartado'&&d.motivoDescarte).forEach(d=>{desc[d.motivoDescarte]=(desc[d.motivoDescarte]||0)+1;});
+    const sorted=Object.entries(desc).sort((a,b)=>b[1]-a[1]);
+    const descTotal=Object.values(desc).reduce((s,v)=>s+v,0);
+    if(!sorted.length){descarteEl.innerHTML='<div class="an-empty">Sin descartados</div>';
+    }else{
+      descarteEl.innerHTML=sorted.map(([m,n])=>`
+        <div class="an-rank-row">
+          <div class="an-rank-name">${m}</div>
+          <div><span class="an-rank-val" style="color:#DC2626">${n}</span><span class="an-rank-pct">${descTotal?Math.round(n/descTotal*100)+'%':''}</span></div>
+        </div>`).join('');
+    }
+  }
+}
 
 /* ===== CLIENT DRAWER ===== */
 let _cdrCallback=null;
@@ -5688,6 +6392,7 @@ async function loadAnalytics(){
     const docs=snap.docs.map(d=>({...d.data(),_id:d.id}));
     _anDocs=docs;
     renderAnalytics(docs);
+    loadLeadsAnalytics();
     const last=docs[0];
     if(last&&last.fecha){
       const d=last.fecha.toDate?last.fecha.toDate():new Date(last.fecha);
