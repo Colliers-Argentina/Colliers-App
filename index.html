@@ -1974,9 +1974,6 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     </div>
   </div>
 
-  <!-- UNIT CRM AUTOCOMPLETE DROPDOWN (singleton, position:fixed) -->
-<div id="du-ac-dropdown"></div>
-
 <!-- LEAD DRAWER -->
   <div id="ldr-overlay" class="cdr-overlay" onclick="closeLeadDrawer()"></div>
   <div id="ldr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nuevo Lead">
@@ -5655,11 +5652,14 @@ function duAcSearch(inputEl){
   _duAcState={bld,uid,role,el:inputEl};
   const q=(inputEl.value||'').trim().toLowerCase();
   const drop=document.getElementById('du-ac-dropdown');
+  console.log('[DU-AC] buscando:',q,'| bld:',bld,'| uid:',uid,'| role:',role,'| drop found:',!!drop);
   if(!q){drop.style.display='none';return;}
   const _render=()=>{
     const cuentas=_crmDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(d.nombre||'').toLowerCase().includes(q)).slice(0,5);
     const contactos=_ctoDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(`${d.nombre||''} ${d.apellidos||''}`).toLowerCase().includes(q)).slice(0,5);
+    console.log('[DU-AC] crm docs:',_crmDocs.length,'| cto docs:',_ctoDocs.length,'| resultados:',cuentas.length+contactos.length);
     const r=inputEl.getBoundingClientRect();
+    console.log('[DU-AC] input rect:',r.top,r.bottom,r.left,'| drop position: top='+(r.bottom+3)+' left='+r.left);
     drop.style.top=(r.bottom+3)+'px';
     drop.style.left=r.left+'px';
     drop.style.width=Math.max(r.width,230)+'px';
@@ -5675,17 +5675,20 @@ function duAcSearch(inputEl){
     html+=`<div class="du-ac-footer"><button class="be-ac-link" onmousedown="event.preventDefault();duAcCreateNew('cuenta')">+ Nueva Cuenta</button><button class="be-ac-link" onmousedown="event.preventDefault();duAcCreateNew('contacto')">+ Nuevo Contacto</button></div>`;
     drop.innerHTML=html;
     drop.style.display='block';
+    console.log('[DU-AC] dropdown abierto | display:',drop.style.display,'| innerHTML length:',drop.innerHTML.length);
   };
   const needCrm=!_crmDocs.length, needCto=!_ctoDocs.length;
   if(needCrm||needCto){
+    console.log('[DU-AC] cargando desde Firestore | needCrm:',needCrm,'needCto:',needCto);
     const loads=[];
-    if(needCrm)loads.push(db.collection('clientes').orderBy('ultimaActividad','desc').get().then(s=>{_crmDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}));
-    if(needCto)loads.push(db.collection('contactos').orderBy('ultimaActividad','desc').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}));
-    Promise.all(loads).then(_render).catch(()=>_render());
+    if(needCrm)loads.push(db.collection('clientes').orderBy('ultimaActividad','desc').get().then(s=>{_crmDocs=s.docs.map(d=>({...d.data(),_id:d.id}));console.log('[DU-AC] clientes cargados:',_crmDocs.length);}));
+    if(needCto)loads.push(db.collection('contactos').orderBy('ultimaActividad','desc').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));console.log('[DU-AC] contactos cargados:',_ctoDocs.length);}));
+    Promise.all(loads).then(_render).catch(e=>{console.error('[DU-AC] error cargando:',e);_render();});
   } else {_render();}
 }
 
 function duAcSelect(tipo,id,nombre){
+  console.log('[DU-AC] seleccionando:',tipo,id,nombre);
   const {bld,uid,role,el}=_duAcState;
   if(!bld||!uid)return;
   if(el)el.value=nombre;
@@ -5742,6 +5745,14 @@ document.addEventListener('click',function(e){
   const drop=document.getElementById('du-ac-dropdown');
   if(drop&&!drop.contains(e.target)&&!e.target.classList.contains('du-ac-inp'))drop.style.display='none';
 });
+
+window.duAcDebug={
+  get crmDocs(){return _crmDocs;},
+  get ctoDocs(){return _ctoDocs;},
+  get state(){return _duAcState;},
+  search:duAcSearch,
+  checkDrop(){const d=document.getElementById('du-ac-dropdown');console.log('drop:',d,'parent:',d?.parentElement,'display:',d?.style.display,'computed:',d?getComputedStyle(d).display:'N/A');return d;}
+};
 
 /* ===== BUILDING CRM AUTOCOMPLETE ===== */
 function _beAcPosition(role){
@@ -7365,6 +7376,8 @@ if(localStorage.getItem('colliers-theme')==='dark'){
   if(btn)btn.textContent='☀️';
 }
 </script>
+<!-- UNIT CRM AUTOCOMPLETE DROPDOWN — outside all panels so position:fixed works from any module -->
+<div id="du-ac-dropdown"></div>
 </body>
 
 </html>
