@@ -7703,7 +7703,10 @@ function _heatColor(t){
 }
 
 function renderAnDemandMap(docs){
+  console.log('[MAP] render iniciado — docs recibidos:',docs.length);
   const mapEl=document.getElementById('an-demand-map');
+  console.log('[MAP] contenedor encontrado:',!!mapEl,'offsetWidth:',mapEl?.offsetWidth,'offsetHeight:',mapEl?.offsetHeight,'parentVisible:',!!mapEl?.offsetParent);
+  if(mapEl){mapEl.style.border='2px solid red';mapEl.style.minHeight='500px';}
   if(!mapEl||typeof L==='undefined'){console.warn('[MAP] Abortando: mapEl=',!!mapEl,'L=',typeof L);return;}
 
   // Inicializar o limpiar mapa
@@ -7743,6 +7746,7 @@ function renderAnDemandMap(docs){
     });
   });
 
+  console.log('[MAP] zonas procesadas',zonaCount,'total zonas únicas:',Object.keys(zonaCount).length);
   // ---- DIAGNOSTIC LOGS ----
   const zonasSinCoordenadas=[];
   const tablaZonas=Object.entries(zonaCount)
@@ -7791,6 +7795,7 @@ function renderAnDemandMap(docs){
     }
   });
   console.log('[MAP] Círculos efectivamente agregados al mapa:',circulosAgregados);
+  console.log('[MAP] mapa agregado al DOM — _anDemandMap:',!!window._anDemandMap);
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},200);
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},600);
 }
