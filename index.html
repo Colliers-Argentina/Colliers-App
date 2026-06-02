@@ -792,6 +792,20 @@ body.dark .kp-chip{background:rgba(28,84,244,.2);border-color:rgba(77,147,255,.3
 
 /* ===== BUILDING CRM AUTOCOMPLETE ===== */
 .be-ac-wrap{position:relative}
+/* Unit CRM autocomplete dropdown */
+#du-ac-dropdown{display:none;position:fixed;background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:9999;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,7,89,.18);min-width:220px}
+body.dark #du-ac-dropdown{background:#0C1640;border-color:rgba(255,255,255,.14)}
+.du-ac-item{padding:7px 10px;cursor:pointer;font-size:12px;color:#0A1B4D;border-bottom:1px solid #EEF3FF;display:flex;align-items:center;gap:6px;transition:background .1s}
+.du-ac-item:last-of-type{border-bottom:none}
+.du-ac-item:hover{background:#EEF3FF}
+body.dark .du-ac-item{color:#C3E6FF;border-bottom-color:rgba(255,255,255,.05)}
+body.dark .du-ac-item:hover{background:rgba(255,255,255,.06)}
+.du-ac-tipo-cta{font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(28,84,244,.12);color:#1C54F4;flex-shrink:0}
+.du-ac-tipo-cto{font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(34,197,94,.12);color:#16A34A;flex-shrink:0}
+.du-ac-footer{padding:5px 8px;border-top:1px solid #EEF3FF;display:flex;gap:5px;background:#FAFCFF;border-radius:0 0 8px 8px}
+body.dark .du-ac-footer{background:rgba(255,255,255,.03);border-top-color:rgba(255,255,255,.07)}
+/* Linked badge on unit cell */
+.du-linked-dot{width:6px;height:6px;border-radius:50%;background:#1C54F4;flex-shrink:0;display:inline-block;margin-left:2px;vertical-align:middle}
 .be-ac-list{display:none;position:fixed;background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:9999;max-height:160px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.18);min-width:200px}
 body.dark .be-ac-list{background:#0C1640;border-color:rgba(255,255,255,.12)}
 .be-ac-item{padding:8px 11px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s}
@@ -1960,7 +1974,10 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     </div>
   </div>
 
-  <!-- LEAD DRAWER -->
+  <!-- UNIT CRM AUTOCOMPLETE DROPDOWN (singleton, position:fixed) -->
+<div id="du-ac-dropdown"></div>
+
+<!-- LEAD DRAWER -->
   <div id="ldr-overlay" class="cdr-overlay" onclick="closeLeadDrawer()"></div>
   <div id="ldr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nuevo Lead">
     <div class="cdr-hd">
@@ -5628,6 +5645,104 @@ function openDrawerFromGenerator(){
 
 window.openNewClientModal=()=>openClientDrawer(()=>loadCRM());
 
+/* ===== UNIT CRM AUTOCOMPLETE ===== */
+let _duAcState={};
+
+function duAcSearch(inputEl){
+  const bld=inputEl.dataset.bld;
+  const uid=inputEl.dataset.uid;
+  const role=inputEl.dataset.role;
+  _duAcState={bld,uid,role,el:inputEl};
+  const q=(inputEl.value||'').trim().toLowerCase();
+  const drop=document.getElementById('du-ac-dropdown');
+  if(!q){drop.style.display='none';return;}
+  const _render=()=>{
+    const cuentas=_crmDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(d.nombre||'').toLowerCase().includes(q)).slice(0,5);
+    const contactos=_ctoDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(`${d.nombre||''} ${d.apellidos||''}`).toLowerCase().includes(q)).slice(0,5);
+    const r=inputEl.getBoundingClientRect();
+    drop.style.top=(r.bottom+3)+'px';
+    drop.style.left=r.left+'px';
+    drop.style.width=Math.max(r.width,230)+'px';
+    let html='';
+    cuentas.forEach(c=>{
+      html+=`<div class="du-ac-item" onmousedown="event.preventDefault();duAcSelect('cuenta','${c._id}','${(c.nombre||'').replace(/'/g,"\\'")}')"><span class="du-ac-tipo-cta">Cuenta</span>${c.nombre}</div>`;
+    });
+    contactos.forEach(c=>{
+      const n=`${c.nombre||''} ${c.apellidos||''}`.trim();
+      html+=`<div class="du-ac-item" onmousedown="event.preventDefault();duAcSelect('contacto','${c._id}','${n.replace(/'/g,"\\'")}')"><span class="du-ac-tipo-cto">Contacto</span>${n}</div>`;
+    });
+    if(!cuentas.length&&!contactos.length)html+=`<div style="padding:7px 10px;font-size:11px;color:#7B8BBD">Sin resultados</div>`;
+    html+=`<div class="du-ac-footer"><button class="be-ac-link" onmousedown="event.preventDefault();duAcCreateNew('cuenta')">+ Nueva Cuenta</button><button class="be-ac-link" onmousedown="event.preventDefault();duAcCreateNew('contacto')">+ Nuevo Contacto</button></div>`;
+    drop.innerHTML=html;
+    drop.style.display='block';
+  };
+  const needCrm=!_crmDocs.length, needCto=!_ctoDocs.length;
+  if(needCrm||needCto){
+    const loads=[];
+    if(needCrm)loads.push(db.collection('clientes').orderBy('ultimaActividad','desc').get().then(s=>{_crmDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}));
+    if(needCto)loads.push(db.collection('contactos').orderBy('ultimaActividad','desc').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}));
+    Promise.all(loads).then(_render).catch(()=>_render());
+  } else {_render();}
+}
+
+function duAcSelect(tipo,id,nombre){
+  const {bld,uid,role,el}=_duAcState;
+  if(!bld||!uid)return;
+  if(el)el.value=nombre;
+  const update={updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  if(role==='occ'){
+    update.ocupante=nombre;
+    if(tipo==='cuenta'){update.occupierAccountId=id;update.occupierAccountName=nombre;update.occupierContactId='';update.occupierContactName='';}
+    else{update.occupierContactId=id;update.occupierContactName=nombre;update.occupierAccountId='';update.occupierAccountName='';}
+  } else {
+    update.propietario=nombre;
+    if(tipo==='cuenta'){update.ownerAccountId=id;update.ownerAccountName=nombre;update.ownerContactId='';update.ownerContactName='';}
+    else{update.ownerContactId=id;update.ownerContactName=nombre;update.ownerAccountId='';update.ownerAccountName='';}
+  }
+  db.collection('buildings').doc(bld).collection('units').doc(uid).update(update)
+    .then(()=>{
+      const u=_unitDocs.find(x=>x._id===uid);if(u)Object.assign(u,update);
+      if(el){el.style.borderColor='#16A34A';el.style.boxShadow='0 0 0 2px rgba(22,163,74,.12)';setTimeout(()=>{el.style.borderColor='';el.style.boxShadow='';},900);}
+    })
+    .catch(e=>showBldToast('❌ Error: '+e.message));
+  document.getElementById('du-ac-dropdown').style.display='none';
+}
+
+function duAcBlurSave(inputEl){
+  const bld=inputEl.dataset.bld,uid=inputEl.dataset.uid,role=inputEl.dataset.role;
+  const val=inputEl.value.trim();
+  const field=role==='occ'?'ocupante':'propietario';
+  const update={[field]:val,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  if(!val){
+    if(role==='occ'){update.occupierAccountId='';update.occupierAccountName='';update.occupierContactId='';update.occupierContactName='';}
+    else{update.ownerAccountId='';update.ownerAccountName='';update.ownerContactId='';update.ownerContactName='';}
+  }
+  if(!db||!bld||!uid)return;
+  db.collection('buildings').doc(bld).collection('units').doc(uid).update(update).catch(()=>{});
+  const u=_unitDocs.find(x=>x._id===uid);if(u)u[field]=val;
+}
+
+function duAcCreateNew(tipo){
+  const {bld,uid,role}=_duAcState;
+  document.getElementById('du-ac-dropdown').style.display='none';
+  if(tipo==='cuenta'){
+    openClientDrawer(function(nombre,newId){
+      if(!newId)return;
+      _duAcState.bld=bld;_duAcState.uid=uid;_duAcState.role=role;
+      _duAcState.el=document.querySelector(`.du-ac-inp[data-uid="${uid}"][data-role="${role}"]`);
+      duAcSelect('cuenta',newId,nombre);
+      loadCRM();
+    });
+  } else {
+    openContactoDrawer(null,null);
+  }
+}
+
+document.addEventListener('click',function(e){
+  const drop=document.getElementById('du-ac-dropdown');
+  if(drop&&!drop.contains(e.target)&&!e.target.classList.contains('du-ac-inp'))drop.style.display='none';
+});
+
 /* ===== BUILDING CRM AUTOCOMPLETE ===== */
 function _beAcPosition(role){
   const inp=document.getElementById(`be-${role}-q`);
@@ -5930,34 +6045,6 @@ function openBuildingEditor(docId){
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Operación</div>
         <div class="bld-det-field"><div class="bld-det-lbl">Ejecutivo Comercial responsable</div><input class="bld-det-inp" id="be-broker" value="${esc(d.broker||'')}"></div>
-        <div class="bld-det-field">
-          <div class="bld-det-lbl">Propietario (Cuenta CRM)</div>
-          <div class="be-ac-wrap">
-            <input class="bld-det-inp" id="be-owner-q" placeholder="Buscar cuenta..." autocomplete="off" value="${esc(d.ownerAccountName||d.propietario||'')}" oninput="beAcSearch('owner',this.value)">
-            <div class="be-ac-list" id="be-owner-list"></div>
-          </div>
-          <input type="hidden" id="be-owner-id" value="${esc(d.ownerAccountId||'')}">
-          <input type="hidden" id="be-owner-name" value="${esc(d.ownerAccountName||'')}">
-          <div class="be-ac-actions">
-            <button type="button" class="be-ac-link" onclick="beAcCreate('owner','cuenta')">+ Crear Cuenta</button>
-            <button type="button" class="be-ac-link" onclick="beAcCreate('owner','contacto')">+ Crear Contacto</button>
-          </div>
-          ${d.ownerAccountId?`<div style="margin-top:.25rem;font-size:11px;color:#22C55E">✓ Vinculado: ${esc(d.ownerAccountName||'')}</div>`:''}
-        </div>
-        <div class="bld-det-field">
-          <div class="bld-det-lbl">Ocupante (Cuenta CRM)</div>
-          <div class="be-ac-wrap">
-            <input class="bld-det-inp" id="be-occupier-q" placeholder="Buscar cuenta..." autocomplete="off" value="${esc(d.occupierAccountName||d.ocupante||'')}" oninput="beAcSearch('occupier',this.value)">
-            <div class="be-ac-list" id="be-occupier-list"></div>
-          </div>
-          <input type="hidden" id="be-occupier-id" value="${esc(d.occupierAccountId||'')}">
-          <input type="hidden" id="be-occupier-name" value="${esc(d.occupierAccountName||'')}">
-          <div class="be-ac-actions">
-            <button type="button" class="be-ac-link" onclick="beAcCreate('occupier','cuenta')">+ Crear Cuenta</button>
-            <button type="button" class="be-ac-link" onclick="beAcCreate('occupier','contacto')">+ Crear Contacto</button>
-          </div>
-          ${d.occupierAccountId?`<div style="margin-top:.25rem;font-size:11px;color:#22C55E">✓ Vinculado: ${esc(d.occupierAccountName||'')}</div>`:''}
-        </div>
         <div class="bld-det-field-row">
           <div class="bld-det-field"><div class="bld-det-lbl">Certificación</div><input class="bld-det-inp" id="be-cert" value="${esc(d.certificacion||'')}"></div>
           <div class="bld-det-field"><div class="bld-det-lbl">URL Foto</div><input class="bld-det-inp" id="be-foto" value="${esc(hasFoto)}"></div>
@@ -6292,10 +6379,10 @@ function renderDetailUnits(buildingId,filterQ=''){
       <td><input class="du-inp" style="width:54px" value="${esc(u.piso||'')}" onblur="saveUnitField('${buildingId}','${u._id}','piso',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="width:68px" value="${esc(u.unidad||'')}" onblur="saveUnitField('${buildingId}','${u._id}','unidad',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td class="du-estado-cell"><select class="du-sel" style="background:${c.bg};border:1px solid ${c.border};color:${c.text};font-weight:700;padding:4px 6px;border-radius:999px" onchange="saveUnitField('${buildingId}','${u._id}','estado',this.value,this);renderDetailUnits('${buildingId}',document.getElementById('bld-det-search')?.value||'')">${so(u.estado)}</select></td>
-      <td><input class="du-inp" style="width:100px" value="${esc(u.ocupante||'')}" onblur="saveUnitField('${buildingId}','${u._id}','ocupante',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><div style="display:flex;align-items:center;gap:2px"><input class="du-inp du-ac-inp" style="width:96px" data-bld="${buildingId}" data-uid="${u._id}" data-role="occ" value="${esc(u.occupierAccountName||u.occupierContactName||u.ocupante||'')}" oninput="duAcSearch(this)" onfocus="if(this.value.trim())duAcSearch(this)" onblur="duAcBlurSave(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()">${(u.occupierAccountId||u.occupierContactId)?`<span class="du-linked-dot" title="${u.occupierAccountId?'Cuenta vinculada':'Contacto vinculado'}"></span>`:''}</div></td>
       <td><input class="du-inp" style="width:58px" type="number" value="${u.m2||''}" onblur="saveUnitField('${buildingId}','${u._id}','m2',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="width:80px" value="${esc(u.askingRent||'')}" onblur="saveUnitField('${buildingId}','${u._id}','askingRent',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
-      <td><input class="du-inp" style="width:100px" value="${esc(u.propietario||'')}" onblur="saveUnitField('${buildingId}','${u._id}','propietario',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><div style="display:flex;align-items:center;gap:2px"><input class="du-inp du-ac-inp" style="width:96px" data-bld="${buildingId}" data-uid="${u._id}" data-role="own" value="${esc(u.ownerAccountName||u.ownerContactName||u.propietario||'')}" oninput="duAcSearch(this)" onfocus="if(this.value.trim())duAcSearch(this)" onblur="duAcBlurSave(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()">${(u.ownerAccountId||u.ownerContactId)?`<span class="du-linked-dot" title="${u.ownerAccountId?'Cuenta vinculada':'Contacto vinculado'}"></span>`:''}</div></td>
       <td><input class="du-inp" style="width:90px" value="${esc(u.brokerAsignado||'')}" onblur="saveUnitField('${buildingId}','${u._id}','brokerAsignado',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="min-width:120px" value="${esc(u.observaciones||'')}" onblur="saveUnitField('${buildingId}','${u._id}','observaciones',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td class="col-actions"><div class="du-actions">
@@ -6451,10 +6538,6 @@ async function saveBuildingEdits(){
     moneda:gv('be-moneda'),
     categoria:gv('be-cat'),
     broker:gv('be-broker'),
-    ownerAccountId:document.getElementById('be-owner-id')?.value||'',
-    ownerAccountName:document.getElementById('be-owner-name')?.value||document.getElementById('be-owner-q')?.value||'',
-    occupierAccountId:document.getElementById('be-occupier-id')?.value||'',
-    occupierAccountName:document.getElementById('be-occupier-name')?.value||document.getElementById('be-occupier-q')?.value||'',
     certificacion:gv('be-cert'),
     googleMaps:gv('be-maps'),
     foto:normalizeImageUrl(gv('be-foto')||''),
