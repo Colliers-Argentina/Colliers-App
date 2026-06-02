@@ -7704,10 +7704,24 @@ function _heatColor(t){
 
 function renderAnDemandMap(docs){
   console.log('[MAP] render iniciado — docs recibidos:',docs.length);
-  const mapEl=document.getElementById('an-demand-map');
-  console.log('[MAP] contenedor encontrado:',!!mapEl,'offsetWidth:',mapEl?.offsetWidth,'offsetHeight:',mapEl?.offsetHeight,'parentVisible:',!!mapEl?.offsetParent);
-  if(mapEl){mapEl.style.border='2px solid red';mapEl.style.minHeight='500px';}
-  if(!mapEl||typeof L==='undefined'){console.warn('[MAP] Abortando: mapEl=',!!mapEl,'L=',typeof L);return;}
+  let mapEl=document.getElementById('an-demand-map');
+  console.log('[MAP] contenedor encontrado:',!!mapEl,'offsetWidth:',mapEl?.offsetWidth,'offsetHeight:',mapEl?.offsetHeight);
+
+  if(!mapEl){
+    console.warn('[MAP] #an-demand-map ausente del DOM — creando dinámicamente');
+    window._anDemandMap=null;
+    const tendCard=document.getElementById('an-tend-card');
+    const anBody=tendCard?.parentElement;
+    if(!anBody){console.error('[MAP] an-body no encontrado, abortando');return;}
+    const card=document.createElement('div');
+    card.className='an-card';card.id='an-map-card';
+    card.innerHTML='<div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">tamaño = intensidad</div></div><div style="padding:0"><div id="an-demand-map" style="height:300px;width:100%;border-radius:0 0 11px 11px;border:2px solid red"></div></div>';
+    anBody.insertBefore(card,tendCard);
+    mapEl=document.getElementById('an-demand-map');
+    console.log('[MAP] card inyectado dinámicamente, mapEl ahora:',!!mapEl);
+  }
+
+  if(!mapEl||typeof L==='undefined'){console.warn('[MAP] Abortando final: mapEl=',!!mapEl,'L=',typeof L);return;}
 
   // Inicializar o limpiar mapa
   try{
