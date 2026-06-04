@@ -2960,7 +2960,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field bwiz-full">
-            <label class="bwiz-lbl">Dirección</label>
+            <label class="bwiz-lbl">Dirección <span class="bwiz-req">*</span></label>
             <input class="bwiz-inp" id="bw-direccion" placeholder="Ej: Av. Leandro N. Alem 855">
           </div>
         </div>
@@ -7480,7 +7480,7 @@ function bwizNav(dir){
 }
 
 function _bwizValidate(){
-  const required={1:['bw-nombre','bw-etapa','bw-corredor','bw-tipologia','bw-categoria']};
+  const required={1:['bw-nombre','bw-etapa','bw-corredor','bw-tipologia','bw-categoria','bw-direccion']};
   const fields=required[_bwizStep]||[];
   let ok=true;
   fields.forEach(id=>{
