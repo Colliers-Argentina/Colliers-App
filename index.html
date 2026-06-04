@@ -1863,14 +1863,45 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
   <!-- Nav -->
   <nav class="sb-nav" id="sb-nav">
 
-    <!-- 🏠 Dashboard -->
+    <!-- Dashboard -->
     <button class="sb-item-solo active" id="sbn-home" data-mod="home" onclick="_sbItemClick('home',null)">
       <span class="sb-item-solo-icon">⊞</span><span>Dashboard</span>
     </button>
 
     <div class="sb-grp-sep"></div>
 
-    <!-- 📄 Presentaciones -->
+    <!-- Comercial -->
+    <div class="sb-grp open" id="sbg-comercial">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-comercial')">
+        <span class="sb-grp-hd-icon">💼</span>
+        <span class="sb-grp-hd-label">Comercial</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body" id="sbb-comercial">
+        <button class="sb-item" disabled><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')">Clientes</button>
+        <button class="sb-item" disabled><span>Actividad</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="crm" onclick="_sbItemClick('crm',null)">CRM</button>
+      </div>
+    </div>
+
+    <!-- Inmuebles -->
+    <div class="sb-grp open" id="sbg-inmuebles">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-inmuebles')">
+        <span class="sb-grp-hd-icon">🏢</span>
+        <span class="sb-grp-hd-label">Inmuebles</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body" id="sbb-inmuebles">
+        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Inventario</button>
+        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Edificios</button>
+        <button class="sb-item" disabled><span>Pisos Disponibles</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Historial</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Reportes</span><span class="sb-soon-badge">Pronto</span></button>
+      </div>
+    </div>
+
+    <!-- Presentaciones -->
     <div class="sb-grp open" id="sbg-ppt">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-ppt')">
         <span class="sb-grp-hd-icon">📄</span>
@@ -1879,77 +1910,27 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       </button>
       <div class="sb-grp-body" id="sbb-ppt">
         <button class="sb-item" data-mod="generator" onclick="_sbItemClick('generator',null)">Generador PPT</button>
-        <button class="sb-item" disabled><span>Historial de PPTs</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Presentaciones Enviadas</span><span class="sb-soon-badge">Pronto</span></button>
         <button class="sb-item" disabled><span>Plantillas</span><span class="sb-soon-badge">Pronto</span></button>
       </div>
     </div>
 
-    <!-- 🏢 Inventario -->
-    <div class="sb-grp open" id="sbg-inv">
-      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-inv')">
-        <span class="sb-grp-hd-icon">🏢</span>
-        <span class="sb-grp-hd-label">Inventario</span>
-        <span class="sb-chevron">›</span>
-      </button>
-      <div class="sb-grp-body" id="sbb-inv">
-        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Inventario General</button>
-        <button class="sb-item" disabled><span>Disponibilidad por Zona</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Disponibilidad por Edificio</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Pisos / Componentes</span><span class="sb-soon-badge">Pronto</span></button>
-      </div>
-    </div>
-
-    <!-- 👥 CRM -->
-    <div class="sb-grp open" id="sbg-crm">
-      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-crm')">
-        <span class="sb-grp-hd-icon">👥</span>
-        <span class="sb-grp-hd-label">CRM</span>
-        <span class="sb-chevron">›</span>
-      </button>
-      <div class="sb-grp-body" id="sbb-crm">
-        <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')">Leads</button>
-        <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')">Clientes</button>
-        <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')">Contactos</button>
-        <button class="sb-item" disabled><span>Llamadas</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Visitas</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Funnel Comercial</span><span class="sb-soon-badge">Pronto</span></button>
-      </div>
-    </div>
-
-    <!-- 🏙️ Inmuebles -->
-    <div class="sb-grp" id="sbg-bld">
-      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-bld')">
-        <span class="sb-grp-hd-icon">🏙️</span>
-        <span class="sb-grp-hd-label">Inmuebles</span>
-        <span class="sb-chevron">›</span>
-      </button>
-      <div class="sb-grp-body sb-closed" id="sbb-bld">
-        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Edificios</button>
-        <button class="sb-item" disabled><span>Historial de Inmuebles</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Comparador de Edificios</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Mapa de Mercado</span><span class="sb-soon-badge">Pronto</span></button>
-      </div>
-    </div>
-
-    <!-- 📊 Inteligencia Comercial (guarded) -->
-    <div class="sb-grp sb-guarded" id="sbg-ic" style="display:none">
-      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-ic')">
+    <!-- Analytics (guarded) -->
+    <div class="sb-grp sb-guarded" id="sbg-analytics" style="display:none">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-analytics')">
         <span class="sb-grp-hd-icon">📊</span>
-        <span class="sb-grp-hd-label">Inteligencia Comercial</span>
+        <span class="sb-grp-hd-label">Analytics</span>
         <span class="sb-chevron">›</span>
       </button>
-      <div class="sb-grp-body sb-closed" id="sbb-ic">
-        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Analytics General</button>
-        <button class="sb-item" disabled><span>Zonas Demandadas</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Heatmap de Demanda</button>
-        <button class="sb-item" disabled><span>Tendencias de Mercado</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Ranking de Edificios</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Ranking de Ejecutivos</span><span class="sb-soon-badge">Pronto</span></button>
+      <div class="sb-grp-body sb-closed" id="sbb-analytics">
+        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Inteligencia Comercial</button>
+        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Heatmaps</button>
+        <button class="sb-item" disabled><span>Tendencias</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Rankings</span><span class="sb-soon-badge">Pronto</span></button>
       </div>
     </div>
 
-    <!-- ⚙️ Administración (guarded) -->
+    <!-- Administración (guarded) -->
     <div class="sb-grp sb-guarded" id="sbg-adm" style="display:none">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-adm')">
         <span class="sb-grp-hd-icon">⚙️</span>
@@ -1959,8 +1940,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="sb-grp-body sb-closed" id="sbb-adm">
         <button class="sb-item" data-mod="admin" onclick="_sbItemClick('admin',null)">Usuarios</button>
         <button class="sb-item" disabled><span>Configuración</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Permisos</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Auditoría</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Base de Datos</span><span class="sb-soon-badge">Pronto</span></button>
         <button class="sb-item" disabled><span>Logs</span><span class="sb-soon-badge">Pronto</span></button>
       </div>
     </div>
