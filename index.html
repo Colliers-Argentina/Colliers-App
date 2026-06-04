@@ -1951,10 +1951,6 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
     </div>
     <div class="an-insights-row" id="an-insights"></div>
-    <div class="an-card" id="an-map-card">
-      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">click zona para filtrar</div></div>
-      <div style="padding:0"><div id="an-demand-map" style="height:450px;width:100%;border-radius:0 0 11px 11px"></div></div>
-    </div>
     <div class="an-charts-row">
       <div class="an-card">
         <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Zonas más demandadas</div><div class="an-card-hint">click para filtrar</div></div>
@@ -1972,6 +1968,10 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <div class="an-card">
       <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ejecutivos Comerciales más activos</div></div>
       <div id="an-brokers-lb" class="an-brokers-row"></div>
+    </div>
+    <div class="an-card" id="an-map-card">
+      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">click zona para filtrar</div></div>
+      <div style="padding:0"><div id="an-demand-map" style="height:450px;width:100%;border-radius:0 0 11px 11px"></div></div>
     </div>
     <div class="an-card" id="an-tend-card">
       <div class="an-tend-hdr">
@@ -7713,30 +7713,8 @@ function _anCircleColor(count){
 }
 
 function renderAnDemandMap(docs){
-  // DIAG-1: función ejecutada
-  console.log('[DIAG-1] renderAnDemandMap ejecutado. docs:',docs.length,'L disponible:',typeof L!=='undefined');
-
-  let mapEl=document.getElementById("an-demand-map");
-  // DIAG-2: estado del contenedor
-  console.log('[DIAG-2] #an-demand-map encontrado:',!!mapEl,'offsetWidth:',mapEl?.offsetWidth,'offsetHeight:',mapEl?.offsetHeight,'display:',mapEl?getComputedStyle(mapEl).display:'N/A','visibility:',mapEl?getComputedStyle(mapEl).visibility:'N/A');
-  // DIAG-3: estado del card padre
-  const dbgCard=document.getElementById('an-map-card');
-  console.log('[DIAG-3] #an-map-card encontrado:',!!dbgCard,'offsetWidth:',dbgCard?.offsetWidth,'offsetHeight:',dbgCard?.offsetHeight,'display:',dbgCard?getComputedStyle(dbgCard).display:'N/A');
-
-  if(!mapEl){
-    console.warn('[DIAG] #an-demand-map ausente — creando dinámicamente');
-    window._anDemandMap=null;
-    const insightsEl=document.getElementById("an-insights");
-    const anBody=insightsEl?.parentElement;
-    if(!anBody){console.error('[DIAG] an-insights no encontrado');return;}
-    const card=document.createElement("div");
-    card.className="an-card";card.id="an-map-card";
-    card.innerHTML="<div class=\"an-card-hd\"><div class=\"an-card-accent\"></div><div class=\"an-card-title\">Mapa de Demanda \xB7 CABA</div><div class=\"an-card-hint\">click zona para filtrar</div></div><div style=\"padding:0\"><div id=\"an-demand-map\" style=\"height:450px;width:100%;border-radius:0 0 11px 11px\"></div></div>";
-    insightsEl.insertAdjacentElement("afterend",card);
-    mapEl=document.getElementById("an-demand-map");
-    console.log('[DIAG] card creado dinámicamente, mapEl ahora:',!!mapEl);
-  }
-  if(!mapEl||typeof L==="undefined"){console.error('[DIAG] ABORT — mapEl:',!!mapEl,'L:',typeof L);return;}
+  const mapEl=document.getElementById("an-demand-map");
+  if(!mapEl||typeof L==="undefined")return;
 
   const zonaCount={},zonaAlts={},zonaEdifs={};
   docs.forEach(d=>{
@@ -7753,19 +7731,14 @@ function renderAnDemandMap(docs){
   });
 
   if(!window._anDemandMap){
-    // DIAG-4: intento de inicialización Leaflet
-    console.log('[DIAG-4] Iniciando L.map — container dims:',mapEl.offsetWidth+'x'+mapEl.offsetHeight,'px, _leaflet_id:',mapEl._leaflet_id);
     try{
       window._anDemandMap=L.map("an-demand-map",{zoomControl:true,scrollWheelZoom:false}).setView([-34.58,-58.43],11);
       L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{attribution:"\xA9 OpenStreetMap \xA9 CARTO",subdomains:"abcd",maxZoom:18}).addTo(window._anDemandMap);
-      console.log('[DIAG-4] Leaflet inicializado OK');
     }catch(err){
-      console.error('[DIAG-4] ERROR en L.map():',err.message);
       window._anDemandMap=null;
       return;
     }
   }else{
-    console.log('[DIAG-4] Mapa ya existe — limpiando círculos');
     const toRemove=[];
     window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
     toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
@@ -7788,9 +7761,6 @@ function renderAnDemandMap(docs){
     circle.addTo(window._anDemandMap);
   });
 
-  // DIAG-5: resultado final
-  const circCount=Object.keys(zonaCount).filter(z=>_AN_ZONE_COORDS[z]).length;
-  console.log('[DIAG-5] Círculos dibujados:',circCount,'zonaCount:',zonaCount,'_anDemandMap:',!!window._anDemandMap);
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},200);
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},800);
 }
