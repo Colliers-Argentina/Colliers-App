@@ -1353,6 +1353,83 @@ body.sb-collapsed .sb-footer-label{opacity:0;max-width:0}
 body.sb-collapsed .sb-footer{justify-content:center!important;gap:6px!important}
 
 
+/* ===== NUEVA OFICINA WIZARD ===== */
+.bld-wiz-modal{background:#0D1829;border:1px solid rgba(77,147,255,.18);border-radius:18px;width:min(640px,95vw);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.55)}
+.bld-wiz-hd{display:flex;align-items:flex-start;justify-content:space-between;padding:1.5rem 1.5rem 1rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.bld-wiz-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:2px}
+.bld-wiz-subtitle{font-size:12px;color:rgba(255,255,255,.4)}
+.bld-wiz-close{background:none;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .15s;line-height:1}
+.bld-wiz-close:hover{background:rgba(255,255,255,.07);color:#fff}
+.bld-wiz-stepper{display:flex;align-items:center;padding:.75rem 1.5rem;gap:0;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto}
+.bwiz-step{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:60px}
+.bwiz-step-dot{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.35);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.bwiz-step.active .bwiz-step-dot{background:#4D93FF;border-color:#4D93FF;color:#fff;box-shadow:0 0 0 3px rgba(77,147,255,.2)}
+.bwiz-step.done .bwiz-step-dot{background:#16A34A;border-color:#16A34A;color:#fff}
+.bwiz-step-lbl{font-size:9.5px;color:rgba(255,255,255,.3);font-weight:600;text-align:center;transition:color .2s;white-space:nowrap}
+.bwiz-step.active .bwiz-step-lbl{color:rgba(255,255,255,.75)}
+.bwiz-step.done .bwiz-step-lbl{color:#16A34A}
+.bwiz-step-line{flex:1;height:1px;background:rgba(255,255,255,.08);margin:0 4px;margin-bottom:20px;min-width:16px}
+.bld-wiz-body{flex:1;overflow-y:auto;padding:1.25rem 1.5rem}
+.bwiz-panel{display:none;flex-direction:column;gap:.85rem;animation:bwizIn .18s ease}
+.bwiz-panel.active{display:flex}
+@keyframes bwizIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.bwiz-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.bwiz-field.bwiz-full{grid-column:1/-1}
+.bwiz-lbl{font-size:11.5px;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:4px;display:block}
+.bwiz-req{color:#EF3340;font-size:12px}
+.bwiz-inp{width:100%;padding:.5rem .65rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#fff;font-family:inherit;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box}
+.bwiz-inp:focus{border-color:#4D93FF;box-shadow:0 0 0 3px rgba(77,147,255,.15)}
+.bwiz-inp::placeholder{color:rgba(255,255,255,.25)}
+.bwiz-inp.bwiz-error{border-color:#EF3340;box-shadow:0 0 0 3px rgba(239,51,64,.12)}
+.bwiz-hint{background:rgba(77,147,255,.07);border:1px solid rgba(77,147,255,.15);border-radius:8px;padding:.6rem .85rem;font-size:12px;color:rgba(255,255,255,.55);line-height:1.5}
+.bld-wiz-footer{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.5rem;border-top:1px solid rgba(255,255,255,.06)}
+.bwiz-btn-pri{background:#4D93FF;border:none;color:#fff;font-family:inherit;font-size:13px;font-weight:600;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;transition:background .15s}
+.bwiz-btn-pri:hover{background:#5CA3FF}
+.bwiz-btn-pri.bwiz-save{background:#16A34A}
+.bwiz-btn-pri.bwiz-save:hover{background:#15803D}
+.bwiz-btn-sec{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.75);font-family:inherit;font-size:13px;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;transition:all .15s}
+.bwiz-btn-sec:hover{background:rgba(255,255,255,.1)}
+.bwiz-step-dots{display:flex;gap:6px}
+.bwiz-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.15);transition:background .2s}
+.bwiz-dot.active{background:#4D93FF}
+/* Step 5 components */
+.bwiz-comp-icon{font-size:36px;text-align:center;margin-top:.5rem}
+.bwiz-comp-title{font-size:15px;font-weight:700;color:#fff;text-align:center}
+.bwiz-comp-desc{font-size:12.5px;color:rgba(255,255,255,.5);text-align:center;line-height:1.5}
+.bwiz-comp-toggle{display:flex;justify-content:center;margin:.5rem 0}
+.bwiz-toggle-row{display:flex;align-items:center;gap:10px;cursor:pointer}
+.bwiz-toggle-wrap{position:relative;width:40px;height:22px;flex-shrink:0}
+.bwiz-toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.bwiz-toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:11px;transition:.2s;border:1px solid rgba(255,255,255,.15);cursor:pointer}
+.bwiz-toggle-slider::after{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:rgba(255,255,255,.5);border-radius:50%;transition:.2s}
+.bwiz-toggle-wrap input:checked+.bwiz-toggle-slider{background:#16A34A;border-color:#16A34A}
+.bwiz-toggle-wrap input:checked+.bwiz-toggle-slider::after{transform:translateX(18px);background:#fff}
+.bwiz-toggle-lbl{font-size:13px;color:rgba(255,255,255,.8);font-weight:500}
+.bwiz-comp-preview{margin-top:.5rem;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-height:160px;overflow-y:auto}
+.bwiz-floor-chip{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#16A34A;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600}
+
+/* ===== FLOOR OCCUPATION MAP ===== */
+.bld-floor-map{margin-bottom:.75rem;display:flex;flex-direction:column;gap:3px;padding:.75rem 1rem;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid rgba(255,255,255,.06)}
+.bld-floor-map-hd{font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.bld-floor-row{display:flex;align-items:center;gap:8px;min-height:22px}
+.bld-floor-lbl{font-size:10.5px;color:rgba(255,255,255,.45);width:38px;text-align:right;flex-shrink:0;font-weight:600}
+.bld-floor-bar{flex:1;height:18px;border-radius:4px;display:flex;align-items:center;padding:0 7px;font-size:10px;font-weight:600;cursor:default;transition:filter .15s}
+.bld-floor-bar:hover{filter:brightness(1.2)}
+.bld-floor-bar.occ{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#16A34A}
+.bld-floor-bar.near{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#B45309}
+.bld-floor-bar.avail{background:rgba(239,51,64,.12);border:1px solid rgba(239,51,64,.25);color:#EF3340}
+.bld-floor-bar.multi{background:linear-gradient(90deg,rgba(34,197,94,.15) 0%,rgba(239,51,64,.12) 100%);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
+.bld-floor-leg{display:flex;gap:14px;margin-top:6px;justify-content:flex-end}
+.bld-floor-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.4)}
+.bld-floor-leg-dot{width:9px;height:9px;border-radius:2px}
+
+/* ===== CALCULATED KPI ROW IN DETAIL ===== */
+.bld-det-calc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;padding:.75rem 0;margin:.5rem 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.bld-det-ckpi{display:flex;flex-direction:column;align-items:center;gap:2px}
+.bld-det-ckpi-v{font-size:14px;font-weight:700;color:#4D93FF}
+.bld-det-ckpi-l{font-size:9.5px;color:rgba(255,255,255,.35);text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.bld-det-ckpi-v.vac{color:#F59E0B}
+
 /* ===== HOME HUB ===== */
 #home-hub{display:none;background:url('home-bg.jpg') center/cover no-repeat;background-attachment:local;overflow-y:auto;min-width:0;flex:1;height:100%;position:relative}
 #home-hub::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(2,6,23,.88) 0%,rgba(3,10,30,.80) 50%,rgba(2,8,24,.75) 100%);pointer-events:none;z-index:0}
@@ -2722,7 +2799,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="bld-wrap">
         <div class="bld-hz">
           <div class="bld-hz-l">
-            <div class="bld-title">Edificios</div>
+            <div class="bld-title">Oficinas</div>
             <div class="bld-subtitle" id="bld-subtitle">Cargando...</div>
           </div>
           <div class="bld-hz-r">
@@ -2741,7 +2818,8 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
               <button class="bld-view-btn active" id="bld-view-grid-btn" onclick="toggleBldView('grid')">⊞ Grid</button>
               <button class="bld-view-btn" id="bld-view-map-btn" onclick="toggleBldView('map')">🗺 Mapa</button>
             </div>
-            <button class="bld-btn bld-btn-primary" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
+            <button class="bld-btn bld-btn-primary" onclick="openBldNewWizard()" id="bld-new-btn">＋ Nueva Oficina</button>
+            <button class="bld-btn" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
             <button id="bld-crm-links-btn" class="bld-btn" style="display:none" onclick="openCrmLinksModal()">🔗 CRM Links</button>
             <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
             <button onclick="showModule('home')" class="bld-close-btn">✕ Cerrar</button>
@@ -2786,10 +2864,201 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 </div>
 <div class="bld-toast" id="bld-toast"></div>
 
+<!-- NUEVA OFICINA WIZARD -->
+<div id="bld-wizard-overlay" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(2,6,23,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center">
+  <div class="bld-wiz-modal">
+    <div class="bld-wiz-hd">
+      <div>
+        <div class="bld-wiz-title">Nueva Oficina</div>
+        <div class="bld-wiz-subtitle" id="bwiz-subtitle">Paso 1 de 5</div>
+      </div>
+      <button class="bld-wiz-close" onclick="closeBldWizard()">✕</button>
+    </div>
+    <div class="bld-wiz-stepper" id="bwiz-stepper">
+      <div class="bwiz-step active" data-step="1"><div class="bwiz-step-dot">1</div><div class="bwiz-step-lbl">General</div></div>
+      <div class="bwiz-step-line"></div>
+      <div class="bwiz-step" data-step="2"><div class="bwiz-step-dot">2</div><div class="bwiz-step-lbl">Características</div></div>
+      <div class="bwiz-step-line"></div>
+      <div class="bwiz-step" data-step="3"><div class="bwiz-step-dot">3</div><div class="bwiz-step-lbl">Superficies</div></div>
+      <div class="bwiz-step-line"></div>
+      <div class="bwiz-step" data-step="4"><div class="bwiz-step-dot">4</div><div class="bwiz-step-lbl">Documentación</div></div>
+      <div class="bwiz-step-line"></div>
+      <div class="bwiz-step" data-step="5"><div class="bwiz-step-dot">5</div><div class="bwiz-step-lbl">Componentes</div></div>
+    </div>
+    <div class="bld-wiz-body" id="bwiz-body">
+      <!-- Step 1: Información General -->
+      <div class="bwiz-panel active" data-panel="1">
+        <div class="bwiz-row">
+          <div class="bwiz-field bwiz-full">
+            <label class="bwiz-lbl">Building Name <span class="bwiz-req">*</span></label>
+            <input class="bwiz-inp" id="bw-nombre" placeholder="Ej: Torre Catalinas Norte" required>
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Etapa <span class="bwiz-req">*</span></label>
+            <select class="bwiz-inp" id="bw-etapa">
+              <option value="">Seleccioná una etapa</option>
+              <option>Proyecto</option>
+              <option>En Construcción</option>
+              <option selected>Existente</option>
+            </select>
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Categoría <span class="bwiz-req">*</span></label>
+            <select class="bwiz-inp" id="bw-categoria">
+              <option value="">Seleccioná una categoría</option>
+              <option>A+</option><option>A</option><option>B+</option><option>B</option><option>C</option>
+            </select>
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Corredor <span class="bwiz-req">*</span></label>
+            <select class="bwiz-inp" id="bw-corredor">
+              <option value="">Seleccioná un corredor</option>
+              <option>Catalinas</option>
+              <option>Macrocentro</option>
+              <option>Macrocentro Norte</option>
+              <option>Macrocentro Sur</option>
+              <option>Microcentro</option>
+              <option>Norte CABA</option>
+              <option>Norte GBA</option>
+              <option>Plaza Roma</option>
+              <option>Plaza San Martín</option>
+              <option>Puerto Madero Este</option>
+              <option>Puerto Madero Oeste</option>
+            </select>
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Tipología <span class="bwiz-req">*</span></label>
+            <select class="bwiz-inp" id="bw-tipologia">
+              <option value="">Seleccioná una tipología</option>
+              <option>Perímetro Libre</option>
+              <option>Perímetro Semilibre</option>
+              <option>Entre Medianeras</option>
+              <option>En Esquina</option>
+            </select>
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field bwiz-full">
+            <label class="bwiz-lbl">Dirección</label>
+            <input class="bwiz-inp" id="bw-direccion" placeholder="Ej: Av. Leandro N. Alem 855">
+          </div>
+        </div>
+      </div>
+      <!-- Step 2: Características -->
+      <div class="bwiz-panel" data-panel="2">
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Año de construcción</label>
+            <input class="bwiz-inp" id="bw-anio" type="number" min="1900" max="2035" placeholder="Ej: 2012">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Cantidad de pisos</label>
+            <input class="bwiz-inp" id="bw-pisos" type="number" min="1" max="100" placeholder="Ej: 18">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Cocheras</label>
+            <input class="bwiz-inp" id="bw-cocheras" type="number" min="0" placeholder="Cantidad total">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Certificación</label>
+            <input class="bwiz-inp" id="bw-cert" placeholder="Ej: LEED Gold, BREEAM">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field bwiz-full">
+            <label class="bwiz-lbl">Ejecutivo Comercial responsable</label>
+            <input class="bwiz-inp" id="bw-broker" placeholder="Nombre del ejecutivo">
+          </div>
+        </div>
+      </div>
+      <!-- Step 3: Superficies -->
+      <div class="bwiz-panel" data-panel="3">
+        <div class="bwiz-hint">Las superficies son referenciales del edificio completo. La superficie disponible se calcula automáticamente desde los componentes.</div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Superficie total (m²)</label>
+            <input class="bwiz-inp" id="bw-sup-total" type="number" min="0" placeholder="m² rentables totales">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Superficie propia (m²)</label>
+            <input class="bwiz-inp" id="bw-sup-propia" type="number" min="0" placeholder="m² de propiedad exclusiva">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Superficie promedio por nivel (m²)</label>
+            <input class="bwiz-inp" id="bw-sup-prom" type="number" min="0" placeholder="m² típicos por piso">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Superficie mínima divisible (m²)</label>
+            <input class="bwiz-inp" id="bw-sup-min" type="number" min="0" placeholder="mínimo alquilable">
+          </div>
+        </div>
+      </div>
+      <!-- Step 4: Documentación -->
+      <div class="bwiz-panel" data-panel="4">
+        <div class="bwiz-hint">Ingresá URLs de documentos externos (Google Drive, Dropbox, sitio web, etc.).</div>
+        <div class="bwiz-row">
+          <div class="bwiz-field bwiz-full">
+            <label class="bwiz-lbl">Ficha técnica (URL)</label>
+            <input class="bwiz-inp" id="bw-ficha" type="url" placeholder="https://...">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field bwiz-full">
+            <label class="bwiz-lbl">Brochure (URL)</label>
+            <input class="bwiz-inp" id="bw-brochure" type="url" placeholder="https://...">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field bwiz-full">
+            <label class="bwiz-lbl">Planos (URL)</label>
+            <input class="bwiz-inp" id="bw-planos" type="url" placeholder="https://...">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field bwiz-full">
+            <label class="bwiz-lbl">Fotografías (URL de imagen principal)</label>
+            <input class="bwiz-inp" id="bw-fotos" type="url" placeholder="https://...">
+          </div>
+        </div>
+      </div>
+      <!-- Step 5: Componentes -->
+      <div class="bwiz-panel" data-panel="5">
+        <div class="bwiz-comp-icon">🏗</div>
+        <div class="bwiz-comp-title">Generar componentes automáticamente</div>
+        <div class="bwiz-comp-desc" id="bwiz-comp-desc">Según la cantidad de pisos ingresada, se pueden crear automáticamente los componentes del edificio (PB + pisos).</div>
+        <div class="bwiz-comp-toggle">
+          <label class="bwiz-toggle-row">
+            <div class="bwiz-toggle-wrap">
+              <input type="checkbox" id="bw-gen-comps" checked onchange="bwizToggleAutoComp(this)">
+              <span class="bwiz-toggle-slider"></span>
+            </div>
+            <span class="bwiz-toggle-lbl">Generar componentes automáticamente</span>
+          </label>
+        </div>
+        <div id="bwiz-comp-preview" class="bwiz-comp-preview"></div>
+      </div>
+    </div>
+    <div class="bld-wiz-footer">
+      <button class="bwiz-btn-sec" id="bwiz-prev" onclick="bwizNav(-1)" style="visibility:hidden">← Anterior</button>
+      <div class="bwiz-step-dots" id="bwiz-dots"></div>
+      <button class="bwiz-btn-pri" id="bwiz-next" onclick="bwizNav(1)">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- BUILDING DETAIL OVERLAY -->
 <div id="bld-detail-overlay">
   <div class="bld-det-hdr">
-    <button class="bld-det-back" onclick="closeBldDetail()">← Edificios</button>
+    <button class="bld-det-back" onclick="closeBldDetail()">← Oficinas</button>
     <div class="bld-det-sep">/</div>
     <div class="bld-det-hdr-name" id="bld-det-hdr-name">Edificio</div>
     <div class="bld-det-hdr-actions">
@@ -2803,7 +3072,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <div class="bld-det-sidebar" id="bld-det-sidebar"></div>
     <div class="bld-det-main">
       <div class="bld-det-main-tabs">
-        <button class="bld-det-main-tab active" id="bld-main-tab-units" onclick="switchBldMainTab('units')">Disponibilidades <span class="bld-det-main-cnt" id="bld-det-unit-count">0</span></button>
+        <button class="bld-det-main-tab active" id="bld-main-tab-units" onclick="switchBldMainTab('units')">Componentes <span class="bld-det-main-cnt" id="bld-det-unit-count">0</span></button>
         <button class="bld-det-main-tab" id="bld-main-tab-hist" onclick="switchBldMainTab('hist')">Historial</button>
       </div>
       <div id="bld-det-panel-units" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
@@ -2812,7 +3081,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           <div class="bld-det-tools">
             <div class="bld-det-stats" id="bld-det-stats"></div>
             <input type="text" class="bld-det-search" id="bld-det-search" placeholder="🔍 Buscar unidad..." oninput="renderDetailUnits(window._bldEditId,this.value)">
-            <button class="bld-det-add-btn" id="bld-det-add-btn" onclick="addUnit(window._bldEditId)">＋ Agregar unidad</button>
+            <button class="bld-det-add-btn" id="bld-det-add-btn" onclick="addUnit(window._bldEditId)">＋ Agregar componente</button>
           </div>
         </div>
         <div class="bld-det-tbl-wrap" id="bld-det-tbl-wrap">
@@ -6647,13 +6916,22 @@ function openBuildingEditor(docId){
         <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.asking||d.rent||'—')}</div><div class="bld-det-kpi-l">Asking</div></div>
         <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.categoria||d.cat||'—')}</div><div class="bld-det-kpi-l">Categ.</div></div>
       </div>
+      <div class="bld-det-calc-kpis">
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v vac" id="bld-kpi-vacancia">—</div><div class="bld-det-ckpi-l">Vacancia</div></div>
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-rent">—</div><div class="bld-det-ckpi-l">Rent Prom.</div></div>
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-exp">—</div><div class="bld-det-ckpi-l">Exp. Prom.</div></div>
+      </div>
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Identificación</div>
         <div class="bld-det-field"><div class="bld-det-lbl">Nombre</div><input class="bld-det-inp" id="be-nombre" value="${esc(d.nombre||'')}"></div>
         <div class="bld-det-field"><div class="bld-det-lbl">Dirección</div><input class="bld-det-inp" id="be-direccion" value="${esc(d.direccion||'')}"></div>
         <div class="bld-det-field-row">
-          <div class="bld-det-field"><div class="bld-det-lbl">Zona</div><input class="bld-det-inp" id="be-zona" value="${esc(d.zona||d.submercado||'')}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Corredor</div><input class="bld-det-inp" id="be-zona" value="${esc(d.corredor||d.zona||d.submercado||'')}"></div>
           <div class="bld-det-field"><div class="bld-det-lbl">Estado</div><select class="bld-det-inp" id="be-estado">${states}</select></div>
+        </div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Etapa</div><select class="bld-det-inp" id="be-etapa">${['Proyecto','En Construcción','Existente'].map(v=>`<option${(d.etapa||'Existente')===v?' selected':''}>${v}</option>`).join('')}</select></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Tipología</div><select class="bld-det-inp" id="be-tipologia">${['','Perímetro Libre','Perímetro Semilibre','Entre Medianeras','En Esquina'].map(v=>`<option${(d.tipologia||'')===v?' selected':''}>${v}</option>`).join('')}</select></div>
         </div>
       </div>
       <div class="bld-det-section">
@@ -6930,20 +7208,38 @@ async function recalcAndSaveSupDisp(buildingId){
 }
 
 function _updateUnitStats(){
-  const disp=_unitDocs.filter(u=>u.estado==='Disponible').length;
-  const res=_unitDocs.filter(u=>u.estado==='Reservado').length;
-  const ocup=_unitDocs.filter(u=>u.estado==='Ocupado').length;
+  const disp=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
+  const res=_unitDocs.filter(u=>u.estado==='Reservado');
+  const ocup=_unitDocs.filter(u=>u.estado==='Ocupado');
   const cnt=document.getElementById('bld-det-unit-count');
   if(cnt)cnt.textContent=_unitDocs.length;
   const stats=document.getElementById('bld-det-stats');
   if(stats)stats.innerHTML=`
-    ${disp?`<span class="bld-det-stat disp">${disp} Disp.</span>`:''}
-    ${res?`<span class="bld-det-stat res">${res} Res.</span>`:''}
-    ${ocup?`<span class="bld-det-stat ocup">${ocup} Ocup.</span>`:''}`;
+    ${disp.length?`<span class="bld-det-stat disp">${disp.length} Disp.</span>`:''}
+    ${res.length?`<span class="bld-det-stat res">${res.length} Res.</span>`:''}
+    ${ocup.length?`<span class="bld-det-stat ocup">${ocup.length} Ocup.</span>`:''}`;
   if(_unitDocs.length){
     const supDisp=_calcSupDispFromUnits();
     const el=document.getElementById('be-supDisp');if(el)el.value=supDisp||'';
     const kpi=document.getElementById('bld-kpi-sup-disp');if(kpi)kpi.textContent=supDisp?supDisp.toLocaleString('es-AR')+'m²':'—';
+    // Vacancia
+    const bld=_bldDocs.find(x=>x._id===_bldEditId);
+    const supTotal=parseFloat(bld?.superficieTotal||bld?.superficieDisponible||0)||0;
+    const vacPct=supTotal>0?Math.round(supDisp/supTotal*100):null;
+    const kvac=document.getElementById('bld-kpi-vacancia');
+    if(kvac)kvac.textContent=vacPct!==null?vacPct+'%':'—';
+    // Avg rent (from disponible units with numeric asking)
+    const rentNums=disp.map(u=>parseFloat(String(u.askingRent||'').replace(/[^0-9.]/g,''))).filter(n=>n>0);
+    const avgRent=rentNums.length?Math.round(rentNums.reduce((s,v)=>s+v,0)/rentNums.length):null;
+    const krent=document.getElementById('bld-kpi-avg-rent');
+    if(krent)krent.textContent=avgRent?'USD '+avgRent.toLocaleString('es-AR'):'—';
+    // Avg expenses (all units with expensas)
+    const expNums=_unitDocs.map(u=>parseFloat(String(u.expensasUnidad||'').replace(/[^0-9.]/g,''))).filter(n=>n>0);
+    const avgExp=expNums.length?Math.round(expNums.reduce((s,v)=>s+v,0)/expNums.length):null;
+    const kexp=document.getElementById('bld-kpi-avg-exp');
+    if(kexp)kexp.textContent=avgExp?'USD '+avgExp.toLocaleString('es-AR'):'—';
+    // Floor occupation map
+    _renderFloorMap();
   }
 }
 
@@ -6995,32 +7291,43 @@ function renderDetailUnits(buildingId,filterQ=''){
     const cls=_unitSortCol===col?(_unitSortDir===1?'sort-asc':'sort-desc'):'';
     return`<th class="${cls}" onclick="sortDetailUnits('${col}')">${label}</th>`;
   };
+  const toOpts=['Alquiler','Venta','Alquiler o Venta'];
+  const toSel=v=>toOpts.map(o=>`<option${v===o?' selected':''}>${o}</option>`).join('');
+  const nearVenc=v=>{if(!v)return false;const d=new Date(v),now=new Date();const diff=(d-now)/(1000*60*60*24);return diff>=0&&diff<=90;};
   let h=`<table class="det-unit-table"><thead><tr>
     <th class="col-num">#</th>
     ${th('piso','Piso')}
     ${th('unidad','Unidad')}
     ${th('estado','Estado')}
     ${th('ocupante','Ocupante')}
-    ${th('m2','m²')}
-    ${th('askingRent','Asking Rent')}
-    ${th('propietario','Propietario')}
-    ${th('brokerAsignado','Ejec. Comercial')}
-    <th>Observaciones</th>
+    ${th('m2','m² Rent.')}
+    ${th('tipoOferta','Tipo')}
+    ${th('askingRent','Renta')}
+    ${th('precioVenta','Venta')}
+    ${th('expensasUnidad','Expensas')}
+    ${th('cocherasUnidad','Coch.')}
+    ${th('vencimientoContrato','Vcto.')}
+    <th>Obs.</th>
     <th class="col-actions"></th>
   </tr></thead><tbody>`;
   filtered.forEach((u,i)=>{
     const c=UNIT_ESTADO_COLORS[u.estado]||UNIT_ESTADO_COLORS['Disponible'];
-    h+=`<tr data-uid="${u._id}">
+    const isNearVenc=nearVenc(u.vencimientoContrato);
+    const rowStyle=isNearVenc?'background:rgba(245,158,11,.04)':'';
+    h+=`<tr data-uid="${u._id}" style="${rowStyle}">
       <td class="col-num">${i+1}</td>
       <td><input class="du-inp" style="width:54px" value="${esc(u.piso||'')}" onblur="saveUnitField('${buildingId}','${u._id}','piso',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="width:68px" value="${esc(u.unidad||'')}" onblur="saveUnitField('${buildingId}','${u._id}','unidad',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td class="du-estado-cell"><select class="du-sel" style="background:${c.bg};border:1px solid ${c.border};color:${c.text};font-weight:700;padding:4px 6px;border-radius:999px" onchange="saveUnitField('${buildingId}','${u._id}','estado',this.value,this);renderDetailUnits('${buildingId}',document.getElementById('bld-det-search')?.value||'')">${so(u.estado)}</select></td>
       <td><div style="display:flex;align-items:center;gap:2px"><input class="du-inp du-ac-inp" style="width:96px" data-bld="${buildingId}" data-uid="${u._id}" data-role="occ" value="${esc(u.occupierAccountName||u.occupierContactName||u.ocupante||'')}" oninput="duAcSearch(this)" onfocus="if(this.value.trim())duAcSearch(this)" onblur="duAcBlurSave(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()">${(u.occupierAccountId||u.occupierContactId)?`<span class="du-linked-dot" title="${u.occupierAccountId?'Cuenta vinculada':'Contacto vinculado'}"></span>`:''}</div></td>
       <td><input class="du-inp" style="width:58px" type="number" value="${u.m2||''}" onblur="saveUnitField('${buildingId}','${u._id}','m2',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><select class="du-sel" style="font-size:11px;padding:3px 5px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7)" onchange="saveUnitField('${buildingId}','${u._id}','tipoOferta',this.value,this)">${toSel(u.tipoOferta||'Alquiler')}</select></td>
       <td><input class="du-inp" style="width:80px" value="${esc(u.askingRent||'')}" onblur="saveUnitField('${buildingId}','${u._id}','askingRent',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
-      <td><div style="display:flex;align-items:center;gap:2px"><input class="du-inp du-ac-inp" style="width:96px" data-bld="${buildingId}" data-uid="${u._id}" data-role="own" value="${esc(u.ownerAccountName||u.ownerContactName||u.propietario||'')}" oninput="duAcSearch(this)" onfocus="if(this.value.trim())duAcSearch(this)" onblur="duAcBlurSave(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()">${(u.ownerAccountId||u.ownerContactId)?`<span class="du-linked-dot" title="${u.ownerAccountId?'Cuenta vinculada':'Contacto vinculado'}"></span>`:''}</div></td>
-      <td><input class="du-inp" style="width:90px" value="${esc(u.brokerAsignado||'')}" onblur="saveUnitField('${buildingId}','${u._id}','brokerAsignado',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
-      <td><input class="du-inp" style="min-width:120px" value="${esc(u.observaciones||'')}" onblur="saveUnitField('${buildingId}','${u._id}','observaciones',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:74px" value="${esc(u.precioVenta||'')}" placeholder="—" onblur="saveUnitField('${buildingId}','${u._id}','precioVenta',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:70px" value="${esc(u.expensasUnidad||'')}" placeholder="—" onblur="saveUnitField('${buildingId}','${u._id}','expensasUnidad',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:44px" type="number" value="${u.cocherasUnidad||''}" placeholder="0" onblur="saveUnitField('${buildingId}','${u._id}','cocherasUnidad',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="width:100px" type="date" value="${esc(u.vencimientoContrato||'')}" title="${isNearVenc?'⚠ Próximo vencimiento':''}" style="width:100px;${isNearVenc?'border-color:#F59E0B;color:#F59E0B':''}" onblur="saveUnitField('${buildingId}','${u._id}','vencimientoContrato',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp" style="min-width:100px" value="${esc(u.observaciones||'')}" onblur="saveUnitField('${buildingId}','${u._id}','observaciones',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td class="col-actions"><div class="du-actions">
         <button class="du-btn dup" title="Duplicar" onclick="duplicateUnit('${buildingId}','${u._id}')">⧉</button>
         <button class="du-btn del" title="Eliminar" onclick="deleteUnit('${buildingId}','${u._id}',this.closest('tr'))">✕</button>
@@ -7032,14 +7339,248 @@ function renderDetailUnits(buildingId,filterQ=''){
   wrap.innerHTML=h;
 }
 
+/* ===== FLOOR OCCUPATION MAP ===== */
+function _renderFloorMap(){
+  const wrap=document.getElementById('bld-det-tbl-wrap');
+  if(!wrap||!_unitDocs.length)return;
+  const now=new Date();
+  const pisoOrder=v=>{
+    const sp={'SS':-3,'SB':-2,'ST':-2,'SUBSUELO':-1,'PB':0,'SEMIPISO':0.5,'MEZZANINE':0.5};
+    const k=(v||'').toUpperCase();
+    if(sp[k]!==undefined)return sp[k];
+    const n=parseInt(v);return isNaN(n)?999:n;
+  };
+  // Group units by piso
+  const byFloor={};
+  _unitDocs.forEach(u=>{
+    const p=u.piso||'?';
+    if(!byFloor[p])byFloor[p]={disp:0,ocup:0,near:0,total:0};
+    byFloor[p].total++;
+    const near=u.vencimientoContrato&&(()=>{const d=new Date(u.vencimientoContrato),diff=(d-now)/(86400000);return diff>=0&&diff<=90;})();
+    if(u.estado==='Ocupado'&&near)byFloor[p].near++;
+    else if(u.estado==='Disponible'||!u.estado)byFloor[p].disp++;
+    else byFloor[p].ocup++;
+  });
+  const floors=Object.keys(byFloor).sort((a,b)=>(pisoOrder(b)-pisoOrder(a)));
+  if(floors.length<2)return; // not worth showing map for 1 floor
+  let mapH=`<div class="bld-floor-map">
+    <div class="bld-floor-map-hd">Vista de ocupación por piso</div>`;
+  floors.forEach(f=>{
+    const {disp,ocup,near,total}=byFloor[f];
+    let cls,label;
+    if(total===1){
+      if(disp){cls='avail';label='Disponible';}
+      else if(near){cls='near';label='Próx. venc.';}
+      else{cls='occ';label='Ocupado';}
+    }else{
+      const hasDisp=disp>0,hasNear=near>0,hasOcc=ocup>0;
+      if(hasDisp&&(hasNear||hasOcc)){cls='multi';label=`${disp} disp. · ${ocup+near} ocup.`;}
+      else if(hasDisp){cls='avail';label=`${disp} disponible${disp>1?'s':''}`;}
+      else if(hasNear){cls='near';label='Próx. venc.';}
+      else{cls='occ';label='Ocupado';}
+    }
+    mapH+=`<div class="bld-floor-row"><span class="bld-floor-lbl">${esc(f)}</span><div class="bld-floor-bar ${cls}" title="Piso ${esc(f)}: ${label}">${label}</div></div>`;
+  });
+  mapH+=`<div class="bld-floor-leg">
+    <div class="bld-floor-leg-item"><div class="bld-floor-leg-dot" style="background:rgba(34,197,94,.4)"></div>Ocupado</div>
+    <div class="bld-floor-leg-item"><div class="bld-floor-leg-dot" style="background:rgba(245,158,11,.4)"></div>Próx. venc.</div>
+    <div class="bld-floor-leg-item"><div class="bld-floor-leg-dot" style="background:rgba(239,51,64,.3)"></div>Disponible</div>
+  </div></div>`;
+  // Prepend to wrap without replacing the table
+  const existing=wrap.querySelector('.bld-floor-map');
+  if(existing)existing.outerHTML=mapH;
+  else wrap.insertAdjacentHTML('afterbegin',mapH);
+}
+
+/* ===== NUEVA OFICINA WIZARD ===== */
+let _bwizStep=1;
+const BWIZ_STEPS=5;
+
+function openBldNewWizard(){
+  _bwizStep=1;
+  const ov=document.getElementById('bld-wizard-overlay');
+  if(!ov)return;
+  ov.style.display='flex';
+  _bwizRender();
+}
+
+function closeBldWizard(){
+  const ov=document.getElementById('bld-wizard-overlay');
+  if(ov)ov.style.display='none';
+  // Reset inputs
+  ['bw-nombre','bw-etapa','bw-corredor','bw-tipologia','bw-categoria','bw-direccion',
+   'bw-anio','bw-pisos','bw-cocheras','bw-cert','bw-broker',
+   'bw-sup-total','bw-sup-propia','bw-sup-prom','bw-sup-min',
+   'bw-ficha','bw-brochure','bw-planos','bw-fotos'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.value=el.tagName==='SELECT'?el.options[0]?.value||'':'';}
+  });
+  const cb=document.getElementById('bw-gen-comps');
+  if(cb)cb.checked=true;
+  const prev=document.getElementById('bwiz-comp-preview');
+  if(prev)prev.innerHTML='';
+}
+
+function _bwizRender(){
+  // Update step dots and labels
+  document.querySelectorAll('.bwiz-step').forEach(el=>{
+    const s=parseInt(el.dataset.step);
+    el.classList.toggle('active',s===_bwizStep);
+    el.classList.toggle('done',s<_bwizStep);
+  });
+  // Update panels
+  document.querySelectorAll('.bwiz-panel').forEach(el=>{
+    el.classList.toggle('active',parseInt(el.dataset.panel)===_bwizStep);
+  });
+  // Update subtitle
+  const sub=document.getElementById('bwiz-subtitle');
+  const labels=['Información General','Características','Superficies','Documentación','Componentes'];
+  if(sub)sub.textContent=`Paso ${_bwizStep} de ${BWIZ_STEPS} — ${labels[_bwizStep-1]}`;
+  // Prev/Next buttons
+  const prev=document.getElementById('bwiz-prev');
+  const next=document.getElementById('bwiz-next');
+  if(prev)prev.style.visibility=_bwizStep>1?'visible':'hidden';
+  if(next){
+    next.textContent=_bwizStep===BWIZ_STEPS?'✓ Crear Oficina':'Siguiente →';
+    next.className='bwiz-btn-pri'+(_bwizStep===BWIZ_STEPS?' bwiz-save':'');
+  }
+  // Dots
+  const dots=document.getElementById('bwiz-dots');
+  if(dots)dots.innerHTML=Array.from({length:BWIZ_STEPS},(_,i)=>`<div class="bwiz-dot${i+1===_bwizStep?' active':''}"></div>`).join('');
+  // Step 5 preview
+  if(_bwizStep===5)_bwizUpdateCompPreview();
+}
+
+function bwizNav(dir){
+  if(dir===1){
+    if(!_bwizValidate())return;
+    if(_bwizStep===BWIZ_STEPS){saveBldWizard();return;}
+    _bwizStep++;
+  }else{
+    _bwizStep=Math.max(1,_bwizStep-1);
+  }
+  _bwizRender();
+}
+
+function _bwizValidate(){
+  const required={1:['bw-nombre','bw-etapa','bw-corredor','bw-tipologia','bw-categoria']};
+  const fields=required[_bwizStep]||[];
+  let ok=true;
+  fields.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const empty=!el.value.trim();
+    el.classList.toggle('bwiz-error',empty);
+    if(empty)ok=false;
+  });
+  return ok;
+}
+
+function bwizToggleAutoComp(cb){
+  _bwizUpdateCompPreview();
+}
+
+function _bwizUpdateCompPreview(){
+  const prev=document.getElementById('bwiz-comp-preview');
+  const desc=document.getElementById('bwiz-comp-desc');
+  if(!prev)return;
+  const pisos=parseInt(document.getElementById('bw-pisos')?.value)||0;
+  const cb=document.getElementById('bw-gen-comps');
+  if(!cb?.checked||!pisos){
+    prev.innerHTML='';
+    if(desc)desc.textContent=pisos?`Se generarán componentes automáticamente al guardar.`:'Ingresá la cantidad de pisos en el Paso 2 para usar esta función.';
+    return;
+  }
+  const chips=[];
+  chips.push('PB');
+  for(let i=1;i<=pisos;i++)chips.push(String(i));
+  if(desc)desc.textContent=`Se crearán ${chips.length} componentes automáticamente (${chips.length>8?chips.slice(0,4).join(', ')+' … '+chips.slice(-2).join(', '):chips.join(', ')}).`;
+  prev.innerHTML=chips.map(p=>`<div class="bwiz-floor-chip">${p}</div>`).join('');
+}
+
+async function saveBldWizard(){
+  if(!db)return;
+  const btn=document.getElementById('bwiz-next');
+  if(btn){btn.disabled=true;btn.textContent='Guardando...';}
+  const nombre=document.getElementById('bw-nombre')?.value.trim()||'';
+  const pisos=parseInt(document.getElementById('bw-pisos')?.value)||0;
+  const data={
+    nombre,
+    direccion:document.getElementById('bw-direccion')?.value.trim()||'',
+    etapa:document.getElementById('bw-etapa')?.value||'Existente',
+    corredor:document.getElementById('bw-corredor')?.value||'',
+    zona:document.getElementById('bw-corredor')?.value||'',
+    submercado:document.getElementById('bw-corredor')?.value||'',
+    tipologia:document.getElementById('bw-tipologia')?.value||'',
+    categoria:document.getElementById('bw-categoria')?.value||'',
+    cat:document.getElementById('bw-categoria')?.value||'',
+    anoConstruccion:parseInt(document.getElementById('bw-anio')?.value)||null,
+    anio:parseInt(document.getElementById('bw-anio')?.value)||null,
+    cantidadPisos:pisos,
+    pisos:pisos||'–',
+    cocherasEdificio:parseInt(document.getElementById('bw-cocheras')?.value)||0,
+    cocheras:document.getElementById('bw-cocheras')?.value||'',
+    certificacion:document.getElementById('bw-cert')?.value.trim()||'',
+    broker:document.getElementById('bw-broker')?.value.trim()||'',
+    superficieTotal:parseFloat(document.getElementById('bw-sup-total')?.value)||0,
+    superficiePropia:parseFloat(document.getElementById('bw-sup-propia')?.value)||0,
+    superficiePromedioNivel:parseFloat(document.getElementById('bw-sup-prom')?.value)||0,
+    superficiePlanta:parseFloat(document.getElementById('bw-sup-prom')?.value)||0,
+    superficieMinima:parseFloat(document.getElementById('bw-sup-min')?.value)||0,
+    superficieDisponible:0,
+    fichaTecnica:document.getElementById('bw-ficha')?.value.trim()||'',
+    brochure:document.getElementById('bw-brochure')?.value.trim()||'',
+    planos:document.getElementById('bw-planos')?.value.trim()||'',
+    foto:document.getElementById('bw-fotos')?.value.trim()||'',
+    imagenes:document.getElementById('bw-fotos')?.value.trim()?[document.getElementById('bw-fotos').value.trim()]:[],
+    estado:'Disponible',
+    activo:true,
+    _source:'manual',
+    createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  try{
+    const ref=await db.collection('buildings').add(data);
+    // Auto-generate components if requested
+    const genComps=document.getElementById('bw-gen-comps')?.checked;
+    if(genComps&&pisos){
+      const batch=db.batch();
+      const floors=['PB',...Array.from({length:pisos},(_,i)=>String(i+1))];
+      floors.forEach(p=>{
+        const uRef=db.collection('buildings').doc(ref.id).collection('units').doc();
+        batch.set(uRef,{
+          piso:p,unidad:'',m2:parseFloat(document.getElementById('bw-sup-prom')?.value)||0,
+          estado:'Disponible',askingRent:'',precioVenta:'',expensasUnidad:'',
+          cocherasUnidad:0,tipoOferta:'Alquiler',vencimientoContrato:'',
+          ocupante:'',propietario:'',brokerAsignado:'',observaciones:'',
+          createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      });
+      await batch.commit();
+    }
+    closeBldWizard();
+    showBldToast('✅ Oficina creada correctamente');
+    await loadBuildings();
+    // Open the newly created building
+    openBuildingEditor(ref.id);
+  }catch(e){
+    showBldToast('❌ Error al crear: '+e.message,4000);
+    if(btn){btn.disabled=false;btn.textContent='✓ Crear Oficina';}
+  }
+}
+
+
 /* keep old renderUnitsTable as alias so existing callers don't break */
 function renderUnitsTable(buildingId,filterQ=''){renderDetailUnits(buildingId,filterQ);}
 
 async function addUnit(buildingId){
   if(!db)return;
   const newUnit={
-    piso:'',unidad:'',m2:0,askingRent:'',moneda:'USD',
+    piso:'',unidad:'',m2:0,askingRent:'',precioVenta:'',moneda:'USD',
     ocupante:'',propietario:'',brokerAsignado:'',
+    tipoOferta:'Alquiler',expensasUnidad:'',cocherasUnidad:0,
+    vencimientoContrato:'',
     estado:'Disponible',observaciones:'',
     createdAt:firebase.firestore.FieldValue.serverTimestamp(),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
@@ -7162,8 +7703,11 @@ async function saveBuildingEdits(){
   const data={
     nombre:gv('be-nombre'),
     direccion:gv('be-direccion'),
+    corredor:gv('be-zona'),
     zona:gv('be-zona'),
     submercado:gv('be-zona'),
+    etapa:gv('be-etapa'),
+    tipologia:gv('be-tipologia'),
     estado:gv('be-estado'),
     superficieDisponible:_unitDocs.length?_calcSupDispFromUnits():(parseFloat(gv('be-supDisp'))||0),
     superficiePlanta:parseFloat(gv('be-supPlanta'))||0,
@@ -7190,7 +7734,7 @@ async function saveBuildingEdits(){
     if(hdrName)hdrName.textContent=data.nombre||_bldEditId;
     showBldToast('✅ Guardado correctamente');
     filterBuildings();
-    const TRACK=[['nombre','Nombre'],['direccion','Dirección'],['asking','Asking Rent'],['broker','Ejecutivo Comercial'],['estado','Estado'],['categoria','Categoría'],['foto','Foto'],['zona','Zona']];
+    const TRACK=[['nombre','Nombre'],['direccion','Dirección'],['asking','Asking Rent'],['broker','Ejecutivo Comercial'],['estado','Estado'],['categoria','Categoría'],['foto','Foto'],['corredor','Corredor'],['etapa','Etapa'],['tipologia','Tipología']];
     const cambios=TRACK.filter(([k])=>String(old[k]||'')!==String(data[k]||'')).map(([k,lbl])=>({campo:lbl,anterior:String(old[k]||''),nuevo:String(data[k]||'')}));
     if(cambios.length)addBuildingHistory(_bldEditId,cambios);
   }catch(e){showBldToast('❌ Error: '+e.message,4000);}
