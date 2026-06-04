@@ -7756,75 +7756,149 @@ function renderAnDemandMap(docs){
   let mapEl=document.getElementById('an-demand-map');
 
   if(!mapEl){
-    window._anDemandMap=null;
+    window._anDemandMap=null;window._anDemandGeoLayer=null;
     const tendCard=document.getElementById('an-tend-card');
     const anBody=tendCard?.parentElement;
     if(!anBody)return;
     const card=document.createElement('div');
     card.className='an-card';card.id='an-map-card';
-    card.innerHTML='<div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">tamaño = intensidad</div></div><div style="padding:0"><div id="an-demand-map" style="height:300px;width:100%;border-radius:0 0 11px 11px"></div></div>';
+    card.innerHTML='<div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">click zona para filtrar</div></div><div style="padding:0;display:flex;overflow:hidden;border-radius:0 0 11px 11px"><div id="an-demand-map" style="height:500px;flex:1;min-width:0"></div><div id="an-zone-side-panel" class="an-zone-panel"></div></div>';
     anBody.insertBefore(card,tendCard);
     mapEl=document.getElementById('an-demand-map');
   }
-
   if(!mapEl||typeof L==='undefined')return;
 
-  if(!window._anDemandMap){
-    try{
-      window._anDemandMap=L.map('an-demand-map',{zoomControl:true,scrollWheelZoom:false}).setView([-34.56,-58.43],11);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:18}).addTo(window._anDemandMap);
-      const lc=L.control({position:'bottomright'});
-      lc.onAdd=()=>{
-        const d=L.DomUtil.create('div','an-map-legend');
-        d.innerHTML='<div class="an-map-legend-title">Demanda</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#FDE68A;border-color:#F59E0B"></div>Baja</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#FCA5A5;border-color:#EF4444"></div>Media</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#F97316;border-color:#C2410C"></div>Alta</div><div class="an-map-legend-item"><div class="an-map-legend-dot" style="background:#DC2626;border-color:#7F1D1D"></div>Muy alta</div><div style="font-size:9px;color:#8A9AC0;margin-top:.35rem">Click = filtrar</div>';
-        return d;
-      };
-      lc.addTo(window._anDemandMap);
-    }catch(err){
-      window._anDemandMap=null;
-      return;
-    }
-  }else{
-    const toRemove=[];
-    window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
-    toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
-  }
-
-  const zonaCount={},zonaAlts={},zonaClientes={};
+  const zonaCount={},zonaAlts={},zonaEdifs={},zonaBrokers={};
   docs.forEach(d=>{
     const zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
     const alts=Number(d.cantidad_alternativas)||0;
-    const cli=d.cliente||'';
+    const broker=d.usuario||d.nombre||'?';
+    const edifs=d.edificios||d.propiedades||[];
     zs.forEach(z=>{
       if(!z||z==='Todas')return;
       zonaCount[z]=(zonaCount[z]||0)+1;
       zonaAlts[z]=(zonaAlts[z]||0)+alts;
-      if(cli){if(!zonaClientes[z])zonaClientes[z]=new Set();zonaClientes[z].add(cli);}
+      if(!zonaBrokers[z])zonaBrokers[z]={};
+      zonaBrokers[z][broker]=(zonaBrokers[z][broker]||0)+1;
+      if(!zonaEdifs[z])zonaEdifs[z]={};
+      edifs.forEach(e=>{if(e)zonaEdifs[z][e]=(zonaEdifs[z][e]||0)+1;});
     });
   });
 
-  const maxCount=Math.max(...Object.values(zonaCount),1);
-  const isSelected=z=>_anFilters.zonas.size===0||_anFilters.zonas.has(z);
-  Object.entries(zonaCount).forEach(([zona,count])=>{
-    const coords=_CABA_ZONE_COORDS[zona];
-    if(!coords)return;
-    const t=count/maxCount;
-    const col=_heatColor(t);
-    const radius=14+Math.round(t*26);
-    const sel=isSelected(zona);
-    const circle=L.circleMarker(coords,{radius,fillColor:col.fill,fillOpacity:sel?0.75:0.35,color:sel?col.stroke:'#ccc',weight:sel?2:1,interactive:true});
-    circle._anCircle=true;
-    const clientes=(zonaClientes[zona]||new Set()).size;
-    const alts=zonaAlts[zona]||0;
-    const ttHtml=`<div style="font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:3px">${zona}</div><div style="font-size:11px;color:#56648F;line-height:1.7">Demandas: <b style="color:#1C54F4">${count}</b><br>Alternativas: <b style="color:#1C54F4">${alts}</b><br>Clientes: <b style="color:#1C54F4">${clientes}</b></div>`;
-    circle.bindTooltip(ttHtml,{permanent:false,sticky:true,direction:'top',offset:[0,-radius-4],className:'an-tt'});
-    circle.on('click',()=>toggleAnZona(zona));
-    circle.addTo(window._anDemandMap);
-  });
+  if(!window._anDemandMap){
+    try{
+      window._anDemandMap=L.map('an-demand-map',{zoomControl:true,scrollWheelZoom:false}).setView([-34.605,-58.415],12);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:18}).addTo(window._anDemandMap);
+
+      const legend=L.control({position:'bottomright'});
+      legend.onAdd=()=>{
+        const d=L.DomUtil.create('div','an-map-legend');
+        d.innerHTML='<div class="an-map-legend-title">Búsquedas</div><div class="an-map-legend-bar"><div class="an-map-legend-sq" style="background:#E2EAF4"></div><span class="an-map-legend-lbl">0–5</span></div><div class="an-map-legend-bar"><div class="an-map-legend-sq" style="background:#FDE68A"></div><span class="an-map-legend-lbl">5–10</span></div><div class="an-map-legend-bar"><div class="an-map-legend-sq" style="background:#F97316"></div><span class="an-map-legend-lbl">10–20</span></div><div class="an-map-legend-bar"><div class="an-map-legend-sq" style="background:#DC2626"></div><span class="an-map-legend-lbl">20–30</span></div><div class="an-map-legend-bar"><div class="an-map-legend-sq" style="background:#7F1D1D"></div><span class="an-map-legend-lbl">30+</span></div>';
+        return d;
+      };
+      legend.addTo(window._anDemandMap);
+
+      window._anZonaData={zonaCount,zonaAlts,zonaEdifs,zonaBrokers,docs};
+      window._anDemandGeoLayer=L.geoJSON(_AN_ZONE_GEOJSON,{
+        style:f=>_anZoneStyle(f.properties.zona,zonaCount,_anFilters.zonas),
+        onEachFeature:(f,layer)=>{
+          const zona=f.properties.zona;
+          layer.on({
+            mouseover(){
+              layer.setStyle({weight:2.5,fillOpacity:0.85});
+              const count=zonaCount[zona]||0;
+              const alts=zonaAlts[zona]||0;
+              const edifCnt=Object.keys(zonaEdifs[zona]||{}).length;
+              layer.bindTooltip(`<div style="font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:3px">${zona}</div><div style="font-size:11px;color:#56648F;line-height:1.8">Búsquedas: <b style="color:#1C54F4">${count}</b><br>PPTs generados: <b style="color:#1C54F4">${alts}</b><br>Edificios consultados: <b style="color:#1C54F4">${edifCnt}</b></div>`,{sticky:true,direction:'top',className:'an-tt'}).openTooltip();
+            },
+            mouseout(){
+              window._anDemandGeoLayer.resetStyle(layer);
+              layer.closeTooltip();
+            },
+            click(){
+              toggleAnZona(zona);
+              _openAnZonePanel(zona);
+            }
+          });
+        }
+      }).addTo(window._anDemandMap);
+    }catch(err){
+      window._anDemandMap=null;window._anDemandGeoLayer=null;
+      return;
+    }
+  }else{
+    window._anZonaData={zonaCount,zonaAlts,zonaEdifs,zonaBrokers,docs};
+    if(window._anDemandGeoLayer){
+      window._anDemandGeoLayer.eachLayer(layer=>{
+        layer.setStyle(_anZoneStyle(layer.feature.properties.zona,zonaCount,_anFilters.zonas));
+      });
+    }
+  }
 
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},200);
   setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},800);
 }
+
+function _openAnZonePanel(zona){
+  const panel=document.getElementById('an-zone-side-panel');
+  if(!panel)return;
+  const d=window._anZonaData||{};
+  const count=(d.zonaCount||{})[zona]||0;
+  const alts=(d.zonaAlts||{})[zona]||0;
+  const topEdifs=Object.entries((d.zonaEdifs||{})[zona]||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topBrokers=Object.entries((d.zonaBrokers||{})[zona]||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const allDocs=d.docs||[];
+  const zonaDocs=allDocs.filter(doc=>{
+    const zs=Array.isArray(doc.zonas)?doc.zonas:(doc.zona?String(doc.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
+    return zs.includes(zona);
+  });
+  const m2Buckets=[['Hasta 500m²',0],['500–1000m²',0],['1000–2000m²',0],['2000–5000m²',0],['5000m²+',0]];
+  zonaDocs.forEach(doc=>{
+    const m=parseFloat(doc.m2Min||doc.m2)||0;
+    if(m<=500)m2Buckets[0][1]++;
+    else if(m<=1000)m2Buckets[1][1]++;
+    else if(m<=2000)m2Buckets[2][1]++;
+    else if(m<=5000)m2Buckets[3][1]++;
+    else m2Buckets[4][1]++;
+  });
+  const m2Max=Math.max(...m2Buckets.map(b=>b[1]),1);
+  const now=new Date();
+  const evol=Array.from({length:30},(_,i)=>{
+    const day=new Date(now);day.setDate(day.getDate()-(29-i));
+    const cnt=zonaDocs.filter(doc=>{const f=_tsToDate(doc.fecha);return f&&f.toDateString()===day.toDateString();}).length;
+    return cnt;
+  });
+  const evolMax=Math.max(...evol,1);
+  panel.innerHTML=`
+    <div class="an-zone-panel-hd">
+      <div style="font-size:13px;font-weight:700;color:#0A1B4D">${zona}</div>
+      <button class="an-zone-panel-close" onclick="closeAnZonePanel()">✕</button>
+    </div>
+    <div class="an-zone-panel-body">
+      <div class="an-zone-stat-grid">
+        <div class="an-zone-stat"><div class="an-zone-stat-val">${count}</div><div class="an-zone-stat-lbl">Búsquedas</div></div>
+        <div class="an-zone-stat"><div class="an-zone-stat-val">${alts}</div><div class="an-zone-stat-lbl">PPTs</div></div>
+      </div>
+      <div class="an-zone-panel-sec">Top Edificios</div>
+      ${topEdifs.length?topEdifs.map(([e,n],i)=>`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.22rem"><span style="font-size:10px;font-weight:700;color:#1C54F4;min-width:14px">${i+1}</span><span style="font-size:11px;color:#0A1B4D;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e}">${e}</span><span style="font-size:10px;color:#8898C0">${n}</span></div>`).join(''):'<div style="font-size:11px;color:#B0BEDB">Sin datos</div>'}
+      <div class="an-zone-panel-sec">Top Ejecutivos</div>
+      ${topBrokers.length?topBrokers.map(([b,n],i)=>`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.22rem"><span style="font-size:10px;font-weight:700;color:#1C54F4;min-width:14px">${i+1}</span><span style="font-size:11px;color:#0A1B4D;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b}</span><span style="font-size:10px;color:#8898C0">${n}</span></div>`).join(''):'<div style="font-size:11px;color:#B0BEDB">Sin datos</div>'}
+      <div class="an-zone-panel-sec">M² buscados</div>
+      ${m2Buckets.filter(b=>b[1]>0).map(([rng,n])=>`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.22rem"><span style="font-size:10px;color:#0A1B4D;flex:1">${rng}</span><div style="width:50px;height:5px;background:#EEF3FF;border-radius:3px;overflow:hidden"><div style="height:5px;background:#1C54F4;border-radius:3px;width:${Math.round(n/m2Max*100)}%"></div></div><span style="font-size:10px;color:#8898C0;min-width:12px;text-align:right">${n}</span></div>`).join('')||'<div style="font-size:11px;color:#B0BEDB">Sin datos</div>'}
+      <div class="an-zone-panel-sec">Evolución 30d</div>
+      <div style="display:flex;align-items:flex-end;gap:1px;height:48px;padding-bottom:2px">
+        ${evol.map(n=>`<div style="flex:1;background:#1C54F4;border-radius:1px 1px 0 0;height:${Math.round(n/evolMax*100)}%;min-height:${n>0?2:0}px;opacity:.7"></div>`).join('')}
+      </div>
+    </div>`;
+  panel.classList.add('open');
+  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},320);
+}
+
+window.closeAnZonePanel=function(){
+  const panel=document.getElementById('an-zone-side-panel');
+  if(panel)panel.classList.remove('open');
+  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},320);
+};
 
 // Phase 5 — Export
 function exportAnPDF(){window.print();}
