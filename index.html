@@ -1446,6 +1446,62 @@ select.bwiz-inp:focus{border-color:#4D93FF}
 .bld-det-ckpi-l{font-size:9.5px;color:rgba(255,255,255,.35);text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .bld-det-ckpi-v.vac{color:#F59E0B}
 
+/* ===== BUILDINGS MODULE v3 — filter bar + list view ===== */
+.bld-filter-bar{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.6rem 0 .8rem;flex-wrap:wrap}
+.bld-filter-bar-l{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex:1}
+.bld-filter-bar-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.bld-filter-inp{padding:.45rem .75rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:13px;color:#000759;background:#fff;font-family:inherit;outline:none;transition:border-color .15s;width:230px}
+.bld-filter-inp:focus{border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
+.bld-filter-sel{padding:.45rem .65rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:12.5px;color:#000759;background:#fff;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
+.bld-filter-sel:focus{border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
+.bld-filter-clear{display:inline-flex;align-items:center;gap:4px;padding:.4rem .75rem;border:1.5px solid rgba(239,51,64,.25);border-radius:8px;background:rgba(239,51,64,.06);color:#EF3340;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.bld-filter-clear:hover{background:rgba(239,51,64,.1);border-color:rgba(239,51,64,.4)}
+body.dark .bld-filter-inp,.bld-filter-inp{background:#fff;color:#000759}
+body.dark .bld-filter-bar{border-color:rgba(255,255,255,.06)}
+
+/* LIST VIEW TABLE */
+.bld-list-view{overflow-x:auto;width:100%}
+.bld-list-table{width:100%;border-collapse:collapse;font-size:13px}
+.bld-list-table thead tr{border-bottom:2px solid #EEF3FF}
+.bld-list-table th{padding:10px 12px;text-align:left;color:#7B8BBD;font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.bld-list-row{cursor:pointer;border-bottom:1px solid #F1F5FE;transition:background .12s}
+.bld-list-row:hover{background:#F8FAFF}
+.bld-list-row.selected{background:#EEF4FF}
+.bld-lt-name{min-width:200px}
+.bld-lt-name-inner{display:flex;align-items:center;gap:10px}
+.bld-lt-avatar{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#1C54F4,#25408F);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bld-lt-nm{font-weight:600;color:#000759;font-size:13px}
+.bld-lt-addr{font-size:11px;color:#7B8BBD;margin-top:1px}
+.bld-lt-num{font-size:12.5px;color:#344563;white-space:nowrap;font-variant-numeric:tabular-nums;padding:10px 12px}
+.bld-lt-disp{color:#16A34A;font-weight:600}
+.bld-lt-date{font-size:11.5px;color:#9CACC8;white-space:nowrap;padding:10px 12px}
+.bld-lt-actions{width:72px;padding:6px 8px;text-align:center}
+.bld-lt-btn{background:none;border:1.5px solid #E2EAF4;border-radius:6px;padding:5px 7px;cursor:pointer;color:#7B8BBD;transition:all .12s;display:inline-flex;align-items:center;justify-content:center;margin:0 2px}
+.bld-lt-btn:hover{background:#EEF3FF;border-color:#C8D5F0;color:#1C54F4}
+.bld-lt-btn.del:hover{background:#FEF2F2;border-color:#FCA5A5;color:#EF3340}
+.bld-cat-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700;background:#EEF3FF;color:#1C54F4}
+.bld-cat-badge.cat-Ap{background:#F0FFF4;color:#15803D}
+.bld-cat-badge.cat-A{background:#EEF4FF;color:#1C54F4}
+.bld-cat-badge.cat-Bp{background:#FFF9EC;color:#B45309}
+.bld-cat-badge.cat-B{background:#FFF9EC;color:#92400E}
+.bld-etapa-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:#F3F4F6;color:#374151}
+.bld-page-ellipsis{padding:5px 4px;color:#7B8BBD}
+
+/* DARK MODE for list view */
+body.dark .bld-list-table thead tr{border-bottom-color:rgba(255,255,255,.08)}
+body.dark .bld-list-table th{color:rgba(255,255,255,.35)}
+body.dark .bld-list-row{border-bottom-color:rgba(255,255,255,.05)}
+body.dark .bld-list-row:hover{background:rgba(255,255,255,.04)}
+body.dark .bld-list-row.selected{background:rgba(28,84,244,.12)}
+body.dark .bld-lt-nm{color:#DCE7FF}
+body.dark .bld-lt-addr{color:rgba(255,255,255,.35)}
+body.dark .bld-lt-num{color:rgba(255,255,255,.7)}
+body.dark .bld-lt-btn{border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.4)}
+body.dark .bld-lt-btn:hover{background:rgba(77,147,255,.12);border-color:rgba(77,147,255,.3);color:#4D93FF}
+body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
+
+@media(max-width:900px){.bld-filter-bar{flex-direction:column;align-items:stretch}.bld-filter-bar-l{flex-wrap:wrap}.bld-filter-inp{width:100%}}
+
 /* ===== HOME HUB ===== */
 #home-hub{display:none;background:url('home-bg.jpg') center/cover no-repeat;background-attachment:local;overflow-y:auto;min-width:0;flex:1;height:100%;position:relative}
 #home-hub::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(2,6,23,.88) 0%,rgba(3,10,30,.80) 50%,rgba(2,8,24,.75) 100%);pointer-events:none;z-index:0}
@@ -2820,26 +2876,43 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
             <div class="bld-subtitle" id="bld-subtitle">Cargando...</div>
           </div>
           <div class="bld-hz-r">
-            <input id="bld-search" type="text" placeholder="🔍 Buscar edificio..." class="bld-input" oninput="filterBuildings()">
-            <div class="mz-dd" id="bld-zona-dd">
-              <button class="bld-select mz-dd-btn" id="bld-zona-btn" onclick="toggleBldZonaDD(event)" type="button">Todas las zonas ▾</button>
-              <div class="mz-dd-panel" id="bld-zona-panel">
-                <div id="bld-zona-list"></div>
-                <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldZonas()">✕ Limpiar</button></div>
-              </div>
-            </div>
-            <select id="bld-filter-estado" class="bld-select" onchange="filterBuildings()">
-              <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
-            </select>
-            <div class="bld-view-toggle">
-              <button class="bld-view-btn active" id="bld-view-grid-btn" onclick="toggleBldView('grid')">⊞ Grid</button>
-              <button class="bld-view-btn" id="bld-view-map-btn" onclick="toggleBldView('map')">🗺 Mapa</button>
-            </div>
             <button class="bld-btn bld-btn-primary" onclick="openBldNewWizard()" id="bld-new-btn">＋ Nueva Oficina</button>
             <button class="bld-btn" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
             <button id="bld-crm-links-btn" class="bld-btn" style="display:none" onclick="openCrmLinksModal()">🔗 CRM Links</button>
             <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
             <button onclick="showModule('home')" class="bld-close-btn">✕ Cerrar</button>
+          </div>
+        </div>
+        <!-- FILTER BAR -->
+        <div class="bld-filter-bar" id="bld-filter-bar">
+          <div class="bld-filter-bar-l">
+            <input id="bld-search" type="text" placeholder="🔍 Buscar por nombre, dirección, broker..." class="bld-filter-inp" oninput="filterBuildings()">
+            <select id="bld-filter-corredor" class="bld-filter-sel" onchange="filterBuildings()">
+              <option value="">Todos los corredores</option>
+              <option>Catalinas</option><option>Macrocentro</option><option>Macrocentro Norte</option>
+              <option>Macrocentro Sur</option><option>Microcentro</option><option>Norte CABA</option>
+              <option>Norte GBA</option><option>Plaza Roma</option><option>Plaza San Martín</option>
+              <option>Puerto Madero Este</option><option>Puerto Madero Oeste</option>
+            </select>
+            <select id="bld-filter-cat" class="bld-filter-sel" onchange="filterBuildings()">
+              <option value="">Todas las categorías</option>
+              <option>A+</option><option>A</option><option>B+</option><option>B</option><option>C</option>
+            </select>
+            <select id="bld-filter-etapa" class="bld-filter-sel" onchange="filterBuildings()">
+              <option value="">Todas las etapas</option>
+              <option>Proyecto</option><option>En Construcción</option><option>Existente</option>
+            </select>
+            <select id="bld-filter-estado" class="bld-filter-sel" onchange="filterBuildings()">
+              <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
+            </select>
+            <button class="bld-filter-clear" id="bld-filter-clear-btn" onclick="bldClearFilters()" style="display:none">✕ Limpiar</button>
+          </div>
+          <div class="bld-filter-bar-r">
+            <div class="bld-view-toggle">
+              <button class="bld-view-btn active" id="bld-view-grid-btn" title="Tarjetas" onclick="toggleBldView('grid')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
+              <button class="bld-view-btn" id="bld-view-list-btn" title="Lista" onclick="toggleBldView('list')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+              <button class="bld-view-btn" id="bld-view-map-btn" title="Mapa" onclick="toggleBldView('map')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></button>
+            </div>
           </div>
         </div>
         <div class="bld-kpi-row" id="bld-kpi-row"></div>
@@ -2974,7 +3047,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           </div>
           <div class="bwiz-field">
             <label class="bwiz-lbl">Cantidad de pisos</label>
-            <input class="bwiz-inp" id="bw-pisos" type="number" min="1" max="100" placeholder="Ej: 18">
+            <input class="bwiz-inp" id="bw-pisos" type="number" min="1" max="100" placeholder="Ej: 18" oninput="_bwizCalcSupProm()">
           </div>
         </div>
         <div class="bwiz-row">
@@ -3004,13 +3077,13 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           </div>
           <div class="bwiz-field">
             <label class="bwiz-lbl">Superficie propia (m²)</label>
-            <input class="bwiz-inp" id="bw-sup-propia" type="number" min="0" placeholder="m² de propiedad exclusiva">
+            <input class="bwiz-inp" id="bw-sup-propia" type="number" min="0" placeholder="m² de propiedad exclusiva" oninput="_bwizCalcSupProm()">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Superficie promedio por nivel (m²)</label>
-            <input class="bwiz-inp" id="bw-sup-prom" type="number" min="0" placeholder="m² típicos por piso">
+            <label class="bwiz-lbl">Superficie promedio por nivel (m²) <span style="font-size:9px;background:rgba(77,147,255,.15);color:#4D93FF;border-radius:4px;padding:1px 5px;font-weight:700">AUTO</span></label>
+            <input class="bwiz-inp" id="bw-sup-prom" type="number" min="0" placeholder="Calculado automáticamente" readonly style="opacity:.7;cursor:default">
           </div>
           <div class="bwiz-field">
             <label class="bwiz-lbl">Superficie mínima divisible (m²)</label>
@@ -6701,6 +6774,8 @@ document.addEventListener('click',function(e){
 const BLD_PAGE_SIZE=20;
 let _bldDocs=[], _bldFiltered=[], _bldPage=0, _bldEditId=null;
 let _bldZonasSel=new Set();
+let _bldCatSel='', _bldEtapaSel='', _bldM2Min=0, _bldM2Max=0;
+let _bldListView='grid'; // 'grid' | 'list' | 'map'
 
 const BLD_ESTADO_COLORS={
   'Disponible' :{bg:'rgba(34,197,94,.1)',  border:'rgba(34,197,94,.3)',  text:'#16A34A'},
@@ -6835,19 +6910,54 @@ function clearBldZonas(){
 function filterBuildings(){
   const q=(document.getElementById('bld-search')?.value||'').toLowerCase().trim();
   const estado=document.getElementById('bld-filter-estado')?.value||'';
+  const corredor=document.getElementById('bld-filter-corredor')?.value||'';
+  const cat=document.getElementById('bld-filter-cat')?.value||'';
+  const etapa=document.getElementById('bld-filter-etapa')?.value||'';
   _bldFiltered=_bldDocs.filter(d=>{
     if(q){
-      const haystack=[d.nombre||'',d.direccion||'',d.zona||'',d.submercado||'',d.broker||'',d.descripcion||'',d.amenities||''].join(' ').toLowerCase();
+      const haystack=[d.nombre||'',d.direccion||'',d.corredor||'',d.zona||'',d.submercado||'',d.broker||'',d.descripcion||''].join(' ').toLowerCase();
       if(!haystack.includes(q))return false;
     }
-    if(_bldZonasSel.size>0&&!_bldZonasSel.has(d.zona||d.submercado))return false;
+    if(corredor){const dc=d.corredor||d.zona||d.submercado||'';if(!dc.toLowerCase().includes(corredor.toLowerCase()))return false;}
+    if(cat){const dc=d.categoria||d.cat||'';if(!dc.toLowerCase().includes(cat.toLowerCase()))return false;}
+    if(etapa&&d.etapa!==etapa)return false;
     if(estado&&d.estado!==estado)return false;
     return true;
   });
   _bldPage=0;
+  // Show/hide clear button
+  const hasFilters=q||estado||corredor||cat||etapa;
+  const cb=document.getElementById('bld-filter-clear-btn');
+  if(cb)cb.style.display=hasFilters?'inline-flex':'none';
   renderBldKPIs(_bldFiltered);
-  if(_bldMapView==='map')renderBldMap(_bldFiltered);
+  if(_bldListView==='map')renderBldMap(_bldFiltered);
+  else if(_bldListView==='list')renderBuildingsListView();
   else renderBuildingsTable();
+}
+
+function bldClearFilters(){
+  ['bld-search','bld-filter-corredor','bld-filter-cat','bld-filter-etapa','bld-filter-estado'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  filterBuildings();
+}
+
+function _bldPaginationHTML(total, startI){
+  const totalPages=Math.ceil(total/BLD_PAGE_SIZE);
+  const pg=document.getElementById('bld-pagination');
+  const info=document.getElementById('bld-page-info');
+  const btns=document.getElementById('bld-page-btns');
+  pg.style.display=total>BLD_PAGE_SIZE?'flex':'none';
+  if(!pg.style.display||pg.style.display==='none')return;
+  info.textContent=`${startI+1}–${Math.min(startI+BLD_PAGE_SIZE,total)} de ${total}`;
+  let btnH=`<button class="bld-page-btn" ${_bldPage===0?'disabled':''} onclick="bldGoPage(${_bldPage-1})">← Ant</button>`;
+  for(let i=0;i<totalPages;i++){
+    if(totalPages<=7||i===0||i===totalPages-1||Math.abs(i-_bldPage)<=1){
+      btnH+=`<button class="bld-page-btn${i===_bldPage?' active':''}" onclick="bldGoPage(${i})">${i+1}</button>`;
+    }else if(Math.abs(i-_bldPage)===2){btnH+=`<span class="bld-page-ellipsis">…</span>`;}
+  }
+  btnH+=`<button class="bld-page-btn" ${_bldPage===totalPages-1?'disabled':''} onclick="bldGoPage(${_bldPage+1})">Sig →</button>`;
+  btns.innerHTML=btnH;
 }
 
 function renderBuildingsTable(){
@@ -6855,7 +6965,7 @@ function renderBuildingsTable(){
   const total=_bldFiltered.length;
   document.getElementById('bld-subtitle').textContent=`${_bldDocs.length} edificio${_bldDocs.length!==1?'s':''} · ${total} en vista`;
   if(!total){
-    wrap.innerHTML='<div class="bld-empty">Sin edificios. Importá desde Sheets para comenzar.</div>';
+    wrap.innerHTML='<div class="bld-empty">Sin edificios. Usá el botón "Nueva Oficina" o importá desde Sheets.</div>';
     document.getElementById('bld-pagination').style.display='none';
     return;
   }
@@ -6864,47 +6974,116 @@ function renderBuildingsTable(){
   let h='<div class="bld-grid">';
   page.forEach(d=>{
     const foto=getBldFoto(d);
-    if(!foto)console.warn('[Edificios] Sin imagen:',d.nombre||d._id,d);
     const imgHtml=foto
       ?`<div class="bld-card-img"><img src="${foto}" loading="lazy" onerror="this.parentElement.innerHTML='🏢'"></div>`
       :`<div class="bld-card-img">🏢</div>`;
     const sel=_bldEditId===d._id?' selected':'';
+    const corredor=d.corredor||d.zona||d.submercado||'–';
+    const cat=d.categoria||d.cat||'–';
+    const etapa=d.etapa||'–';
     h+=`<div class="bld-card${sel}" onclick="openBuildingEditor('${d._id}')">
       ${imgHtml}
       <div class="bld-card-body">
-        <div class="bld-card-name">${d.nombre||d._id}</div>
-        <div class="bld-card-addr">${d.direccion||d.zona||'–'}</div>
+        <div class="bld-card-name">${esc(d.nombre||d._id)}</div>
+        <div class="bld-card-addr">${esc(d.direccion||corredor)}</div>
         <div class="bld-card-meta">
-          <div class="bld-meta-item"><span class="bld-meta-val">${d.zona||d.submercado||'–'}</span><span class="bld-meta-lbl">Zona</span></div>
-          <div class="bld-meta-item"><span class="bld-meta-val">${d.asking||d.rent||'–'}</span><span class="bld-meta-lbl">Asking</span></div>
+          <div class="bld-meta-item"><span class="bld-meta-val">${esc(corredor)}</span><span class="bld-meta-lbl">Corredor</span></div>
+          <div class="bld-meta-item"><span class="bld-meta-val">${esc(cat)}</span><span class="bld-meta-lbl">Categ.</span></div>
           <div class="bld-meta-item"><span class="bld-meta-val">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+' m²':'–'}</span><span class="bld-meta-lbl">Disponible</span></div>
-          <div class="bld-meta-item"><span class="bld-meta-val">${d.broker||'–'}</span><span class="bld-meta-lbl">Ejec. Comercial</span></div>
+          <div class="bld-meta-item"><span class="bld-meta-val">${esc(etapa)}</span><span class="bld-meta-lbl">Etapa</span></div>
         </div>
         <div class="bld-card-footer">
           ${bldEstadoBadge(d.estado||'Disponible')}
-          <button class="bld-card-edit-btn" onclick="event.stopPropagation();openBuildingEditor('${d._id}')">Editar →</button>
+          <button class="bld-card-edit-btn" onclick="event.stopPropagation();openBuildingEditor('${d._id}')">Ver ficha →</button>
         </div>
       </div>
     </div>`;
   });
   h+='</div>';
   wrap.innerHTML=h;
+  _bldPaginationHTML(total,start);
+}
 
-  // Pagination
-  const totalPages=Math.ceil(total/BLD_PAGE_SIZE);
-  const pg=document.getElementById('bld-pagination');
-  const info=document.getElementById('bld-page-info');
-  const btns=document.getElementById('bld-page-btns');
-  pg.style.display=total>BLD_PAGE_SIZE?'flex':'none';
-  info.textContent=`${start+1}–${Math.min(start+BLD_PAGE_SIZE,total)} de ${total}`;
-  let btnH=`<button class="bld-page-btn" ${_bldPage===0?'disabled':''} onclick="bldGoPage(${_bldPage-1})">← Ant</button>`;
-  for(let i=0;i<totalPages;i++){
-    if(totalPages<=7||i===0||i===totalPages-1||Math.abs(i-_bldPage)<=1){
-      btnH+=`<button class="bld-page-btn${i===_bldPage?' active':''}" onclick="bldGoPage(${i})">${i+1}</button>`;
-    }else if(Math.abs(i-_bldPage)===2){btnH+=`<span style="padding:5px 4px;color:#7B8BBD">…</span>`;}
+function renderBuildingsListView(){
+  const wrap=document.getElementById('bld-table-wrap');
+  const total=_bldFiltered.length;
+  document.getElementById('bld-subtitle').textContent=`${_bldDocs.length} edificio${_bldDocs.length!==1?'s':''} · ${total} en vista`;
+  if(!total){
+    wrap.innerHTML='<div class="bld-empty">Sin edificios que coincidan con los filtros.</div>';
+    document.getElementById('bld-pagination').style.display='none';
+    return;
   }
-  btnH+=`<button class="bld-page-btn" ${_bldPage===totalPages-1?'disabled':''} onclick="bldGoPage(${_bldPage+1})">Sig →</button>`;
-  btns.innerHTML=btnH;
+  const start=_bldPage*BLD_PAGE_SIZE;
+  const page=_bldFiltered.slice(start,start+BLD_PAGE_SIZE);
+  const fmtM2=v=>v?Number(v).toLocaleString('es-AR')+' m²':'–';
+  const fmtDate=v=>{if(!v)return'–';try{const d=_tsToDate(v);if(!d)return'–';return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'2-digit'});}catch{return'–';}};
+  let h=`<div class="bld-list-view">
+    <table class="bld-list-table">
+      <thead><tr>
+        <th>Nombre</th>
+        <th>Corredor</th>
+        <th>Categ.</th>
+        <th>Etapa</th>
+        <th>Sup. Propia</th>
+        <th>Disponible</th>
+        <th>Vacancia</th>
+        <th>Pisos</th>
+        <th>Actualizado</th>
+        <th class="bld-lt-actions"></th>
+      </tr></thead><tbody>`;
+  page.forEach(d=>{
+    const corredor=d.corredor||d.zona||d.submercado||'–';
+    const cat=d.categoria||d.cat||'–';
+    const supPropia=fmtM2(d.superficiePropia||d.superficiePlanta);
+    const supDisp=fmtM2(d.superficieDisponible);
+    const supPropiaNum=parseFloat(d.superficiePropia||d.superficiePlanta)||0;
+    const supDispNum=parseFloat(d.superficieDisponible)||0;
+    const vacPct=supPropiaNum>0?Math.round(supDispNum/supPropiaNum*100)+'%':'–';
+    const pisos=d.cantidadPisos||d.pisos||'–';
+    const upd=fmtDate(d.updatedAt||d.createdAt);
+    h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
+      <td class="bld-lt-name">
+        <div class="bld-lt-name-inner">
+          <div class="bld-lt-avatar">${(d.nombre||'O').charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="bld-lt-nm">${esc(d.nombre||d._id)}</div>
+            <div class="bld-lt-addr">${esc(d.direccion||'')}</div>
+          </div>
+        </div>
+      </td>
+      <td>${esc(corredor)}</td>
+      <td><span class="bld-cat-badge cat-${(cat||'').replace('+','p')}">${esc(cat)}</span></td>
+      <td><span class="bld-etapa-badge">${esc(d.etapa||'–')}</span></td>
+      <td class="bld-lt-num">${supPropia}</td>
+      <td class="bld-lt-num bld-lt-disp">${supDisp}</td>
+      <td class="bld-lt-num">${vacPct}</td>
+      <td class="bld-lt-num">${pisos}</td>
+      <td class="bld-lt-date">${upd}</td>
+      <td class="bld-lt-actions" onclick="event.stopPropagation()">
+        <button class="bld-lt-btn" onclick="openBuildingEditor('${d._id}')" title="Ver ficha">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="bld-lt-btn del" onclick="_bldDeleteFromList('${d._id}')" title="Eliminar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  wrap.innerHTML=h;
+  _bldPaginationHTML(total,start);
+}
+
+async function _bldDeleteFromList(docId){
+  const d=_bldDocs.find(x=>x._id===docId);
+  if(!d)return;
+  if(!confirm(`¿Eliminar "${d.nombre||docId}"? Esta acción no se puede deshacer.`))return;
+  try{
+    await db.collection('buildings').doc(docId).delete();
+    _bldDocs=_bldDocs.filter(x=>x._id!==docId);
+    filterBuildings();
+    showBldToast('🗑 Edificio eliminado');
+  }catch(e){showBldToast('❌ Error: '+e.message,4000);}
 }
 
 function bldGoPage(p){_bldPage=p;renderBuildingsTable();}
@@ -7212,7 +7391,14 @@ function unitEstadoBadge(e){
 }
 
 function _calcSupDispFromUnits(){
-  return _unitDocs.filter(u=>u.estado==='Disponible'||!u.estado).reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
+  // A unit is "available" when it's offered for rent (alone or combined)
+  // and its estado is Disponible or unset
+  return _unitDocs.filter(u=>{
+    const to=u.tipoOferta||'Alquiler';
+    const st=u.estado||'Disponible';
+    const offerRent=to==='Alquiler'||to==='Alquiler o Venta'||to==='Alquiler / Venta';
+    return offerRent&&(st==='Disponible'||!u.estado);
+  }).reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
 }
 
 async function recalcAndSaveSupDisp(buildingId){
@@ -7239,20 +7425,26 @@ function _updateUnitStats(){
     const supDisp=_calcSupDispFromUnits();
     const el=document.getElementById('be-supDisp');if(el)el.value=supDisp||'';
     const kpi=document.getElementById('bld-kpi-sup-disp');if(kpi)kpi.textContent=supDisp?supDisp.toLocaleString('es-AR')+'m²':'—';
-    // Vacancia
+    // Vacancia = supDisp / superficiePropia (use total as fallback)
     const bld=_bldDocs.find(x=>x._id===_bldEditId);
-    const supTotal=parseFloat(bld?.superficieTotal||bld?.superficieDisponible||0)||0;
-    const vacPct=supTotal>0?Math.round(supDisp/supTotal*100):null;
+    const supRef=parseFloat(bld?.superficiePropia||bld?.superficieTotal||bld?.superficiePlanta||0)||0;
+    const vacPct=supRef>0?Math.round(supDisp/supRef*100):null;
     const kvac=document.getElementById('bld-kpi-vacancia');
     if(kvac)kvac.textContent=vacPct!==null?vacPct+'%':'—';
-    // Avg rent (from disponible units with numeric asking)
-    const rentNums=disp.map(u=>parseFloat(String(u.askingRent||'').replace(/[^0-9.]/g,''))).filter(n=>n>0);
-    const avgRent=rentNums.length?Math.round(rentNums.reduce((s,v)=>s+v,0)/rentNums.length):null;
+    // Weighted avg rent: sum(m²×price) / sum(m²) for available units
+    const rentUnits=disp.filter(u=>parseFloat(String(u.askingRent||'').replace(/[^0-9.]/g,''))>0);
+    const rentNum=n=>parseFloat(String(n).replace(/[^0-9.]/g,''))||0;
+    const rentWSum=rentUnits.reduce((s,u)=>s+(rentNum(u.askingRent)*(parseFloat(u.m2)||1)),0);
+    const rentWM2=rentUnits.reduce((s,u)=>s+(parseFloat(u.m2)||1),0);
+    const avgRent=rentWM2>0?Math.round(rentWSum/rentWM2):null;
     const krent=document.getElementById('bld-kpi-avg-rent');
     if(krent)krent.textContent=avgRent?'USD '+avgRent.toLocaleString('es-AR'):'—';
-    // Avg expenses (all units with expensas)
-    const expNums=_unitDocs.map(u=>parseFloat(String(u.expensasUnidad||'').replace(/[^0-9.]/g,''))).filter(n=>n>0);
-    const avgExp=expNums.length?Math.round(expNums.reduce((s,v)=>s+v,0)/expNums.length):null;
+    // Weighted avg expenses across all active units
+    const expUnits=_unitDocs.filter(u=>u.estado!=='Archivado'&&parseFloat(String(u.expensasUnidad||'').replace(/[^0-9.]/g,''))>0);
+    const expNum=n=>parseFloat(String(n).replace(/[^0-9.]/g,''))||0;
+    const expWSum=expUnits.reduce((s,u)=>s+(expNum(u.expensasUnidad)*(parseFloat(u.m2)||1)),0);
+    const expWM2=expUnits.reduce((s,u)=>s+(parseFloat(u.m2)||1),0);
+    const avgExp=expWM2>0?Math.round(expWSum/expWM2):null;
     const kexp=document.getElementById('bld-kpi-avg-exp');
     if(kexp)kexp.textContent=avgExp?'USD '+avgExp.toLocaleString('es-AR'):'—';
     // Floor occupation map
@@ -7308,7 +7500,7 @@ function renderDetailUnits(buildingId,filterQ=''){
     const cls=_unitSortCol===col?(_unitSortDir===1?'sort-asc':'sort-desc'):'';
     return`<th class="${cls}" onclick="sortDetailUnits('${col}')">${label}</th>`;
   };
-  const toOpts=['Alquiler','Venta','Alquiler o Venta'];
+  const toOpts=['No disponible','Alquiler','Venta','Alquiler o Venta'];
   const toSel=v=>toOpts.map(o=>`<option${v===o?' selected':''}>${o}</option>`).join('');
   const nearVenc=v=>{if(!v)return false;const d=new Date(v),now=new Date();const diff=(d-now)/(1000*60*60*24);return diff>=0&&diff<=90;};
   let h=`<table class="det-unit-table"><thead><tr>
@@ -7419,6 +7611,16 @@ function openBldNewWizard(){
   if(!ov)return;
   ov.style.display='flex';
   _bwizRender();
+}
+
+function _bwizCalcSupProm(){
+  const propia=parseFloat(document.getElementById('bw-sup-propia')?.value)||0;
+  const pisos=parseInt(document.getElementById('bw-pisos')?.value)||0;
+  const prom=document.getElementById('bw-sup-prom');
+  if(prom){
+    if(propia>0&&pisos>0){prom.value=Math.round(propia/pisos);}
+    else{prom.value='';}
+  }
 }
 
 function closeBldWizard(){
@@ -7568,7 +7770,7 @@ async function saveBldWizard(){
         batch.set(uRef,{
           piso:p,unidad:'',m2:parseFloat(document.getElementById('bw-sup-prom')?.value)||0,
           estado:'Disponible',askingRent:'',precioVenta:'',expensasUnidad:'',
-          cocherasUnidad:0,tipoOferta:'Alquiler',vencimientoContrato:'',
+          cocherasUnidad:0,tipoOferta:'No disponible',vencimientoContrato:'',
           ocupante:'',propietario:'',brokerAsignado:'',observaciones:'',
           createdAt:firebase.firestore.FieldValue.serverTimestamp(),
           updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
@@ -8610,22 +8812,18 @@ function switchBldMainTab(panel){
 let _bldMap=null,_bldMapView='grid',_bldMapMarkers=[],_bldClusterGroup=null;
 
 function toggleBldView(view){
-  _bldMapView=view;
-  document.getElementById('bld-view-grid-btn').classList.toggle('active',view==='grid');
-  document.getElementById('bld-view-map-btn').classList.toggle('active',view==='map');
-  const tblWrap=document.getElementById('bld-tbl-wrap');
-  const mapCont=document.getElementById('bld-map-container');
-  const pagination=document.getElementById('bld-pagination');
-  if(view==='map'){
-    if(tblWrap)tblWrap.style.display='none';
-    if(mapCont)mapCont.style.display='flex';
-    if(pagination)pagination.style.display='none';
-    renderBldMap(_bldFiltered.length?_bldFiltered:_bldDocs);
-  }else{
-    if(tblWrap)tblWrap.style.display='';
-    if(mapCont)mapCont.style.display='none';
-    renderBuildingsTable();
-  }
+  _bldListView=view;
+  ['grid','list','map'].forEach(v=>{
+    const btn=document.getElementById(`bld-view-${v}-btn`);
+    if(btn)btn.classList.toggle('active',v===view);
+  });
+  const mapC=document.getElementById('bld-map-container');
+  const tblC=document.getElementById('bld-tbl-wrap');
+  if(mapC)mapC.style.display=view==='map'?'flex':'none';
+  if(tblC)tblC.style.display=view!=='map'?'block':'none';
+  if(view==='map')renderBldMap(_bldFiltered);
+  else if(view==='list')renderBuildingsListView();
+  else renderBuildingsTable();
 }
 
 // Returns the best address string for geocoding a building doc.
