@@ -1875,15 +1875,16 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <!-- Comercial -->
     <div class="sb-grp open" id="sbg-comercial">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-comercial')">
-        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></span>
+        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></span>
         <span class="sb-grp-hd-label">Comercial</span>
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-comercial">
+        <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')">Cuentas</button>
+        <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')">Contactos</button>
+        <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')">Leads</button>
+        <button class="sb-item" disabled><span>Transacciones</span><span class="sb-soon-badge">Pronto</span></button>
         <button class="sb-item" disabled><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')">Clientes</button>
-        <button class="sb-item" disabled><span>Actividad</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" data-mod="crm" onclick="_sbItemClick('crm',null)">CRM</button>
       </div>
     </div>
 
@@ -1895,25 +1896,21 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-inmuebles">
-        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Inventario</button>
-        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Edificios</button>
-        <button class="sb-item" disabled><span>Pisos Disponibles</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Historial</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Reportes</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Oficinas</button>
+        <button class="sb-item" disabled><span>Industrial</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Retail</span><span class="sb-soon-badge">Pronto</span></button>
       </div>
     </div>
 
     <!-- Presentaciones -->
     <div class="sb-grp open" id="sbg-ppt">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-ppt')">
-        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
         <span class="sb-grp-hd-label">Presentaciones</span>
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-ppt">
-        <button class="sb-item" data-mod="generator" onclick="_sbItemClick('generator',null)">Generador PPT</button>
-        <button class="sb-item" disabled><span>Presentaciones Enviadas</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Plantillas</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="generator" onclick="_sbItemClick('generator',null)">Generador de Alternativas</button>
       </div>
     </div>
 
