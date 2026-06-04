@@ -1969,9 +1969,9 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ejecutivos Comerciales más activos</div></div>
       <div id="an-brokers-lb" class="an-brokers-row"></div>
     </div>
-    <div class="an-card" id="an-map-card">
-      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">click zona para filtrar</div></div>
-      <div style="padding:0"><div id="an-demand-map" style="height:450px;width:100%;border-radius:0 0 11px 11px"></div></div>
+    <div class="an-card" id="an-heatmap-card">
+      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Calor de Corredores</div><div class="an-card-hint">click corredor para filtrar</div></div>
+      <div id="an-heatmap-body"></div>
     </div>
     <div class="an-card" id="an-tend-card">
       <div class="an-tend-hdr">
@@ -7298,7 +7298,6 @@ async function upsertCliente(datos){
 // ===== ANALYTICS =====
 const _anCharts={};
 let _anDocs=[];
-window._anDemandMap=null;
 const ANALYTICS_ALLOWED=['mazaretto@gmail.com','matias.azaretto@colliers.com','colliers.arg@gmail.com'];
 const _anFilters={periodo:0,zonas:new Set(),ejecutivo:'',edificio:'',m2min:0,m2max:0};
 
@@ -7627,8 +7626,7 @@ function renderAnalytics(docs){
   `).join('');
   if(_anCharts.brokers){_anCharts.brokers.destroy();_anCharts.brokers=null;}
 
-  // CABA demand map (Phase 4)
-  renderAnDemandMap(docs);
+  renderAnHeatmap(docs);
 
   renderTendencias(_anDocs.length?_anDocs:docs,_tendPeriodo);
 }
@@ -7695,74 +7693,103 @@ function closeAnBldPanel(){
   if(p)p.style.display='none';
 }
 
-// Phase 4 — demand map (circle markers)
-const _AN_ZONE_COORDS={
-  'Norte CABA':[-34.5700,-58.4350],
-  'Norte GBA':[-34.5050,-58.5200],
-  'Microcentro':[-34.6037,-58.3739],
-  'Catalinas':[-34.5973,-58.3745],
-  'Plaza Roma':[-34.5997,-58.3758],
-  'Puerto Madero':[-34.6135,-58.3617],
-  'Sur CABA':[-34.6450,-58.3920]
-};
-function _anCircleColor(count){
-  if(count>=30)return{fill:"#EF4444",stroke:"#B91C1C"};
-  if(count>=15)return{fill:"#F97316",stroke:"#C2410C"};
-  if(count>=5)return{fill:"#EAB308",stroke:"#A16207"};
-  return{fill:"#22C55E",stroke:"#15803D"};
-}
+function renderAnHeatmap(docs){
+  const body=document.getElementById('an-heatmap-body');
+  if(!body)return;
 
-function renderAnDemandMap(docs){
-  const mapEl=document.getElementById("an-demand-map");
-  if(!mapEl||typeof L==="undefined")return;
-
-  const zonaCount={},zonaAlts={},zonaEdifs={};
+  const zonaCount={};
+  let total=0;
   docs.forEach(d=>{
-    const zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(",").map(z=>z.trim()).filter(Boolean):[]);
-    const alts=Number(d.cantidad_alternativas)||0;
-    const edifs=d.edificios||d.propiedades||[];
-    zs.forEach(z=>{
-      if(!z||z==="Todas")return;
-      zonaCount[z]=(zonaCount[z]||0)+1;
-      zonaAlts[z]=(zonaAlts[z]||0)+alts;
-      if(!zonaEdifs[z])zonaEdifs[z]=new Set();
-      edifs.forEach(e=>{if(e)zonaEdifs[z].add(e);});
+    const zs=Array.isArray(d.zonas)?d.zonas:(d.zona?String(d.zona).split(',').map(z=>z.trim()).filter(Boolean):[]);
+    zs.forEach(z=>{if(z&&z!=='Todas'){zonaCount[z]=(zonaCount[z]||0)+1;total++;}});
+  });
+  console.log('[HEATMAP] total búsquedas:',total);
+  console.log('[HEATMAP] zonas procesadas:',Object.keys(zonaCount).length,JSON.stringify(zonaCount));
+
+  // Schematic SVG layout — viewBox 0 0 560 370, 4px gaps between zones
+  const Z=[
+    {id:'hm-n-gba', display:'Norte GBA',            lines:['Norte GBA'],              fz:['Norte GBA'],              x:2,  y:2,  w:556,h:78 },
+    {id:'hm-pan',   display:'Corredor Panamericana', lines:['Corredor','Panamericana'],fz:['Corredor Panamericana'],  x:2,  y:84, w:118,h:200},
+    {id:'hm-ncaba', display:'Norte CABA',            lines:['Norte CABA'],             fz:['Norte CABA'],             x:124,y:84, w:286,h:100},
+    {id:'hm-pto',   display:'Puerto Madero',         lines:['Puerto','Madero'],        fz:['Puerto Madero'],          x:414,y:84, w:144,h:200},
+    {id:'hm-micro', display:'Microcentro',           lines:['Microcentro'],            fz:['Microcentro'],            x:124,y:188,w:150,h:96 },
+    {id:'hm-cat',   display:'Catalinas / Plaza Roma',lines:['Catalinas /','Plaza Roma'],fz:['Catalinas','Plaza Roma'],x:278,y:188,w:132,h:96 },
+    {id:'hm-sur',   display:'Sur CABA',              lines:['Sur CABA'],               fz:['Sur CABA'],               x:2,  y:288,w:408,h:80 },
+  ];
+
+  function hmCol(c){
+    if(c>=31)return{bg:'#FEE2E2',brd:'#EF4444',txt:'#991B1B'};
+    if(c>=16)return{bg:'#FFEDD5',brd:'#F97316',txt:'#9A3412'};
+    if(c>=6) return{bg:'#FEF9C3',brd:'#EAB308',txt:'#713F12'};
+    return{bg:'#DCFCE7',brd:'#22C55E',txt:'#14532D'};
+  }
+
+  function zTxt(cx,cy,lines,count,col){
+    const lH=14,cH=17,gap=3,n=lines.length;
+    const totH=n*lH+(count>0?gap+cH:0);
+    const topY=cy-totH/2;
+    let s=lines.map((l,i)=>`<text x="${cx}" y="${Math.round(topY+lH*(i+1))}" text-anchor="middle" font-size="11" font-weight="600" fill="${col.txt}" font-family="Inter,system-ui,sans-serif" style="user-select:none">${l}</text>`).join('');
+    if(count>0)s+=`<text x="${cx}" y="${Math.round(topY+n*lH+gap+cH)}" text-anchor="middle" font-size="16" font-weight="700" fill="${col.txt}" font-family="Inter,system-ui,sans-serif" style="user-select:none">${count}</text>`;
+    return s;
+  }
+
+  const mainSet=new Set(Z.flatMap(z=>z.fz));
+
+  const svgZones=Z.map(z=>{
+    const cnt=z.fz.reduce((s,fz)=>s+(zonaCount[fz]||0),0);
+    const col=hmCol(cnt);
+    const isSel=z.fz.some(fz=>_anFilters.zonas.has(fz));
+    const dimmed=_anFilters.zonas.size>0&&!isSel;
+    const cx=Math.round(z.x+z.w/2),cy=Math.round(z.y+z.h/2);
+    return `<g class="an-hm-z" id="${z.id}" data-fz="${z.fz.join('|')}" data-cnt="${cnt}" data-tot="${total}" data-disp="${z.display}" style="cursor:pointer;opacity:${dimmed?'0.3':'1'};transition:opacity .15s">
+      <rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" fill="${col.bg}" stroke="${col.brd}" stroke-width="${isSel?'3':'1.5'}" rx="5"/>
+      ${zTxt(cx,cy,z.lines,cnt,col)}</g>`;
+  });
+
+  const otras=Object.entries(zonaCount).filter(([z])=>!mainSet.has(z)).sort((a,b)=>b[1]-a[1]);
+  const otrasPills=otras.map(([z,c])=>{
+    const col=hmCol(c);
+    const isSel=_anFilters.zonas.has(z);
+    const dimmed=_anFilters.zonas.size>0&&!isSel;
+    return `<span class="an-hm-pill" data-fz="${z}" data-cnt="${c}" data-tot="${total}" data-disp="${z}" style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 8px;border-radius:20px;background:${col.bg};border:1.5px solid ${col.brd};cursor:pointer;font-size:11px;font-weight:600;color:${col.txt};opacity:${dimmed?'0.35':'1'};transition:opacity .15s"><span>${z}</span><b style="font-size:13px">${c}</b></span>`;
+  }).join('');
+
+  body.innerHTML=`<div style="padding:12px 16px 0"><svg viewBox="0 0 560 370" width="100%" style="display:block;max-height:420px" id="an-hm-svg">${svgZones.join('')}</svg></div>${otras.length?`<div style="padding:6px 16px 2px;display:flex;flex-wrap:wrap;gap:6px;align-items:center"><span style="font-size:11px;color:#9BAACC;white-space:nowrap;margin-right:2px">Otras:</span>${otrasPills}</div>`:''}<div id="an-hm-tt" style="position:fixed;background:#0A1B4D;color:#fff;font-size:12px;border-radius:8px;padding:8px 12px;pointer-events:none;z-index:9999;display:none;line-height:1.7;box-shadow:0 4px 16px rgba(10,27,77,.25);min-width:140px"></div><div style="display:flex;gap:16px;padding:10px 16px 14px;flex-wrap:wrap;border-top:1px solid #F0F4FA;margin-top:8px"><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#56648F"><span style="width:12px;height:12px;border-radius:3px;background:#DCFCE7;border:1.5px solid #22C55E;display:inline-block;flex-shrink:0"></span>Baja (0–5)</span><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#56648F"><span style="width:12px;height:12px;border-radius:3px;background:#FEF9C3;border:1.5px solid #EAB308;display:inline-block;flex-shrink:0"></span>Media (6–15)</span><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#56648F"><span style="width:12px;height:12px;border-radius:3px;background:#FFEDD5;border:1.5px solid #F97316;display:inline-block;flex-shrink:0"></span>Alta (16–30)</span><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#56648F"><span style="width:12px;height:12px;border-radius:3px;background:#FEE2E2;border:1.5px solid #EF4444;display:inline-block;flex-shrink:0"></span>Muy alta (31+)</span></div>`;
+
+  const tt=document.getElementById('an-hm-tt');
+
+  document.querySelectorAll('#an-hm-svg .an-hm-z').forEach(el=>{
+    el.addEventListener('mousemove',e=>{
+      const pct=+el.dataset.tot>0?((+el.dataset.cnt/+el.dataset.tot)*100).toFixed(1):'0.0';
+      tt.innerHTML=`<b style="font-size:13px">${el.dataset.disp}</b><br>B\xFAsquedas: <b style="color:#93C5FD">${el.dataset.cnt}</b><br>% del total: <b style="color:#93C5FD">${pct}%</b>`;
+      tt.style.display='block';tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+    });
+    el.addEventListener('mouseleave',()=>tt.style.display='none');
+    el.addEventListener('click',()=>{
+      const zonas=el.dataset.fz.split('|');
+      const anyOn=zonas.some(z=>_anFilters.zonas.has(z));
+      zonas.forEach(z=>{
+        if(anyOn)_anFilters.zonas.delete(z);else _anFilters.zonas.add(z);
+        const chk=document.getElementById('an-zchk-'+z.replace(/[\s/]/g,'_'));
+        if(chk)chk.checked=!anyOn;
+      });
+      console.log('[HEATMAP] zona seleccionada:',el.dataset.disp,'→ activo:',!anyOn);
+      applyAnFilters();
     });
   });
 
-  if(!window._anDemandMap){
-    try{
-      window._anDemandMap=L.map("an-demand-map",{zoomControl:true,scrollWheelZoom:false}).setView([-34.58,-58.43],11);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{attribution:"\xA9 OpenStreetMap \xA9 CARTO",subdomains:"abcd",maxZoom:18}).addTo(window._anDemandMap);
-    }catch(err){
-      window._anDemandMap=null;
-      return;
-    }
-  }else{
-    const toRemove=[];
-    window._anDemandMap.eachLayer(l=>{if(l._anCircle)toRemove.push(l);});
-    toRemove.forEach(l=>window._anDemandMap.removeLayer(l));
-  }
-
-  const maxCount=Math.max(...Object.values(zonaCount),1);
-  const isSelected=z=>_anFilters.zonas.size===0||_anFilters.zonas.has(z);
-  Object.entries(_AN_ZONE_COORDS).forEach(([zona,coords])=>{
-    const count=zonaCount[zona]||0;
-    const alts=zonaAlts[zona]||0;
-    const edifCount=(zonaEdifs[zona]||new Set()).size;
-    const col=_anCircleColor(count);
-    const radius=15+Math.round((count/maxCount)*50);
-    const sel=isSelected(zona);
-    const circle=L.circleMarker(coords,{radius,fillColor:col.fill,fillOpacity:sel?0.75:0.3,color:col.stroke,weight:sel?2:1,interactive:true});
-    circle._anCircle=true;
-    const ttHtml="<div style=\"font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:3px\">"+zona+"</div><div style=\"font-size:11px;color:#56648F;line-height:1.8\">B\xFAsquedas: <b style=\"color:#1C54F4\">"+count+"</b><br>PPTs generados: <b style=\"color:#1C54F4\">"+alts+"</b><br>Edificios: <b style=\"color:#1C54F4\">"+edifCount+"</b></div>";
-    circle.bindTooltip(ttHtml,{permanent:false,sticky:true,direction:"top",offset:[0,-radius-4],className:"an-tt"});
-    circle.on("click",()=>toggleAnZona(zona));
-    circle.addTo(window._anDemandMap);
+  document.querySelectorAll('#an-heatmap-body .an-hm-pill').forEach(el=>{
+    el.addEventListener('mousemove',e=>{
+      const pct=+el.dataset.tot>0?((+el.dataset.cnt/+el.dataset.tot)*100).toFixed(1):'0.0';
+      tt.innerHTML=`<b style="font-size:13px">${el.dataset.disp}</b><br>B\xFAsquedas: <b style="color:#93C5FD">${el.dataset.cnt}</b><br>% del total: <b style="color:#93C5FD">${pct}%</b>`;
+      tt.style.display='block';tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+    });
+    el.addEventListener('mouseleave',()=>tt.style.display='none');
+    el.addEventListener('click',()=>{
+      console.log('[HEATMAP] zona seleccionada:',el.dataset.fz,'→ activo:',!_anFilters.zonas.has(el.dataset.fz));
+      toggleAnZona(el.dataset.fz);
+    });
   });
-
-  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},200);
-  setTimeout(()=>{if(window._anDemandMap)window._anDemandMap.invalidateSize();},800);
 }
 
 // Phase 5 — Export
