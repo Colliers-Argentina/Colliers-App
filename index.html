@@ -1540,10 +1540,12 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 #app-shell.active{display:flex;flex-direction:row}
 #main-content{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;height:100%}
 #main-content #as{flex:1;overflow-y:auto;min-width:0;height:100%}
-#main-content #analytics-panel,#main-content #crm-panel,#main-content #admin-panel,#main-content #buildings-panel{flex:1;min-width:0;min-height:0}
+#main-content #analytics-panel,#main-content #crm-panel,#main-content #admin-panel,#main-content #buildings-panel,#main-content #transacciones-panel{flex:1;min-width:0;min-height:0}
 #admin-panel{background:#F4F6FB;display:flex;flex-direction:column}
 body.dark #admin-panel{background:#0D1733}
 #buildings-panel{display:flex;flex-direction:column}
+#transacciones-panel{display:flex;flex-direction:column;background:#F4F6FB}
+body.dark #transacciones-panel{background:#0D1733}
 .adm-topbar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.5rem;background:#fff;border-bottom:1px solid #E8EFF8;flex-shrink:0}
 body.dark .adm-topbar{background:rgba(0,13,46,.7);border-bottom-color:rgba(77,147,255,.1)}
 .adm-page-title{font-size:15px;font-weight:700;color:#0A1B4D;letter-spacing:-.2px}
@@ -1556,6 +1558,79 @@ body.dark .adm-body{background:#0D1733}
 body.dark .mod-back-btn{border-color:rgba(77,147,255,.2);color:#8A9AC0}
 body.dark .mod-back-btn:hover{border-color:#4D93FF;color:#C3E6FF}
 
+
+/* ===== TRANSACCIONES MODULE ===== */
+.tx-topbar{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.5rem;background:#fff;border-bottom:1px solid #E8EFF8;flex-shrink:0;gap:1rem}
+body.dark .tx-topbar{background:rgba(0,13,46,.7);border-bottom-color:rgba(77,147,255,.1)}
+.tx-title{font-size:15px;font-weight:700;color:#0A1B4D;letter-spacing:-.2px}
+body.dark .tx-title{color:#C3E6FF}
+.tx-subtitle{font-size:11px;color:#8A9AC0;margin-top:2px}
+.tx-filters{display:flex;align-items:center;gap:.6rem;padding:.75rem 1.5rem;background:#F8FAFD;border-bottom:1px solid #E8EFF8;flex-wrap:wrap;flex-shrink:0}
+body.dark .tx-filters{background:rgba(0,13,46,.5);border-bottom-color:rgba(77,147,255,.1)}
+.tx-filter-sel{height:34px;padding:0 10px;border:1px solid #DDE5F2;border-radius:7px;font-size:12px;color:#1F2937;background:#fff;font-family:inherit;cursor:pointer;color-scheme:light}
+body.dark .tx-filter-sel{background:#0D1733;color:#C3E6FF;border-color:rgba(77,147,255,.2)}
+.tx-filter-inp{height:34px;padding:0 10px;border:1px solid #DDE5F2;border-radius:7px;font-size:12px;color:#1F2937;background:#fff;font-family:inherit;min-width:130px}
+body.dark .tx-filter-inp{background:#0D1733;color:#C3E6FF;border-color:rgba(77,147,255,.2)}
+.tx-filter-inp::placeholder{color:#9CA3AF}
+.tx-kpi-row{display:flex;gap:1rem;padding:.85rem 1.5rem;flex-shrink:0;flex-wrap:wrap}
+.tx-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:10px;padding:.6rem 1rem;min-width:140px}
+body.dark .tx-kpi{background:rgba(0,13,46,.5);border-color:rgba(77,147,255,.1)}
+.tx-kpi-label{font-size:10px;color:#8A9AC0;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.tx-kpi-val{font-size:20px;font-weight:700;color:#0A1B4D;margin-top:2px}
+body.dark .tx-kpi-val{color:#C3E6FF}
+.tx-body{flex:1;overflow-y:auto;padding:0 1.5rem 1.5rem}
+.tx-table-wrap{background:#fff;border:1px solid #E8EFF8;border-radius:12px;overflow:hidden;margin-top:1rem}
+body.dark .tx-table-wrap{background:rgba(0,13,46,.5);border-color:rgba(77,147,255,.1)}
+.tx-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.tx-table th{padding:.65rem 1rem;text-align:left;font-size:10.5px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.4px;background:#F8FAFD;border-bottom:1px solid #E8EFF8;white-space:nowrap}
+body.dark .tx-table th{background:rgba(0,5,30,.4);color:#6B8FCC;border-bottom-color:rgba(77,147,255,.1)}
+.tx-table td{padding:.7rem 1rem;border-bottom:1px solid #F0F4FB;vertical-align:middle}
+body.dark .tx-table td{border-bottom-color:rgba(77,147,255,.06);color:#C3E6FF}
+.tx-table tr:last-child td{border-bottom:none}
+.tx-table tr:hover td{background:#F8FAFD}
+body.dark .tx-table tr:hover td{background:rgba(77,147,255,.04)}
+.tx-empty{text-align:center;padding:3rem 1rem;color:#8A9AC0}
+.tx-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600}
+.tx-badge-neg{background:#FEF3C7;color:#92400E}
+.tx-badge-cerr{background:#D1FAE5;color:#065F46}
+.tx-badge-caid{background:#FEE2E2;color:#991B1B}
+/* Drawer */
+.tx-drawer-overlay{position:fixed;inset:0;background:rgba(10,27,77,.35);z-index:500;display:none;align-items:flex-start;justify-content:flex-end}
+.tx-drawer-overlay.open{display:flex}
+.tx-drawer{width:520px;max-width:100vw;height:100%;background:#fff;box-shadow:-4px 0 32px rgba(0,0,0,.12);display:flex;flex-direction:column;overflow:hidden}
+body.dark .tx-drawer{background:#0D1B40}
+.tx-drawer-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid #E8EFF8;flex-shrink:0}
+body.dark .tx-drawer-hd{border-bottom-color:rgba(77,147,255,.1)}
+.tx-drawer-title{font-size:15px;font-weight:700;color:#0A1B4D}
+body.dark .tx-drawer-title{color:#C3E6FF}
+.tx-drawer-close{background:none;border:none;cursor:pointer;font-size:20px;color:#8A9AC0;line-height:1;padding:4px}
+.tx-drawer-body{flex:1;overflow-y:auto;padding:1.5rem}
+.tx-drawer-footer{padding:1rem 1.5rem;border-top:1px solid #E8EFF8;display:flex;gap:.75rem;justify-content:flex-end;flex-shrink:0}
+body.dark .tx-drawer-footer{border-top-color:rgba(77,147,255,.1)}
+.tx-drawer-cancel{height:38px;padding:0 20px;border:1px solid #DDE5F2;border-radius:8px;background:#fff;color:#56648F;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+body.dark .tx-drawer-cancel{background:#0D1B40;color:#8A9AC0;border-color:rgba(77,147,255,.2)}
+.tx-drawer-save{height:38px;padding:0 24px;border:none;border-radius:8px;background:#1C54F4;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.tx-drawer-save:hover{background:#1442CC}
+.tx-form-row{margin-bottom:1rem}
+.tx-form-label{display:block;font-size:11.5px;font-weight:600;color:#374151;margin-bottom:4px}
+body.dark .tx-form-label{color:#8A9AC0}
+.tx-form-req{color:#EF4444;margin-left:2px}
+.tx-form-inp,.tx-form-sel,.tx-form-ta{width:100%;padding:8px 12px;border:1px solid #DDE5F2;border-radius:8px;font-family:inherit;font-size:13px;color:#1F2937;background:#fff;box-sizing:border-box;transition:border-color .15s}
+body.dark .tx-form-inp,body.dark .tx-form-sel,body.dark .tx-form-ta{background:#0A1530;color:#C3E6FF;border-color:rgba(77,147,255,.2)}
+.tx-form-inp:focus,.tx-form-sel:focus,.tx-form-ta:focus{outline:none;border-color:#1C54F4}
+.tx-form-sel{height:38px;color-scheme:light}
+.tx-form-ta{resize:vertical;min-height:70px}
+.tx-form-inp.tx-err,.tx-form-sel.tx-err{border-color:#EF4444}
+.tx-form-2col{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.tx-inmueble-wrap{position:relative}
+.tx-inmueble-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #DDE5F2;border-radius:8px;max-height:180px;overflow-y:auto;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+body.dark .tx-inmueble-results{background:#0D1B40;border-color:rgba(77,147,255,.2)}
+.tx-inmueble-opt{padding:8px 12px;cursor:pointer;font-size:13px;color:#1F2937}
+body.dark .tx-inmueble-opt{color:#C3E6FF}
+.tx-inmueble-opt:hover{background:#F0F4FB}
+body.dark .tx-inmueble-opt:hover{background:rgba(77,147,255,.08)}
+.tx-inmueble-create{padding:8px 12px;cursor:pointer;font-size:12px;color:#1C54F4;font-weight:600;border-top:1px solid #E8EFF8;display:flex;align-items:center;gap:4px}
+body.dark .tx-inmueble-create{border-top-color:rgba(77,147,255,.1)}
 /* ===== MIN-WIDTH FIX (tablas) ===== */
 .app-grid{min-width:0}
 .app-grid > *{min-width:0}
@@ -1593,6 +1668,7 @@ body:not(.dark) #home-hub::before{background:linear-gradient(160deg,rgba(2,6,23,
   #app-shell.active #analytics-panel .an-body{overflow-y:visible;flex:none}
   #app-shell.active #crm-panel{height:auto;min-height:100vh;flex:none!important;display:flex!important}
   #app-shell.active #buildings-panel{height:auto;min-height:100vh;flex:none!important;display:flex!important}
+  #app-shell.active #transacciones-panel{height:auto;min-height:100vh;flex:none!important;display:flex!important}
   #app-shell.active #admin-panel{height:auto;min-height:100vh;flex:none!important;display:flex!important}
   .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:188}
   .sb-overlay.active{display:block}
@@ -2033,7 +2109,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')">Cuentas</button>
         <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')">Contactos</button>
         <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')">Leads</button>
-        <button class="sb-item" disabled><span>Transacciones</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="transacciones" onclick="_sbItemClick('transacciones',null)">Transacciones</button>
         <button class="sb-item" disabled><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
       </div>
     </div>
@@ -3411,6 +3487,196 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     </div>
   </div>
   <footer>Colliers International Argentina · Uso interno · Generador de Informes</footer>
+</div>
+
+<!-- TRANSACCIONES MODULE -->
+<div id="transacciones-panel" style="display:none">
+  <!-- Topbar -->
+  <div class="tx-topbar">
+    <div>
+      <div class="tx-title">Transacciones</div>
+      <div class="tx-subtitle">Registro de operaciones comerciales</div>
+    </div>
+    <button class="btn-search" style="height:36px;padding:0 18px;font-size:13px" onclick="openNewTransaccion()">+ Nueva Transacción</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="tx-filters">
+    <select class="tx-filter-sel" id="tx-f-tipo" onchange="filterTransacciones()">
+      <option value="">Tipo inmueble</option>
+      <option value="Oficinas">Oficinas</option>
+      <option value="Industrial">Industrial</option>
+      <option value="Retail">Retail</option>
+      <option value="Terreno">Terreno</option>
+    </select>
+    <select class="tx-filter-sel" id="tx-f-corredor" onchange="filterTransacciones()">
+      <option value="">Corredor</option>
+      <option value="Norte">Norte</option>
+      <option value="Catalinas / Puerto Madero">Catalinas / Puerto Madero</option>
+      <option value="Microcentro">Microcentro</option>
+      <option value="Macrocentro">Macrocentro</option>
+      <option value="Palermo / Soho">Palermo / Soho</option>
+      <option value="Libertador">Libertador</option>
+      <option value="Panamericana">Panamericana</option>
+      <option value="Sur">Sur</option>
+      <option value="Otro">Otro</option>
+    </select>
+    <select class="tx-filter-sel" id="tx-f-estado" onchange="filterTransacciones()">
+      <option value="">Estado</option>
+      <option value="En negociación">En negociación</option>
+      <option value="Cerrada">Cerrada</option>
+      <option value="Caída">Caída</option>
+    </select>
+    <input class="tx-filter-inp" id="tx-f-comprador" placeholder="Comprador..." oninput="filterTransacciones()">
+    <input class="tx-filter-inp" id="tx-f-vendedor" placeholder="Vendedor..." oninput="filterTransacciones()">
+    <input class="tx-filter-inp" id="tx-f-broker" placeholder="Broker..." oninput="filterTransacciones()">
+    <input class="tx-filter-inp" id="tx-f-fecha-desde" type="date" oninput="filterTransacciones()" style="min-width:120px">
+    <input class="tx-filter-inp" id="tx-f-fecha-hasta" type="date" oninput="filterTransacciones()" style="min-width:120px">
+  </div>
+
+  <!-- KPIs -->
+  <div class="tx-kpi-row" id="tx-kpi-row">
+    <div class="tx-kpi"><div class="tx-kpi-label">Total</div><div class="tx-kpi-val" id="tx-kpi-total">—</div></div>
+    <div class="tx-kpi"><div class="tx-kpi-label">Cerradas</div><div class="tx-kpi-val" id="tx-kpi-cerradas">—</div></div>
+    <div class="tx-kpi"><div class="tx-kpi-label">Sup. total</div><div class="tx-kpi-val" id="tx-kpi-sup">—</div></div>
+    <div class="tx-kpi"><div class="tx-kpi-label">Precio prom. m²</div><div class="tx-kpi-val" id="tx-kpi-pm2">—</div></div>
+  </div>
+
+  <!-- Table -->
+  <div class="tx-body">
+    <div class="tx-table-wrap">
+      <table class="tx-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Inmueble</th>
+            <th>Comprador</th>
+            <th>Vendedor</th>
+            <th>Broker</th>
+            <th>Superficie</th>
+            <th>Precio m²</th>
+            <th>Precio Total</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tx-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Nueva Transacción Drawer -->
+  <div class="tx-drawer-overlay" id="tx-drawer-overlay" onclick="_txDrawerBgClick(event)">
+    <div class="tx-drawer" id="tx-drawer">
+      <div class="tx-drawer-hd">
+        <div class="tx-drawer-title" id="tx-drawer-title">Nueva Transacción</div>
+        <button class="tx-drawer-close" onclick="closeTxDrawer()">&#10005;</button>
+      </div>
+      <div class="tx-drawer-body">
+        <!-- Tipo inmueble -->
+        <div class="tx-form-row">
+          <label class="tx-form-label">Tipo de inmueble<span class="tx-form-req">*</span></label>
+          <select class="tx-form-sel" id="txf-tipo" onchange="_txUpdateInmuebleHint()">
+            <option value="">Seleccionar tipo...</option>
+            <option value="Oficinas">Oficinas</option>
+            <option value="Industrial">Industrial</option>
+            <option value="Retail">Retail</option>
+            <option value="Terreno">Terreno</option>
+          </select>
+        </div>
+        <!-- Inmueble -->
+        <div class="tx-form-row">
+          <label class="tx-form-label">Inmueble<span class="tx-form-req">*</span></label>
+          <div class="tx-inmueble-wrap">
+            <input class="tx-form-inp" id="txf-inmueble" placeholder="Buscar inmueble existente..." autocomplete="off" oninput="_txSearchInmueble(this.value)">
+            <div class="tx-inmueble-results" id="tx-inmueble-results" style="display:none"></div>
+          </div>
+          <input type="hidden" id="txf-inmueble-id">
+        </div>
+        <!-- Corredor -->
+        <div class="tx-form-row">
+          <label class="tx-form-label">Corredor</label>
+          <select class="tx-form-sel" id="txf-corredor">
+            <option value="">Seleccionar...</option>
+            <option value="Norte">Norte</option>
+            <option value="Catalinas / Puerto Madero">Catalinas / Puerto Madero</option>
+            <option value="Microcentro">Microcentro</option>
+            <option value="Macrocentro">Macrocentro</option>
+            <option value="Palermo / Soho">Palermo / Soho</option>
+            <option value="Libertador">Libertador</option>
+            <option value="Panamericana">Panamericana</option>
+            <option value="Sur">Sur</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <!-- Comprador / Vendedor -->
+        <div class="tx-form-2col">
+          <div class="tx-form-row">
+            <label class="tx-form-label">Comprador / Locatario</label>
+            <input class="tx-form-inp" id="txf-comprador" placeholder="Empresa o persona">
+          </div>
+          <div class="tx-form-row">
+            <label class="tx-form-label">Vendedor / Locador</label>
+            <input class="tx-form-inp" id="txf-vendedor" placeholder="Empresa o persona">
+          </div>
+        </div>
+        <!-- Broker -->
+        <div class="tx-form-row">
+          <label class="tx-form-label">Broker responsable</label>
+          <input class="tx-form-inp" id="txf-broker" placeholder="Nombre del broker">
+        </div>
+        <!-- Superficie / Precio m² / Moneda -->
+        <div class="tx-form-2col">
+          <div class="tx-form-row">
+            <label class="tx-form-label">Superficie (m²)</label>
+            <input class="tx-form-inp" id="txf-superficie" type="number" min="0" placeholder="0" oninput="_txCalcTotal()">
+          </div>
+          <div class="tx-form-row">
+            <label class="tx-form-label">Precio m²</label>
+            <input class="tx-form-inp" id="txf-pm2" type="number" min="0" placeholder="0" oninput="_txCalcTotal()">
+          </div>
+        </div>
+        <div class="tx-form-2col">
+          <div class="tx-form-row">
+            <label class="tx-form-label">Precio Total</label>
+            <input class="tx-form-inp" id="txf-total" type="number" min="0" placeholder="Calculado automáticamente">
+          </div>
+          <div class="tx-form-row">
+            <label class="tx-form-label">Moneda</label>
+            <select class="tx-form-sel" id="txf-moneda">
+              <option value="USD">USD</option>
+              <option value="ARS">ARS</option>
+            </select>
+          </div>
+        </div>
+        <!-- Estado / Fecha -->
+        <div class="tx-form-2col">
+          <div class="tx-form-row">
+            <label class="tx-form-label">Estado<span class="tx-form-req">*</span></label>
+            <select class="tx-form-sel" id="txf-estado">
+              <option value="En negociación">En negociación</option>
+              <option value="Cerrada">Cerrada</option>
+              <option value="Caída">Caída</option>
+            </select>
+          </div>
+          <div class="tx-form-row">
+            <label class="tx-form-label">Fecha</label>
+            <input class="tx-form-inp" id="txf-fecha" type="date">
+          </div>
+        </div>
+        <!-- Notas -->
+        <div class="tx-form-row">
+          <label class="tx-form-label">Notas</label>
+          <textarea class="tx-form-ta" id="txf-notas" placeholder="Observaciones, condiciones, etc."></textarea>
+        </div>
+      </div>
+      <div class="tx-drawer-footer">
+        <button class="tx-drawer-cancel" onclick="closeTxDrawer()">Cancelar</button>
+        <button class="tx-drawer-save" onclick="saveTxDrawer()">Guardar transacción</button>
+      </div>
+    </div>
+  </div>
 </div>
 </div><!-- /main-content -->
 </div><!-- /app-shell -->
@@ -9020,12 +9286,12 @@ function renderTendencias(allDocs,dias){
 }
 
 function show(id){
-  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel"].forEach(s=>{
+  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel","transacciones-panel"].forEach(s=>{
     const el=document.getElementById(s);
     if(!el)return;
     if(s==="ls")el.style.display=s===id?"grid":"none";
     else if(s==="ds")el.style.display=s===id?"flex":"none";
-    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel")el.style.display=s===id?"flex":"none";
+    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel"||s==="transacciones-panel")el.style.display=s===id?"flex":"none";
     else el.style.display=s===id?"block":"none";
   });
   const isApp=id!=="ls"&&id!=="ds";
@@ -9090,7 +9356,7 @@ function _setSbActive(mod,submod){
 function showModule(mod){
   closeMobileSidebar();
   // Close all overlays (including CRM)
-  ['analytics-panel','buildings-panel','admin-panel','crm-panel'].forEach(id=>{
+  ['analytics-panel','buildings-panel','admin-panel','crm-panel','transacciones-panel'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.style.display='none';
   });
@@ -9120,6 +9386,9 @@ function showModule(mod){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
     show('admin-panel');
     cargarRegistros();
+  } else if(mod==='transacciones'){
+    show('transacciones-panel');
+    loadTransacciones();
   }
 }
 function renderHubCards(){
@@ -9171,6 +9440,244 @@ if(localStorage.getItem('colliers-theme')==='dark'){
   const btn=document.getElementById('theme-toggle');
   if(btn)btn.textContent='☀️';
 }
+// ===== TRANSACCIONES MODULE =====
+let _txDocs=[], _txFiltered=[], _txEditId=null;
+
+function loadTransacciones(){
+  db.collection('transacciones').orderBy('fecha','desc').get().then(snap=>{
+    _txDocs=snap.docs.map(d=>({_id:d.id,...d.data()}));
+    _txFiltered=[..._txDocs];
+    _renderTxKpis(_txFiltered);
+    _renderTxTable(_txFiltered);
+  }).catch(e=>console.error('loadTransacciones',e));
+}
+
+function filterTransacciones(){
+  const tipo=(document.getElementById('tx-f-tipo')||{}).value||'';
+  const corredor=(document.getElementById('tx-f-corredor')||{}).value||'';
+  const estado=(document.getElementById('tx-f-estado')||{}).value||'';
+  const comp=((document.getElementById('tx-f-comprador')||{}).value||'').toLowerCase();
+  const vend=((document.getElementById('tx-f-vendedor')||{}).value||'').toLowerCase();
+  const brok=((document.getElementById('tx-f-broker')||{}).value||'').toLowerCase();
+  const desde=(document.getElementById('tx-f-fecha-desde')||{}).value||'';
+  const hasta=(document.getElementById('tx-f-fecha-hasta')||{}).value||'';
+  _txFiltered=_txDocs.filter(d=>{
+    if(tipo&&d.tipo!==tipo)return false;
+    if(corredor&&d.corredor!==corredor)return false;
+    if(estado&&d.estado!==estado)return false;
+    if(comp&&!(d.comprador||'').toLowerCase().includes(comp))return false;
+    if(vend&&!(d.vendedor||'').toLowerCase().includes(vend))return false;
+    if(brok&&!(d.broker||'').toLowerCase().includes(brok))return false;
+    if(desde||hasta){
+      const f=_tsToDate(d.fecha);
+      const fd=f?f.toISOString().slice(0,10):'';
+      if(desde&&fd<desde)return false;
+      if(hasta&&fd>hasta)return false;
+    }
+    return true;
+  });
+  _renderTxKpis(_txFiltered);
+  _renderTxTable(_txFiltered);
+}
+
+function _renderTxKpis(docs){
+  const cerradas=docs.filter(d=>d.estado==='Cerrada');
+  const supTot=docs.reduce((s,d)=>s+(parseFloat(d.superficie)||0),0);
+  const pm2Docs=docs.filter(d=>d.precioM2&&d.superficie);
+  const pm2W=pm2Docs.reduce((s,d)=>s+(parseFloat(d.precioM2)*(parseFloat(d.superficie)||1)),0);
+  const pm2M2=pm2Docs.reduce((s,d)=>s+(parseFloat(d.superficie)||1),0);
+  const avgPm2=pm2M2>0?Math.round(pm2W/pm2M2):null;
+  _setTxt('tx-kpi-total',docs.length);
+  _setTxt('tx-kpi-cerradas',cerradas.length);
+  _setTxt('tx-kpi-sup',supTot>0?_fmtNum(Math.round(supTot))+' m²':'—');
+  _setTxt('tx-kpi-pm2',avgPm2?'USD '+_fmtNum(avgPm2):'—');
+}
+
+function _setTxt(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function _fmtNum(n){return n.toLocaleString('es-AR');}
+
+function _renderTxTable(docs){
+  const tb=document.getElementById('tx-tbody');
+  if(!tb)return;
+  if(!docs.length){
+    tb.innerHTML='<tr><td colspan="11"><div class="tx-empty">No hay transacciones que coincidan con los filtros.</div></td></tr>';
+    return;
+  }
+  tb.innerHTML=docs.map(d=>{
+    const fecha=_tsToDate(d.fecha);
+    const fStr=fecha?fecha.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}):'—';
+    const sup=d.superficie?_fmtNum(parseFloat(d.superficie))+' m²':'—';
+    const pm2=d.precioM2?'USD '+_fmtNum(parseFloat(d.precioM2)):'—';
+    const tot=d.precioTotal?'USD '+_fmtNum(parseFloat(d.precioTotal)):(d.superficie&&d.precioM2?'USD '+_fmtNum(Math.round(parseFloat(d.superficie)*parseFloat(d.precioM2))):'—');
+    const badgeCls=d.estado==='Cerrada'?'tx-badge-cerr':d.estado==='Caída'?'tx-badge-caid':'tx-badge-neg';
+    return `<tr>
+      <td style="white-space:nowrap;color:#56648F;font-size:11.5px">${esc(fStr)}</td>
+      <td><span style="font-size:11px;background:#EFF3FF;color:#1C54F4;padding:2px 8px;border-radius:20px;font-weight:600">${esc(d.tipo||'')}</span></td>
+      <td style="font-weight:600;color:#0A1B4D;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.inmueble||'—')}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.comprador||'—')}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.vendedor||'—')}</td>
+      <td>${esc(d.broker||'—')}</td>
+      <td>${esc(sup)}</td>
+      <td>${esc(pm2)}</td>
+      <td style="font-weight:600">${esc(tot)}</td>
+      <td><span class="tx-badge ${badgeCls}">${esc(d.estado||'')}</span></td>
+      <td style="white-space:nowrap">
+        <button onclick="openEditTx('${d._id}')" style="background:none;border:none;color:#1C54F4;font-size:11px;cursor:pointer;font-weight:600;padding:2px 6px">Editar</button>
+        <button onclick="deleteTx('${d._id}')" style="background:none;border:none;color:#EF4444;font-size:11px;cursor:pointer;font-weight:600;padding:2px 6px">Eliminar</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openNewTransaccion(){
+  _txEditId=null;
+  document.getElementById('tx-drawer-title').textContent='Nueva Transacción';
+  ['txf-tipo','txf-corredor','txf-inmueble','txf-inmueble-id','txf-comprador','txf-vendedor','txf-broker','txf-superficie','txf-pm2','txf-total','txf-notas'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value='';
+  });
+  const fe=document.getElementById('txf-fecha');
+  if(fe)fe.value=new Date().toISOString().slice(0,10);
+  const est=document.getElementById('txf-estado');
+  if(est)est.value='En negociación';
+  const mon=document.getElementById('txf-moneda');
+  if(mon)mon.value='USD';
+  document.querySelectorAll('.tx-form-inp,.tx-form-sel').forEach(el=>el.classList.remove('tx-err'));
+  const ov=document.getElementById('tx-drawer-overlay');
+  if(ov)ov.classList.add('open');
+}
+
+function openEditTx(id){
+  const d=_txDocs.find(x=>x._id===id);
+  if(!d)return;
+  _txEditId=id;
+  document.getElementById('tx-drawer-title').textContent='Editar Transacción';
+  _txSetVal('txf-tipo',d.tipo||'');
+  _txSetVal('txf-corredor',d.corredor||'');
+  _txSetVal('txf-inmueble',d.inmueble||'');
+  _txSetVal('txf-inmueble-id',d.inmuebleId||'');
+  _txSetVal('txf-comprador',d.comprador||'');
+  _txSetVal('txf-vendedor',d.vendedor||'');
+  _txSetVal('txf-broker',d.broker||'');
+  _txSetVal('txf-superficie',d.superficie||'');
+  _txSetVal('txf-pm2',d.precioM2||'');
+  _txSetVal('txf-total',d.precioTotal||'');
+  _txSetVal('txf-moneda',d.moneda||'USD');
+  _txSetVal('txf-estado',d.estado||'En negociación');
+  _txSetVal('txf-notas',d.notas||'');
+  const fecha=_tsToDate(d.fecha);
+  const fe=document.getElementById('txf-fecha');
+  if(fe)fe.value=fecha?fecha.toISOString().slice(0,10):'';
+  document.querySelectorAll('.tx-form-inp,.tx-form-sel').forEach(el=>el.classList.remove('tx-err'));
+  const ov=document.getElementById('tx-drawer-overlay');
+  if(ov)ov.classList.add('open');
+}
+
+function _txSetVal(id,val){const el=document.getElementById(id);if(el)el.value=val;}
+
+function closeTxDrawer(){
+  const ov=document.getElementById('tx-drawer-overlay');
+  if(ov)ov.classList.remove('open');
+  const res=document.getElementById('tx-inmueble-results');
+  if(res)res.style.display='none';
+}
+
+function _txDrawerBgClick(e){
+  if(e.target===document.getElementById('tx-drawer-overlay'))closeTxDrawer();
+}
+
+function _txCalcTotal(){
+  const sup=parseFloat((document.getElementById('txf-superficie')||{}).value)||0;
+  const pm2=parseFloat((document.getElementById('txf-pm2')||{}).value)||0;
+  const tot=document.getElementById('txf-total');
+  if(tot&&sup>0&&pm2>0)tot.value=Math.round(sup*pm2);
+}
+
+function _txUpdateInmuebleHint(){
+  const res=document.getElementById('tx-inmueble-results');
+  if(res)res.style.display='none';
+}
+
+function _txSearchInmueble(q){
+  const res=document.getElementById('tx-inmueble-results');
+  if(!res)return;
+  if(!q||q.length<2){res.style.display='none';return;}
+  const ql=q.toLowerCase();
+  const matches=_bldDocs.filter(b=>(b.nombre||'').toLowerCase().includes(ql)||(b.direccion||'').toLowerCase().includes(ql)).slice(0,8);
+  const tipo=(document.getElementById('txf-tipo')||{}).value||'';
+  const html=matches.map(b=>`<div class="tx-inmueble-opt" onclick="_txSelectInmueble('${b._id}','${esc(b.nombre||b.direccion||'').replace(/'/g,'\'')}')">${esc(b.nombre||b.direccion||b._id)}</div>`).join('')
+    +`<div class="tx-inmueble-create" onclick="_txCreateInmueble()">+ Crear nuevo inmueble${tipo?' de tipo '+tipo:''}</div>`;
+  res.innerHTML=html;
+  res.style.display='block';
+}
+
+function _txSelectInmueble(id,nombre){
+  _txSetVal('txf-inmueble',nombre);
+  _txSetVal('txf-inmueble-id',id);
+  const b=_bldDocs.find(x=>x._id===id);
+  if(b){
+    if(b.corredor||b.zona){const sel=document.getElementById('txf-corredor');if(sel)sel.value=b.corredor||b.zona||'';}
+  }
+  const res=document.getElementById('tx-inmueble-results');
+  if(res)res.style.display='none';
+}
+
+function _txCreateInmueble(){
+  closeTxDrawer();
+  showModule('buildings');
+}
+
+function saveTxDrawer(){
+  const tipo=(document.getElementById('txf-tipo')||{}).value||'';
+  const inmueble=(document.getElementById('txf-inmueble')||{}).value||'';
+  let valid=true;
+  const req=['txf-tipo','txf-inmueble'];
+  req.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    if(!el.value.trim()){el.classList.add('tx-err');valid=false;}
+    else el.classList.remove('tx-err');
+  });
+  if(!valid)return;
+  const fechaVal=(document.getElementById('txf-fecha')||{}).value||'';
+  const data={
+    tipo,
+    inmueble,
+    inmuebleId:(document.getElementById('txf-inmueble-id')||{}).value||'',
+    corredor:(document.getElementById('txf-corredor')||{}).value||'',
+    comprador:(document.getElementById('txf-comprador')||{}).value||'',
+    vendedor:(document.getElementById('txf-vendedor')||{}).value||'',
+    broker:(document.getElementById('txf-broker')||{}).value||'',
+    superficie:parseFloat((document.getElementById('txf-superficie')||{}).value)||null,
+    precioM2:parseFloat((document.getElementById('txf-pm2')||{}).value)||null,
+    precioTotal:parseFloat((document.getElementById('txf-total')||{}).value)||null,
+    moneda:(document.getElementById('txf-moneda')||{}).value||'USD',
+    estado:(document.getElementById('txf-estado')||{}).value||'En negociación',
+    notas:(document.getElementById('txf-notas')||{}).value||'',
+    fecha:fechaVal?firebase.firestore.Timestamp.fromDate(new Date(fechaVal)):firebase.firestore.Timestamp.now(),
+    updatedAt:firebase.firestore.Timestamp.now(),
+    updatedBy:user?.email||''
+  };
+  const btn=document.querySelector('#tx-drawer .tx-drawer-save');
+  if(btn){btn.disabled=true;btn.textContent='Guardando...';}
+  const ref=_txEditId?db.collection('transacciones').doc(_txEditId):db.collection('transacciones').doc();
+  const payload=_txEditId?data:{...data,createdAt:firebase.firestore.Timestamp.now(),createdBy:user?.email||''};
+  ref.set(payload,{merge:true}).then(()=>{
+    closeTxDrawer();
+    loadTransacciones();
+  }).catch(e=>{
+    console.error('saveTxDrawer',e);
+    alert('Error al guardar: '+e.message);
+  }).finally(()=>{
+    if(btn){btn.disabled=false;btn.textContent='Guardar transacción';}
+  });
+}
+
+function deleteTx(id){
+  if(!confirm('¿Eliminar esta transacción?'))return;
+  db.collection('transacciones').doc(id).delete().then(()=>loadTransacciones()).catch(e=>alert('Error: '+e.message));
+}
+
 </script>
 <!-- UNIT CRM AUTOCOMPLETE DROPDOWN — outside all panels so position:fixed works from any module -->
 <div id="du-ac-dropdown"></div>
