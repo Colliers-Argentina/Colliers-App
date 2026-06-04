@@ -397,6 +397,22 @@ body.dark .an-map-legend-title{color:#6B7FA3}
 .an-map-legend-item{display:flex;align-items:center;gap:.4rem;font-size:10px;color:#353E59;margin-bottom:.18rem}
 body.dark .an-map-legend-item{color:#C3E6FF}
 .an-map-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1.5px solid rgba(255,255,255,.6)}
+.an-zone-panel{width:0;overflow:hidden;transition:width .3s ease;background:#fff;border-left:1px solid #E8EFF8;display:flex;flex-direction:column;min-height:0}
+body.dark .an-zone-panel{background:rgba(8,14,50,.85);border-left-color:rgba(255,255,255,.07)}
+.an-zone-panel.open{width:270px}
+.an-zone-panel-hd{padding:.6rem .9rem .45rem;border-bottom:1px solid #F2F6FF;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.an-zone-panel-close{background:none;border:none;font-size:16px;color:#8898C0;cursor:pointer;padding:0;line-height:1}
+.an-zone-panel-body{padding:.7rem .9rem;overflow-y:auto;flex:1}
+.an-zone-panel-sec{font-size:9px;font-weight:700;color:#8898C0;text-transform:uppercase;letter-spacing:.05em;margin:.6rem 0 .3rem}
+.an-zone-panel-sec:first-child{margin-top:0}
+.an-zone-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.7rem}
+.an-zone-stat{background:#F4F7FF;border-radius:8px;padding:.45rem .65rem}
+body.dark .an-zone-stat{background:rgba(28,84,244,.08)}
+.an-zone-stat-val{font-size:17px;font-weight:700;color:#1C54F4}
+.an-zone-stat-lbl{font-size:9px;font-weight:700;color:#8898C0;text-transform:uppercase;letter-spacing:.04em}
+.an-map-legend-bar{display:flex;gap:.25rem;align-items:center;margin-top:.55rem}
+.an-map-legend-sq{width:14px;height:14px;border-radius:3px;flex-shrink:0;border:1px solid rgba(0,0,0,.08)}
+.an-map-legend-lbl{font-size:9px;color:#56648F}
 .leaflet-tooltip.an-tt{background:#fff;border:1px solid #E2EAF4;border-radius:8px;padding:.45rem .65rem;box-shadow:0 4px 16px rgba(0,7,89,.12);pointer-events:none}
 body.dark .leaflet-tooltip.an-tt{background:#0A1B4D;border-color:rgba(255,255,255,.1)}
 .leaflet-tooltip.an-tt::before{display:none}
@@ -1954,8 +1970,11 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div id="an-brokers-lb" class="an-brokers-row"></div>
     </div>
     <div class="an-card" id="an-map-card">
-      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">tamaño = intensidad</div></div>
-      <div style="padding:0"><div id="an-demand-map" style="height:300px;width:100%;border-radius:0 0 11px 11px"></div></div>
+      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Demanda · CABA</div><div class="an-card-hint">click zona para filtrar</div></div>
+      <div style="padding:0;display:flex;overflow:hidden;border-radius:0 0 11px 11px">
+        <div id="an-demand-map" style="height:500px;flex:1;min-width:0"></div>
+        <div id="an-zone-side-panel" class="an-zone-panel"></div>
+      </div>
     </div>
     <div class="an-card" id="an-tend-card">
       <div class="an-tend-hdr">
@@ -7680,26 +7699,57 @@ function closeAnBldPanel(){
 }
 
 // Phase 4 — CABA demand heatmap
-const _CABA_ZONE_COORDS={
-  'Microcentro':[-34.6037,-58.3739],'Catalinas':[-34.5973,-58.3745],'Puerto Madero':[-34.6135,-58.3617],
-  'Plaza Roma':[-34.5997,-58.3758],'Retiro':[-34.5953,-58.3770],'Macrocentro':[-34.6150,-58.3900],
-  'Macrocentro Sur':[-34.6260,-58.3950],'Palermo':[-34.5797,-58.4239],'Belgrano':[-34.5594,-58.4578],
-  'Norte CABA':[-34.5700,-58.4350],'Libertador':[-34.5750,-58.4180],'Barrio Norte':[-34.5883,-58.3941],
-  'Sur CABA':[-34.6450,-58.3920],'San Telmo':[-34.6211,-58.3711],'Flores':[-34.6258,-58.4642],
-  'Monserrat':[-34.6155,-58.3783],'Barracas':[-34.6469,-58.3760],'Almagro':[-34.6058,-58.4194],
-  'Caballito':[-34.6186,-58.4430],'Once':[-34.6087,-58.4097],'Villa Urquiza':[-34.5756,-58.4775],
-  'Saavedra':[-34.5630,-58.4785],'Villa del Parque':[-34.6033,-58.4816],'Núñez':[-34.5500,-58.4668],
-  'Colegiales':[-34.5706,-58.4495],'Chacarita':[-34.5853,-58.4555],'Villa Crespo':[-34.5958,-58.4438],
-  'Boedo':[-34.6283,-58.4178],'Constitución':[-34.6306,-58.3858],'San Cristóbal':[-34.6194,-58.3969],
-  'Parque Patricios':[-34.6408,-58.3981],'Vicente López':[-34.5225,-58.4731],'San Isidro':[-34.4723,-58.5070],
-  'Panamericana':[-34.5050,-58.5200],'Norte GBA':[-34.5050,-58.5200],'GBA Norte':[-34.5050,-58.5200]
-};
+const _AN_ZONE_GEOJSON={type:'FeatureCollection',features:[
+  {type:'Feature',properties:{zona:'Puerto Madero'},geometry:{type:'Polygon',coordinates:[[[-58.374,-34.573],[-58.356,-34.573],[-58.356,-34.626],[-58.374,-34.626],[-58.374,-34.573]]]}},
+  {type:'Feature',properties:{zona:'Catalinas'},geometry:{type:'Polygon',coordinates:[[[-58.382,-34.592],[-58.365,-34.592],[-58.365,-34.603],[-58.382,-34.603],[-58.382,-34.592]]]}},
+  {type:'Feature',properties:{zona:'Microcentro'},geometry:{type:'Polygon',coordinates:[[[-58.387,-34.598],[-58.368,-34.598],[-58.368,-34.616],[-58.387,-34.616],[-58.387,-34.598]]]}},
+  {type:'Feature',properties:{zona:'Plaza Roma'},geometry:{type:'Polygon',coordinates:[[[-58.382,-34.596],[-58.367,-34.596],[-58.367,-34.604],[-58.382,-34.604],[-58.382,-34.596]]]}},
+  {type:'Feature',properties:{zona:'Retiro'},geometry:{type:'Polygon',coordinates:[[[-58.396,-34.585],[-58.366,-34.585],[-58.366,-34.598],[-58.396,-34.598],[-58.396,-34.585]]]}},
+  {type:'Feature',properties:{zona:'Macrocentro'},geometry:{type:'Polygon',coordinates:[[[-58.412,-34.595],[-58.382,-34.595],[-58.382,-34.626],[-58.412,-34.626],[-58.412,-34.595]]]}},
+  {type:'Feature',properties:{zona:'Macrocentro Sur'},geometry:{type:'Polygon',coordinates:[[[-58.414,-34.622],[-58.374,-34.622],[-58.374,-34.650],[-58.414,-34.650],[-58.414,-34.622]]]}},
+  {type:'Feature',properties:{zona:'Barrio Norte'},geometry:{type:'Polygon',coordinates:[[[-58.410,-34.580],[-58.380,-34.580],[-58.380,-34.604],[-58.410,-34.604],[-58.410,-34.580]]]}},
+  {type:'Feature',properties:{zona:'Libertador'},geometry:{type:'Polygon',coordinates:[[[-58.434,-34.566],[-58.378,-34.566],[-58.378,-34.588],[-58.434,-34.588],[-58.434,-34.566]]]}},
+  {type:'Feature',properties:{zona:'Palermo'},geometry:{type:'Polygon',coordinates:[[[-58.462,-34.564],[-58.416,-34.564],[-58.416,-34.602],[-58.462,-34.602],[-58.462,-34.564]]]}},
+  {type:'Feature',properties:{zona:'Norte CABA'},geometry:{type:'Polygon',coordinates:[[[-58.484,-34.542],[-58.406,-34.542],[-58.406,-34.572],[-58.484,-34.572],[-58.484,-34.542]]]}},
+  {type:'Feature',properties:{zona:'Belgrano'},geometry:{type:'Polygon',coordinates:[[[-58.474,-34.545],[-58.440,-34.545],[-58.440,-34.574],[-58.474,-34.574],[-58.474,-34.545]]]}},
+  {type:'Feature',properties:{zona:'Núñez'},geometry:{type:'Polygon',coordinates:[[[-58.484,-34.538],[-58.456,-34.538],[-58.456,-34.558],[-58.484,-34.558],[-58.484,-34.538]]]}},
+  {type:'Feature',properties:{zona:'Saavedra'},geometry:{type:'Polygon',coordinates:[[[-58.494,-34.552],[-58.466,-34.552],[-58.466,-34.574],[-58.494,-34.574],[-58.494,-34.552]]]}},
+  {type:'Feature',properties:{zona:'Villa Urquiza'},geometry:{type:'Polygon',coordinates:[[[-58.494,-34.566],[-58.464,-34.566],[-58.464,-34.594],[-58.494,-34.594],[-58.494,-34.566]]]}},
+  {type:'Feature',properties:{zona:'Colegiales'},geometry:{type:'Polygon',coordinates:[[[-58.462,-34.558],[-58.436,-34.558],[-58.436,-34.580],[-58.462,-34.580],[-58.462,-34.558]]]}},
+  {type:'Feature',properties:{zona:'Chacarita'},geometry:{type:'Polygon',coordinates:[[[-58.468,-34.574],[-58.440,-34.574],[-58.440,-34.598],[-58.468,-34.598],[-58.468,-34.574]]]}},
+  {type:'Feature',properties:{zona:'Villa Crespo'},geometry:{type:'Polygon',coordinates:[[[-58.452,-34.590],[-58.428,-34.590],[-58.428,-34.610],[-58.452,-34.610],[-58.452,-34.590]]]}},
+  {type:'Feature',properties:{zona:'Almagro'},geometry:{type:'Polygon',coordinates:[[[-58.444,-34.596],[-58.418,-34.596],[-58.418,-34.622],[-58.444,-34.622],[-58.444,-34.596]]]}},
+  {type:'Feature',properties:{zona:'Once'},geometry:{type:'Polygon',coordinates:[[[-58.424,-34.602],[-58.400,-34.602],[-58.400,-34.622],[-58.424,-34.622],[-58.424,-34.602]]]}},
+  {type:'Feature',properties:{zona:'Caballito'},geometry:{type:'Polygon',coordinates:[[[-58.466,-34.606],[-58.430,-34.606],[-58.430,-34.638],[-58.466,-34.638],[-58.466,-34.606]]]}},
+  {type:'Feature',properties:{zona:'Boedo'},geometry:{type:'Polygon',coordinates:[[[-58.434,-34.618],[-58.406,-34.618],[-58.406,-34.646],[-58.434,-34.646],[-58.434,-34.618]]]}},
+  {type:'Feature',properties:{zona:'Flores'},geometry:{type:'Polygon',coordinates:[[[-58.488,-34.616],[-58.452,-34.616],[-58.452,-34.648],[-58.488,-34.648],[-58.488,-34.616]]]}},
+  {type:'Feature',properties:{zona:'Villa del Parque'},geometry:{type:'Polygon',coordinates:[[[-58.508,-34.592],[-58.468,-34.592],[-58.468,-34.620],[-58.508,-34.620],[-58.508,-34.592]]]}},
+  {type:'Feature',properties:{zona:'Monserrat'},geometry:{type:'Polygon',coordinates:[[[-58.390,-34.611],[-58.368,-34.611],[-58.368,-34.628],[-58.390,-34.628],[-58.390,-34.611]]]}},
+  {type:'Feature',properties:{zona:'San Telmo'},geometry:{type:'Polygon',coordinates:[[[-58.382,-34.616],[-58.360,-34.616],[-58.360,-34.636],[-58.382,-34.636],[-58.382,-34.616]]]}},
+  {type:'Feature',properties:{zona:'Constitución'},geometry:{type:'Polygon',coordinates:[[[-58.400,-34.626],[-58.366,-34.626],[-58.366,-34.648],[-58.400,-34.648],[-58.400,-34.626]]]}},
+  {type:'Feature',properties:{zona:'San Cristóbal'},geometry:{type:'Polygon',coordinates:[[[-58.412,-34.612],[-58.386,-34.612],[-58.386,-34.634],[-58.412,-34.634],[-58.412,-34.612]]]}},
+  {type:'Feature',properties:{zona:'Barracas'},geometry:{type:'Polygon',coordinates:[[[-58.396,-34.642],[-58.353,-34.642],[-58.353,-34.672],[-58.396,-34.672],[-58.396,-34.642]]]}},
+  {type:'Feature',properties:{zona:'Parque Patricios'},geometry:{type:'Polygon',coordinates:[[[-58.412,-34.634],[-58.388,-34.634],[-58.388,-34.658],[-58.412,-34.658],[-58.412,-34.634]]]}},
+  {type:'Feature',properties:{zona:'Sur CABA'},geometry:{type:'Polygon',coordinates:[[[-58.420,-34.638],[-58.350,-34.638],[-58.350,-34.690],[-58.420,-34.690],[-58.420,-34.638]]]}},
+  {type:'Feature',properties:{zona:'Norte GBA'},geometry:{type:'Polygon',coordinates:[[[-58.540,-34.466],[-58.380,-34.466],[-58.380,-34.548],[-58.540,-34.548],[-58.540,-34.466]]]}},
+  {type:'Feature',properties:{zona:'GBA Norte'},geometry:{type:'Polygon',coordinates:[[[-58.540,-34.466],[-58.380,-34.466],[-58.380,-34.548],[-58.540,-34.548],[-58.540,-34.466]]]}},
+  {type:'Feature',properties:{zona:'Vicente López'},geometry:{type:'Polygon',coordinates:[[[-58.496,-34.506],[-58.432,-34.506],[-58.432,-34.536],[-58.496,-34.536],[-58.496,-34.506]]]}},
+  {type:'Feature',properties:{zona:'San Isidro'},geometry:{type:'Polygon',coordinates:[[[-58.540,-34.464],[-58.454,-34.464],[-58.454,-34.510],[-58.540,-34.510],[-58.540,-34.464]]]}},
+  {type:'Feature',properties:{zona:'Panamericana'},geometry:{type:'Polygon',coordinates:[[[-58.560,-34.482],[-58.506,-34.482],[-58.506,-34.524],[-58.560,-34.524],[-58.560,-34.482]]]}},
+]};
 
-function _heatColor(t){
-  if(t<0.25)return{fill:'#FDE68A',stroke:'#F59E0B'};
-  if(t<0.5)return{fill:'#FCA5A5',stroke:'#EF4444'};
-  if(t<0.75)return{fill:'#F97316',stroke:'#C2410C'};
-  return{fill:'#DC2626',stroke:'#7F1D1D'};
+function _anZoneColor(count){
+  if(count>=30)return'#7F1D1D';
+  if(count>=20)return'#DC2626';
+  if(count>=10)return'#F97316';
+  if(count>=5)return'#FDE68A';
+  return'#E2EAF4';
+}
+
+function _anZoneStyle(zona,zonaCount,selectedZonas){
+  const count=zonaCount[zona]||0;
+  const sel=selectedZonas.size===0||selectedZonas.has(zona);
+  return{fillColor:_anZoneColor(count),fillOpacity:sel?0.65:0.18,color:'#1C54F4',weight:sel?1.5:0.7,opacity:sel?0.9:0.4};
 }
 
 function renderAnDemandMap(docs){
