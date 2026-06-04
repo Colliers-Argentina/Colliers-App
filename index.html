@@ -1313,6 +1313,44 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 .sb-logout-btn{width:100%;padding:.6rem;background:rgba(239,51,64,.08);border:1px solid rgba(239,51,64,.18);color:#EF3340;font-family:inherit;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;transition:all .15s}
 .sb-logout-btn:hover{background:rgba(239,51,64,.15);border-color:rgba(239,51,64,.4)}
 
+/* ===== SIDEBAR v2 — collapsible grouped nav ===== */
+#app-sidebar{transition:width .25s ease,min-width .25s ease}
+body.sb-collapsed #app-sidebar{width:68px!important;min-width:68px!important;overflow:hidden}
+#app-sidebar nav.sb-nav{padding:.4rem 0!important}
+.sb-collapse-btn{background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.18);color:#C3E6FF;padding:5px 8px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s;flex-shrink:0}
+.sb-collapse-btn:hover{background:rgba(77,147,255,.22);border-color:rgba(77,147,255,.4)}
+.sb-brand-collapsible{flex:1;overflow:hidden;transition:opacity .2s,max-width .2s;max-width:220px}
+body.sb-collapsed .sb-brand-collapsible{opacity:0;max-width:0;pointer-events:none}
+.sb-user-collapsible{flex:1;overflow:hidden;min-width:0;transition:opacity .18s}
+body.sb-collapsed .sb-user-collapsible{opacity:0;pointer-events:none}
+.sb-item-solo{display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem .55rem 12px;cursor:pointer;color:rgba(163,193,255,.7);font-size:12.5px;font-weight:500;transition:all .15s;border:none;background:transparent;font-family:inherit;width:calc(100% - 16px);text-align:left;position:relative;margin:2px 8px;border-radius:8px;border-left:3px solid transparent;white-space:nowrap;overflow:hidden}
+.sb-item-solo:hover{background:rgba(77,147,255,.12);color:#C3E6FF}
+.sb-item-solo.active{background:linear-gradient(90deg,rgba(77,147,255,.2),rgba(28,84,244,.08));color:#fff;font-weight:700;border-left-color:#4D93FF}
+.sb-item-solo-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+body.sb-collapsed .sb-item-solo{width:44px!important;margin:2px auto!important;justify-content:center;padding:.55rem}
+body.sb-collapsed .sb-item-solo>span:not(.sb-item-solo-icon){display:none}
+.sb-grp-sep{height:1px;background:rgba(77,147,255,.07);margin:6px 12px}
+.sb-grp-hd{display:flex;align-items:center;gap:9px;padding:5px 12px;background:none;border:none;width:100%;text-align:left;cursor:pointer;color:rgba(163,193,255,.38);font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;transition:color .15s;font-family:inherit;white-space:nowrap;margin-top:5px}
+.sb-grp-hd:hover{color:rgba(163,193,255,.75)}
+.sb-grp-hd-icon{font-size:14px;width:22px;text-align:center;flex-shrink:0}
+.sb-grp-hd-label{flex:1;overflow:hidden;white-space:nowrap;transition:opacity .2s,max-width .2s;max-width:200px}
+body.sb-collapsed .sb-grp-hd-label{opacity:0;max-width:0}
+.sb-chevron{font-size:11px;transition:transform .22s;flex-shrink:0;opacity:.45;line-height:1;margin-left:auto}
+.sb-grp.open>.sb-grp-hd>.sb-chevron{transform:rotate(90deg)}
+body.sb-collapsed .sb-chevron{display:none!important}
+.sb-grp-body{overflow:hidden;max-height:600px;transition:max-height .25s ease}
+.sb-grp-body.sb-closed{max-height:0!important}
+body.sb-collapsed .sb-grp-body{display:none!important}
+.sb-item{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 34px;background:none;border:none;border-left:3px solid transparent;width:100%;text-align:left;cursor:pointer;color:rgba(163,193,255,.58);font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;transition:all .15s;font-family:inherit;line-height:1.3}
+.sb-item:hover:not([disabled]){background:rgba(77,147,255,.1);color:#C3E6FF;border-left-color:rgba(77,147,255,.28)}
+.sb-item.active{background:linear-gradient(90deg,rgba(77,147,255,.18),rgba(28,84,244,.04));color:#fff;border-left-color:#4D93FF;font-weight:600}
+.sb-item[disabled]{opacity:.32;cursor:default;pointer-events:none}
+.sb-soon-badge{margin-left:auto;font-size:9px;background:rgba(163,193,255,.07);color:rgba(163,193,255,.38);padding:1px 5px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;flex-shrink:0}
+.sb-footer-label{overflow:hidden;white-space:nowrap;transition:opacity .15s,max-width .15s;max-width:120px}
+body.sb-collapsed .sb-footer-label{opacity:0;max-width:0}
+body.sb-collapsed .sb-footer{justify-content:center!important;gap:6px!important}
+
+
 /* ===== HOME HUB ===== */
 #home-hub{display:none;background:url('home-bg.jpg') center/cover no-repeat;background-attachment:local;overflow-y:auto;min-width:0;flex:1;height:100%;position:relative}
 #home-hub::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(2,6,23,.88) 0%,rgba(3,10,30,.80) 50%,rgba(2,8,24,.75) 100%);pointer-events:none;z-index:0}
@@ -1803,46 +1841,139 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 <div id="app-shell">
 <!-- APP SIDEBAR -->
 <div id="app-sidebar">
-  <div class="sb-logo-area">
-    <div class="sb-brand">Colliers Nexus</div>
-    <div class="sb-brand-bar"></div>
-    <div class="sb-brand-sub">Plataforma Inteligente de Real Estate</div>
+  <!-- Brand + collapse toggle -->
+  <div class="sb-logo-area" style="display:flex;align-items:center;gap:8px">
+    <div class="sb-brand-collapsible">
+      <div class="sb-brand">Colliers Nexus</div>
+      <div class="sb-brand-bar"></div>
+      <div class="sb-brand-sub">Plataforma de Real Estate</div>
+    </div>
+    <button class="sb-collapse-btn" onclick="_sbToggle()" title="Colapsar menú">☰</button>
   </div>
-  <div class="sb-user" id="sb-user-area">
-    <div style="display:flex;align-items:center;gap:.65rem">
-      <div class="sb-avatar" id="sb-avatar">CO</div>
-      <div>
-        <div class="sb-user-name" id="sb-user-name">Usuario</div>
-        <div class="sb-user-email" id="sb-user-email"></div>
+
+  <!-- User -->
+  <div class="sb-user" id="sb-user-area" style="display:flex;align-items:center;gap:.65rem">
+    <div class="sb-avatar" id="sb-avatar" style="flex-shrink:0">CO</div>
+    <div class="sb-user-collapsible">
+      <div class="sb-user-name" id="sb-user-name">Usuario</div>
+      <div class="sb-user-email" id="sb-user-email"></div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="sb-nav" id="sb-nav">
+
+    <!-- 🏠 Dashboard -->
+    <button class="sb-item-solo active" id="sbn-home" data-mod="home" onclick="_sbItemClick('home',null)">
+      <span class="sb-item-solo-icon">⊞</span><span>Dashboard</span>
+    </button>
+
+    <div class="sb-grp-sep"></div>
+
+    <!-- 📄 Presentaciones -->
+    <div class="sb-grp open" id="sbg-ppt">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-ppt')">
+        <span class="sb-grp-hd-icon">📄</span>
+        <span class="sb-grp-hd-label">Presentaciones</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body" id="sbb-ppt">
+        <button class="sb-item" data-mod="generator" onclick="_sbItemClick('generator',null)">Generador PPT</button>
+        <button class="sb-item" disabled><span>Historial de PPTs</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Plantillas</span><span class="sb-soon-badge">Pronto</span></button>
       </div>
     </div>
-  </div>
-  <nav class="sb-nav">
-    <button class="sb-nav-item active" id="sbn-home" onclick="showModule('home')">
-      <span class="sb-nav-icon">⊞</span>Dashboard
-    </button>
-    <button class="sb-nav-item" id="sbn-generator" onclick="showModule('generator')">
-      <span class="sb-nav-icon">📄</span>Generador PPTs
-    </button>
-    <button class="sb-nav-item" id="sbn-buildings" onclick="showModule('buildings')">
-      <span class="sb-nav-icon">🏢</span>Inventario
-    </button>
-    <button class="sb-nav-item" id="sbn-crm" onclick="showModule('crm')">
-      <span class="sb-nav-icon">👥</span>CRM
-    </button>
-    <button class="sb-nav-item" id="sbn-analytics" onclick="showModule('analytics')" style="display:none">
-      <span class="sb-nav-icon">📊</span>Analytics
-    </button>
-    <button class="sb-nav-item" id="sbn-admin" onclick="showModule('admin')" style="display:none">
-      <span class="sb-nav-icon">🛡️</span>Administrador
-    </button>
-  </nav>
-  <div class="sb-footer">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
-      <span style="font-size:11px;color:rgba(163,193,255,.45)">Tema</span>
-      <button id="theme-toggle" onclick="toggleTheme()" style="background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.2);color:#C3E6FF;font-size:15px;padding:4px 10px;border-radius:6px;cursor:pointer;line-height:1;transition:all .15s">🌙</button>
+
+    <!-- 🏢 Inventario -->
+    <div class="sb-grp open" id="sbg-inv">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-inv')">
+        <span class="sb-grp-hd-icon">🏢</span>
+        <span class="sb-grp-hd-label">Inventario</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body" id="sbb-inv">
+        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Inventario General</button>
+        <button class="sb-item" disabled><span>Disponibilidad por Zona</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Disponibilidad por Edificio</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Pisos / Componentes</span><span class="sb-soon-badge">Pronto</span></button>
+      </div>
     </div>
-    <button class="sb-logout-btn" onclick="logout()">← Cerrar sesión</button>
+
+    <!-- 👥 CRM -->
+    <div class="sb-grp open" id="sbg-crm">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-crm')">
+        <span class="sb-grp-hd-icon">👥</span>
+        <span class="sb-grp-hd-label">CRM</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body" id="sbb-crm">
+        <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')">Leads</button>
+        <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')">Clientes</button>
+        <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')">Contactos</button>
+        <button class="sb-item" disabled><span>Llamadas</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Visitas</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Funnel Comercial</span><span class="sb-soon-badge">Pronto</span></button>
+      </div>
+    </div>
+
+    <!-- 🏙️ Inmuebles -->
+    <div class="sb-grp" id="sbg-bld">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-bld')">
+        <span class="sb-grp-hd-icon">🏙️</span>
+        <span class="sb-grp-hd-label">Inmuebles</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body sb-closed" id="sbb-bld">
+        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Edificios</button>
+        <button class="sb-item" disabled><span>Historial de Inmuebles</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Comparador de Edificios</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Mapa de Mercado</span><span class="sb-soon-badge">Pronto</span></button>
+      </div>
+    </div>
+
+    <!-- 📊 Inteligencia Comercial (guarded) -->
+    <div class="sb-grp sb-guarded" id="sbg-ic" style="display:none">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-ic')">
+        <span class="sb-grp-hd-icon">📊</span>
+        <span class="sb-grp-hd-label">Inteligencia Comercial</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body sb-closed" id="sbb-ic">
+        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Analytics General</button>
+        <button class="sb-item" disabled><span>Zonas Demandadas</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Heatmap de Demanda</button>
+        <button class="sb-item" disabled><span>Tendencias de Mercado</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Ranking de Edificios</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Ranking de Ejecutivos</span><span class="sb-soon-badge">Pronto</span></button>
+      </div>
+    </div>
+
+    <!-- ⚙️ Administración (guarded) -->
+    <div class="sb-grp sb-guarded" id="sbg-adm" style="display:none">
+      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-adm')">
+        <span class="sb-grp-hd-icon">⚙️</span>
+        <span class="sb-grp-hd-label">Administración</span>
+        <span class="sb-chevron">›</span>
+      </button>
+      <div class="sb-grp-body sb-closed" id="sbb-adm">
+        <button class="sb-item" data-mod="admin" onclick="_sbItemClick('admin',null)">Usuarios</button>
+        <button class="sb-item" disabled><span>Configuración</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Permisos</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Auditoría</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" disabled><span>Logs</span><span class="sb-soon-badge">Pronto</span></button>
+      </div>
+    </div>
+
+  </nav>
+
+  <!-- Footer -->
+  <div class="sb-footer" style="display:flex;align-items:center;gap:8px">
+    <button id="theme-toggle" onclick="toggleTheme()" style="background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.2);color:#C3E6FF;font-size:15px;padding:4px 9px;border-radius:6px;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0">🌙</button>
+    <span class="sb-footer-label" style="font-size:10px;color:rgba(163,193,255,.3)">Nexus v2</span>
+    <button class="sb-logout-btn" onclick="logout()" style="margin-left:auto;width:auto!important;padding:.4rem .8rem;display:flex;align-items:center;gap:6px">
+      <span style="flex-shrink:0;font-size:13px">⏻</span><span class="sb-footer-label">Salir</span>
+    </button>
   </div>
 </div>
 <div id="main-content">
@@ -3130,10 +3261,8 @@ function onUserLoggedIn(){
   const greeting=h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
   const firstName=(user.displayName||'').split(' ')[0]||'Broker';
   const greetEl=document.getElementById('hub-greeting');if(greetEl)greetEl.textContent='¡'+greeting+', '+firstName+'!';
-  // Show admin-only sidebar items only for whitelist
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
-  const sbAnBtn=document.getElementById('sbn-analytics');if(sbAnBtn)sbAnBtn.style.display=isAdmin?'':'none';
-  const sbAdmBtn=document.getElementById('sbn-admin');if(sbAdmBtn)sbAdmBtn.style.display=isAdmin?'':'none';
+  document.querySelectorAll('.sb-guarded').forEach(el=>el.style.display=isAdmin?'':'none');
   // Render hub cards
   renderHubCards();
   // Show home hub
@@ -8170,6 +8299,56 @@ function show(id){
   const nav=document.getElementById('main-nav');
   if(nav)nav.style.display="none";
 }
+// ===== SIDEBAR v2 FUNCTIONS =====
+function _sbToggle(){
+  document.body.classList.toggle('sb-collapsed');
+  try{localStorage.setItem('sb_collapsed',document.body.classList.contains('sb-collapsed')?'1':'0');}catch(e){}
+}
+function _sbGrpToggle(grpId){
+  const grp=document.getElementById(grpId);
+  if(!grp)return;
+  if(document.body.classList.contains('sb-collapsed')){
+    _sbToggle();
+    setTimeout(()=>_sbGrpToggle(grpId),270);
+    return;
+  }
+  const isOpen=grp.classList.toggle('open');
+  const body=document.getElementById(grpId.replace('sbg-','sbb-'));
+  if(body)body.classList.toggle('sb-closed',!isOpen);
+  try{const s=JSON.parse(localStorage.getItem('sb_grps')||'{}');s[grpId]=isOpen;localStorage.setItem('sb_grps',JSON.stringify(s));}catch(e){}
+}
+function _sbItemClick(mod,submod){
+  if(mod==='crm'&&submod){
+    showModule('crm');
+    switchCRMTab(submod);
+    _setSbActive('crm',submod);
+  }else{
+    showModule(mod);
+  }
+}
+function _setSbActive(mod,submod){
+  document.querySelectorAll('#sb-nav .sb-item,#sb-nav .sb-item-solo').forEach(el=>el.classList.remove('active'));
+  let sub=submod;
+  if(mod==='crm'&&!sub&&typeof _crmActiveTab!=='undefined')sub=_crmActiveTab;
+  const el=sub
+    ?document.querySelector(`#sb-nav .sb-item[data-mod="${mod}"][data-submod="${sub}"]`)
+    :(document.querySelector(`#sb-nav .sb-item-solo[data-mod="${mod}"]`)||document.querySelector(`#sb-nav .sb-item[data-mod="${mod}"]`));
+  if(el)el.classList.add('active');
+}
+// Restore collapsed + group state on load
+(function(){
+  try{
+    if(localStorage.getItem('sb_collapsed')==='1')document.body.classList.add('sb-collapsed');
+    const s=JSON.parse(localStorage.getItem('sb_grps')||'{}');
+    Object.entries(s).forEach(([gId,open])=>{
+      const g=document.getElementById(gId);if(!g)return;
+      const b=document.getElementById(gId.replace('sbg-','sbb-'));
+      if(open){g.classList.add('open');if(b)b.classList.remove('sb-closed');}
+      else{g.classList.remove('open');if(b)b.classList.add('sb-closed');}
+    });
+  }catch(e){}
+})();
+
 function showModule(mod){
   closeMobileSidebar();
   // Close all overlays (including CRM)
@@ -8179,11 +8358,7 @@ function showModule(mod){
   });
   const bldLayout=document.getElementById('bld-layout');
   if(bldLayout)bldLayout.classList.remove('editor-open');
-  // Update sidebar active state
-  ['home','generator','buildings','crm','analytics','admin'].forEach(m=>{
-    const btn=document.getElementById('sbn-'+m);
-    if(btn)btn.classList.toggle('active',m===mod);
-  });
+  _setSbActive(mod,null);
   if(mod==='home'){
     show('home-hub');
   } else if(mod==='generator'){
