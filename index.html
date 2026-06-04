@@ -1317,35 +1317,37 @@ body.dark .det-unit-add-row:hover{background:rgba(77,147,255,.06);color:#4D93FF}
 #app-sidebar{transition:width .25s ease,min-width .25s ease}
 body.sb-collapsed #app-sidebar{width:68px!important;min-width:68px!important;overflow:hidden}
 #app-sidebar nav.sb-nav{padding:.4rem 0!important}
-.sb-collapse-btn{background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.18);color:#C3E6FF;padding:5px 8px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s;flex-shrink:0}
-.sb-collapse-btn:hover{background:rgba(77,147,255,.22);border-color:rgba(77,147,255,.4)}
+.sb-collapse-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.75);padding:5px 8px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sb-collapse-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff}
 .sb-brand-collapsible{flex:1;overflow:hidden;transition:opacity .2s,max-width .2s;max-width:220px}
 body.sb-collapsed .sb-brand-collapsible{opacity:0;max-width:0;pointer-events:none}
 .sb-user-collapsible{flex:1;overflow:hidden;min-width:0;transition:opacity .18s}
 body.sb-collapsed .sb-user-collapsible{opacity:0;pointer-events:none}
-.sb-item-solo{display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem .55rem 12px;cursor:pointer;color:rgba(163,193,255,.7);font-size:12.5px;font-weight:500;transition:all .15s;border:none;background:transparent;font-family:inherit;width:calc(100% - 16px);text-align:left;position:relative;margin:2px 8px;border-radius:8px;border-left:3px solid transparent;white-space:nowrap;overflow:hidden}
-.sb-item-solo:hover{background:rgba(77,147,255,.12);color:#C3E6FF}
-.sb-item-solo.active{background:linear-gradient(90deg,rgba(77,147,255,.2),rgba(28,84,244,.08));color:#fff;font-weight:700;border-left-color:#4D93FF}
-.sb-item-solo-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sb-item-solo{display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem .55rem 12px;cursor:pointer;color:rgba(255,255,255,.82);font-size:12.5px;font-weight:500;transition:background .15s,color .15s;border:none;background:transparent;font-family:inherit;width:calc(100% - 16px);text-align:left;position:relative;margin:2px 8px;border-radius:8px;border-left:3px solid transparent;white-space:nowrap;overflow:hidden}
+.sb-item-solo:hover{background:rgba(255,255,255,.06);color:#fff}
+.sb-item-solo.active{background:linear-gradient(90deg,rgba(77,147,255,.22),rgba(28,84,244,.1));color:#fff;font-weight:700;border-left-color:#4D93FF}
+.sb-item-solo-icon{width:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sb-item-solo-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 body.sb-collapsed .sb-item-solo{width:44px!important;margin:2px auto!important;justify-content:center;padding:.55rem}
 body.sb-collapsed .sb-item-solo>span:not(.sb-item-solo-icon){display:none}
-.sb-grp-sep{height:1px;background:rgba(77,147,255,.07);margin:6px 12px}
-.sb-grp-hd{display:flex;align-items:center;gap:9px;padding:5px 12px;background:none;border:none;width:100%;text-align:left;cursor:pointer;color:rgba(163,193,255,.38);font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;transition:color .15s;font-family:inherit;white-space:nowrap;margin-top:5px}
-.sb-grp-hd:hover{color:rgba(163,193,255,.75)}
-.sb-grp-hd-icon{font-size:14px;width:22px;text-align:center;flex-shrink:0}
+.sb-grp-sep{height:1px;background:rgba(255,255,255,.06);margin:6px 12px}
+.sb-grp-hd{display:flex;align-items:center;gap:9px;padding:5px 12px;background:none;border:none;width:100%;text-align:left;cursor:pointer;color:rgba(255,255,255,.35);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:color .15s;font-family:inherit;white-space:nowrap;margin-top:5px}
+.sb-grp-hd:hover{color:rgba(255,255,255,.7)}
+.sb-grp-hd-icon{width:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;opacity:.65}
+.sb-grp-hd-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .sb-grp-hd-label{flex:1;overflow:hidden;white-space:nowrap;transition:opacity .2s,max-width .2s;max-width:200px}
 body.sb-collapsed .sb-grp-hd-label{opacity:0;max-width:0}
-.sb-chevron{font-size:11px;transition:transform .22s;flex-shrink:0;opacity:.45;line-height:1;margin-left:auto}
+.sb-chevron{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s;flex-shrink:0;opacity:.4;margin-left:auto}
 .sb-grp.open>.sb-grp-hd>.sb-chevron{transform:rotate(90deg)}
 body.sb-collapsed .sb-chevron{display:none!important}
 .sb-grp-body{overflow:hidden;max-height:600px;transition:max-height .25s ease}
 .sb-grp-body.sb-closed{max-height:0!important}
 body.sb-collapsed .sb-grp-body{display:none!important}
-.sb-item{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 34px;background:none;border:none;border-left:3px solid transparent;width:100%;text-align:left;cursor:pointer;color:rgba(163,193,255,.58);font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;transition:all .15s;font-family:inherit;line-height:1.3}
-.sb-item:hover:not([disabled]){background:rgba(77,147,255,.1);color:#C3E6FF;border-left-color:rgba(77,147,255,.28)}
-.sb-item.active{background:linear-gradient(90deg,rgba(77,147,255,.18),rgba(28,84,244,.04));color:#fff;border-left-color:#4D93FF;font-weight:600}
-.sb-item[disabled]{opacity:.32;cursor:default;pointer-events:none}
-.sb-soon-badge{margin-left:auto;font-size:9px;background:rgba(163,193,255,.07);color:rgba(163,193,255,.38);padding:1px 5px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;flex-shrink:0}
+.sb-item{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 34px;background:none;border:none;border-left:3px solid transparent;width:100%;text-align:left;cursor:pointer;color:rgba(255,255,255,.65);font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;transition:background .15s,color .15s,border-color .15s;font-family:inherit;line-height:1.3}
+.sb-item:hover:not([disabled]){background:rgba(255,255,255,.06);color:#fff;border-left-color:rgba(255,255,255,.2)}
+.sb-item.active{background:linear-gradient(90deg,rgba(77,147,255,.2),rgba(28,84,244,.06));color:#fff;border-left-color:#4D93FF;font-weight:600}
+.sb-item[disabled]{opacity:.28;cursor:default;pointer-events:none}
+.sb-soon-badge{margin-left:auto;font-size:9px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.3);padding:1px 5px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;flex-shrink:0}
 .sb-footer-label{overflow:hidden;white-space:nowrap;transition:opacity .15s,max-width .15s;max-width:120px}
 body.sb-collapsed .sb-footer-label{opacity:0;max-width:0}
 body.sb-collapsed .sb-footer{justify-content:center!important;gap:6px!important}
@@ -1848,7 +1850,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="sb-brand-bar"></div>
       <div class="sb-brand-sub">Plataforma de Real Estate</div>
     </div>
-    <button class="sb-collapse-btn" onclick="_sbToggle()" title="Colapsar menú">☰</button>
+    <button class="sb-collapse-btn" onclick="_sbToggle()" title="Colapsar menú"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
   </div>
 
   <!-- User -->
@@ -1865,7 +1867,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 
     <!-- Dashboard -->
     <button class="sb-item-solo active" id="sbn-home" data-mod="home" onclick="_sbItemClick('home',null)">
-      <span class="sb-item-solo-icon">⊞</span><span>Dashboard</span>
+      <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span>Dashboard</span>
     </button>
 
     <div class="sb-grp-sep"></div>
@@ -1873,9 +1875,9 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <!-- Comercial -->
     <div class="sb-grp open" id="sbg-comercial">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-comercial')">
-        <span class="sb-grp-hd-icon">💼</span>
+        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></span>
         <span class="sb-grp-hd-label">Comercial</span>
-        <span class="sb-chevron">›</span>
+        <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-comercial">
         <button class="sb-item" disabled><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
@@ -1888,9 +1890,9 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <!-- Inmuebles -->
     <div class="sb-grp open" id="sbg-inmuebles">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-inmuebles')">
-        <span class="sb-grp-hd-icon">🏢</span>
+        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="14" height="18" rx="1"/><path d="M16 8h4a1 1 0 011 1v10a1 1 0 01-1 1h-4"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="6" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="10" y2="12"/><line x1="6" y1="16" x2="6" y2="16"/><line x1="10" y1="16" x2="10" y2="16"/></svg></span>
         <span class="sb-grp-hd-label">Inmuebles</span>
-        <span class="sb-chevron">›</span>
+        <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-inmuebles">
         <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Inventario</button>
@@ -1904,9 +1906,9 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <!-- Presentaciones -->
     <div class="sb-grp open" id="sbg-ppt">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-ppt')">
-        <span class="sb-grp-hd-icon">📄</span>
+        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
         <span class="sb-grp-hd-label">Presentaciones</span>
-        <span class="sb-chevron">›</span>
+        <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-ppt">
         <button class="sb-item" data-mod="generator" onclick="_sbItemClick('generator',null)">Generador PPT</button>
@@ -1918,9 +1920,9 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <!-- Analytics (guarded) -->
     <div class="sb-grp sb-guarded" id="sbg-analytics" style="display:none">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-analytics')">
-        <span class="sb-grp-hd-icon">📊</span>
+        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>
         <span class="sb-grp-hd-label">Analytics</span>
-        <span class="sb-chevron">›</span>
+        <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body sb-closed" id="sbb-analytics">
         <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Inteligencia Comercial</button>
@@ -1933,9 +1935,9 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <!-- Administración (guarded) -->
     <div class="sb-grp sb-guarded" id="sbg-adm" style="display:none">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-adm')">
-        <span class="sb-grp-hd-icon">⚙️</span>
+        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
         <span class="sb-grp-hd-label">Administración</span>
-        <span class="sb-chevron">›</span>
+        <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body sb-closed" id="sbb-adm">
         <button class="sb-item" data-mod="admin" onclick="_sbItemClick('admin',null)">Usuarios</button>
@@ -1952,7 +1954,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <button id="theme-toggle" onclick="toggleTheme()" style="background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.2);color:#C3E6FF;font-size:15px;padding:4px 9px;border-radius:6px;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0">🌙</button>
     <span class="sb-footer-label" style="font-size:10px;color:rgba(163,193,255,.3)">Nexus v2</span>
     <button class="sb-logout-btn" onclick="logout()" style="margin-left:auto;width:auto!important;padding:.4rem .8rem;display:flex;align-items:center;gap:6px">
-      <span style="flex-shrink:0;font-size:13px">⏻</span><span class="sb-footer-label">Salir</span>
+      <span style="flex-shrink:0;display:flex;align-items:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span class="sb-footer-label">Salir</span>
     </button>
   </div>
 </div>
