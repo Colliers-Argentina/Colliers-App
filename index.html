@@ -7558,11 +7558,15 @@ function openBuildingEditor(docId){
         <div class="bld-det-sec-hd">Superficies</div>
         <div class="bld-det-field-row">
           <div class="bld-det-field"><div class="bld-det-lbl">Sup. Total (m²)</div><input class="bld-det-inp" id="be-supTotal" type="number" value="${d.superficieTotal||''}" placeholder="0"></div>
-          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Propia (m²)</div><input class="bld-det-inp" id="be-supPropia" type="number" value="${d.superficiePropia||d.superficiePlanta||''}" placeholder="0"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Propia (m²)</div><input class="bld-det-inp" id="be-supPropia" type="number" value="${d.superficiePropia||''}" placeholder="0" oninput="_bldUpdatePromNivel()"></div>
         </div>
         <div class="bld-det-field-row">
           <div class="bld-det-field"><div class="bld-det-lbl">Sup. Disp. (m²) <span style="font-size:9px;font-weight:600;color:#1C54F4;background:rgba(28,84,244,.08);border-radius:4px;padding:1px 5px;vertical-align:middle">AUTO</span></div><input class="bld-det-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}" readonly title="Calculado automáticamente desde componentes" style="background:rgba(28,84,244,.04);cursor:default;color:#1C54F4;font-weight:600"></div>
           <div class="bld-det-field"><div class="bld-det-lbl">Sup. Mín. (m²)</div><input class="bld-det-inp" id="be-supMin" type="number" value="${d.superficieMinima||''}"></div>
+        </div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Promedio Nivel (m²)</div><input class="bld-det-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}" placeholder="0"></div>
+          <div class="bld-det-field"></div>
         </div>
         <div class="bld-det-field-row">
           <div class="bld-det-field"><div class="bld-det-lbl">Cantidad Pisos</div><input class="bld-det-inp" id="be-cantPisos" type="number" value="${d.cantidadPisos||''}" placeholder="0" oninput="_bldUpdatePromNivel()"></div>
@@ -8417,7 +8421,7 @@ async function saveBuildingEdits(){
     estado:gv('be-estado'),
     superficieTotal:parseFloat(gv('be-supTotal'))||0,
     superficiePropia:parseFloat(gv('be-supPropia'))||0,
-    superficiePlanta:parseFloat(gv('be-supPropia'))||0,
+    superficiePlanta:parseFloat(gv('be-supPlanta'))||0,
     superficieDisponible:_unitDocs.length?_calcSupDispFromUnits():(parseFloat(gv('be-supDisp'))||0),
     superficieMinima:parseFloat(gv('be-supMin'))||0,
     cantidadPisos:parseInt(gv('be-cantPisos'))||0,
