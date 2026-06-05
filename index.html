@@ -1718,6 +1718,18 @@ body.dark .anb-ranking-table td{color:#C3E6FF;border-bottom-color:rgba(77,147,25
 .mz-dd-chk:hover{background:#F0F4FF}
 body.dark .mz-dd-chk{color:#C3E6FF}
 body.dark .mz-dd-chk:hover{background:rgba(77,147,255,.08)}
+/* ===== TIPO OFERTA BADGES ===== */
+.to-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.04em;white-space:nowrap;line-height:1.4;flex-shrink:0}
+.to-badge.alq{background:rgba(28,84,244,.12);color:#1C54F4;border:1px solid rgba(28,84,244,.22)}
+.to-badge.vta{background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.22)}
+.to-badge.alqvta{background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.22)}
+.to-badge.nodisp{background:rgba(123,139,189,.08);color:#94A3B8;border:1px solid rgba(123,139,189,.18)}
+.to-badges{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.du-to-sel{cursor:pointer;font-family:inherit;appearance:none;-webkit-appearance:none;padding-right:18px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 5px center!important;outline:none;min-width:100px}
+body.dark .to-badge.alq{background:rgba(28,84,244,.2);color:#72AEFF;border-color:rgba(28,84,244,.4)}
+body.dark .to-badge.vta{background:rgba(5,150,105,.18);color:#34D399;border-color:rgba(5,150,105,.4)}
+body.dark .to-badge.alqvta{background:rgba(124,58,237,.18);color:#C084FC;border-color:rgba(124,58,237,.4)}
+body.dark .to-badge.nodisp{background:rgba(123,139,189,.1);color:#64748B;border-color:rgba(123,139,189,.2)}
 /* ===== MIN-WIDTH FIX (tablas) ===== */
 .app-grid{min-width:0}
 .app-grid > *{min-width:0}
@@ -3111,6 +3123,18 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
                   <label class="mz-dd-chk"><input type="checkbox" value="C" onchange="_bldCatChg(this)"> C</label>
                 </div>
                 <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldCat()">✕ Limpiar</button></div>
+              </div>
+            </div>
+            <div class="mz-dd" id="bld-to-dd" style="position:relative">
+              <button class="bld-filter-sel mz-dd-btn" id="bld-to-btn" onclick="toggleBldToDD(event)" type="button" style="white-space:nowrap">Oferta ▾</button>
+              <div class="mz-dd-panel" id="bld-to-panel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;min-width:190px;background:#fff;border:1px solid #DDE5F2;border-radius:10px;box-shadow:0 4px 16px rgba(10,27,77,.12);padding:8px 0">
+                <div id="bld-to-list" style="padding:0 8px 4px">
+                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Alquiler" onchange="_bldToChg(this)"> <span class="to-badge alq">ALQUILER</span></label>
+                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Venta" onchange="_bldToChg(this)"> <span class="to-badge vta">VENTA</span></label>
+                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Alquiler o Venta" onchange="_bldToChg(this)"> <span class="to-badge alqvta">ALQ + VTA</span></label>
+                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="No disponible" onchange="_bldToChg(this)"> <span class="to-badge nodisp">NO DISP.</span></label>
+                </div>
+                <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldTo()">✕ Limpiar</button></div>
               </div>
             </div>
             <select id="bld-filter-etapa" class="bld-filter-sel" onchange="filterBuildings()">
@@ -7210,6 +7234,7 @@ const BLD_PAGE_SIZE=20;
 let _bldDocs=[], _bldFiltered=[], _bldPage=0, _bldEditId=null;
 let _bldZonasSel=new Set();
 let _bldCatSel='', _bldEtapaSel='', _bldM2Min=0, _bldM2Max=0;
+let _bldToSelSet=new Set();
 let _bldListView='grid'; // 'grid' | 'list' | 'map'
 
 const BLD_ESTADO_COLORS={
@@ -7222,6 +7247,54 @@ const BLD_ESTADO_COLORS={
 function bldEstadoBadge(e){
   const c=BLD_ESTADO_COLORS[e]||BLD_ESTADO_COLORS['Disponible'];
   return`<span class="bld-estado" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${e||'Disponible'}</span>`;
+}
+
+const _TO_MAP={
+  'Alquiler':['alq','ALQUILER','rgba(28,84,244,.1)','#1C54F4','rgba(28,84,244,.3)'],
+  'Venta':['vta','VENTA','rgba(5,150,105,.1)','#059669','rgba(5,150,105,.3)'],
+  'Alquiler o Venta':['alqvta','ALQ + VTA','rgba(124,58,237,.1)','#7C3AED','rgba(124,58,237,.3)'],
+  'Alquiler / Venta':['alqvta','ALQ + VTA','rgba(124,58,237,.1)','#7C3AED','rgba(124,58,237,.3)'],
+  'No disponible':['nodisp','NO DISP.','rgba(123,139,189,.06)','#94A3B8','rgba(123,139,189,.2)'],
+};
+function tipoOfertaBadge(tipo){
+  const [cls,lbl]=_TO_MAP[tipo]||['nodisp','NO DISP.'];
+  return`<span class="to-badge ${cls}">${lbl}</span>`;
+}
+function tipoOfertaBadges(tipos){
+  if(!tipos||!tipos.length)return'';
+  return`<div class="to-badges">${tipos.map(tipoOfertaBadge).join('')}</div>`;
+}
+function _toSelectStyle(v){
+  const [,,bg,color,border]=_TO_MAP[v]||_TO_MAP['No disponible'];
+  return`background:${bg};color:${color};border:1px solid ${border};font-weight:700;padding:3px 7px;border-radius:999px;font-size:11px`;
+}
+
+function toggleBldToDD(e){
+  e.stopPropagation();
+  const p=document.getElementById('bld-to-panel');
+  if(p)p.style.display=p.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  const dd=document.getElementById('bld-to-dd');
+  if(dd&&!dd.contains(e.target)){const p=document.getElementById('bld-to-panel');if(p)p.style.display='none';}
+});
+function _bldToChg(chk){
+  if(chk.checked)_bldToSelSet.add(chk.value);
+  else _bldToSelSet.delete(chk.value);
+  const btn=document.getElementById('bld-to-btn');
+  if(btn){
+    btn.classList.toggle('has-sel',_bldToSelSet.size>0);
+    btn.textContent=_bldToSelSet.size?`Oferta (${_bldToSelSet.size}) ▾`:'Oferta ▾';
+  }
+  filterBuildings();
+}
+function clearBldTo(){
+  _bldToSelSet.clear();
+  document.querySelectorAll('#bld-to-list input[type=checkbox]').forEach(c=>c.checked=false);
+  const btn=document.getElementById('bld-to-btn');
+  if(btn){btn.classList.remove('has-sel');btn.textContent='Oferta ▾';}
+  const p=document.getElementById('bld-to-panel');if(p)p.style.display='none';
+  filterBuildings();
 }
 
 function showBldToast(msg,ms=2800){
@@ -7348,6 +7421,7 @@ function filterBuildings(){
   const corredor=document.getElementById('bld-filter-corredor')?.value||'';
   const cats=_bldCatSelSet||new Set();
   const etapa=document.getElementById('bld-filter-etapa')?.value||'';
+  const tos=_bldToSelSet||new Set();
   _bldFiltered=_bldDocs.filter(d=>{
     if(q){
       const haystack=[d.nombre||'',d.direccion||'',d.corredor||'',d.zona||'',d.submercado||'',d.broker||'',d.descripcion||''].join(' ').toLowerCase();
@@ -7357,11 +7431,15 @@ function filterBuildings(){
     if(cats.size){const dc=d.categoria||d.cat||'';if(!cats.has(dc))return false;}
     if(etapa&&d.etapa!==etapa)return false;
     if(estado&&d.estado!==estado)return false;
+    if(tos.size){
+      const dt=d.tiposDisponibles||[];
+      if(!dt.some(t=>tos.has(t)))return false;
+    }
     return true;
   });
   _bldPage=0;
   // Show/hide clear button
-  const hasFilters=q||estado||corredor||cats.size||etapa;
+  const hasFilters=q||estado||corredor||cats.size||etapa||tos.size;
   const cb=document.getElementById('bld-filter-clear-btn');
   if(cb)cb.style.display=hasFilters?'inline-flex':'none';
   renderBldKPIs(_bldFiltered);
@@ -7375,6 +7453,7 @@ function bldClearFilters(){
     const el=document.getElementById(id);if(el)el.value='';
   });
   clearBldCat();
+  clearBldTo();
 }
 
 function _bldPaginationHTML(total, startI){
@@ -7429,6 +7508,7 @@ function renderBuildingsTable(){
         </div>
         <div class="bld-card-footer">
           ${bldEstadoBadge(d.estado||'Disponible')}
+          ${(d.tiposDisponibles&&d.tiposDisponibles.length)?tipoOfertaBadges(d.tiposDisponibles):''}
           <button class="bld-card-edit-btn" onclick="event.stopPropagation();openBuildingEditor('${d._id}')">Ver ficha →</button>
         </div>
       </div>
@@ -7459,6 +7539,7 @@ function renderBuildingsListView(){
         <th>Corredor</th>
         <th>Categ.</th>
         <th>Etapa</th>
+        <th>Oferta</th>
         <th>Sup. Propia</th>
         <th>Sup. Total</th>
         <th>Disponible</th>
@@ -7490,6 +7571,7 @@ function renderBuildingsListView(){
       <td>${esc(corredor)}</td>
       <td><span class="bld-cat-badge cat-${(cat||'').replace('+','p')}">${esc(cat)}</span></td>
       <td><span class="bld-etapa-badge">${esc(d.etapa||'–')}</span></td>
+      <td>${(d.tiposDisponibles&&d.tiposDisponibles.length)?tipoOfertaBadges(d.tiposDisponibles):'<span style="color:#94A3B8;font-size:11px">–</span>'}</td>
       <td class="bld-lt-num">${supPropia}</td>
       <td class="bld-lt-num">${fmtM2(d.superficieTotal)}</td>
       <td class="bld-lt-num bld-lt-disp">${supDisp}</td>
@@ -7592,6 +7674,7 @@ function openBuildingEditor(docId){
           <div class="bld-kpi-card-lbl">Asking Rent</div>
         </div>
       </div>
+      <div id="bld-to-disp-row" style="padding:.4rem .05rem .55rem;display:${(d.tiposDisponibles&&d.tiposDisponibles.length)?'flex':'none'};align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.06em">Oferta</span><div class="bld-to-disp-badges to-badges">${(d.tiposDisponibles&&d.tiposDisponibles.length)?d.tiposDisponibles.map(tipoOfertaBadge).join(''):''}  </div></div>
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Identificación</div>
         <div class="bld-det-field"><div class="bld-det-lbl">Nombre</div><input class="bld-det-inp" id="be-nombre" value="${esc(d.nombre||'')}"></div>
@@ -7910,6 +7993,10 @@ async function recalcAndSaveSupDisp(buildingId){
   const eWS=expUnits.reduce((s,u)=>s+(_n(u.expensasUnidad)*(parseFloat(u.m2)||0)),0);
   const eWM=expUnits.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
   const avgExp=eWM>0?Math.round(eWS/eWM):null;
+  // Compute tiposDisponibles: unique offer types of disponible units (excluding No disponible)
+  const _dispUnits=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
+  const _toSet=new Set(_dispUnits.map(u=>u.tipoOferta||'Alquiler').filter(t=>t!=='No disponible'));
+  const tiposDisponibles=[..._toSet].sort();
   // Update in-memory cache
   if(bld){
     bld.superficieDisponible=supDisp;bld.supDisp=supDisp;
@@ -7917,9 +8004,10 @@ async function recalcAndSaveSupDisp(buildingId){
     if(supPromNivel!==null)bld.superficiePromedioNivel=supPromNivel;
     if(avgRent!==null)bld.precioPromedioAlquiler=avgRent;
     if(avgExp!==null)bld.expensasPromedio=avgExp;
+    bld.tiposDisponibles=tiposDisponibles;
   }
   // Persist to Firestore
-  const update={superficieDisponible:supDisp};
+  const update={superficieDisponible:supDisp,tiposDisponibles};
   if(vacancia!==null)update.vacancia=vacancia;
   if(supPromNivel!==null)update.superficiePromedioNivel=supPromNivel;
   if(avgRent!==null)update.precioPromedioAlquiler=avgRent;
@@ -7986,6 +8074,16 @@ function _updateUnitStats(){
     if(kexp)kexp.innerHTML=avgExp?`USD ${avgExp.toLocaleString('es-AR')}`:'<span class="bld-kpi-card-val sin">Sin información</span>';
     // Floor occupation map
     _renderFloorMap();
+    // Refresh offer type badges in ficha sidebar
+    const _dispU=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
+    const _toSetU=new Set(_dispU.map(u=>u.tipoOferta||'Alquiler').filter(t=>t!=='No disponible'));
+    const _todRow=document.getElementById('bld-to-disp-row');
+    if(_todRow){
+      const _tipos=[..._toSetU].sort();
+      _todRow.style.display=_tipos.length?'flex':'none';
+      const _todBadges=_todRow.querySelector('.bld-to-disp-badges');
+      if(_todBadges)_todBadges.innerHTML=_tipos.map(tipoOfertaBadge).join('');
+    }
   }
 }
 
@@ -8039,6 +8137,11 @@ function renderDetailUnits(buildingId,filterQ=''){
   };
   const toOpts=['No disponible','Alquiler','Venta','Alquiler o Venta'];
   const toSel=v=>toOpts.map(o=>`<option${v===o?' selected':''}>${o}</option>`).join('');
+  const toCell=(uid,v)=>{
+    const st=_toSelectStyle(v||'Alquiler');
+    const opts=toOpts.map(o=>`<option${(v||'Alquiler')===o?' selected':''}>${o}</option>`).join('');
+    return`<select class="du-sel du-to-sel" style="${st}" onchange="saveUnitField('${buildingId}','${uid}','tipoOferta',this.value,this);this.style.cssText=_toSelectStyle(this.value)">${opts}</select>`;
+  };
   const nearVenc=v=>{if(!v)return false;const d=new Date(v),now=new Date();const diff=(d-now)/(1000*60*60*24);return diff>=0&&diff<=90;};
   let h=`<table class="det-unit-table"><thead><tr>
     <th class="col-num">#</th>
@@ -8067,7 +8170,7 @@ function renderDetailUnits(buildingId,filterQ=''){
       <td class="du-estado-cell"><select class="du-sel" style="background:${c.bg};border:1px solid ${c.border};color:${c.text};font-weight:700;padding:4px 6px;border-radius:999px" onchange="saveUnitField('${buildingId}','${u._id}','estado',this.value,this);renderDetailUnits('${buildingId}',document.getElementById('bld-det-search')?.value||'')">${so(u.estado)}</select></td>
       <td><div style="display:flex;align-items:center;gap:2px"><input class="du-inp du-ac-inp" style="width:96px" data-bld="${buildingId}" data-uid="${u._id}" data-role="occ" value="${esc(u.occupierAccountName||u.occupierContactName||u.ocupante||'')}" oninput="duAcSearch(this)" onfocus="if(this.value.trim())duAcSearch(this)" onblur="duAcBlurSave(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()">${(u.occupierAccountId||u.occupierContactId)?`<span class="du-linked-dot" title="${u.occupierAccountId?'Cuenta vinculada':'Contacto vinculado'}"></span>`:''}</div></td>
       <td><input class="du-inp" style="width:58px" type="number" value="${u.m2||''}" onblur="saveUnitField('${buildingId}','${u._id}','m2',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
-      <td><select class="du-sel" style="font-size:11px;padding:3px 5px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7)" onchange="saveUnitField('${buildingId}','${u._id}','tipoOferta',this.value,this)">${toSel(u.tipoOferta||'Alquiler')}</select></td>
+      <td style="min-width:110px">${toCell(u._id,u.tipoOferta)}</td>
       <td><input class="du-inp" style="width:80px" value="${esc(u.askingRent||'')}" onblur="saveUnitField('${buildingId}','${u._id}','askingRent',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="width:74px" value="${esc(u.precioVenta||'')}" placeholder="—" onblur="saveUnitField('${buildingId}','${u._id}','precioVenta',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="width:70px" value="${esc(u.expensasUnidad||'')}" placeholder="—" onblur="saveUnitField('${buildingId}','${u._id}','expensasUnidad',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
