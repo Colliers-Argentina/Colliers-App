@@ -7442,6 +7442,7 @@ function renderBuildingsListView(){
         <th>Categ.</th>
         <th>Etapa</th>
         <th>Sup. Propia</th>
+        <th>Sup. Total</th>
         <th>Disponible</th>
         <th>Vacancia</th>
         <th>Pisos</th>
@@ -7455,7 +7456,7 @@ function renderBuildingsListView(){
     const supDisp=fmtM2(d.superficieDisponible);
     const supPropiaNum=parseFloat(d.superficiePropia||d.superficiePlanta)||0;
     const supDispNum=parseFloat(d.superficieDisponible)||0;
-    const vacPct=supPropiaNum>0?Math.round(supDispNum/supPropiaNum*100)+'%':'–';
+    const vacPct=supPropiaNum>0?(supDispNum/supPropiaNum*100).toFixed(1)+'%':'–';
     const pisos=d.cantidadPisos||d.pisos||'–';
     const upd=fmtDate(d.updatedAt||d.createdAt);
     h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
@@ -7472,6 +7473,7 @@ function renderBuildingsListView(){
       <td><span class="bld-cat-badge cat-${(cat||'').replace('+','p')}">${esc(cat)}</span></td>
       <td><span class="bld-etapa-badge">${esc(d.etapa||'–')}</span></td>
       <td class="bld-lt-num">${supPropia}</td>
+      <td class="bld-lt-num">${fmtM2(d.superficieTotal)}</td>
       <td class="bld-lt-num bld-lt-disp">${supDisp}</td>
       <td class="bld-lt-num">${vacPct}</td>
       <td class="bld-lt-num">${pisos}</td>
@@ -7525,14 +7527,19 @@ function openBuildingEditor(docId){
     </div>
     <div class="bld-det-sidebar-body">
       <div class="bld-det-kpis">
-        <div class="bld-det-kpi"><div class="bld-det-kpi-v" id="bld-kpi-sup-disp">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+'m²':'—'}</div><div class="bld-det-kpi-l">Sup. Disp.</div></div>
-        <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.asking||d.rent||'—')}</div><div class="bld-det-kpi-l">Asking</div></div>
+        <div class="bld-det-kpi"><div class="bld-det-kpi-v" id="bld-kpi-sup-total">${d.superficieTotal?Math.round(d.superficieTotal).toLocaleString('es-AR')+' m²':'—'}</div><div class="bld-det-kpi-l">Sup. Total</div></div>
+        <div class="bld-det-kpi"><div class="bld-det-kpi-v" id="bld-kpi-sup-propia">${d.superficiePropia?Math.round(d.superficiePropia).toLocaleString('es-AR')+' m²':'—'}</div><div class="bld-det-kpi-l">Sup. Propia</div></div>
         <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.categoria||d.cat||'—')}</div><div class="bld-det-kpi-l">Categ.</div></div>
       </div>
       <div class="bld-det-calc-kpis">
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v vac" id="bld-kpi-vacancia">—</div><div class="bld-det-ckpi-l">Vacancia</div></div>
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-rent">—</div><div class="bld-det-ckpi-l">Rent Prom.</div></div>
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-exp">—</div><div class="bld-det-ckpi-l">Exp. Prom.</div></div>
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-sup-disp">${d.superficieDisponible?Math.round(d.superficieDisponible).toLocaleString('es-AR')+' m²':'—'}</div><div class="bld-det-ckpi-l">Sup. Disp.</div></div>
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v vac" id="bld-kpi-vacancia">—</div><div class="bld-det-ckpi-l">Vacancia %</div></div>
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-sup-prom">—</div><div class="bld-det-ckpi-l">Prom. Nivel</div></div>
+      </div>
+      <div class="bld-det-calc-kpis">
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-rent">—</div><div class="bld-det-ckpi-l">Rent Prom. m²</div></div>
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-exp">—</div><div class="bld-det-ckpi-l">Exp. Prom. m²</div></div>
+        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v">${esc(d.asking||d.rent||'—')}</div><div class="bld-det-ckpi-l">Asking</div></div>
       </div>
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Identificación</div>
@@ -7550,11 +7557,15 @@ function openBuildingEditor(docId){
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Superficies</div>
         <div class="bld-det-field-row">
-          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Disp. (m²) <span style="font-size:9px;font-weight:600;color:#1C54F4;background:rgba(28,84,244,.08);border-radius:4px;padding:1px 5px;vertical-align:middle">AUTO</span></div><input class="bld-det-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}" readonly title="Calculado automáticamente desde la tabla de Disponibilidades" style="background:rgba(28,84,244,.04);cursor:default;color:#1C54F4;font-weight:600"></div>
-          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Planta (m²)</div><input class="bld-det-inp" id="be-supPlanta" type="number" value="${d.superficiePlanta||''}"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Total (m²)</div><input class="bld-det-inp" id="be-supTotal" type="number" value="${d.superficieTotal||''}" placeholder="0"></div>
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Propia (m²)</div><input class="bld-det-inp" id="be-supPropia" type="number" value="${d.superficiePropia||d.superficiePlanta||''}" placeholder="0"></div>
         </div>
         <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Sup. Disp. (m²) <span style="font-size:9px;font-weight:600;color:#1C54F4;background:rgba(28,84,244,.08);border-radius:4px;padding:1px 5px;vertical-align:middle">AUTO</span></div><input class="bld-det-inp" id="be-supDisp" type="number" value="${d.superficieDisponible||''}" readonly title="Calculado automáticamente desde componentes" style="background:rgba(28,84,244,.04);cursor:default;color:#1C54F4;font-weight:600"></div>
           <div class="bld-det-field"><div class="bld-det-lbl">Sup. Mín. (m²)</div><input class="bld-det-inp" id="be-supMin" type="number" value="${d.superficieMinima||''}"></div>
+        </div>
+        <div class="bld-det-field-row">
+          <div class="bld-det-field"><div class="bld-det-lbl">Cantidad Pisos</div><input class="bld-det-inp" id="be-cantPisos" type="number" value="${d.cantidadPisos||''}" placeholder="0" oninput="_bldUpdatePromNivel()"></div>
           <div class="bld-det-field"><div class="bld-det-lbl">Pisos disp.</div><input class="bld-det-inp" id="be-pisosDisp" value="${esc(d.pisosDisponibles||d.pisosDisp||'')}"></div>
         </div>
       </div>
@@ -7819,12 +7830,49 @@ function _calcSupDispFromUnits(){
 }
 
 async function recalcAndSaveSupDisp(buildingId){
-  if(!db||!buildingId||!_unitDocs.length)return;
-  const supDisp=_calcSupDispFromUnits();
+  if(!db||!buildingId)return;
+  const _n=n=>parseFloat(String(n||'').replace(/[^0-9.]/g,''))||0;
+  const supDisp=_unitDocs.length?_calcSupDispFromUnits():0;
   const bld=_bldDocs.find(x=>x._id===buildingId);
-  if(bld){bld.superficieDisponible=supDisp;bld.supDisp=supDisp;}
-  try{await db.collection('buildings').doc(buildingId).update({superficieDisponible:supDisp});}
-  catch(e){console.error('[recalcSupDisp]',e);}
+  const supPropia=parseFloat(bld?.superficiePropia||bld?.superficiePlanta||0)||0;
+  const supRef=supPropia||parseFloat(bld?.superficieTotal||0)||0;
+  const vacancia=supRef>0?parseFloat((supDisp/supRef*100).toFixed(1)):null;
+  const cantPisos=parseInt(bld?.cantidadPisos)||0;
+  const supPromNivel=supPropia>0&&cantPisos>0?Math.round(supPropia/cantPisos):null;
+  // Weighted avg rent (disponible + tipoOferta Alquiler)
+  const rentUnits=_unitDocs.filter(u=>{
+    const to=u.tipoOferta||'Alquiler';const st=u.estado||'Disponible';
+    return (to==='Alquiler'||to==='Alquiler o Venta'||to==='Alquiler / Venta')&&(st==='Disponible'||!u.estado)&&_n(u.askingRent)>0;
+  });
+  const rWS=rentUnits.reduce((s,u)=>s+(_n(u.askingRent)*(parseFloat(u.m2)||0)),0);
+  const rWM=rentUnits.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
+  const avgRent=rWM>0?Math.round(rWS/rWM):null;
+  // Weighted avg expenses (same filter)
+  const expUnits=_unitDocs.filter(u=>{
+    const to=u.tipoOferta||'Alquiler';const st=u.estado||'Disponible';
+    return (to==='Alquiler'||to==='Alquiler o Venta'||to==='Alquiler / Venta')&&(st==='Disponible'||!u.estado)&&_n(u.expensasUnidad)>0;
+  });
+  const eWS=expUnits.reduce((s,u)=>s+(_n(u.expensasUnidad)*(parseFloat(u.m2)||0)),0);
+  const eWM=expUnits.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
+  const avgExp=eWM>0?Math.round(eWS/eWM):null;
+  // Update in-memory cache
+  if(bld){
+    bld.superficieDisponible=supDisp;bld.supDisp=supDisp;
+    if(vacancia!==null)bld.vacancia=vacancia;
+    if(supPromNivel!==null)bld.superficiePromedioNivel=supPromNivel;
+    if(avgRent!==null)bld.precioPromedioAlquiler=avgRent;
+    if(avgExp!==null)bld.expensasPromedio=avgExp;
+  }
+  // Persist to Firestore
+  const update={superficieDisponible:supDisp};
+  if(vacancia!==null)update.vacancia=vacancia;
+  if(supPromNivel!==null)update.superficiePromedioNivel=supPromNivel;
+  if(avgRent!==null)update.precioPromedioAlquiler=avgRent;
+  if(avgExp!==null)update.expensasPromedio=avgExp;
+  try{await db.collection('buildings').doc(buildingId).update(update);}
+  catch(e){console.error('[recalcBldStats]',e);}
+  // Update UI immediately
+  _updateUnitStats();
 }
 
 function _updateUnitStats(){
@@ -7839,28 +7887,45 @@ function _updateUnitStats(){
     ${res.length?`<span class="bld-det-stat res">${res.length} Res.</span>`:''}
     ${ocup.length?`<span class="bld-det-stat ocup">${ocup.length} Ocup.</span>`:''}`;
   if(_unitDocs.length){
+    const _rentNum=n=>parseFloat(String(n||'').replace(/[^0-9.]/g,''))||0;
     const supDisp=_calcSupDispFromUnits();
-    const el=document.getElementById('be-supDisp');if(el)el.value=supDisp||'';
-    const kpi=document.getElementById('bld-kpi-sup-disp');if(kpi)kpi.textContent=supDisp?supDisp.toLocaleString('es-AR')+'m²':'—';
-    // Vacancia = supDisp / superficiePropia (use total as fallback)
+    // Update auto field + KPI
+    const elDisp=document.getElementById('be-supDisp');if(elDisp)elDisp.value=supDisp||'';
+    const kDisp=document.getElementById('bld-kpi-sup-disp');
+    if(kDisp)kDisp.textContent=supDisp?Math.round(supDisp).toLocaleString('es-AR')+' m²':'—';
+    // Vacancia = supDisp / superficiePropia (1 decimal)
     const bld=_bldDocs.find(x=>x._id===_bldEditId);
-    const supRef=parseFloat(bld?.superficiePropia||bld?.superficieTotal||bld?.superficiePlanta||0)||0;
-    const vacPct=supRef>0?Math.round(supDisp/supRef*100):null;
+    const supPropia=parseFloat(bld?.superficiePropia||bld?.superficiePlanta||0)||0;
+    const supRef=supPropia||parseFloat(bld?.superficieTotal||0)||0;
+    const vacPct=supRef>0?(supDisp/supRef*100):null;
     const kvac=document.getElementById('bld-kpi-vacancia');
-    if(kvac)kvac.textContent=vacPct!==null?vacPct+'%':'—';
-    // Weighted avg rent: sum(m²×price) / sum(m²) for available units
-    const rentUnits=disp.filter(u=>parseFloat(String(u.askingRent||'').replace(/[^0-9.]/g,''))>0);
-    const rentNum=n=>parseFloat(String(n).replace(/[^0-9.]/g,''))||0;
-    const rentWSum=rentUnits.reduce((s,u)=>s+(rentNum(u.askingRent)*(parseFloat(u.m2)||1)),0);
-    const rentWM2=rentUnits.reduce((s,u)=>s+(parseFloat(u.m2)||1),0);
+    if(kvac)kvac.textContent=vacPct!==null?vacPct.toFixed(1)+'%':'—';
+    // Superficie Promedio Nivel = superficiePropia / cantidadPisos
+    const cantPisos=parseInt(bld?.cantidadPisos)||0;
+    const supPromNivel=supPropia>0&&cantPisos>0?Math.round(supPropia/cantPisos):null;
+    const kProm=document.getElementById('bld-kpi-sup-prom');
+    if(kProm)kProm.textContent=supPromNivel?supPromNivel.toLocaleString('es-AR')+' m²':'—';
+    // Weighted avg RENT: only disponible units with tipoOferta Alquiler/Alquiler-Venta
+    const rentUnits=_unitDocs.filter(u=>{
+      const to=u.tipoOferta||'Alquiler';
+      const st=u.estado||'Disponible';
+      const offerRent=to==='Alquiler'||to==='Alquiler o Venta'||to==='Alquiler / Venta';
+      return offerRent&&(st==='Disponible'||!u.estado)&&_rentNum(u.askingRent)>0;
+    });
+    const rentWSum=rentUnits.reduce((s,u)=>s+(_rentNum(u.askingRent)*(parseFloat(u.m2)||0)),0);
+    const rentWM2=rentUnits.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
     const avgRent=rentWM2>0?Math.round(rentWSum/rentWM2):null;
     const krent=document.getElementById('bld-kpi-avg-rent');
     if(krent)krent.textContent=avgRent?'USD '+avgRent.toLocaleString('es-AR'):'—';
-    // Weighted avg expenses across all active units
-    const expUnits=_unitDocs.filter(u=>u.estado!=='Archivado'&&parseFloat(String(u.expensasUnidad||'').replace(/[^0-9.]/g,''))>0);
-    const expNum=n=>parseFloat(String(n).replace(/[^0-9.]/g,''))||0;
-    const expWSum=expUnits.reduce((s,u)=>s+(expNum(u.expensasUnidad)*(parseFloat(u.m2)||1)),0);
-    const expWM2=expUnits.reduce((s,u)=>s+(parseFloat(u.m2)||1),0);
+    // Weighted avg EXPENSES: same disponible filter
+    const expUnits=_unitDocs.filter(u=>{
+      const to=u.tipoOferta||'Alquiler';
+      const st=u.estado||'Disponible';
+      const offerRent=to==='Alquiler'||to==='Alquiler o Venta'||to==='Alquiler / Venta';
+      return offerRent&&(st==='Disponible'||!u.estado)&&_rentNum(u.expensasUnidad)>0;
+    });
+    const expWSum=expUnits.reduce((s,u)=>s+(_rentNum(u.expensasUnidad)*(parseFloat(u.m2)||0)),0);
+    const expWM2=expUnits.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
     const avgExp=expWM2>0?Math.round(expWSum/expWM2):null;
     const kexp=document.getElementById('bld-kpi-avg-exp');
     if(kexp)kexp.textContent=avgExp?'USD '+avgExp.toLocaleString('es-AR'):'—';
@@ -8260,7 +8325,7 @@ async function saveUnitField(buildingId,unitId,field,value,el){
     });
     const u=_unitDocs.find(x=>x._id===unitId);
     if(u)u[field]=value;
-    if(field==='m2'||field==='estado')recalcAndSaveSupDisp(buildingId);
+    if(['m2','estado','tipoOferta','askingRent','expensasUnidad','precioVenta'].includes(field))recalcAndSaveSupDisp(buildingId);
     // flash green indicator on the cell
     if(el){
       const orig=el.style.borderColor;
@@ -8350,9 +8415,12 @@ async function saveBuildingEdits(){
     etapa:gv('be-etapa'),
     tipologia:gv('be-tipologia'),
     estado:gv('be-estado'),
+    superficieTotal:parseFloat(gv('be-supTotal'))||0,
+    superficiePropia:parseFloat(gv('be-supPropia'))||0,
+    superficiePlanta:parseFloat(gv('be-supPropia'))||0,
     superficieDisponible:_unitDocs.length?_calcSupDispFromUnits():(parseFloat(gv('be-supDisp'))||0),
-    superficiePlanta:parseFloat(gv('be-supPlanta'))||0,
     superficieMinima:parseFloat(gv('be-supMin'))||0,
+    cantidadPisos:parseInt(gv('be-cantPisos'))||0,
     pisosDisponibles:gv('be-pisosDisp'),
     asking:gv('be-asking'),
     expensas:gv('be-expensas'),
@@ -8375,7 +8443,7 @@ async function saveBuildingEdits(){
     if(hdrName)hdrName.textContent=data.nombre||_bldEditId;
     showBldToast('✅ Guardado correctamente');
     filterBuildings();
-    const TRACK=[['nombre','Nombre'],['direccion','Dirección'],['asking','Asking Rent'],['broker','Ejecutivo Comercial'],['estado','Estado'],['categoria','Categoría'],['foto','Foto'],['corredor','Corredor'],['etapa','Etapa'],['tipologia','Tipología']];
+    const TRACK=[['nombre','Nombre'],['direccion','Dirección'],['superficieTotal','Sup. Total'],['superficiePropia','Sup. Propia'],['superficieDisponible','Sup. Disponible'],['cantidadPisos','Cantidad Pisos'],['asking','Asking Rent'],['broker','Ejecutivo Comercial'],['estado','Estado'],['categoria','Categoría'],['foto','Foto'],['corredor','Corredor'],['etapa','Etapa'],['tipologia','Tipología']];
     const cambios=TRACK.filter(([k])=>String(old[k]||'')!==String(data[k]||'')).map(([k,lbl])=>({campo:lbl,anterior:String(old[k]||''),nuevo:String(data[k]||'')}));
     if(cambios.length){
       addBuildingHistory(_bldEditId,cambios);
@@ -8384,7 +8452,7 @@ async function saveBuildingEdits(){
         if(c.campo==='Categoría')tipo='cambio_categoria';
         else if(c.campo==='Corredor')tipo='cambio_corredor';
         else if(c.campo==='Etapa')tipo='cambio_etapa';
-        else if(['Sup. Disponible','Sup. Planta','Sup. Mínima'].some(x=>c.campo.startsWith(x)))tipo='cambio_superficie';
+        else if(['Sup. Total','Sup. Propia','Sup. Disponible','Sup. Mínima','Cantidad Pisos'].some(x=>c.campo.startsWith(x)))tipo='cambio_superficie';
         else if(c.campo==='Asking Rent')tipo='cambio_precio_renta';
         addBldTimelineEvent(_bldEditId,tipo,c.campo,`${c.anterior} → ${c.nuevo}`);
       });
@@ -10218,6 +10286,14 @@ function _dhmShowTip(e,name,ppt,bld,score,lbl){
   tt.style.top=(e.clientY-10)+'px';
 }
 function _dhmHideTip(){const tt=document.getElementById('dhm-tooltip');if(tt)tt.style.display='none';}
+
+function _bldUpdatePromNivel(){
+  const propiaCant=parseFloat(document.getElementById('be-supPropia')?.value)||0;
+  const pisos=parseInt(document.getElementById('be-cantPisos')?.value)||0;
+  const prom=propiaCant>0&&pisos>0?Math.round(propiaCant/pisos):null;
+  const kpi=document.getElementById('bld-kpi-sup-prom');
+  if(kpi)kpi.textContent=prom?prom.toLocaleString('es-AR')+' m²':'—';
+}
 
 </script>
 <!-- UNIT CRM AUTOCOMPLETE DROPDOWN — outside all panels so position:fixed works from any module -->
