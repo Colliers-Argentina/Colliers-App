@@ -7529,6 +7529,7 @@ function openBuildingEditor(docId){
   const d=_bldDocs.find(x=>x._id===docId);
   if(!d)return;
   _bldEditId=docId;
+  window._bldEditId=docId;
   const hasFoto=getBldFoto(d);
   const states=['Disponible','Reservado','Ocupado','Archivado'].map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('');
   const monedas=['USD','ARS'].map(m=>`<option${(d.moneda||'USD')===m?' selected':''}>${m}</option>`).join('');
@@ -8332,6 +8333,8 @@ function renderUnitsTable(buildingId,filterQ=''){renderDetailUnits(buildingId,fi
 
 async function addUnit(buildingId){
   if(!db)return;
+  if(!buildingId){console.error('[addUnit] buildingId undefined');showBldToast('❌ Error: edificio no identificado',3000);return;}
+  console.log('[addUnit]',buildingId);
   const newUnit={
     piso:'',unidad:'',m2:0,askingRent:'',precioVenta:'',moneda:'USD',
     ocupante:'',propietario:'',brokerAsignado:'',
@@ -8357,6 +8360,8 @@ async function addUnit(buildingId){
 
 async function saveUnitField(buildingId,unitId,field,value,el){
   if(!db)return;
+  if(!buildingId||!unitId){console.error('[saveUnitField] buildingId o unitId inválido',{buildingId,unitId,field});showBldToast('❌ Error: no se puede guardar sin ID de edificio',3000);return;}
+  console.log('[saveUnitField]',{buildingId,unitId,field});
   // Normalise m² input regardless of locale / thousand-separator format
   const normalized=field==='m2'?normalizeM2Input(value):value;
   // Separate piso and unidad when user types "10 A" or "10A" in the piso cell
@@ -8446,6 +8451,7 @@ window.getAllAvailableUnits=async()=>{
 function closeBldDetail(){
   document.getElementById('bld-detail-overlay').classList.remove('open');
   _bldEditId=null;
+  window._bldEditId=null;
   _unitDocs=[];
   renderBuildingsTable();
 }
