@@ -1215,13 +1215,32 @@ body.dark .bld-det-sidebar{border-right-color:rgba(255,255,255,.08)}
 .bld-det-img-name{color:#fff;font-size:14px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.5);line-height:1.3}
 .bld-det-img-addr{color:rgba(255,255,255,.75);font-size:10px;margin-top:2px;font-weight:500}
 .bld-det-sidebar-body{padding:1rem 1.1rem 1.5rem;display:flex;flex-direction:column;gap:1.1rem}
-.bld-det-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
-.bld-det-kpi{background:#EEF3FF;border:1px solid #DBE5FF;border-radius:10px;padding:.55rem .6rem;display:flex;flex-direction:column;gap:2px}
-body.dark .bld-det-kpi{background:rgba(28,84,244,.12);border-color:rgba(77,147,255,.2)}
-.bld-det-kpi-v{font-size:14px;font-weight:700;color:#0A1B4D;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-body.dark .bld-det-kpi-v{color:#fff}
-.bld-det-kpi-l{font-size:8px;color:#7B8BBD;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
-body.dark .bld-det-kpi-l{color:#A8B3D1}
+.bld-det-kpis{display:none}
+.bld-det-kpi{display:none}
+.bld-det-kpi-v{display:none}
+.bld-det-kpi-l{display:none}
+/* ===== REDISEÑO KPI GRID ===== */
+.bld-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;padding:.5rem 0}
+.bld-kpi-card{background:#F8FAFD;border:1px solid #E2EAF4;border-radius:10px;padding:.65rem .7rem .6rem;display:flex;flex-direction:column;gap:4px;position:relative;transition:border-color .15s,box-shadow .15s;overflow:visible}
+.bld-kpi-card:hover{border-color:#B6CFFF;box-shadow:0 2px 10px rgba(28,84,244,.09)}
+.bld-kpi-card-val{font-size:15px;font-weight:700;color:#0A1B4D;line-height:1.15;word-break:break-word}
+.bld-kpi-card-val.auto{color:#1C54F4}
+.bld-kpi-card-val.vac{color:#F59E0B}
+.bld-kpi-card-val.cat{color:#7C3AED}
+.bld-kpi-card-val.sin{font-size:10px;font-weight:600;color:#9CA3AF;font-style:italic}
+.bld-kpi-card-lbl{font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.055em;line-height:1.2}
+body.dark .bld-kpi-card{background:rgba(0,5,30,.45);border-color:rgba(77,147,255,.12)}
+body.dark .bld-kpi-card:hover{border-color:rgba(77,147,255,.3);box-shadow:0 2px 10px rgba(28,84,244,.15)}
+body.dark .bld-kpi-card-val{color:#E0EFFF}
+body.dark .bld-kpi-card-val.auto{color:#60A5FA}
+body.dark .bld-kpi-card-val.vac{color:#FBBF24}
+body.dark .bld-kpi-card-val.cat{color:#A78BFA}
+body.dark .bld-kpi-card-val.sin{color:#6B7280}
+body.dark .bld-kpi-card-lbl{color:#8A9AC0}
+/* Tooltip */
+.bld-kpi-card[data-tip]{cursor:help}
+.bld-kpi-tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:#0A1B4D;color:#fff;font-size:11px;font-weight:400;border-radius:8px;padding:7px 11px;width:190px;text-align:center;z-index:500;pointer-events:none;line-height:1.45;box-shadow:0 4px 14px rgba(10,27,77,.25);display:none;text-transform:none;letter-spacing:0}
+.bld-kpi-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#0A1B4D}
 .bld-det-section{display:flex;flex-direction:column;gap:.55rem}
 .bld-det-sec-hd{font-size:9px;font-weight:700;color:#1C54F4;text-transform:uppercase;letter-spacing:.1em;padding-bottom:.4rem;border-bottom:1px solid #EEF3FF}
 body.dark .bld-det-sec-hd{color:#4D93FF;border-bottom-color:rgba(255,255,255,.07)}
@@ -1441,11 +1460,10 @@ select.bwiz-inp:focus{border-color:#4D93FF}
 .bld-floor-leg-dot{width:9px;height:9px;border-radius:2px}
 
 /* ===== CALCULATED KPI ROW IN DETAIL ===== */
-.bld-det-calc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;padding:.75rem 0;margin:.5rem 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
-.bld-det-ckpi{display:flex;flex-direction:column;align-items:center;gap:2px}
-.bld-det-ckpi-v{font-size:14px;font-weight:700;color:#4D93FF}
-.bld-det-ckpi-l{font-size:9.5px;color:rgba(255,255,255,.35);text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.bld-det-ckpi-v.vac{color:#F59E0B}
+.bld-det-calc-kpis{display:none}
+.bld-det-ckpi{display:none}
+.bld-det-ckpi-v{display:none}
+.bld-det-ckpi-l{display:none}
 
 /* ===== BUILDINGS MODULE v3 — filter bar + list view ===== */
 .bld-filter-bar{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.6rem 0 .8rem;flex-wrap:wrap}
@@ -7526,20 +7544,52 @@ function openBuildingEditor(docId){
       </div>
     </div>
     <div class="bld-det-sidebar-body">
-      <div class="bld-det-kpis">
-        <div class="bld-det-kpi"><div class="bld-det-kpi-v" id="bld-kpi-sup-total">${d.superficieTotal?Math.round(d.superficieTotal).toLocaleString('es-AR')+' m²':'—'}</div><div class="bld-det-kpi-l">Sup. Total</div></div>
-        <div class="bld-det-kpi"><div class="bld-det-kpi-v" id="bld-kpi-sup-propia">${d.superficiePropia?Math.round(d.superficiePropia).toLocaleString('es-AR')+' m²':'—'}</div><div class="bld-det-kpi-l">Sup. Propia</div></div>
-        <div class="bld-det-kpi"><div class="bld-det-kpi-v">${esc(d.categoria||d.cat||'—')}</div><div class="bld-det-kpi-l">Categ.</div></div>
-      </div>
-      <div class="bld-det-calc-kpis">
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-sup-disp">${d.superficieDisponible?Math.round(d.superficieDisponible).toLocaleString('es-AR')+' m²':'—'}</div><div class="bld-det-ckpi-l">Sup. Disp.</div></div>
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v vac" id="bld-kpi-vacancia">—</div><div class="bld-det-ckpi-l">Vacancia %</div></div>
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-sup-prom">—</div><div class="bld-det-ckpi-l">Prom. Nivel</div></div>
-      </div>
-      <div class="bld-det-calc-kpis">
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-rent">—</div><div class="bld-det-ckpi-l">Rent Prom. m²</div></div>
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v" id="bld-kpi-avg-exp">—</div><div class="bld-det-ckpi-l">Exp. Prom. m²</div></div>
-        <div class="bld-det-ckpi"><div class="bld-det-ckpi-v">${esc(d.asking||d.rent||'—')}</div><div class="bld-det-ckpi-l">Asking</div></div>
+      <div class="bld-kpi-grid" id="bld-kpi-grid-wrap">
+        <div class="bld-kpi-card" data-tip="Superficie total construida del edificio." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val" id="bld-kpi-sup-total">${d.superficieTotal?`${Math.round(d.superficieTotal).toLocaleString('es-AR')} m²`:'<span class="bld-kpi-card-val sin">Sin información</span>'}</div>
+          <div class="bld-kpi-card-lbl">Superficie Total</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Superficie rentable propia del edificio. Base para calcular la vacancia." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val" id="bld-kpi-sup-propia">${d.superficiePropia?`${Math.round(d.superficiePropia).toLocaleString('es-AR')} m²`:'<span class="bld-kpi-card-val sin">Sin información</span>'}</div>
+          <div class="bld-kpi-card-lbl">Superficie Propia</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Clasificación del edificio según estándares de mercado." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val cat">${d.categoria||d.cat||'<span class="bld-kpi-card-val sin">Sin información</span>'}</div>
+          <div class="bld-kpi-card-lbl">Categoría</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Suma de superficies de componentes disponibles para Alquiler o Alquiler/Venta. Se actualiza automáticamente." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val auto" id="bld-kpi-sup-disp">${d.superficieDisponible?`${Math.round(d.superficieDisponible).toLocaleString('es-AR')} m²`:'<span class="bld-kpi-card-val sin">Sin información</span>'}</div>
+          <div class="bld-kpi-card-lbl">Sup. Disponible</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Porcentaje de superficie disponible sobre la superficie propia total del edificio." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val vac" id="bld-kpi-vacancia"><span class="bld-kpi-card-val sin">Sin información</span></div>
+          <div class="bld-kpi-card-lbl">Vacancia</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Superficie promedio por nivel. Calculada como Superficie Propia / Cantidad de Pisos." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val auto" id="bld-kpi-sup-prom"><span class="bld-kpi-card-val sin">Sin información</span></div>
+          <div class="bld-kpi-card-lbl">Prom. Nivel</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Promedio ponderado por m² del precio de renta de unidades disponibles para alquiler." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val auto" id="bld-kpi-avg-rent"><span class="bld-kpi-card-val sin">Sin información</span></div>
+          <div class="bld-kpi-card-lbl">Rent. Prom. m²</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Promedio ponderado por m² de expensas de unidades disponibles para alquiler." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val auto" id="bld-kpi-avg-exp"><span class="bld-kpi-card-val sin">Sin información</span></div>
+          <div class="bld-kpi-card-lbl">Exp. Prom. m²</div>
+        </div>
+        <div class="bld-kpi-card" data-tip="Precio de renta publicado manualmente para el edificio." onmouseenter="_kpiTip(this)" onmouseleave="_kpiHide(this)">
+          <div class="bld-kpi-tip"></div>
+          <div class="bld-kpi-card-val">${d.asking||d.rent||'<span class="bld-kpi-card-val sin">Sin información</span>'}</div>
+          <div class="bld-kpi-card-lbl">Asking Rent</div>
+        </div>
       </div>
       <div class="bld-det-section">
         <div class="bld-det-sec-hd">Identificación</div>
@@ -7896,19 +7946,19 @@ function _updateUnitStats(){
     // Update auto field + KPI
     const elDisp=document.getElementById('be-supDisp');if(elDisp)elDisp.value=supDisp||'';
     const kDisp=document.getElementById('bld-kpi-sup-disp');
-    if(kDisp)kDisp.textContent=supDisp?Math.round(supDisp).toLocaleString('es-AR')+' m²':'—';
+    if(kDisp)kDisp.innerHTML=supDisp?`${Math.round(supDisp).toLocaleString('es-AR')} m²`:'<span class="bld-kpi-card-val sin">Sin información</span>';
     // Vacancia = supDisp / superficiePropia (1 decimal)
     const bld=_bldDocs.find(x=>x._id===_bldEditId);
     const supPropia=parseFloat(bld?.superficiePropia||bld?.superficiePlanta||0)||0;
     const supRef=supPropia||parseFloat(bld?.superficieTotal||0)||0;
     const vacPct=supRef>0?(supDisp/supRef*100):null;
     const kvac=document.getElementById('bld-kpi-vacancia');
-    if(kvac)kvac.textContent=vacPct!==null?vacPct.toFixed(1)+'%':'—';
+    if(kvac)kvac.innerHTML=vacPct!==null?`${vacPct.toFixed(1)} %`:'<span class="bld-kpi-card-val sin">Sin información</span>';
     // Superficie Promedio Nivel = superficiePropia / cantidadPisos
     const cantPisos=parseInt(bld?.cantidadPisos)||0;
     const supPromNivel=supPropia>0&&cantPisos>0?Math.round(supPropia/cantPisos):null;
     const kProm=document.getElementById('bld-kpi-sup-prom');
-    if(kProm)kProm.textContent=supPromNivel?supPromNivel.toLocaleString('es-AR')+' m²':'—';
+    if(kProm)kProm.innerHTML=supPromNivel?`${supPromNivel.toLocaleString('es-AR')} m²`:'<span class="bld-kpi-card-val sin">Sin información</span>';
     // Weighted avg RENT: only disponible units with tipoOferta Alquiler/Alquiler-Venta
     const rentUnits=_unitDocs.filter(u=>{
       const to=u.tipoOferta||'Alquiler';
@@ -7920,7 +7970,7 @@ function _updateUnitStats(){
     const rentWM2=rentUnits.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
     const avgRent=rentWM2>0?Math.round(rentWSum/rentWM2):null;
     const krent=document.getElementById('bld-kpi-avg-rent');
-    if(krent)krent.textContent=avgRent?'USD '+avgRent.toLocaleString('es-AR'):'—';
+    if(krent)krent.innerHTML=avgRent?`USD ${avgRent.toLocaleString('es-AR')}`:'<span class="bld-kpi-card-val sin">Sin información</span>';
     // Weighted avg EXPENSES: same disponible filter
     const expUnits=_unitDocs.filter(u=>{
       const to=u.tipoOferta||'Alquiler';
@@ -7932,7 +7982,7 @@ function _updateUnitStats(){
     const expWM2=expUnits.reduce((s,u)=>s+(parseFloat(u.m2)||0),0);
     const avgExp=expWM2>0?Math.round(expWSum/expWM2):null;
     const kexp=document.getElementById('bld-kpi-avg-exp');
-    if(kexp)kexp.textContent=avgExp?'USD '+avgExp.toLocaleString('es-AR'):'—';
+    if(kexp)kexp.innerHTML=avgExp?`USD ${avgExp.toLocaleString('es-AR')}`:'<span class="bld-kpi-card-val sin">Sin información</span>';
     // Floor occupation map
     _renderFloorMap();
   }
@@ -10297,6 +10347,32 @@ function _bldUpdatePromNivel(){
   const prom=propiaCant>0&&pisos>0?Math.round(propiaCant/pisos):null;
   const kpi=document.getElementById('bld-kpi-sup-prom');
   if(kpi)kpi.textContent=prom?prom.toLocaleString('es-AR')+' m²':'—';
+}
+
+// ===== KPI TOOLTIP =====
+function _kpiTip(card){
+  const tip=card.querySelector('.bld-kpi-tip');
+  if(!tip||!card.dataset.tip)return;
+  tip.textContent=card.dataset.tip;
+  tip.style.display='block';
+  // Keep tooltip within sidebar bounds
+  const rect=card.getBoundingClientRect();
+  const sidebar=card.closest('.bld-det-sidebar-body');
+  if(sidebar){
+    const sr=sidebar.getBoundingClientRect();
+    const half=95; // half of tip width 190px
+    const cardCenter=rect.left+rect.width/2-sr.left;
+    const offset=Math.max(half,Math.min(cardCenter,sr.width-half));
+    const pct=((offset-rect.width/2)/rect.width*100).toFixed(0);
+    tip.style.left=`calc(${pct}% + ${rect.width/2}px - ${offset}px + ${cardCenter-rect.width/2-rect.left+sr.left}px)`;
+    // simpler: just left:0 and let it overflow to right if needed
+    tip.style.left='50%';
+    tip.style.transform='translateX(-50%)';
+  }
+}
+function _kpiHide(card){
+  const tip=card.querySelector('.bld-kpi-tip');
+  if(tip)tip.style.display='none';
 }
 
 </script>
