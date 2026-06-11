@@ -1555,6 +1555,79 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 .hub-quick-label{font-size:12px;font-weight:600;color:#C3E6FF}
 .hub-quick-sub{font-size:10px;color:rgba(163,193,255,.45)}
 
+/* ===== HOME HUB V2 DASHBOARD ===== */
+.hub-hero-v2{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;margin-bottom:1.75rem}
+.hub-hero-left{flex:1}
+.hub-hero-right{display:flex;align-items:center;gap:.85rem;flex-shrink:0}
+.hub-clock-box{text-align:right}
+.hub-clock-date{font-size:12px;color:rgba(163,193,255,.6);font-weight:500}
+.hub-clock-time{font-size:22px;font-weight:700;color:#fff;letter-spacing:.5px;font-variant-numeric:tabular-nums;line-height:1.1}
+.hub-notif-pill{display:flex;align-items:center;gap:.4rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:999px;padding:.4rem .9rem;cursor:pointer;transition:all .2s;font-size:13px;font-weight:700;color:#FCA5A5;white-space:nowrap}
+.hub-notif-pill:hover{background:rgba(239,68,68,.24);border-color:rgba(239,68,68,.5)}
+.hub-notif-pill .hub-notif-zero{color:rgba(163,193,255,.5);font-weight:500}
+.hub-sec-label{font-size:11px;font-weight:700;color:rgba(163,193,255,.45);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.85rem;margin-top:2rem}
+.hub-alert-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem}
+@media(max-width:1000px){.hub-alert-strip{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:540px){.hub-alert-strip{grid-template-columns:repeat(2,1fr)}}
+.hub-alert-card{background:rgba(8,14,36,.52);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:14px;padding:1.1rem 1.2rem;cursor:pointer;transition:all .22s;border-left:3px solid transparent;display:flex;flex-direction:column;gap:.3rem;border:1px solid rgba(255,255,255,.05)}
+.hub-alert-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.hub-alert-red{border-left:3px solid #EF4444 !important;background:rgba(239,68,68,.08) !important}
+.hub-alert-orange{border-left:3px solid #F97316 !important;background:rgba(249,115,22,.08) !important}
+.hub-alert-green{border-left:3px solid #22C55E !important;background:rgba(34,197,94,.08) !important}
+.hub-alert-blue{border-left:3px solid #3B82F6 !important;background:rgba(59,130,246,.08) !important}
+.hub-alert-purple{border-left:3px solid #A855F7 !important;background:rgba(168,85,247,.08) !important}
+.hub-alert-icon{font-size:15px}
+.hub-alert-num{font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1;margin:.1rem 0}
+.hub-alert-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.85)}
+.hub-alert-sub{font-size:10px;color:rgba(163,193,255,.4)}
+.hub-mid-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:860px){.hub-mid-grid{grid-template-columns:1fr}}
+.hub-insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.hub-insight-card{background:rgba(8,14,36,.52);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(77,147,255,.1);border-radius:14px;padding:1.1rem 1.2rem;cursor:pointer;transition:all .22s;display:flex;flex-direction:column;gap:.3rem}
+.hub-insight-card:hover{border-color:rgba(77,147,255,.28);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.hub-insight-header{display:flex;align-items:center;gap:.4rem;margin-bottom:.15rem}
+.hub-insight-emoji{font-size:14px}
+.hub-insight-title{font-size:10px;font-weight:700;color:rgba(163,193,255,.5);text-transform:uppercase;letter-spacing:.06em}
+.hub-insight-val{font-size:15px;font-weight:700;color:#fff;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hub-insight-meta{font-size:10px;color:rgba(163,193,255,.4)}
+.hub-insight-fire{border-top:2px solid rgba(239,68,68,.5) !important}
+.hub-insight-bld{border-top:2px solid rgba(77,147,255,.5) !important}
+.hub-insight-broker{border-top:2px solid rgba(34,197,94,.5) !important}
+.hub-insight-demand{border-top:2px solid rgba(168,85,247,.5) !important}
+.hub-activity-box{background:rgba(8,14,36,.52);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(77,147,255,.1);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.hub-activity-list{flex:1}
+.hub-activity-item{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem 1rem;transition:background .15s;border-bottom:1px solid rgba(77,147,255,.04)}
+.hub-activity-item:last-child{border-bottom:none}
+.hub-activity-item:hover{background:rgba(77,147,255,.05)}
+.hub-activity-dot{font-size:14px;line-height:1;margin-top:.1rem;flex-shrink:0}
+.hub-activity-body{flex:1;min-width:0}
+.hub-activity-text{font-size:12px;color:#C3E6FF;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hub-activity-user{font-size:10px;color:rgba(163,193,255,.38);margin-top:.1rem}
+.hub-activity-time{font-size:10px;color:rgba(163,193,255,.32);flex-shrink:0;padding-top:.1rem}
+.hub-activity-more{width:100%;background:none;border:none;border-top:1px solid rgba(77,147,255,.1);padding:.7rem;font-size:11px;font-weight:600;color:#4D93FF;cursor:pointer;font-family:inherit;transition:background .15s}
+.hub-activity-more:hover{background:rgba(28,84,244,.08)}
+.hub-mini-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:.7rem}
+@media(max-width:1000px){.hub-mini-kpi-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:540px){.hub-mini-kpi-row{grid-template-columns:repeat(2,1fr)}}
+.hub-mini-kpi{background:rgba(8,14,36,.52);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(77,147,255,.1);border-radius:12px;padding:.9rem .85rem;text-align:center;transition:all .2s}
+.hub-mini-kpi:hover{border-color:rgba(77,147,255,.25);transform:translateY(-1px)}
+.hub-mini-kpi-icon{font-size:17px;margin-bottom:.3rem}
+.hub-mini-kpi-val{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1}
+.hub-mini-kpi-label{font-size:10px;color:rgba(163,193,255,.42);font-weight:500;margin-top:.3rem;line-height:1.3}
+.hub-radar-box{background:linear-gradient(135deg,rgba(28,84,244,.16),rgba(77,147,255,.06));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(77,147,255,.22);border-radius:18px;padding:1.75rem 2rem;margin-top:1.75rem;margin-bottom:2.5rem}
+.hub-radar-inner{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.hub-radar-left{flex:1;min-width:200px}
+.hub-radar-tag{display:inline-flex;align-items:center;gap:.4rem;font-size:10px;font-weight:700;color:#A5B4FC;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.28);padding:3px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem}
+.hub-radar-title{font-size:19px;font-weight:700;color:#fff;margin-bottom:.5rem}
+.hub-radar-text{font-size:13px;color:rgba(163,193,255,.62);line-height:1.75}
+.hub-radar-text strong{color:#C3E6FF}
+.hub-radar-stats{display:flex;gap:1.5rem;flex-shrink:0}
+.hub-radar-stat{text-align:center}
+.hub-radar-stat-val{font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1}
+.hub-radar-stat-lbl{font-size:10px;color:rgba(163,193,255,.48);font-weight:500;margin-top:.25rem}
+.hub-radar-btn{background:rgba(28,84,244,.2);border:1px solid rgba(77,147,255,.3);color:#C3E6FF;padding:.7rem 1.5rem;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.hub-radar-btn:hover{background:rgba(28,84,244,.35);border-color:#4D93FF;color:#fff}
+
 /* ===== APP SHELL FLEX LAYOUT ===== */
 #app-shell{display:none;height:100vh;overflow:hidden}
 #app-shell.active{display:flex;flex-direction:row}
@@ -2313,37 +2386,52 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 <!-- HOME HUB -->
 <div id="home-hub">
   <div class="hub-wrap">
-    <div class="hub-hero">
-      <div class="hub-greeting" id="hub-greeting">¡Buenos días!</div>
-      <h1 class="hub-title">Bienvenido a tu <span>centro de operaciones</span></h1>
-      <p class="hub-subtitle">Seleccioná un módulo para comenzar</p>
-    </div>
-    <div class="hub-cards" id="hub-cards">
-      <!-- cards rendered by JS so analytics card only shows for whitelist -->
-    </div>
-    <div class="hub-section-title">Accesos rápidos</div>
-    <div class="hub-quick">
-      <div class="hub-quick-card" onclick="showModule('generator')">
-        <div class="hub-quick-icon">📄</div>
-        <div class="hub-quick-label">Nueva propuesta</div>
-        <div class="hub-quick-sub">Generador de Informes</div>
+    <!-- 1. HERO -->
+    <div class="hub-hero-v2">
+      <div class="hub-hero-left">
+        <div class="hub-greeting" id="hub-greeting">¡Buenos días!</div>
+        <h1 class="hub-title"><span>Centro de Operaciones Comerciales</span></h1>
+        <p class="hub-subtitle" style="margin-top:.25rem">Colliers Nexus · Plataforma Comercial</p>
       </div>
-      <div class="hub-quick-card" onclick="showModule('crm')">
-        <div class="hub-quick-icon">👤</div>
-        <div class="hub-quick-label">Clientes activos</div>
-        <div class="hub-quick-sub">Clientes CRM</div>
-      </div>
-      <div class="hub-quick-card" onclick="showModule('buildings')">
-        <div class="hub-quick-icon">🏗️</div>
-        <div class="hub-quick-label">Inventario</div>
-        <div class="hub-quick-sub">Edificios y disponibilidades</div>
-      </div>
-      <div class="hub-quick-card" onclick="showModule('generator')">
-        <div class="hub-quick-icon">🔍</div>
-        <div class="hub-quick-label">Búsqueda de oficinas</div>
-        <div class="hub-quick-sub">Filtros avanzados</div>
+      <div class="hub-hero-right">
+        <div class="hub-clock-box">
+          <div class="hub-clock-date" id="hub-date"></div>
+          <div class="hub-clock-time" id="hub-time">--:--</div>
+        </div>
+        <div class="hub-notif-pill" id="hub-notif-pill" onclick="document.getElementById('hub-alerts-section').scrollIntoView({behavior:'smooth'})">
+          🔔 <span id="hub-notif-count" class="hub-notif-zero">—</span>
+        </div>
       </div>
     </div>
+
+    <!-- 2. ACCESOS RÁPIDOS -->
+    <div class="hub-sec-label" style="margin-top:0">Accesos Rápidos</div>
+    <div class="hub-cards" id="hub-cards"><!-- rendered by JS --></div>
+
+    <!-- 3. ALERTAS -->
+    <div id="hub-alerts-section">
+      <div class="hub-sec-label">Alertas y Notificaciones</div>
+      <div class="hub-alert-strip" id="hub-alerts"><!-- rendered by JS --></div>
+    </div>
+
+    <!-- 4+5. INSIGHTS + ACTIVIDAD -->
+    <div class="hub-mid-grid" style="margin-top:0">
+      <div>
+        <div class="hub-sec-label">Insights Comerciales</div>
+        <div class="hub-insight-grid" id="hub-insights"><!-- rendered by JS --></div>
+      </div>
+      <div>
+        <div class="hub-sec-label">Actividad Reciente</div>
+        <div class="hub-activity-box" id="hub-activity"><!-- rendered by JS --></div>
+      </div>
+    </div>
+
+    <!-- 6. KPIs -->
+    <div class="hub-sec-label">KPIs Operacionales</div>
+    <div class="hub-mini-kpi-row" id="hub-kpis"><!-- rendered by JS --></div>
+
+    <!-- 7. RADAR COMERCIAL -->
+    <div class="hub-radar-box" id="hub-radar"><!-- rendered by JS --></div>
   </div>
 </div>
 
@@ -10634,6 +10722,7 @@ function _setSbActive(mod,submod){
 
 function showModule(mod){
   closeMobileSidebar();
+  if(_hubClockTick&&mod!=='home'){clearInterval(_hubClockTick);_hubClockTick=null;}
   // Close all overlays (including CRM)
   ['analytics-panel','buildings-panel','admin-panel','crm-panel','transacciones-panel'].forEach(id=>{
     const el=document.getElementById(id);
@@ -10674,8 +10763,34 @@ function showModule(mod){
     loadTransacciones();
   }
 }
+// ─── HUB DASHBOARD V2 ───────────────────────────────────────────────────
+let _hubClockTick=null;
+
+function _startHubClock(){
+  if(_hubClockTick)clearInterval(_hubClockTick);
+  const DAYS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const MONTHS=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  function tick(){
+    const n=new Date();
+    const d=document.getElementById('hub-date');
+    const t=document.getElementById('hub-time');
+    if(d)d.textContent=`${DAYS[n.getDay()]}, ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
+    if(t)t.textContent=n.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  tick();
+  _hubClockTick=setInterval(tick,1000);
+}
+
+function _updateHubGreeting(){
+  const h=new Date().getHours();
+  const saludo=h<12?'¡Buenos días':h<18?'¡Buenas tardes':'¡Buenas noches';
+  const nombre=user?.name?.split(' ')[0]||user?.email?.split('@')[0]||'';
+  const el=document.getElementById('hub-greeting');
+  if(el)el.textContent=`${saludo}${nombre?', '+nombre:''}!`;
+}
+
 function _hubCardHTML(c){
-  const statHTML=c.stats?`<div class="hub-card-stat-row">${c.stats.map(s=>`<span class="hub-card-stat-val" id="${s.id}">—</span><span class="hub-card-stat-lbl">${s.lbl}</span>`).join('<span style="color:rgba(255,255,255,.2);margin:0 .2rem">·</span>')}</div>`:'';
+  const statHTML=c.stats?`<div class="hub-card-stat-row" style="margin:.25rem 0">${c.stats.map(s=>`<span class="hub-card-stat-val" id="${s.id}">—</span><span class="hub-card-stat-lbl">${s.lbl}</span>`).join('<span style="color:rgba(255,255,255,.18);margin:0 .3rem">·</span>')}</div>`:'';
   return `<div class="hub-card" onclick="showModule('${c.mod}')">
     <div class="hub-card-hd">
       <div class="hub-card-icon">${c.icon}</div>
@@ -10684,7 +10799,6 @@ function _hubCardHTML(c){
     <div>
       <div class="hub-card-title">${c.title}</div>
       ${statHTML}
-      <div class="hub-card-desc">${c.desc}</div>
     </div>
     <div class="hub-card-footer">
       <button class="hub-card-btn" onclick="event.stopPropagation();showModule('${c.mod}')">${c.btn} →</button>
@@ -10693,62 +10807,283 @@ function _hubCardHTML(c){
 }
 
 function renderHubCards(){
+  _updateHubGreeting();
+  _startHubClock();
   const container=document.getElementById('hub-cards');
   if(!container)return;
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
   const cards=[
-    {icon:'🔍',title:'Generador de Informes',desc:'Creación automática de propuestas comerciales para presentar a clientes.',mod:'generator',btn:'Abrir módulo'},
-    {icon:'🏢',title:'Oficinas',desc:'Inventario de oficinas corporativas y disponibilidades.',mod:'office',btn:'Abrir módulo',stats:[{id:'hc-off-total',lbl:'activos'},{id:'hc-off-disp',lbl:'disponibles'}]},
-    {icon:'🏭',title:'Industrial',desc:'Naves, parques y centros logísticos del portafolio.',mod:'industrial',btn:'Abrir módulo',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disponibles'}]},
-    {icon:'🛍️',title:'Retail',desc:'Locales comerciales y centros de consumo.',mod:'retail',btn:'Abrir módulo',stats:[{id:'hc-ret-total',lbl:'activos'},{id:'hc-ret-disp',lbl:'disponibles'}]},
-    {icon:'📋',title:'Leads',desc:'Pipeline de negocios y oportunidades en seguimiento.',mod:'crm-leads',btn:'Abrir módulo',stats:[{id:'hc-leads-total',lbl:'total'},{id:'hc-leads-30d',lbl:'últimos 30d'}]},
-    {icon:'👤',title:'Contactos',desc:'Base de contactos vinculados a cuentas.',mod:'crm-contactos',btn:'Abrir módulo',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
-    {icon:'🏛️',title:'Cuentas',desc:'Empresas y organizaciones del portafolio comercial.',mod:'crm-cuentas',btn:'Abrir módulo',stats:[{id:'hc-cta-total',lbl:'cuentas'}]},
+    {icon:'🏢',title:'Oficinas',mod:'office',btn:'Ver inventario',stats:[{id:'hc-off-total',lbl:'edificios'},{id:'hc-off-disp',lbl:'disponibles'}]},
+    {icon:'🏭',title:'Industrial',mod:'industrial',btn:'Ver inventario',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disponibles'}]},
+    {icon:'🛍️',title:'Retail',mod:'retail',btn:'Ver inventario',stats:[{id:'hc-ret-total',lbl:'locales'},{id:'hc-ret-disp',lbl:'disponibles'}]},
+    {icon:'🎯',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'leads abiertos'}]},
+    {icon:'🏛️',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'cuentas activas'}]},
+    {icon:'👤',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
+    {icon:'📄',title:'Generador PPT',mod:'generator',btn:'Crear presentación',stats:[{id:'hc-ppt-30d',lbl:'PPTs últimos 30d'}]},
   ];
-  if(isAdmin){
-    cards.push({icon:'📊',title:'Analítica',desc:'Métricas y performance del negocio con reporting estratégico.',mod:'analytics',btn:'Abrir módulo',badge:'Solo Admin'});
-  }
+  if(isAdmin)cards.push({icon:'📊',title:'Analytics',mod:'analytics',btn:'Abrir analytics',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
   container.innerHTML=cards.map(c=>_hubCardHTML(c)).join('');
-  _loadHubCardStats();
+  _loadHubDashboardData();
 }
 
-async function _loadHubCardStats(){
+async function _loadHubDashboardData(){
   if(!db)return;
-  const classifyAt=d=>d.assetType||(d._tipo==='industrial'?'industrial':d._tipo==='retail'?'retail':'office');
   const now=Date.now();
+  const ms7d=7*24*60*60*1000;
+  const ms14d=14*24*60*60*1000;
   const ms30d=30*24*60*60*1000;
+  const classify=d=>d.assetType||(d._tipo==='industrial'?'industrial':d._tipo==='retail'?'retail':'office');
+  const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   try{
-    const [bldSnap,ctoSnap,ctaSnap]=await Promise.all([
+    const [bldSnap,ctoSnap,ctaSnap,descSnap,txSnap]=await Promise.all([
       db.collection('buildings').where('activo','==',true).get(),
       db.collection('contactos').get(),
       db.collection('clientes').get(),
+      db.collection('descargas').orderBy('fecha','desc').limit(200).get().catch(()=>({docs:[],size:0})),
+      db.collection('transacciones').get().catch(()=>({docs:[]})),
     ]);
-    let offT=0,offD=0,indT=0,indD=0,retT=0,retD=0;
+
+    // Inventory
+    let offT=0,offD=0,indT=0,indD=0,retT=0,retD=0,totalM2=0,bldThisWeek=0;
     bldSnap.docs.forEach(doc=>{
       const d=doc.data();
-      const at=classifyAt(d);
+      const at=classify(d);
       const disp=d.disponible!==false&&d.estado!=='Ocupado';
       if(at==='office'){offT++;if(disp)offD++;}
       else if(at==='industrial'){indT++;if(disp)indD++;}
       else if(at==='retail'){retT++;if(disp)retD++;}
+      if(disp&&d.superficieTotal)totalM2+=d.superficieTotal;
+      const ca=d.createdAt?_tsToDate(d.createdAt):null;
+      if(ca&&(now-ca.getTime())<ms7d)bldThisWeek++;
     });
-    const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
     setEl('hc-off-total',offT);setEl('hc-off-disp',offD);
     setEl('hc-ind-total',indT);setEl('hc-ind-disp',indD);
     setEl('hc-ret-total',retT);setEl('hc-ret-disp',retD);
-    setEl('hc-cto-total',ctoSnap.size);
-    setEl('hc-cta-total',ctaSnap.size);
-    // Leads: count from clientes where categoria includes lead-like, or just show total cuentas for now
-    // Show total leads (clientes docs) + nuevos 30d
-    let leads30d=0;
+
+    // CRM
+    let leads30d=0,leadsNoContact=0,leadsSinAct14d=0;
     ctaSnap.docs.forEach(doc=>{
       const d=doc.data();
       const fc=d.fechaCreacion?_tsToDate(d.fechaCreacion):null;
+      const ua=d.ultimaActividad?_tsToDate(d.ultimaActividad):null;
       if(fc&&(now-fc.getTime())<ms30d)leads30d++;
+      if(!ua)leadsNoContact++;
+      else if((now-ua.getTime())>ms14d)leadsSinAct14d++;
     });
     setEl('hc-leads-total',ctaSnap.size);
-    setEl('hc-leads-30d','+'+leads30d);
-  }catch(e){console.error('_loadHubCardStats',e);}
+    setEl('hc-cto-total',ctoSnap.size);
+    setEl('hc-cta-total',ctaSnap.size);
+
+    // Descargas / PPTs
+    let ppt30d=0,ppt7d=0;
+    const zonaCounts={},buildingCounts={},brokerCounts={};
+    descSnap.docs.forEach(doc=>{
+      const d=doc.data();
+      const f=d.fecha?_tsToDate(d.fecha):null;
+      if(f){
+        if((now-f.getTime())<ms30d)ppt30d++;
+        if((now-f.getTime())<ms7d)ppt7d++;
+      }
+      const z=d.corredor||d.zona||d.submercado;
+      if(z)zonaCounts[z]=(zonaCounts[z]||0)+1;
+      const b=d.edificioNombre||d.nombre||d.building;
+      if(b)buildingCounts[b]=(buildingCounts[b]||0)+1;
+      const br=d.brokerEmail||d.broker||d.userEmail;
+      if(br)brokerCounts[br]=(brokerCounts[br]||0)+1;
+    });
+    setEl('hc-ppt-30d',ppt30d);
+    setEl('hc-an-total',descSnap.size||descSnap.docs?.length||0);
+
+    // Transactions
+    const txNow=new Date();
+    let txCerradas=0,txAbiertas=0;
+    txSnap.docs.forEach(doc=>{
+      const d=doc.data();
+      const f=d.fecha?_tsToDate(d.fecha):null;
+      if(d.estado==='cerrada'||d.estado==='Cerrada'){
+        if(f&&f.getMonth()===txNow.getMonth()&&f.getFullYear()===txNow.getFullYear())txCerradas++;
+      }else{txAbiertas++;}
+    });
+
+    // Notif pill
+    const totalNotif=leadsNoContact+leadsSinAct14d;
+    const npCount=document.getElementById('hub-notif-count');
+    if(npCount){
+      npCount.textContent=totalNotif||'0';
+      npCount.className=totalNotif>0?'':'hub-notif-zero';
+    }
+
+    // Render sections
+    _renderHubAlerts({leadsNoContact,leadsSinAct14d,txCerradas,bldThisWeek,ppt7d});
+    const topZona=Object.entries(zonaCounts).sort((a,b)=>b[1]-a[1])[0]||null;
+    const topBld=Object.entries(buildingCounts).sort((a,b)=>b[1]-a[1])[0]||null;
+    const topBroker=Object.entries(brokerCounts).sort((a,b)=>b[1]-a[1])[0]||null;
+    _renderHubInsights({topZona,topBld,topBroker,descDocs:descSnap.docs});
+    _renderHubKPIs({offT,indT,retT,offD,indD,retD,totalM2,ctaSize:ctaSnap.size,txAbiertas,txCerradas});
+    _renderHubRadar({topZona,offD,indD,retD,descDocs:descSnap.docs});
+    _renderHubActivity(ctaSnap.docs,ctoSnap.docs,bldSnap.docs,descSnap.docs);
+  }catch(e){console.error('_loadHubDashboardData',e);}
+}
+
+function _renderHubAlerts({leadsNoContact,leadsSinAct14d,txCerradas,bldThisWeek,ppt7d}){
+  const el=document.getElementById('hub-alerts');
+  if(!el)return;
+  const alerts=[
+    {color:'red',icon:'🚨',label:'Leads sin contactar',val:leadsNoContact,sub:'requieren atención inmediata',mod:'crm-cuentas'},
+    {color:'orange',icon:'⏰',label:'Sin actividad +14d',val:leadsSinAct14d,sub:'oportunidades sin seguimiento',mod:'crm-cuentas'},
+    {color:'green',icon:'✅',label:'Tx cerradas este mes',val:txCerradas,sub:'transacciones completadas',mod:'transacciones'},
+    {color:'blue',icon:'🏗️',label:'Nuevos inmuebles',val:bldThisWeek,sub:'cargados esta semana',mod:'office'},
+    {color:'purple',icon:'📤',label:'PPTs enviadas',val:ppt7d,sub:'últimos 7 días',mod:'analytics'},
+  ];
+  el.innerHTML=alerts.map(a=>`
+    <div class="hub-alert-card hub-alert-${a.color}" onclick="showModule('${a.mod}')">
+      <div class="hub-alert-icon">${a.icon}</div>
+      <div class="hub-alert-num">${a.val}</div>
+      <div class="hub-alert-label">${a.label}</div>
+      <div class="hub-alert-sub">${a.sub}</div>
+    </div>
+  `).join('');
+}
+
+function _renderHubInsights({topZona,topBld,topBroker,descDocs}){
+  const el=document.getElementById('hub-insights');
+  if(!el)return;
+  const m2vals=[];
+  descDocs.forEach(doc=>{
+    const d=doc.data?doc.data():doc;
+    if(d.supMin&&d.supMin>0)m2vals.push(d.supMin);
+    if(d.supMax&&d.supMax>0)m2vals.push(d.supMax);
+    if(d.supReq&&d.supReq>0)m2vals.push(d.supReq);
+  });
+  const avgM2=m2vals.length?Math.round(m2vals.reduce((a,b)=>a+b,0)/m2vals.length):null;
+  const fmtNum=v=>v!=null?v.toLocaleString('es-AR'):'—';
+  el.innerHTML=`
+    <div class="hub-insight-card hub-insight-fire" onclick="showModule('analytics')">
+      <div class="hub-insight-header"><span class="hub-insight-emoji">🔥</span><span class="hub-insight-title">Zona Caliente</span></div>
+      <div class="hub-insight-val">${topZona?topZona[0]:'Sin datos'}</div>
+      <div class="hub-insight-meta">${topZona?topZona[1]+' búsquedas':''}</div>
+    </div>
+    <div class="hub-insight-card hub-insight-bld" onclick="showModule('analytics')">
+      <div class="hub-insight-header"><span class="hub-insight-emoji">🏢</span><span class="hub-insight-title">Más Solicitado</span></div>
+      <div class="hub-insight-val">${topBld?topBld[0]:'Sin datos'}</div>
+      <div class="hub-insight-meta">${topBld?topBld[1]+' apariciones en PPTs':''}</div>
+    </div>
+    <div class="hub-insight-card hub-insight-broker" onclick="showModule('analytics')">
+      <div class="hub-insight-header"><span class="hub-insight-emoji">👤</span><span class="hub-insight-title">Broker Líder</span></div>
+      <div class="hub-insight-val">${topBroker?(topBroker[0].includes('@')?topBroker[0].split('@')[0]:topBroker[0]):'Sin datos'}</div>
+      <div class="hub-insight-meta">${topBroker?topBroker[1]+' PPTs generadas':''}</div>
+    </div>
+    <div class="hub-insight-card hub-insight-demand" onclick="showModule('generator')">
+      <div class="hub-insight-header"><span class="hub-insight-emoji">📈</span><span class="hub-insight-title">Demanda Detectada</span></div>
+      <div class="hub-insight-val">${avgM2?fmtNum(avgM2)+' m²':'Sin datos'}</div>
+      <div class="hub-insight-meta">superficie promedio requerida</div>
+    </div>
+  `;
+}
+
+function _renderHubKPIs({offT,indT,retT,offD,indD,retD,totalM2,ctaSize,txAbiertas,txCerradas}){
+  const el=document.getElementById('hub-kpis');
+  if(!el)return;
+  const fmtM2=v=>v>=1000?(v/1000).toFixed(1).replace('.',',')+' k':v.toLocaleString('es-AR');
+  const kpis=[
+    {icon:'🏗️',val:offT+indT+retT,label:'Edificios activos'},
+    {icon:'✅',val:offD+indD+retD,label:'Disponibles'},
+    {icon:'📐',val:totalM2?fmtM2(Math.round(totalM2))+' m²':'—',label:'m² disponibles'},
+    {icon:'🏛️',val:ctaSize,label:'Cuentas activas'},
+    {icon:'🤝',val:txAbiertas,label:'Tx abiertas'},
+    {icon:'🏆',val:txCerradas,label:'Tx cerradas mes'},
+  ];
+  el.innerHTML=kpis.map(k=>`
+    <div class="hub-mini-kpi">
+      <div class="hub-mini-kpi-icon">${k.icon}</div>
+      <div class="hub-mini-kpi-val">${k.val}</div>
+      <div class="hub-mini-kpi-label">${k.label}</div>
+    </div>
+  `).join('');
+}
+
+function _renderHubRadar({topZona,offD,indD,retD,descDocs}){
+  const el=document.getElementById('hub-radar');
+  if(!el)return;
+  const totalDisp=offD+indD+retD;
+  const zona=topZona?topZona[0]:'el mercado';
+  const mins=[],maxs=[];
+  descDocs.forEach(doc=>{
+    const d=doc.data?doc.data():doc;
+    if(d.supMin&&d.supMin>0)mins.push(d.supMin);
+    if(d.supMax&&d.supMax>0)maxs.push(d.supMax);
+  });
+  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):null;
+  const avgMin=avg(mins)||500;
+  const avgMax=avg(maxs)||1000;
+  const fmtN=v=>v.toLocaleString('es-AR');
+  el.innerHTML=`
+    <div class="hub-radar-inner">
+      <div class="hub-radar-left">
+        <div class="hub-radar-tag">🎯 Oportunidad del día</div>
+        <div class="hub-radar-title">Radar Comercial</div>
+        <div class="hub-radar-text">Actualmente <strong>${zona}</strong> concentra la mayor demanda del sistema para superficies entre <strong>${fmtN(avgMin)}</strong> y <strong>${fmtN(avgMax)} m²</strong>. Hay <strong>${totalDisp}</strong> disponibilidades activas en el portafolio.</div>
+      </div>
+      <div class="hub-radar-stats">
+        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${offD}</div><div class="hub-radar-stat-lbl">Oficinas<br>disp.</div></div>
+        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${indD}</div><div class="hub-radar-stat-lbl">Industrial<br>disp.</div></div>
+        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${retD}</div><div class="hub-radar-stat-lbl">Retail<br>disp.</div></div>
+      </div>
+      <button class="hub-radar-btn" onclick="showModule('generator')">Crear propuesta →</button>
+    </div>
+  `;
+}
+
+function _renderHubActivity(ctaDocs,ctoDocs,bldDocs,descDocs){
+  const el=document.getElementById('hub-activity');
+  if(!el)return;
+  const now=Date.now();
+  const items=[];
+  ctaDocs.slice(0,6).forEach(doc=>{
+    const d=doc.data?doc.data():doc;
+    const f=d.fechaCreacion?_tsToDate(d.fechaCreacion):null;
+    if(f)items.push({ts:f.getTime(),icon:'🏛️',text:'Nueva cuenta: '+(d.nombre||'Sin nombre'),user:d.brokerCreador||''});
+  });
+  ctoDocs.slice(0,6).forEach(doc=>{
+    const d=doc.data?doc.data():doc;
+    const f=d.fechaCreacion?_tsToDate(d.fechaCreacion):null;
+    if(f)items.push({ts:f.getTime(),icon:'👤',text:'Nuevo contacto: '+([d.nombre,d.apellidos].filter(Boolean).join(' ')||'Sin nombre'),user:d.brokerResponsable||''});
+  });
+  bldDocs.slice(0,6).forEach(doc=>{
+    const d=doc.data?doc.data():doc;
+    const f=d.createdAt?_tsToDate(d.createdAt):null;
+    if(f)items.push({ts:f.getTime(),icon:'🏗️',text:'Nuevo inmueble: '+(d.nombre||d.direccion||'Sin nombre'),user:''});
+  });
+  descDocs.slice(0,6).forEach(doc=>{
+    const d=doc.data?doc.data():doc;
+    const f=d.fecha?_tsToDate(d.fecha):null;
+    if(f)items.push({ts:f.getTime(),icon:'📄',text:'PPT generada para '+(d.clienteNombre||d.cliente||'cliente'),user:(d.brokerEmail||d.broker||d.userEmail||'').split('@')[0]});
+  });
+  items.sort((a,b)=>b.ts-a.ts);
+  const top=items.slice(0,10);
+  if(!top.length){
+    el.innerHTML='<div style="text-align:center;padding:2rem 1rem;color:rgba(163,193,255,.35);font-size:12px">Sin actividad reciente registrada</div>';
+    return;
+  }
+  function fmtAgo(ts){
+    const diff=now-ts;
+    const m=Math.floor(diff/60000);
+    if(m<1)return 'ahora';
+    if(m<60)return m+'m';
+    const h=Math.floor(diff/3600000);
+    if(h<24)return h+'h';
+    return Math.floor(diff/86400000)+'d';
+  }
+  el.innerHTML=`<div class="hub-activity-list">${top.map(it=>`
+    <div class="hub-activity-item">
+      <div class="hub-activity-dot">${it.icon}</div>
+      <div class="hub-activity-body">
+        <div class="hub-activity-text">${it.text}</div>
+        ${it.user?`<div class="hub-activity-user">${it.user}</div>`:''}
+      </div>
+      <div class="hub-activity-time">${fmtAgo(it.ts)}</div>
+    </div>`).join('')}</div>
+    <button class="hub-activity-more" onclick="showModule('crm')">Ver actividad completa →</button>`;
 }
 function toggleMobileSidebar(){
   const sb=document.getElementById('app-sidebar');
