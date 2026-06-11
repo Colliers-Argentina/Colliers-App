@@ -4315,7 +4315,7 @@ let _logoB64=null;
 async function addLogo(slide,grande=false){
   if(!_logoB64)_logoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png');
   if(_logoB64){
-    slide.addImage({data:_logoB64,x:11.3,y:0.02,w:1.9,h:0.62});
+    slide.addImage({data:_logoB64,x:11.7,y:0.1,w:1.5,h:0.45});
   }
 }
 
@@ -10557,10 +10557,15 @@ async function generateFichaComercial(buildingId){
     const availUnits=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
     const _n=v=>parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;
     const totalM2=availUnits.reduce((s,u)=>s+_n(u.m2),0);
+    const m2Vals=availUnits.map(u=>_n(u.m2)).filter(v=>v>0);
+    const minM2=m2Vals.length?Math.min(...m2Vals):0;
+    const maxM2=m2Vals.length?Math.max(...m2Vals):0;
+    const supRangeStr=!m2Vals.length?'–':minM2===maxM2?Math.round(minM2).toLocaleString('es-AR')+' m²':Math.round(minM2).toLocaleString('es-AR')+' – '+Math.round(maxM2).toLocaleString('es-AR')+' m²';
     const rentUs=availUnits.filter(u=>{const t=u.tipoOferta||'Alquiler';return t==='Alquiler'||t==='Alquiler o Venta'||t==='Alquiler / Venta';});
-    const rWS=rentUs.reduce((s,u)=>s+(_n(u.askingRent)*_n(u.m2)),0);
-    const rWM=rentUs.reduce((s,u)=>s+_n(u.m2),0);
-    const avgRent=rWM>0?Math.round(rWS/rWM):null;
+    const rentVals=rentUs.map(u=>_n(u.askingRent)).filter(v=>v>0);
+    const minRent=rentVals.length?Math.min(...rentVals):null;
+    const maxRent=rentVals.length?Math.max(...rentVals):null;
+    const rentRangeStr=!minRent?null:minRent===maxRent?'USD '+Math.round(minRent).toLocaleString('es-AR')+'/m²':'USD '+Math.round(minRent).toLocaleString('es-AR')+' – '+Math.round(maxRent).toLocaleString('es-AR')+'/m²';
     const hasVenta=availUnits.some(u=>u.tipoOferta==='Venta'||u.tipoOferta==='Alquiler o Venta'||u.tipoOferta==='Alquiler / Venta');
     const hasAlq=availUnits.some(u=>!u.tipoOferta||u.tipoOferta==='Alquiler'||u.tipoOferta==='Alquiler o Venta'||u.tipoOferta==='Alquiler / Venta');
     const ofLbl=hasAlq&&hasVenta?'ALQ + VTA':hasVenta?'VENTA':'ALQUILER';
@@ -10655,11 +10660,15 @@ async function generateFichaComercial(buildingId){
     s1.addShape(pptx.ShapeType.rect,{x:9.88,y:0.68,w:3.3,h:3.18,fill:{color:WHITE,transparency:8}});
     s1.addShape(pptx.ShapeType.roundRect,{x:10.03,y:0.8,w:3.0,h:0.36,fill:{color:ofColor},rectRadius:0.04});
     s1.addText(ofLbl,{x:10.03,y:0.8,w:3.0,h:0.36,fontSize:11,bold:true,color:WHITE,align:'center',valign:'middle',fontFace:'Open Sans'});
-    if(avgRent){
-      s1.addText('USD '+avgRent+'/m²',{x:10.03,y:1.28,w:3.0,h:0.55,fontSize:21,bold:true,color:NAVY,align:'center',valign:'middle',fontFace:'Open Sans'});
+    s1.addText('Asking Rent',{x:10.03,y:1.24,w:3.0,h:0.22,fontSize:8,color:MGRAY,align:'center',fontFace:'Open Sans'});
+    if(rentRangeStr){
+      s1.addText(rentRangeStr,{x:10.03,y:1.48,w:3.0,h:0.42,fontSize:14,bold:true,color:NAVY,align:'center',valign:'middle',fontFace:'Open Sans'});
+      s1.addText('+IVA',{x:10.03,y:1.92,w:3.0,h:0.22,fontSize:8.5,color:MGRAY,align:'center',fontFace:'Open Sans'});
+    }else{
+      s1.addText('–',{x:10.03,y:1.48,w:3.0,h:0.42,fontSize:14,color:MGRAY,align:'center',valign:'middle',fontFace:'Open Sans'});
     }
-    s1.addText('Superficie disponible',{x:10.03,y:1.92,w:3.0,h:0.26,fontSize:8.5,color:MGRAY,align:'center',fontFace:'Open Sans'});
-    s1.addText(totalM2>0?Math.round(totalM2).toLocaleString('es-AR')+' m²':'–',{x:10.03,y:2.2,w:3.0,h:0.55,fontSize:21,bold:true,color:NAVY,align:'center',valign:'middle',fontFace:'Open Sans'});
+    s1.addText('Superficie disponible',{x:10.03,y:2.22,w:3.0,h:0.22,fontSize:8,color:MGRAY,align:'center',fontFace:'Open Sans'});
+    s1.addText(supRangeStr,{x:10.03,y:2.46,w:3.0,h:0.42,fontSize:14,bold:true,color:NAVY,align:'center',valign:'middle',fontFace:'Open Sans'});
     s1.addShape(pptx.ShapeType.rect,{x:0,y:4.1,w:13.33,h:3.4,fill:{color:WHITE}});
     s1.addShape(pptx.ShapeType.rect,{x:0,y:4.1,w:0.06,h:3.4,fill:{color:NAVY}});
     s1.addText(d.nombre||'Edificio',{x:0.22,y:4.18,w:8.55,h:0.72,fontSize:22,bold:true,color:NAVY,fontFace:'Open Sans',wrap:true});
@@ -10672,7 +10681,6 @@ async function generateFichaComercial(buildingId){
     if(d.superficiePropia)bItems.push('Sup. propia: '+Math.round(d.superficiePropia).toLocaleString('es-AR')+' m²');
     if(d.certificacion)bItems.push(d.certificacion);
     if(d.anoConstruccion||d.anio)bItems.push('Año: '+(d.anoConstruccion||d.anio));
-    if(d.amenities){d.amenities.split(/[\n;]/).map(s=>s.trim()).filter(s=>s.length>3).slice(0,3).forEach(s=>bItems.push(s));}
     const bText=bItems.slice(0,9).map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}}));
     if(bText.length)s1.addText(bText,{x:0.22,y:5.38,w:8.55,h:2.0,fontFace:'Open Sans',wrap:true});
     s1.addShape(pptx.ShapeType.rect,{x:8.9,y:4.1,w:4.3,h:3.4,fill:{color:NAVY}});
