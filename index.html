@@ -2633,6 +2633,8 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <button class="crm-det-back-btn" onclick="closeLeadDetail()">← Volver a leads</button>
         <div style="flex:1"></div>
         <button id="lead-convert-btn" onclick="openConvertModal()" style="display:none;background:#16A34A;color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer">🔄 Convertir a contacto</button>
+        <button id="lead-send-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="_leadSendToBroker(_currentLeadId)">📧 Enviar al Broker</button>
+        <button id="lead-copy-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="_leadCopyResumen(_currentLeadId)">📋 Copiar Resumen</button>
         <button id="lead-edit-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF">✏️ Editar</button>
         <button id="lead-archive-btn" class="crm-action-btn" style="background:rgba(123,139,189,.1);color:#7B8BBD;border-color:rgba(123,139,189,.3)">📦 Archivar</button>
       </div>
@@ -2694,6 +2696,10 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
             <div id="ldr-bld-list" style="display:none;position:absolute;left:0;right:0;top:calc(100%+2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
           </div>
           <input id="ldr-buildingId" type="hidden"><input id="ldr-buildingName" type="hidden">
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Link de origen <span class="cdr-req">*</span></div>
+          <input id="ldr-link-origen" class="cdr-input" type="url" placeholder="https://www.zonaprop.com.ar/..." autocomplete="off">
         </div>
       </div>
       <div class="cdr-section">
@@ -6268,6 +6274,7 @@ function openLeadDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${d.empresa||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${d.brokerAsignado||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.buildingName||'–'}</div></div>
+    ${d.linkOrigen?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Link de origen</div><div class="crm-det-meta-val" style="word-break:break-all"><a href="${d.linkOrigen}" target="_blank" rel="noopener" style="color:#1C54F4;text-decoration:none;font-size:11px">${d.linkOrigen}</a></div></div>`:''}
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     ${d.ultimaModificacion?`<div class="crm-det-meta-item" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF3FF"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${fmtDate(d.ultimaModificacion)}${d.usuarioUltimaModificacion?' · '+d.usuarioUltimaModificacion:''}</div></div>`:''}
   `;
@@ -6316,6 +6323,40 @@ window.closeLeadDetail=()=>{
   document.getElementById('lead-detail-view').style.display='none';
   const lv=document.getElementById('lead-list-view');
   lv.style.display='flex';lv.style.flexDirection='column';
+};
+
+function _leadResumenText(d){
+  const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
+  const subject='Nuevo Lead'+(d.buildingName?' - '+d.buildingName:'')+(d.empresa?' - '+d.empresa:'');
+  let body='INMUEBLE\n';
+  body+=(d.buildingName?'Inmueble: '+d.buildingName+'\n':'');
+  body+=(d.linkOrigen?'Link: '+d.linkOrigen+'\n':'');
+  if(d.empresa){body+='\nEMPRESA\nEmpresa: '+d.empresa+'\n';}
+  body+='\nCONTACTO\n';
+  body+='Nombre: '+fullname+'\n';
+  body+=(d.email?'Email: '+d.email+'\n':'');
+  body+=(d.telefono?'Teléfono: '+d.telefono+'\n':'');
+  body+=(d.puesto?'Puesto: '+d.puesto+'\n':'');
+  return {subject,body:body.trim()};
+}
+
+window._leadSendToBroker=function(docId){
+  const d=_leadDocs.find(x=>x._id===docId);
+  if(!d)return;
+  const brokerName=d.brokerAsignado||'';
+  const brokerObj=BROKERS.find(b=>b.name.split(' ').some(p=>brokerName===p)||b.displayName.split(',').map(s=>s.trim()).some(p=>brokerName===p));
+  const brokerEmail=brokerObj?.email||'';
+  if(!brokerEmail){showBldToast('No hay email asignado al broker');return;}
+  const {subject,body}=_leadResumenText(d);
+  window.location.href='mailto:'+brokerEmail+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+};
+
+window._leadCopyResumen=function(docId){
+  const d=_leadDocs.find(x=>x._id===docId);
+  if(!d)return;
+  const {subject,body}=_leadResumenText(d);
+  const full='Asunto: '+subject+'\n\n'+body;
+  navigator.clipboard.writeText(full).then(()=>showBldToast('Resumen copiado correctamente')).catch(()=>showBldToast('Error al copiar'));
 };
 
 function leadDetTab(el,tabId){
@@ -6379,7 +6420,7 @@ async function loadLeadTimeline(docId){
 // LEAD DRAWER
 window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
   _ldrEditId=null;
-  ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-bld-q','ldr-comentarios'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-bld-q','ldr-comentarios','ldr-link-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['ldr-tipoInmueble','ldr-origen','ldr-broker'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ldr-buildingId').value='';
   document.getElementById('ldr-buildingName').value='';
@@ -6413,7 +6454,7 @@ window.openLeadDrawer_edit=function(docId){
   set('ldr-nombre',d.nombre);set('ldr-apellido',d.apellido);set('ldr-email',d.email);
   set('ldr-telefono',d.telefono);set('ldr-empresa',d.empresa);set('ldr-puesto',d.puesto);
   set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
-  set('ldr-comentarios',d.comentarios);
+  set('ldr-comentarios',d.comentarios);set('ldr-link-origen',d.linkOrigen);
   if(d.buildingId){document.getElementById('ldr-buildingId').value=d.buildingId;document.getElementById('ldr-buildingName').value=d.buildingName||'';document.getElementById('ldr-bld-q').value=d.buildingName||'';}
   document.querySelector('#ldr-drawer .cdr-title').textContent='Editar Lead';
   const btn=document.getElementById('ldr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
@@ -6454,8 +6495,9 @@ window.saveLeadDrawer=async function(){
   const email=(document.getElementById('ldr-email').value||'').trim();
   const origen=document.getElementById('ldr-origen').value||'';
   const brokerAsignado=document.getElementById('ldr-broker').value||'';
+  const linkOrigen=(document.getElementById('ldr-link-origen').value||'').trim();
   let ok=true;
-  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado}].forEach(({id,v})=>{
+  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-link-origen',v:linkOrigen}].forEach(({id,v})=>{
     const el=document.getElementById(id);if(!el)return;
     if(!v){el.style.borderColor='#ED1B34';ok=false;}else{el.style.borderColor='';}
   });
@@ -6473,11 +6515,12 @@ window.saveLeadDrawer=async function(){
       buildingId:document.getElementById('ldr-buildingId').value||'',
       buildingName:document.getElementById('ldr-buildingName').value||'',
       brokerAsignado,
+      linkOrigen,
       comentarios:(document.getElementById('ldr-comentarios').value||'').trim(),
     };
     if(_ldrEditId){
       const oldD=_leadDocs.find(x=>x._id===_ldrEditId)||{};
-      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',comentarios:'Comentarios',buildingName:'Inmueble'};
+      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',comentarios:'Comentarios',buildingName:'Inmueble'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('leads').doc(_ldrEditId).update(updatePayload);
