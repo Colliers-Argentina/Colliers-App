@@ -2305,7 +2305,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 <div id="ds">
   <div class="dbox">
     <h2>Acceso denegado</h2>
-    <p>Esta herramienta es exclusiva para cuentas <strong>@gmail.com</strong>.<br>
+    <p>Esta herramienta es exclusiva para cuentas autorizadas de Colliers.<br>
     Cuenta: <span id="de" style="font-weight:600"></span></p>
     <button class="gbtn" onclick="logout()" style="margin-top:1.5rem">Volver</button>
   </div>
@@ -4320,7 +4320,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 
 <script>
 const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLUmjoaea_htH898sLsLIzQsk_JJdNNk7mwou9Wc9LvDUtBwYKGd4E_kEpiaS4Fw/pub?gid=1012730079&single=true&output=csv";
-const DOM = "gmail.com";
+const ALLOWED_DOMAINS = ["gmail.com","colliers.com.ar","colliers.com"];
 const CLIENT_ID = "312606519681-q1bkpeug6sonp48bc6842o02hs71uma2.apps.googleusercontent.com";
 const ANTHROPIC_API_KEY = ""; // completar con clave Anthropic
 const GOOGLE_MAPS_KEY = ""; // completar con clave Google Maps Static API
@@ -4446,7 +4446,7 @@ function decodeJWT(token){
 let _tokenClient=null;
 
 function handlePayload(payload){
-  if(!payload.email||!payload.email.endsWith('@'+DOM)){
+  if(!payload.email||!ALLOWED_DOMAINS.some(d=>payload.email.endsWith('@'+d))){
     document.getElementById('de').textContent=payload.email||'desconocido';
     show('ds');
     return;
