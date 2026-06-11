@@ -10772,7 +10772,6 @@ function _setSbActive(mod,submod){
 
 function showModule(mod){
   closeMobileSidebar();
-  if(_hubClockTick&&mod!=='home'){clearInterval(_hubClockTick);_hubClockTick=null;}
   // Close all overlays (including CRM)
   ['analytics-panel','buildings-panel','admin-panel','crm-panel','transacciones-panel'].forEach(id=>{
     const el=document.getElementById(id);
@@ -10814,7 +10813,6 @@ function showModule(mod){
   }
 }
 // ─── HUB DASHBOARD V2 ───────────────────────────────────────────────────
-let _hubClockTick=null;
 
 function _updateHubGreeting(){
   const h=new Date().getHours();
@@ -10825,13 +10823,13 @@ function _updateHubGreeting(){
 }
 
 function _hubCardHTML(c){
-  const statHTML=c.stats?`<div class="hub-card-stat-row">${c.stats.map(s=>`<span class="hub-card-stat-val" id="${s.id}">—</span><span class="hub-card-stat-lbl">${s.lbl}</span>`).join('<span style="color:rgba(255,255,255,.15);margin:0 .4rem;font-size:22px;line-height:1">·</span>')}</div>`:'';
+  const statHTML=c.stats?`<div class="hub-card-stat-row">${c.stats.map(s=>`<span class="hub-card-stat-val" id="${s.id}">—</span><span class="hub-card-stat-lbl">${s.lbl}</span>`).join('<span style="color:rgba(255,255,255,.12);margin:0 .25rem">·</span>')}</div>`:'';
   return `<div class="hub-card" onclick="showModule('${c.mod}')">
     <div class="hub-card-hd">
       <div class="hub-card-icon">${c.icon}</div>
       ${c.badge?`<span class="hub-card-badge">${c.badge}</span>`:''}
     </div>
-    <div style="flex:1">
+    <div style="flex:1;min-width:0">
       <div class="hub-card-title">${c.title}</div>
       ${statHTML}
     </div>
@@ -10847,15 +10845,15 @@ function renderHubCards(){
   if(!container)return;
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
   const cards=[
-    {icon:'🏢',title:'Oficinas',mod:'office',btn:'Ver inventario',stats:[{id:'hc-off-total',lbl:'edificios'},{id:'hc-off-disp',lbl:'disponibles'}]},
-    {icon:'🏭',title:'Industrial',mod:'industrial',btn:'Ver inventario',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disponibles'}]},
-    {icon:'🛍️',title:'Retail',mod:'retail',btn:'Ver inventario',stats:[{id:'hc-ret-total',lbl:'locales'},{id:'hc-ret-disp',lbl:'disponibles'}]},
-    {icon:'🎯',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'leads abiertos'}]},
-    {icon:'🏛️',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'cuentas activas'}]},
+    {icon:'🏢',title:'Oficinas',mod:'office',btn:'Ver inventario',stats:[{id:'hc-off-total',lbl:'edif.'},{id:'hc-off-disp',lbl:'disp.'}]},
+    {icon:'🏭',title:'Industrial',mod:'industrial',btn:'Ver inventario',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disp.'}]},
+    {icon:'🛍️',title:'Retail',mod:'retail',btn:'Ver inventario',stats:[{id:'hc-ret-total',lbl:'locales'},{id:'hc-ret-disp',lbl:'disp.'}]},
+    {icon:'🎯',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
+    {icon:'🏛️',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'activas'}]},
     {icon:'👤',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
-    {icon:'📄',title:'Generador PPT',mod:'generator',btn:'Crear presentación',stats:[{id:'hc-ppt-30d',lbl:'PPTs últimos 30d'}]},
+    {icon:'📄',title:'PPTs',mod:'generator',btn:'Crear PPT',stats:[{id:'hc-ppt-30d',lbl:'últimos 30d'}]},
   ];
-  if(isAdmin)cards.push({icon:'📊',title:'Analytics',mod:'analytics',btn:'Abrir analytics',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
+  if(isAdmin)cards.push({icon:'📊',title:'Analytics',mod:'analytics',btn:'Abrir',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
   container.innerHTML=cards.map(c=>_hubCardHTML(c)).join('');
   _loadHubDashboardData();
 }
@@ -10877,30 +10875,46 @@ async function _loadHubDashboardData(){
       db.collection('transacciones').get().catch(()=>({docs:[]})),
     ]);
 
-    // Inventory
-    let offT=0,offD=0,indT=0,indD=0,retT=0,retD=0,totalM2=0,bldThisWeek=0;
+    // ── Per-type detailed stats for Market Summary ──────────────────────
+    const typeData={
+      office:{total:0,disp:0,m2:0,rentSum:0,rentCount:0,subs:{},cats:{}},
+      industrial:{total:0,disp:0,m2:0,rentSum:0,rentCount:0,subs:{},cats:{}},
+      retail:{total:0,disp:0,m2:0,rentSum:0,rentCount:0,subs:{},cats:{}},
+    };
+    let totalM2=0,bldThisWeek=0;
     bldSnap.docs.forEach(doc=>{
       const d=doc.data();
       const at=classify(d);
+      const td=typeData[at];
+      if(!td)return;
       const disp=d.disponible!==false&&d.estado!=='Ocupado';
-      if(at==='office'){offT++;if(disp)offD++;}
-      else if(at==='industrial'){indT++;if(disp)indD++;}
-      else if(at==='retail'){retT++;if(disp)retD++;}
-      if(disp&&d.superficieTotal)totalM2+=d.superficieTotal;
+      td.total++;
+      if(disp){
+        td.disp++;
+        const m2=d.superficieTotal||d.superficieCubierta||0;
+        if(m2){td.m2+=m2;totalM2+=m2;}
+        const rent=d.askingRent||d.precioAlquilerM2||d.precioAlquiler||0;
+        if(rent){td.rentSum+=rent;td.rentCount++;}
+      }
+      const sub=d.zona||d.corredor||d.submercado||d.localidad;
+      if(sub)td.subs[sub]=(td.subs[sub]||0)+1;
+      const cat=d.cat||d.categoria||d.tipoActivo;
+      if(cat)td.cats[cat]=(td.cats[cat]||0)+1;
       const ca=d.createdAt?_tsToDate(d.createdAt):null;
       if(ca&&(now-ca.getTime())<ms7d)bldThisWeek++;
     });
-    setEl('hc-off-total',offT);setEl('hc-off-disp',offD);
-    setEl('hc-ind-total',indT);setEl('hc-ind-disp',indD);
-    setEl('hc-ret-total',retT);setEl('hc-ret-disp',retD);
+    const {office:offT2,industrial:indT2,retail:retT2}={
+      office:typeData.office.total,industrial:typeData.industrial.total,retail:typeData.retail.total
+    };
+    setEl('hc-off-total',typeData.office.total);setEl('hc-off-disp',typeData.office.disp);
+    setEl('hc-ind-total',typeData.industrial.total);setEl('hc-ind-disp',typeData.industrial.disp);
+    setEl('hc-ret-total',typeData.retail.total);setEl('hc-ret-disp',typeData.retail.disp);
 
-    // CRM
-    let leads30d=0,leadsNoContact=0,leadsSinAct14d=0;
+    // ── CRM ─────────────────────────────────────────────────────────────
+    let leadsNoContact=0,leadsSinAct14d=0;
     ctaSnap.docs.forEach(doc=>{
       const d=doc.data();
-      const fc=d.fechaCreacion?_tsToDate(d.fechaCreacion):null;
       const ua=d.ultimaActividad?_tsToDate(d.ultimaActividad):null;
-      if(fc&&(now-fc.getTime())<ms30d)leads30d++;
       if(!ua)leadsNoContact++;
       else if((now-ua.getTime())>ms14d)leadsSinAct14d++;
     });
@@ -10908,27 +10922,30 @@ async function _loadHubDashboardData(){
     setEl('hc-cto-total',ctoSnap.size);
     setEl('hc-cta-total',ctaSnap.size);
 
-    // Descargas / PPTs
+    // ── Descargas / PPTs ────────────────────────────────────────────────
     let ppt30d=0,ppt7d=0;
-    const zonaCounts={},buildingCounts={},brokerCounts={};
+    const zonaCounts={},buildingCounts={},brokerCounts={},catCounts={};
+    const mins=[],maxs=[];
     descSnap.docs.forEach(doc=>{
-      const d=doc.data();
+      const d=doc.data?doc.data():doc;
       const f=d.fecha?_tsToDate(d.fecha):null;
-      if(f){
-        if((now-f.getTime())<ms30d)ppt30d++;
-        if((now-f.getTime())<ms7d)ppt7d++;
-      }
+      if(f){if((now-f.getTime())<ms30d)ppt30d++;if((now-f.getTime())<ms7d)ppt7d++;}
       const z=d.corredor||d.zona||d.submercado;
       if(z)zonaCounts[z]=(zonaCounts[z]||0)+1;
       const b=d.edificioNombre||d.nombre||d.building;
       if(b)buildingCounts[b]=(buildingCounts[b]||0)+1;
       const br=d.brokerEmail||d.broker||d.userEmail;
       if(br)brokerCounts[br]=(brokerCounts[br]||0)+1;
+      const cat=d.categoria||d.cat;
+      if(cat)catCounts[cat]=(catCounts[cat]||0)+1;
+      if(d.supMin>0)mins.push(d.supMin);
+      if(d.supMax>0)maxs.push(d.supMax);
+      if(d.supReq>0){mins.push(d.supReq);maxs.push(d.supReq);}
     });
     setEl('hc-ppt-30d',ppt30d);
-    setEl('hc-an-total',descSnap.size||descSnap.docs?.length||0);
+    setEl('hc-an-total',descSnap.docs.length);
 
-    // Transactions
+    // ── Transactions ─────────────────────────────────────────────────────
     const txNow=new Date();
     let txCerradas=0,txAbiertas=0;
     txSnap.docs.forEach(doc=>{
@@ -10939,91 +10956,144 @@ async function _loadHubDashboardData(){
       }else{txAbiertas++;}
     });
 
-    // Notif pill
+    // ── Hero meta ────────────────────────────────────────────────────────
+    const totalRecs=bldSnap.size+ctaSnap.size+ctoSnap.size;
+    const luEl=document.getElementById('hub-last-update');
+    const trEl=document.getElementById('hub-total-records');
+    if(luEl)luEl.textContent='actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    if(trEl)trEl.textContent=totalRecs.toLocaleString('es-AR')+' registros activos';
+
+    // ── Notif pill ────────────────────────────────────────────────────────
     const totalNotif=leadsNoContact+leadsSinAct14d;
     const npCount=document.getElementById('hub-notif-count');
-    if(npCount){
-      npCount.textContent=totalNotif||'0';
-      npCount.className=totalNotif>0?'':'hub-notif-zero';
-    }
+    if(npCount){npCount.textContent=totalNotif||'0';npCount.className=totalNotif>0?'':'hub-notif-zero';}
 
-    // Render sections
-    _renderHubAlerts({leadsNoContact,leadsSinAct14d,txCerradas,bldThisWeek,ppt7d});
+    // ── Render all sections ───────────────────────────────────────────────
     const topZona=Object.entries(zonaCounts).sort((a,b)=>b[1]-a[1])[0]||null;
     const topBld=Object.entries(buildingCounts).sort((a,b)=>b[1]-a[1])[0]||null;
     const topBroker=Object.entries(brokerCounts).sort((a,b)=>b[1]-a[1])[0]||null;
-    _renderHubInsights({topZona,topBld,topBroker,descDocs:descSnap.docs});
-    _renderHubKPIs({offT,indT,retT,offD,indD,retD,totalM2,ctaSize:ctaSnap.size,txAbiertas,txCerradas});
-    _renderHubRadar({topZona,offD,indD,retD,descDocs:descSnap.docs});
+    const topCat=Object.entries(catCounts).sort((a,b)=>b[1]-a[1])[0]||null;
+    const avgMin=mins.length?Math.round(mins.reduce((a,b)=>a+b,0)/mins.length):0;
+    const avgMax=maxs.length?Math.round(maxs.reduce((a,b)=>a+b,0)/maxs.length):0;
+
+    _renderHubMarket(typeData,topZona,avgMin,avgMax,topCat);
+    _renderHubInsights({topZona,topBld,topBroker,topCat,avgMin,avgMax,ppt30d});
+    _renderHubAlerts({leadsNoContact,leadsSinAct14d,txCerradas,bldThisWeek,ppt7d});
+    _renderHubKPIs({typeData,totalM2,ctaSize:ctaSnap.size,txAbiertas,txCerradas});
+    _renderHubRadar({topZona,topCat,typeData,avgMin,avgMax});
     _renderHubActivity(ctaSnap.docs,ctoSnap.docs,bldSnap.docs,descSnap.docs);
   }catch(e){console.error('_loadHubDashboardData',e);}
 }
 
-function _renderHubAlerts({leadsNoContact,leadsSinAct14d,txCerradas,bldThisWeek,ppt7d}){
-  const el=document.getElementById('hub-alerts');
+function _renderHubMarket(typeData,topZona,avgMin,avgMax,topCat){
+  const el=document.getElementById('hub-market');
   if(!el)return;
-  const alerts=[
+  const fmtN=v=>v?Math.round(v).toLocaleString('es-AR'):'—';
+  const fmtM2=v=>{if(!v)return'—';return v>=1000?(v/1000).toFixed(1).replace('.',',')+' k m²':v.toLocaleString('es-AR')+' m²';};
+  const fmtUSD=v=>v?'USD '+(v).toFixed(1).replace('.',','):null;
+  const fmtPct=v=>v?(v).toFixed(1).replace('.',',')+' %':'—';
+  const topOf=obj=>Object.entries(obj||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||null;
+  const types=[
+    {key:'office',icon:'🏢',name:'Oficinas',cls:'office',badge:'CORPORATIVO',mod:'office'},
+    {key:'industrial',icon:'🏭',name:'Industrial',cls:'industrial',badge:'LOGÍSTICA',mod:'industrial'},
+    {key:'retail',icon:'🛍️',name:'Retail',cls:'retail',badge:'COMERCIAL',mod:'retail'},
+  ];
+  el.innerHTML=types.map(t=>{
+    const td=typeData[t.key];
+    const avgRent=td.rentCount?td.rentSum/td.rentCount:null;
+    const vac=td.total?(td.disp/td.total*100):0;
+    const sub=topOf(td.subs);
+    const cat=topOf(td.cats);
+    const rentStr=fmtUSD(avgRent);
+    return `<div class="hub-mkt-card hub-mkt-${t.cls}" onclick="showModule('${t.mod}')">
+      <div class="hub-mkt-hd">
+        <div class="hub-mkt-hd-left">
+          <span class="hub-mkt-emoji">${t.icon}</span>
+          <span class="hub-mkt-name">${t.name}</span>
+        </div>
+        <span class="hub-mkt-badge hub-mkt-badge-${t.cls}">${t.badge}</span>
+      </div>
+      <div class="hub-mkt-primary">
+        <div class="hub-mkt-stat"><div class="hub-mkt-stat-val">${td.total||'—'}</div><div class="hub-mkt-stat-lbl">activos</div></div>
+        <div class="hub-mkt-stat"><div class="hub-mkt-stat-val">${td.disp||'—'}</div><div class="hub-mkt-stat-lbl">disponibles</div></div>
+        <div class="hub-mkt-stat"><div class="hub-mkt-stat-val">${td.m2>=1000?Math.round(td.m2/1000).toLocaleString('es-AR')+'k':(td.m2?td.m2.toLocaleString('es-AR'):'—')}</div><div class="hub-mkt-stat-lbl">m² disp.</div></div>
+      </div>
+      <div class="hub-mkt-divider"></div>
+      <div class="hub-mkt-rows">
+        <div class="hub-mkt-row"><div class="hub-mkt-row-lbl">Vacancia</div><div class="hub-mkt-row-val">${fmtPct(vac)}</div></div>
+        ${rentStr?`<div class="hub-mkt-row"><div class="hub-mkt-row-lbl">Precio prom.</div><div class="hub-mkt-row-val">${rentStr}/m²</div></div>`:''}
+        ${sub?`<div class="hub-mkt-row"><div class="hub-mkt-row-lbl">Mayor oferta</div><div class="hub-mkt-row-val">${sub}</div></div>`:''}
+        ${cat?`<div class="hub-mkt-row"><div class="hub-mkt-row-lbl">Categoría top</div><div class="hub-mkt-row-val">${cat}</div></div>`:''}
+      </div>
+      <div class="hub-mkt-insights">
+        <div class="hub-mkt-insight-row"><span class="hub-mkt-insight-icon">🔥</span><span class="hub-mkt-insight-text">Zona demandada: <strong>${topZona?topZona[0]:'Sin datos'}</strong></span></div>
+        ${avgMin&&avgMax?`<div class="hub-mkt-insight-row"><span class="hub-mkt-insight-icon">📐</span><span class="hub-mkt-insight-text">Rango buscado: <strong>${fmtN(avgMin)} – ${fmtN(avgMax)} m²</strong></span></div>`:''}
+        ${topCat?`<div class="hub-mkt-insight-row"><span class="hub-mkt-insight-icon">⭐</span><span class="hub-mkt-insight-text">Categoría demandada: <strong>${topCat[0]}</strong></span></div>`:''}
+      </div>
+      <button class="hub-mkt-btn" onclick="event.stopPropagation();showModule('${t.mod}')">Ver inventario →</button>
+    </div>`;
+  }).join('');
+}
+
+function _renderHubInsights({topZona,topBld,topBroker,topCat,avgMin,avgMax,ppt30d}){
+  const el=document.getElementById('hub-insights');
+  if(!el)return;
+  const fmtN=v=>v?Math.round(v).toLocaleString('es-AR'):'—';
+  const cards=[
+    {cls:'hub-insight-fire',emoji:'🔥',title:'Zona Caliente',
+      val:topZona?topZona[0]:'Sin datos',meta:topZona?topZona[1]+' búsquedas registradas':'',mod:'analytics'},
+    {cls:'hub-insight-bld',emoji:'🏢',title:'Edificio más enviado',
+      val:topBld?topBld[0]:'Sin datos',meta:topBld?topBld[1]+' apariciones en PPTs':'',mod:'analytics'},
+    {cls:'hub-insight-broker',emoji:'👤',title:'Broker Líder',
+      val:topBroker?(topBroker[0].includes('@')?topBroker[0].split('@')[0]:topBroker[0]):'Sin datos',
+      meta:topBroker?topBroker[1]+' PPTs generadas':'',mod:'analytics'},
+    {cls:'hub-insight-demand',emoji:'📐',title:'Demanda m²',
+      val:(avgMin&&avgMax)?fmtN(avgMin)+' – '+fmtN(avgMax)+' m²':'Sin datos',
+      meta:'rango superficial más buscado',mod:'generator'},
+  ];
+  el.innerHTML=cards.map(c=>`
+    <div class="hub-insight-card ${c.cls}" onclick="showModule('${c.mod}')">
+      <div class="hub-insight-header"><span class="hub-insight-emoji">${c.emoji}</span><span class="hub-insight-title">${c.title}</span></div>
+      <div class="hub-insight-val">${c.val}</div>
+      <div class="hub-insight-meta">${c.meta}</div>
+    </div>`).join('');
+}
+
+function _renderHubAlerts({leadsNoContact,leadsSinAct14d,txCerradas,bldThisWeek,ppt7d}){
+  const sec=document.getElementById('hub-alerts-section');
+  const el=document.getElementById('hub-alerts');
+  if(!el||!sec)return;
+  const all=[
     {color:'red',icon:'🚨',label:'Leads sin contactar',val:leadsNoContact,sub:'requieren atención inmediata',mod:'crm-cuentas'},
     {color:'orange',icon:'⏰',label:'Sin actividad +14d',val:leadsSinAct14d,sub:'oportunidades sin seguimiento',mod:'crm-cuentas'},
     {color:'green',icon:'✅',label:'Tx cerradas este mes',val:txCerradas,sub:'transacciones completadas',mod:'transacciones'},
     {color:'blue',icon:'🏗️',label:'Nuevos inmuebles',val:bldThisWeek,sub:'cargados esta semana',mod:'office'},
     {color:'purple',icon:'📤',label:'PPTs enviadas',val:ppt7d,sub:'últimos 7 días',mod:'analytics'},
   ];
-  el.innerHTML=alerts.map(a=>`
+  const active=all.filter(a=>a.val>0);
+  if(!active.length){sec.style.display='none';return;}
+  sec.style.display='';
+  el.innerHTML=active.map(a=>`
     <div class="hub-alert-card hub-alert-${a.color}" onclick="showModule('${a.mod}')">
       <div class="hub-alert-icon">${a.icon}</div>
       <div class="hub-alert-num">${a.val}</div>
       <div class="hub-alert-label">${a.label}</div>
       <div class="hub-alert-sub">${a.sub}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function _renderHubInsights({topZona,topBld,topBroker,descDocs}){
-  const el=document.getElementById('hub-insights');
-  if(!el)return;
-  const m2vals=[];
-  descDocs.forEach(doc=>{
-    const d=doc.data?doc.data():doc;
-    if(d.supMin&&d.supMin>0)m2vals.push(d.supMin);
-    if(d.supMax&&d.supMax>0)m2vals.push(d.supMax);
-    if(d.supReq&&d.supReq>0)m2vals.push(d.supReq);
-  });
-  const avgM2=m2vals.length?Math.round(m2vals.reduce((a,b)=>a+b,0)/m2vals.length):null;
-  const fmtNum=v=>v!=null?v.toLocaleString('es-AR'):'—';
-  el.innerHTML=`
-    <div class="hub-insight-card hub-insight-fire" onclick="showModule('analytics')">
-      <div class="hub-insight-header"><span class="hub-insight-emoji">🔥</span><span class="hub-insight-title">Zona Caliente</span></div>
-      <div class="hub-insight-val">${topZona?topZona[0]:'Sin datos'}</div>
-      <div class="hub-insight-meta">${topZona?topZona[1]+' búsquedas':''}</div>
-    </div>
-    <div class="hub-insight-card hub-insight-bld" onclick="showModule('analytics')">
-      <div class="hub-insight-header"><span class="hub-insight-emoji">🏢</span><span class="hub-insight-title">Más Solicitado</span></div>
-      <div class="hub-insight-val">${topBld?topBld[0]:'Sin datos'}</div>
-      <div class="hub-insight-meta">${topBld?topBld[1]+' apariciones en PPTs':''}</div>
-    </div>
-    <div class="hub-insight-card hub-insight-broker" onclick="showModule('analytics')">
-      <div class="hub-insight-header"><span class="hub-insight-emoji">👤</span><span class="hub-insight-title">Broker Líder</span></div>
-      <div class="hub-insight-val">${topBroker?(topBroker[0].includes('@')?topBroker[0].split('@')[0]:topBroker[0]):'Sin datos'}</div>
-      <div class="hub-insight-meta">${topBroker?topBroker[1]+' PPTs generadas':''}</div>
-    </div>
-    <div class="hub-insight-card hub-insight-demand" onclick="showModule('generator')">
-      <div class="hub-insight-header"><span class="hub-insight-emoji">📈</span><span class="hub-insight-title">Demanda Detectada</span></div>
-      <div class="hub-insight-val">${avgM2?fmtNum(avgM2)+' m²':'Sin datos'}</div>
-      <div class="hub-insight-meta">superficie promedio requerida</div>
-    </div>
-  `;
-}
-
-function _renderHubKPIs({offT,indT,retT,offD,indD,retD,totalM2,ctaSize,txAbiertas,txCerradas}){
+function _renderHubKPIs({typeData,totalM2,ctaSize,txAbiertas,txCerradas}){
   const el=document.getElementById('hub-kpis');
   if(!el)return;
-  const fmtM2=v=>v>=1000?(v/1000).toFixed(1).replace('.',',')+' k':v.toLocaleString('es-AR');
+  const off=typeData.office,ind=typeData.industrial,ret=typeData.retail;
+  const totT=off.total+ind.total+ret.total;
+  const totD=off.disp+ind.disp+ret.disp;
+  const fmtM2=v=>{if(!v)return'—';return v>=1000?(v/1000).toFixed(1).replace('.',',')+' k m²':v.toLocaleString('es-AR')+' m²';};
   const kpis=[
-    {icon:'🏗️',val:offT+indT+retT,label:'Edificios activos'},
-    {icon:'✅',val:offD+indD+retD,label:'Disponibles'},
-    {icon:'📐',val:totalM2?fmtM2(Math.round(totalM2))+' m²':'—',label:'m² disponibles'},
-    {icon:'🏛️',val:ctaSize,label:'Cuentas activas'},
+    {icon:'🏗️',val:totT,label:'Edificios activos'},
+    {icon:'✅',val:totD,label:'Disponibilidades'},
+    {icon:'📐',val:fmtM2(Math.round(totalM2)),label:'m² disponibles'},
+    {icon:'🏛️',val:ctaSize,label:'Cuentas CRM'},
     {icon:'🤝',val:txAbiertas,label:'Tx abiertas'},
     {icon:'🏆',val:txCerradas,label:'Tx cerradas mes'},
   ];
@@ -11032,40 +11102,32 @@ function _renderHubKPIs({offT,indT,retT,offD,indD,retD,totalM2,ctaSize,txAbierta
       <div class="hub-mini-kpi-icon">${k.icon}</div>
       <div class="hub-mini-kpi-val">${k.val}</div>
       <div class="hub-mini-kpi-label">${k.label}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function _renderHubRadar({topZona,offD,indD,retD,descDocs}){
+function _renderHubRadar({topZona,topCat,typeData,avgMin,avgMax}){
   const el=document.getElementById('hub-radar');
   if(!el)return;
-  const totalDisp=offD+indD+retD;
+  const off=typeData.office,ind=typeData.industrial,ret=typeData.retail;
+  const totalDisp=off.disp+ind.disp+ret.disp;
   const zona=topZona?topZona[0]:'el mercado';
-  const mins=[],maxs=[];
-  descDocs.forEach(doc=>{
-    const d=doc.data?doc.data():doc;
-    if(d.supMin&&d.supMin>0)mins.push(d.supMin);
-    if(d.supMax&&d.supMax>0)maxs.push(d.supMax);
-  });
-  const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):null;
-  const avgMin=avg(mins)||500;
-  const avgMax=avg(maxs)||1000;
-  const fmtN=v=>v.toLocaleString('es-AR');
+  const fmtN=v=>v?Math.round(v).toLocaleString('es-AR'):'—';
+  const catStr=topCat?` La categoría dominante es <strong>${topCat[0]}</strong>.`:'';
+  const m2Str=(avgMin&&avgMax)?` para superficies entre <strong>${fmtN(avgMin)}</strong> y <strong>${fmtN(avgMax)} m²</strong>`:'';
   el.innerHTML=`
     <div class="hub-radar-inner">
       <div class="hub-radar-left">
-        <div class="hub-radar-tag">🎯 Oportunidad del día</div>
+        <div class="hub-radar-tag">🎯 Inteligencia Comercial</div>
         <div class="hub-radar-title">Radar Comercial</div>
-        <div class="hub-radar-text">Actualmente <strong>${zona}</strong> concentra la mayor demanda del sistema para superficies entre <strong>${fmtN(avgMin)}</strong> y <strong>${fmtN(avgMax)} m²</strong>. Hay <strong>${totalDisp}</strong> disponibilidades activas en el portafolio.</div>
+        <div class="hub-radar-text">Actualmente <strong>${zona}</strong> concentra la mayor demanda del sistema${m2Str}. Hay <strong>${totalDisp}</strong> disponibilidades activas en el portafolio.${catStr}</div>
       </div>
       <div class="hub-radar-stats">
-        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${offD}</div><div class="hub-radar-stat-lbl">Oficinas<br>disp.</div></div>
-        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${indD}</div><div class="hub-radar-stat-lbl">Industrial<br>disp.</div></div>
-        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${retD}</div><div class="hub-radar-stat-lbl">Retail<br>disp.</div></div>
+        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${off.disp}</div><div class="hub-radar-stat-lbl">Oficinas<br>disp.</div></div>
+        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${ind.disp}</div><div class="hub-radar-stat-lbl">Industrial<br>disp.</div></div>
+        <div class="hub-radar-stat"><div class="hub-radar-stat-val">${ret.disp}</div><div class="hub-radar-stat-lbl">Retail<br>disp.</div></div>
       </div>
       <button class="hub-radar-btn" onclick="showModule('generator')">Crear propuesta →</button>
-    </div>
-  `;
+    </div>`;
 }
 
 function _renderHubActivity(ctaDocs,ctoDocs,bldDocs,descDocs){
