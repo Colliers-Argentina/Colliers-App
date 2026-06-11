@@ -1530,8 +1530,9 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 .hub-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.2}
 .hub-title span{background:linear-gradient(90deg,#4D93FF,#C3E6FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hub-subtitle{font-size:14px;color:rgba(163,193,255,.55);margin-top:.5rem}
-.hub-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2.5rem}
-@media(max-width:900px){.hub-cards{grid-template-columns:1fr}}
+.hub-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:2.5rem}
+@media(max-width:1100px){.hub-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.hub-cards{grid-template-columns:1fr}}
 .hub-card{background:rgba(8,14,36,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(77,147,255,.14);border-radius:18px;padding:1.75rem 2rem;cursor:pointer;transition:all .28s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:1.1rem;box-shadow:0 4px 24px rgba(0,0,0,.25)}
 .hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(77,147,255,.5),transparent);opacity:0;transition:.28s}
 .hub-card:hover{background:rgba(28,84,244,.12);backdrop-filter:blur(22px);border-color:rgba(77,147,255,.32);transform:translateY(-4px);box-shadow:0 20px 56px rgba(0,0,0,.4),0 0 0 1px rgba(77,147,255,.18)}
@@ -2096,6 +2097,23 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 .bwiz-subtipo-icon{width:38px;height:38px;border-radius:9px;background:#F0F4FF;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .bwiz-subtipo-name{font-size:13px;font-weight:700;color:#0A1B4D}
 .bwiz-subtipo-desc{font-size:11px;color:#7B8BBD;margin-top:.2rem;line-height:1.4}
+/* Hub card stats */
+.hub-card-stat-row{display:flex;align-items:baseline;gap:.4rem;flex-wrap:wrap}
+.hub-card-stat-val{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1}
+.hub-card-stat-lbl{font-size:11px;color:rgba(163,193,255,.5);font-weight:500}
+.hub-card-stat-sub{font-size:11px;color:rgba(77,197,120,.75);font-weight:600;margin-left:auto}
+/* Dark mode filter bar fixes */
+body.dark .bld-filter-sel{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);color:#e0eaff}
+body.dark .bld-filter-sel:focus{border-color:#4D93FF}
+body.dark .bld-filter-inp{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.14)!important;color:#e0eaff!important}
+body.dark .bld-filter-inp::placeholder{color:rgba(255,255,255,.3)!important}
+/* Select option visibility (cross-browser) */
+select.bwiz-inp option{background:#fff;color:#1F2937}
+select.bld-filter-sel option,select.bld-filter-sel optgroup{background:#fff;color:#000759}
+body.dark select.bld-filter-sel option,body.dark select.bld-filter-sel optgroup{background:#0D1829;color:#e0eaff}
+/* CRM and TX drawer selects in dark mode */
+body.dark .cdr-select option{background:#1a2c52;color:#e0eaff}
+body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 </style>
 </head>
 <body>
@@ -3382,21 +3400,35 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <div class="bld-wiz-hd">
       <div>
         <div class="bld-wiz-title">Nuevo Activo Industrial</div>
-        <div class="bld-wiz-subtitle" id="iwiz-subtitle">Paso 1 de 4</div>
+        <div class="bld-wiz-subtitle" id="iwiz-subtitle">Paso 1 de 5</div>
       </div>
       <button class="bld-wiz-close" onclick="closeIndWizard()">✕</button>
     </div>
     <div class="bld-wiz-stepper">
-      <div class="bwiz-step active" data-step="1"><div class="bwiz-step-dot">1</div><div class="bwiz-step-lbl">General</div></div>
+      <div class="bwiz-step active" data-step="1"><div class="bwiz-step-dot">1</div><div class="bwiz-step-lbl">Tipo</div></div>
       <div class="bwiz-step-line"></div>
-      <div class="bwiz-step" data-step="2"><div class="bwiz-step-dot">2</div><div class="bwiz-step-lbl">Superficies</div></div>
+      <div class="bwiz-step" data-step="2"><div class="bwiz-step-dot">2</div><div class="bwiz-step-lbl">General</div></div>
       <div class="bwiz-step-line"></div>
-      <div class="bwiz-step" data-step="3"><div class="bwiz-step-dot">3</div><div class="bwiz-step-lbl">Características</div></div>
+      <div class="bwiz-step" data-step="3"><div class="bwiz-step-dot">3</div><div class="bwiz-step-lbl">Superficies</div></div>
       <div class="bwiz-step-line"></div>
-      <div class="bwiz-step" data-step="4"><div class="bwiz-step-dot">4</div><div class="bwiz-step-lbl">Comercial</div></div>
+      <div class="bwiz-step" data-step="4"><div class="bwiz-step-dot">4</div><div class="bwiz-step-lbl">Características</div></div>
+      <div class="bwiz-step-line"></div>
+      <div class="bwiz-step" data-step="5"><div class="bwiz-step-dot">5</div><div class="bwiz-step-lbl">Comercial</div></div>
     </div>
     <div class="bld-wiz-body">
       <div class="bwiz-panel active" data-panel="1">
+        <div style="margin-bottom:.5rem;font-size:13px;color:rgba(255,255,255,.5)">Seleccioná el tipo de activo industrial:</div>
+        <div style="display:flex;flex-direction:column;gap:.55rem">
+          <div class="bwiz-subtipo-card" id="iwiz-tipo-cl" onclick="_indSetTipo('Centro Logístico',this)"><div class="bwiz-subtipo-icon">🏗</div><div><div class="bwiz-subtipo-name">Centro Logístico</div><div class="bwiz-subtipo-desc">Inmueble industrial para almacenamiento y distribución</div></div></div>
+          <div class="bwiz-subtipo-card" id="iwiz-tipo-nave" onclick="_indSetTipo('Nave Industrial',this)"><div class="bwiz-subtipo-icon">🏭</div><div><div class="bwiz-subtipo-name">Nave Industrial</div><div class="bwiz-subtipo-desc">Para producción, almacenamiento o logística</div></div></div>
+          <div class="bwiz-subtipo-card" id="iwiz-tipo-parque" onclick="_indSetTipo('Parque Industrial',this)"><div class="bwiz-subtipo-icon">🏘</div><div><div class="bwiz-subtipo-name">Parque Industrial</div><div class="bwiz-subtipo-desc">Perímetro con parcelas para actividad industrial</div></div></div>
+          <div class="bwiz-subtipo-card" id="iwiz-tipo-deposito" onclick="_indSetTipo('Depósito',this)"><div class="bwiz-subtipo-icon">📦</div><div><div class="bwiz-subtipo-name">Depósito</div><div class="bwiz-subtipo-desc">Almacenamiento general de bienes o mercaderías</div></div></div>
+          <div class="bwiz-subtipo-card" id="iwiz-tipo-terreno" onclick="_indSetTipo('Terreno Industrial',this)"><div class="bwiz-subtipo-icon">🌱</div><div><div class="bwiz-subtipo-name">Terreno Industrial</div><div class="bwiz-subtipo-desc">Tierra para desarrollos industriales o mixtos</div></div></div>
+          <div class="bwiz-subtipo-card" id="iwiz-tipo-planta" onclick="_indSetTipo('Planta Productiva',this)"><div class="bwiz-subtipo-icon">⚙️</div><div><div class="bwiz-subtipo-name">Planta Productiva</div><div class="bwiz-subtipo-desc">Instalaciones para manufactura o producción</div></div></div>
+          <div class="bwiz-subtipo-card" id="iwiz-tipo-otro" onclick="_indSetTipo('Otro',this)"><div class="bwiz-subtipo-icon">🔹</div><div><div class="bwiz-subtipo-name">Otro</div><div class="bwiz-subtipo-desc">Otro tipo de activo industrial</div></div></div>
+        </div>
+      </div>
+      <div class="bwiz-panel" data-panel="2">
         <div class="bwiz-row">
           <div class="bwiz-field bwiz-full">
             <label class="bwiz-lbl">Nombre <span class="bwiz-req">*</span></label>
@@ -9001,14 +9033,23 @@ function _bldRenderFilterBar(){
 
 // ─── INDUSTRIAL WIZARD ───────────────────────────────
 let _indWizStep=1;
-const IND_WIZ_STEPS=4;
-const IND_WIZ_LABELS=['General','Superficies','Características','Comercial'];
+let _indWizSubtipo='';
+const IND_WIZ_STEPS=5;
+const IND_WIZ_LABELS=['Tipo','General','Superficies','Características','Comercial'];
+
+function _indSetTipo(tipo,el){
+  _indWizSubtipo=tipo;
+  document.querySelectorAll('#ind-wizard-overlay .bwiz-subtipo-card').forEach(c=>c.classList.remove('sel'));
+  if(el)el.classList.add('sel');
+}
 
 function openIndWizard(){
   _indWizStep=1;
+  _indWizSubtipo='';
   document.querySelectorAll('#ind-wizard-overlay .bwiz-inp').forEach(el=>{
     if(el.tagName==='SELECT'){el.selectedIndex=0;}else if(el.type==='checkbox'){el.checked=false;}else{el.value='';}
   });
+  document.querySelectorAll('#ind-wizard-overlay .bwiz-subtipo-card').forEach(c=>c.classList.remove('sel'));
   document.getElementById('ind-wizard-overlay').style.display='flex';
   _indWizRender();
 }
@@ -9050,6 +9091,10 @@ function indWizNav(dir){
 
 function _indWizValidate(){
   if(_indWizStep===1){
+    if(!_indWizSubtipo){showBldToast('⚠️ Seleccioná el tipo de activo industrial',3000);return false;}
+    return true;
+  }
+  if(_indWizStep===2){
     const reqIds=['ind-nombre','ind-direccion','ind-corredor'];
     let ok=true;
     reqIds.forEach(id=>{
@@ -9071,6 +9116,7 @@ async function saveIndWizard(){
   const g=(id)=>document.getElementById(id)?.value?.trim()||'';
   const gn=(id)=>{const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?null:v;};
   const data={
+    tipoActivo:_indWizSubtipo,
     nombre:g('ind-nombre'),
     direccion:g('ind-direccion'),
     localidad:g('ind-localidad'),
@@ -10609,9 +10655,12 @@ function showModule(mod){
     _bldAssetType=mod==='buildings'?'office':mod;
     show('buildings-panel');
     loadBuildings();
-  } else if(mod==='crm'){
+  } else if(mod==='crm'||mod==='crm-cuentas'||mod==='crm-contactos'||mod==='crm-leads'){
     show('crm-panel');
     loadCRM();
+    if(mod==='crm-contactos')setTimeout(()=>switchCRMTab('contactos'),300);
+    else if(mod==='crm-leads')setTimeout(()=>switchCRMTab('leads'),300);
+    else setTimeout(()=>switchCRMTab('cuentas'),300);
   } else if(mod==='analytics'){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
     show('analytics-panel');
@@ -10625,33 +10674,81 @@ function showModule(mod){
     loadTransacciones();
   }
 }
+function _hubCardHTML(c){
+  const statHTML=c.stats?`<div class="hub-card-stat-row">${c.stats.map(s=>`<span class="hub-card-stat-val" id="${s.id}">—</span><span class="hub-card-stat-lbl">${s.lbl}</span>`).join('<span style="color:rgba(255,255,255,.2);margin:0 .2rem">·</span>')}</div>`:'';
+  return `<div class="hub-card" onclick="showModule('${c.mod}')">
+    <div class="hub-card-hd">
+      <div class="hub-card-icon">${c.icon}</div>
+      ${c.badge?`<span class="hub-card-badge">${c.badge}</span>`:''}
+    </div>
+    <div>
+      <div class="hub-card-title">${c.title}</div>
+      ${statHTML}
+      <div class="hub-card-desc">${c.desc}</div>
+    </div>
+    <div class="hub-card-footer">
+      <button class="hub-card-btn" onclick="event.stopPropagation();showModule('${c.mod}')">${c.btn} →</button>
+    </div>
+  </div>`;
+}
+
 function renderHubCards(){
   const container=document.getElementById('hub-cards');
   if(!container)return;
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
   const cards=[
     {icon:'🔍',title:'Generador de Informes',desc:'Creación automática de propuestas comerciales para presentar a clientes.',mod:'generator',btn:'Abrir módulo'},
-    {icon:'🏢',title:'Edificios',desc:'Administración del inventario corporativo de edificios y disponibilidades.',mod:'buildings',btn:'Abrir módulo'},
-    {icon:'👥',title:'Clientes CRM',desc:'Seguimiento comercial y pipeline de negocios con clientes.',mod:'crm',btn:'Abrir módulo'},
+    {icon:'🏢',title:'Oficinas',desc:'Inventario de oficinas corporativas y disponibilidades.',mod:'office',btn:'Abrir módulo',stats:[{id:'hc-off-total',lbl:'activos'},{id:'hc-off-disp',lbl:'disponibles'}]},
+    {icon:'🏭',title:'Industrial',desc:'Naves, parques y centros logísticos del portafolio.',mod:'industrial',btn:'Abrir módulo',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disponibles'}]},
+    {icon:'🛍️',title:'Retail',desc:'Locales comerciales y centros de consumo.',mod:'retail',btn:'Abrir módulo',stats:[{id:'hc-ret-total',lbl:'activos'},{id:'hc-ret-disp',lbl:'disponibles'}]},
+    {icon:'📋',title:'Leads',desc:'Pipeline de negocios y oportunidades en seguimiento.',mod:'crm-leads',btn:'Abrir módulo',stats:[{id:'hc-leads-total',lbl:'total'},{id:'hc-leads-30d',lbl:'últimos 30d'}]},
+    {icon:'👤',title:'Contactos',desc:'Base de contactos vinculados a cuentas.',mod:'crm-contactos',btn:'Abrir módulo',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
+    {icon:'🏛️',title:'Cuentas',desc:'Empresas y organizaciones del portafolio comercial.',mod:'crm-cuentas',btn:'Abrir módulo',stats:[{id:'hc-cta-total',lbl:'cuentas'}]},
   ];
   if(isAdmin){
     cards.push({icon:'📊',title:'Analítica',desc:'Métricas y performance del negocio con reporting estratégico.',mod:'analytics',btn:'Abrir módulo',badge:'Solo Admin'});
   }
-  container.innerHTML=cards.map(c=>`
-    <div class="hub-card" onclick="showModule('${c.mod}')">
-      <div class="hub-card-hd">
-        <div class="hub-card-icon">${c.icon}</div>
-        ${c.badge?`<span class="hub-card-badge">${c.badge}</span>`:''}
-      </div>
-      <div>
-        <div class="hub-card-title">${c.title}</div>
-        <div class="hub-card-desc">${c.desc}</div>
-      </div>
-      <div class="hub-card-footer">
-        <button class="hub-card-btn" onclick="event.stopPropagation();showModule('${c.mod}')">${c.btn} →</button>
-      </div>
-    </div>
-  `).join('');
+  container.innerHTML=cards.map(c=>_hubCardHTML(c)).join('');
+  _loadHubCardStats();
+}
+
+async function _loadHubCardStats(){
+  if(!db)return;
+  const classifyAt=d=>d.assetType||(d._tipo==='industrial'?'industrial':d._tipo==='retail'?'retail':'office');
+  const now=Date.now();
+  const ms30d=30*24*60*60*1000;
+  try{
+    const [bldSnap,ctoSnap,ctaSnap]=await Promise.all([
+      db.collection('buildings').where('activo','==',true).get(),
+      db.collection('contactos').get(),
+      db.collection('clientes').get(),
+    ]);
+    let offT=0,offD=0,indT=0,indD=0,retT=0,retD=0;
+    bldSnap.docs.forEach(doc=>{
+      const d=doc.data();
+      const at=classifyAt(d);
+      const disp=d.disponible!==false&&d.estado!=='Ocupado';
+      if(at==='office'){offT++;if(disp)offD++;}
+      else if(at==='industrial'){indT++;if(disp)indD++;}
+      else if(at==='retail'){retT++;if(disp)retD++;}
+    });
+    const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    setEl('hc-off-total',offT);setEl('hc-off-disp',offD);
+    setEl('hc-ind-total',indT);setEl('hc-ind-disp',indD);
+    setEl('hc-ret-total',retT);setEl('hc-ret-disp',retD);
+    setEl('hc-cto-total',ctoSnap.size);
+    setEl('hc-cta-total',ctaSnap.size);
+    // Leads: count from clientes where categoria includes lead-like, or just show total cuentas for now
+    // Show total leads (clientes docs) + nuevos 30d
+    let leads30d=0;
+    ctaSnap.docs.forEach(doc=>{
+      const d=doc.data();
+      const fc=d.fechaCreacion?_tsToDate(d.fechaCreacion):null;
+      if(fc&&(now-fc.getTime())<ms30d)leads30d++;
+    });
+    setEl('hc-leads-total',ctaSnap.size);
+    setEl('hc-leads-30d','+'+leads30d);
+  }catch(e){console.error('_loadHubCardStats',e);}
 }
 function toggleMobileSidebar(){
   const sb=document.getElementById('app-sidebar');
