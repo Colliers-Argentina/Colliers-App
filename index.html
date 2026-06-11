@@ -2247,10 +2247,11 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body sb-closed" id="sbb-analytics">
-        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Inteligencia Comercial</button>
-        <button class="sb-item" data-mod="analytics" onclick="_sbItemClick('analytics',null)">Heatmaps</button>
-        <button class="sb-item" disabled><span>Tendencias</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Rankings</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="analytics" data-submod="intel" onclick="_sbItemClick('analytics','intel')">Inteligencia Comercial</button>
+        <button class="sb-item" data-mod="analytics" data-submod="heatmaps" onclick="_sbItemClick('analytics','heatmaps')">Heatmaps</button>
+        <button class="sb-item" data-mod="analytics" data-submod="brokers" onclick="_sbItemClick('analytics','brokers')">Dashboard Brokers</button>
+        <button class="sb-item" data-mod="analytics" data-submod="tendencias" onclick="_sbItemClick('analytics','tendencias')">Tendencias</button>
+        <button class="sb-item" data-mod="analytics" data-submod="rankings" onclick="_sbItemClick('analytics','rankings')">Rankings</button>
       </div>
     </div>
 
@@ -2339,7 +2340,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 <div id="analytics-panel" style="display:none">
   <div class="an-topbar">
     <div class="an-topbar-l">
-      <div class="an-page-title">Analítica · Inteligencia Comercial</div>
+      <div class="an-page-title" id="an-page-title">Analítica · Inteligencia Comercial</div>
       <div class="an-subtitle" id="an-last-update">Cargando datos...</div>
     </div>
     <div class="an-topbar-r">
@@ -8838,6 +8839,10 @@ async function upsertCliente(datos){
 // ===== ANALYTICS =====
 const _anCharts={};
 let _anDocs=[];
+let _anPendingScroll=null;
+let _anActiveSubmod='intel';
+const _AN_SCROLL={intel:'an-kpis',heatmaps:'an-demand-heatmap-card',brokers:'an-brokers-dash-card',tendencias:'an-tend-card',rankings:'an-leads-section'};
+const _AN_TITLES={intel:'Inteligencia Comercial',heatmaps:'Heatmaps',brokers:'Dashboard Brokers',tendencias:'Tendencias',rankings:'Rankings'};
 const ANALYTICS_ALLOWED=['mazaretto@gmail.com','matias.azaretto@colliers.com','colliers.arg@gmail.com'];
 const _anFilters={periodo:0,zonas:new Set(),ejecutivo:'',edificio:'',m2min:0,m2max:0};
 
@@ -9174,6 +9179,18 @@ function renderAnalytics(docs){
   renderAnDemandHeatmap(_anDocs.length?_anDocs:docs,_bldDocs);
 
   renderTendencias(_anDocs.length?_anDocs:docs,_tendPeriodo);
+  // Scroll to pending section after full render
+  if(_anPendingScroll){
+    const sub=_anPendingScroll;_anPendingScroll=null;
+    requestAnimationFrame(()=>{
+      const target=document.getElementById(_AN_SCROLL[sub]);
+      const sc=document.querySelector('#analytics-panel .an-body');
+      if(target&&sc){
+        const sb=sc.getBoundingClientRect(),tb=target.getBoundingClientRect();
+        sc.scrollBy({top:tb.top-sb.top-8,behavior:'smooth'});
+      }else if(sc){sc.scrollTop=0;}
+    });
+  }
 }
 
 // Phase 6 — auto insights
@@ -9734,11 +9751,32 @@ function _sbGrpToggle(grpId){
   if(body)body.classList.toggle('sb-closed',!isOpen);
   try{const s=JSON.parse(localStorage.getItem('sb_grps')||'{}');s[grpId]=isOpen;localStorage.setItem('sb_grps',JSON.stringify(s));}catch(e){}
 }
+function _anGoTo(submod){
+  _anActiveSubmod=submod;
+  const titleEl=document.getElementById('an-page-title');
+  if(titleEl)titleEl.textContent='Analítica · '+(_AN_TITLES[submod]||'Analytics');
+  document.querySelectorAll('#sb-nav .sb-item[data-mod="analytics"]').forEach(el=>el.classList.remove('active'));
+  const sbBtn=document.querySelector(`#sb-nav .sb-item[data-mod="analytics"][data-submod="${submod}"]`);
+  if(sbBtn)sbBtn.classList.add('active');
+  const panel=document.getElementById('analytics-panel');
+  if(panel&&panel.style.display!=='none'){
+    const target=document.getElementById(_AN_SCROLL[submod]);
+    if(target){
+      const pb=panel.getBoundingClientRect(),tb=target.getBoundingClientRect();
+      panel.scrollBy({top:tb.top-pb.top-8,behavior:'smooth'});
+    }else{panel.scrollTop=0;}
+  }else{
+    _anPendingScroll=submod;
+    showModule('analytics');
+  }
+}
 function _sbItemClick(mod,submod){
   if(mod==='crm'&&submod){
     showModule('crm');
     switchCRMTab(submod);
     _setSbActive('crm',submod);
+  }else if(mod==='analytics'&&submod){
+    _anGoTo(submod);
   }else{
     showModule(mod);
   }
