@@ -1524,22 +1524,23 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 /* ===== HOME HUB ===== */
 #home-hub{display:none;background:url('home-bg.jpg') center/cover no-repeat;background-attachment:local;overflow-y:auto;min-width:0;flex:1;height:100%;position:relative}
 #home-hub::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(2,6,23,.88) 0%,rgba(3,10,30,.80) 50%,rgba(2,8,24,.75) 100%);pointer-events:none;z-index:0}
-.hub-wrap{max-width:1100px;margin:0 auto;padding:3rem 2.5rem;position:relative;z-index:1}
+.hub-wrap{max-width:1440px;margin:0 auto;padding:2.5rem 2.5rem;position:relative;z-index:1}
 .hub-hero{margin-bottom:2.5rem}
 .hub-greeting{font-size:13px;color:rgba(163,193,255,.6);font-weight:500;margin-bottom:.35rem}
 .hub-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.2}
 .hub-title span{background:linear-gradient(90deg,#4D93FF,#C3E6FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hub-subtitle{font-size:14px;color:rgba(163,193,255,.55);margin-top:.5rem}
-.hub-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.35rem;margin-bottom:2.5rem}
-@media(max-width:1100px){.hub-cards{grid-template-columns:repeat(2,1fr)}}
+.hub-cards{display:grid;grid-template-columns:repeat(8,1fr);gap:1rem;margin-bottom:2rem}
+@media(max-width:1200px){.hub-cards{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:700px){.hub-cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:540px){.hub-cards{grid-template-columns:1fr}}
-.hub-card{background:rgba(8,14,36,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(77,147,255,.14);border-radius:20px;padding:2rem 2.1rem;cursor:pointer;transition:all .28s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:1.25rem;box-shadow:0 4px 24px rgba(0,0,0,.25);min-height:190px}
+.hub-card{background:rgba(8,14,36,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(77,147,255,.14);border-radius:16px;padding:1.35rem 1.35rem;cursor:pointer;transition:all .28s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.85rem;box-shadow:0 4px 24px rgba(0,0,0,.25);min-height:160px}
 .hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(77,147,255,.55),transparent);opacity:0;transition:.28s}
 .hub-card:hover{background:rgba(28,84,244,.13);backdrop-filter:blur(22px);border-color:rgba(77,147,255,.35);transform:translateY(-5px);box-shadow:0 22px 60px rgba(0,0,0,.42),0 0 0 1px rgba(77,147,255,.2)}
 .hub-card:hover::before{opacity:1}
-.hub-card-icon{font-size:32px;line-height:1;width:58px;height:58px;background:rgba(28,84,244,.18);border:1px solid rgba(77,147,255,.22);border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.hub-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-.hub-card-title{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.25px;margin-bottom:.3rem}
+.hub-card-icon{font-size:24px;line-height:1;width:46px;height:46px;background:rgba(28,84,244,.18);border:1px solid rgba(77,147,255,.22);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hub-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:.6rem}
+.hub-card-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.15px;margin-bottom:.2rem}
 .hub-card-desc{font-size:13px;color:rgba(163,193,255,.6);line-height:1.6}
 .hub-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
 .hub-card-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#4D93FF;background:rgba(28,84,244,.14);border:1px solid rgba(77,147,255,.22);padding:.55rem 1.1rem;border-radius:8px;cursor:pointer;transition:all .2s;font-family:inherit}
@@ -1563,6 +1564,53 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 .hub-notif-pill:hover{background:rgba(239,68,68,.24);border-color:rgba(239,68,68,.5)}
 .hub-notif-pill .hub-notif-zero{color:rgba(163,193,255,.5);font-weight:500}
 .hub-sec-label{font-size:11px;font-weight:700;color:rgba(163,193,255,.45);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.85rem;margin-top:2rem}
+
+/* ── Market Summary ──────────────────────────────────────── */
+.hub-market-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+@media(max-width:900px){.hub-market-grid{grid-template-columns:1fr}}
+.hub-mkt-card{background:rgba(6,11,28,.62);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(77,147,255,.13);border-radius:20px;padding:1.5rem 1.6rem;display:flex;flex-direction:column;gap:.9rem;position:relative;overflow:hidden;cursor:pointer;transition:all .26s}
+.hub-mkt-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0}
+.hub-mkt-office::after{background:linear-gradient(90deg,#2563EB,#60A5FA)}
+.hub-mkt-industrial::after{background:linear-gradient(90deg,#D97706,#FCD34D)}
+.hub-mkt-retail::after{background:linear-gradient(90deg,#7C3AED,#A78BFA)}
+.hub-mkt-card:hover{border-color:rgba(77,147,255,.28);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.hub-mkt-hd{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.hub-mkt-hd-left{display:flex;align-items:center;gap:.55rem}
+.hub-mkt-emoji{font-size:20px;line-height:1}
+.hub-mkt-name{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.2px}
+.hub-mkt-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 9px;border-radius:999px}
+.hub-mkt-badge-office{background:rgba(37,99,235,.18);color:#93C5FD;border:1px solid rgba(37,99,235,.3)}
+.hub-mkt-badge-industrial{background:rgba(217,119,6,.18);color:#FCD34D;border:1px solid rgba(217,119,6,.3)}
+.hub-mkt-badge-retail{background:rgba(124,58,237,.18);color:#C4B5FD;border:1px solid rgba(124,58,237,.3)}
+.hub-mkt-primary{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}
+.hub-mkt-stat{text-align:center;background:rgba(255,255,255,.04);border-radius:10px;padding:.65rem .35rem}
+.hub-mkt-stat-val{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1}
+.hub-mkt-stat-lbl{font-size:10px;color:rgba(163,193,255,.48);font-weight:500;margin-top:.22rem;line-height:1.2}
+.hub-mkt-divider{height:1px;background:rgba(77,147,255,.08)}
+.hub-mkt-rows{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .9rem}
+.hub-mkt-row{display:flex;flex-direction:column;gap:.1rem}
+.hub-mkt-row-lbl{font-size:10px;color:rgba(163,193,255,.4);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.hub-mkt-row-val{font-size:12px;font-weight:700;color:#C3E6FF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hub-mkt-insights{background:rgba(255,255,255,.03);border-radius:10px;padding:.7rem .85rem;display:flex;flex-direction:column;gap:.32rem}
+.hub-mkt-insight-row{display:flex;align-items:center;gap:.45rem}
+.hub-mkt-insight-icon{font-size:11px;flex-shrink:0;width:16px;text-align:center}
+.hub-mkt-insight-text{font-size:11px;color:rgba(163,193,255,.5);line-height:1.3}
+.hub-mkt-insight-text strong{color:#C3E6FF;font-weight:600}
+.hub-mkt-btn{background:rgba(28,84,244,.14);border:1px solid rgba(77,147,255,.22);color:#4D93FF;padding:.55rem .9rem;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;margin-top:auto}
+.hub-mkt-btn:hover{background:rgba(28,84,244,.28);border-color:#4D93FF;color:#fff}
+
+/* ── Insights row (horizontal) ───────────────────────────── */
+.hub-insights-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:900px){.hub-insights-row{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Bottom layout: activity | radar ─────────────────────── */
+.hub-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:900px){.hub-bottom-grid{grid-template-columns:1fr}}
+
+/* ── Alerts (only shown when there are alerts) ───────────── */
+#hub-alerts-section{display:none}
+.hub-alert-strip{display:flex;gap:.85rem;flex-wrap:wrap}
+.hub-alert-card{flex:1;min-width:160px}
 .hub-alert-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem}
 @media(max-width:1000px){.hub-alert-strip{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:540px){.hub-alert-strip{grid-template-columns:repeat(2,1fr)}}
@@ -2168,10 +2216,11 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 .bwiz-subtipo-name{font-size:13px;font-weight:700;color:#0A1B4D}
 .bwiz-subtipo-desc{font-size:11px;color:#7B8BBD;margin-top:.2rem;line-height:1.4}
 /* Hub card stats */
-.hub-card-stat-row{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;margin:.2rem 0 .1rem}
-.hub-card-stat-val{font-size:38px;font-weight:800;color:#fff;letter-spacing:-1.5px;line-height:1}
-.hub-card-stat-lbl{font-size:13px;color:rgba(163,193,255,.7);font-weight:600;letter-spacing:-.1px}
-.hub-card-stat-sub{font-size:12px;color:rgba(77,197,120,.85);font-weight:700;margin-left:auto}
+.hub-card-stat-row{display:flex;align-items:baseline;gap:.35rem;flex-wrap:wrap;margin:.1rem 0 0}
+.hub-card-stat-val{font-size:28px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1}
+.hub-card-stat-lbl{font-size:11px;color:rgba(163,193,255,.7);font-weight:600}
+.hub-card-stat-sub{font-size:11px;color:rgba(77,197,120,.85);font-weight:700;margin-left:auto}
+.hub-card-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#4D93FF;background:rgba(28,84,244,.14);border:1px solid rgba(77,147,255,.22);padding:.4rem .75rem;border-radius:7px;cursor:pointer;transition:all .2s;font-family:inherit}
 /* Dark mode filter bar fixes */
 body.dark .bld-filter-sel{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);color:#e0eaff}
 body.dark .bld-filter-sel:focus{border-color:#4D93FF}
@@ -2383,12 +2432,13 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 <!-- HOME HUB -->
 <div id="home-hub">
   <div class="hub-wrap">
+
     <!-- 1. HERO -->
     <div class="hub-hero-v2">
       <div class="hub-hero-left">
         <div class="hub-greeting" id="hub-greeting">¡Buenos días!</div>
         <h1 class="hub-title"><span>Centro de Operaciones Comerciales</span></h1>
-        <p class="hub-subtitle" style="margin-top:.25rem">Colliers Nexus · Plataforma Comercial</p>
+        <p class="hub-subtitle" style="margin-top:.2rem">Colliers Nexus · <span id="hub-last-update" style="color:rgba(163,193,255,.4)">actualizando...</span> · <span id="hub-total-records" style="color:#4D93FF;font-weight:600"></span></p>
       </div>
       <div class="hub-hero-right">
         <div class="hub-notif-pill" id="hub-notif-pill" onclick="document.getElementById('hub-alerts-section').scrollIntoView({behavior:'smooth'})">
@@ -2401,21 +2451,23 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
     <div class="hub-sec-label" style="margin-top:0">Accesos Rápidos</div>
     <div class="hub-cards" id="hub-cards"><!-- rendered by JS --></div>
 
-    <!-- 3. ALERTAS -->
-    <div id="hub-alerts-section">
-      <div class="hub-sec-label">Alertas y Notificaciones</div>
-      <div class="hub-alert-strip" id="hub-alerts"><!-- rendered by JS --></div>
-    </div>
+    <!-- 3. RESUMEN DEL MERCADO -->
+    <div class="hub-sec-label">Resumen del Mercado</div>
+    <div class="hub-market-grid" id="hub-market"><!-- rendered by JS --></div>
 
-    <!-- 4+5. INSIGHTS + ACTIVIDAD -->
-    <div class="hub-mid-grid" style="margin-top:0">
+    <!-- 4. INSIGHTS COMERCIALES -->
+    <div class="hub-sec-label">Insights Comerciales</div>
+    <div class="hub-insights-row" id="hub-insights"><!-- rendered by JS --></div>
+
+    <!-- 5. ACTIVIDAD + RADAR -->
+    <div class="hub-bottom-grid" style="margin-top:2rem">
       <div>
-        <div class="hub-sec-label">Insights Comerciales</div>
-        <div class="hub-insight-grid" id="hub-insights"><!-- rendered by JS --></div>
+        <div class="hub-sec-label" style="margin-top:0">Actividad Reciente</div>
+        <div class="hub-activity-box" id="hub-activity"><!-- rendered by JS --></div>
       </div>
       <div>
-        <div class="hub-sec-label">Actividad Reciente</div>
-        <div class="hub-activity-box" id="hub-activity"><!-- rendered by JS --></div>
+        <div class="hub-sec-label" style="margin-top:0">Radar Comercial</div>
+        <div class="hub-radar-box" id="hub-radar" style="margin-top:0"><!-- rendered by JS --></div>
       </div>
     </div>
 
@@ -2423,8 +2475,13 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
     <div class="hub-sec-label">KPIs Operacionales</div>
     <div class="hub-mini-kpi-row" id="hub-kpis"><!-- rendered by JS --></div>
 
-    <!-- 7. RADAR COMERCIAL -->
-    <div class="hub-radar-box" id="hub-radar"><!-- rendered by JS --></div>
+    <!-- 7. ALERTAS (hidden when all 0) -->
+    <div id="hub-alerts-section">
+      <div class="hub-sec-label">Alertas</div>
+      <div class="hub-alert-strip" id="hub-alerts"><!-- rendered by JS --></div>
+    </div>
+
+    <div style="height:2.5rem"></div>
   </div>
 </div>
 
@@ -10758,21 +10815,6 @@ function showModule(mod){
 }
 // ─── HUB DASHBOARD V2 ───────────────────────────────────────────────────
 let _hubClockTick=null;
-
-function _startHubClock(){
-  if(_hubClockTick)clearInterval(_hubClockTick);
-  const DAYS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-  const MONTHS=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  function tick(){
-    const n=new Date();
-    const d=document.getElementById('hub-date');
-    const t=document.getElementById('hub-time');
-    if(d)d.textContent=`${DAYS[n.getDay()]}, ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
-    if(t)t.textContent=n.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  }
-  tick();
-  _hubClockTick=setInterval(tick,1000);
-}
 
 function _updateHubGreeting(){
   const h=new Date().getHours();
