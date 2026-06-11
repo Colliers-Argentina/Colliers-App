@@ -2463,8 +2463,8 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
     <div class="an-card" id="an-demand-heatmap-card" style="margin-top:.5rem">
       <div class="an-card-hd">
         <div class="an-card-accent" style="background:linear-gradient(135deg,#22C55E,#EF4444)"></div>
-        <div class="an-card-title">Heatmap de Demanda · Corredores</div>
-        <div class="an-card-hint">Intensidad = búsquedas + PPTs + inventario</div>
+        <div class="an-card-title">Mapa de Demanda · Corredores</div>
+        <div class="an-card-hint">Score = búsquedas × 3 + edificios × 2 + inventario · click para filtrar</div>
       </div>
       <div class="an-card-body" style="padding:.5rem 1rem 1rem">
         <div id="an-demand-hm-body"></div>
@@ -10382,79 +10382,89 @@ function clearBldCat(){
   filterBuildings();
 }
 
-// ===================== PHASE 5: HEATMAP DE DEMANDA =====================
+// ===================== MAPA DE DEMANDA · CORREDORES =====================
 function renderAnDemandHeatmap(descargasDocs,bldDocs){
   const body=document.getElementById('an-demand-hm-body');
   if(!body)return;
-  const CORREDORES=[
-    {id:'dhm-cat',   name:'Catalinas',           fz:['Catalinas','Catalinas / Plaza Roma','Catalinas / Puerto Madero']},
-    {id:'dhm-roma',  name:'Plaza Roma',           fz:['Plaza Roma']},
-    {id:'dhm-sanm',  name:'Plaza San Martín',     fz:['Plaza San Martín','San Martín']},
-    {id:'dhm-micro', name:'Microcentro',          fz:['Microcentro']},
-    {id:'dhm-macro', name:'Macrocentro',          fz:['Macrocentro']},
-    {id:'dhm-macrn', name:'Macrocentro Norte',    fz:['Macrocentro Norte']},
-    {id:'dhm-macrs', name:'Macrocentro Sur',      fz:['Macrocentro Sur']},
-    {id:'dhm-pmoe',  name:'Puerto Madero Este',   fz:['Puerto Madero Este','Puerto Madero']},
-    {id:'dhm-pmoo',  name:'Puerto Madero Oeste',  fz:['Puerto Madero Oeste']},
-    {id:'dhm-ncaba', name:'Norte CABA',           fz:['Norte CABA']},
-    {id:'dhm-ngba',  name:'Norte GBA',            fz:['Norte GBA','Corredor Panamericana','Panamericana']},
+  // Same 7-zone SVG schematic as Mapa de Calor de Corredores
+  const Z=[
+    {id:'dhm-ngba', display:'Norte GBA',            lines:['Norte GBA'],               fz:['Norte GBA'],                                                                     x:2,  y:2,  w:556,h:78 },
+    {id:'dhm-pan',  display:'Corredor Panamericana', lines:['Corredor','Panamericana'],  fz:['Corredor Panamericana','Panamericana'],                                           x:2,  y:84, w:118,h:200},
+    {id:'dhm-ncaba',display:'Norte CABA',            lines:['Norte CABA'],               fz:['Norte CABA'],                                                                    x:124,y:84, w:286,h:100},
+    {id:'dhm-pto',  display:'Puerto Madero',         lines:['Puerto','Madero'],          fz:['Puerto Madero','Puerto Madero Este','Puerto Madero Oeste'],                       x:414,y:84, w:144,h:200},
+    {id:'dhm-micro',display:'Microcentro',           lines:['Microcentro'],              fz:['Microcentro'],                                                                   x:124,y:188,w:150,h:96 },
+    {id:'dhm-cat',  display:'Catalinas / Plaza Roma',lines:['Catalinas /','Plaza Roma'], fz:['Catalinas','Catalinas / Plaza Roma','Plaza Roma','Plaza San Martín','San Martín'],x:278,y:188,w:132,h:96 },
+    {id:'dhm-sur',  display:'Sur CABA',              lines:['Sur CABA'],                 fz:['Sur CABA','Macrocentro','Macrocentro Norte','Macrocentro Sur'],                   x:2,  y:288,w:408,h:80 },
   ];
-  const pptByZona={},bldByZona={};
+  // Compute demand per zone
+  const srchByFz={},uniqBldByFz={},invBldByFz={};
   (descargasDocs||[]).forEach(d=>{
     const zs=Array.isArray(d.zonas)?d.zonas:(d.zona?[d.zona]:[]);
-    zs.forEach(z=>{pptByZona[z]=(pptByZona[z]||0)+1;});
+    const blds=[...(Array.isArray(d.propiedades)?d.propiedades:[]),...(Array.isArray(d.edificios)?d.edificios:[])];
+    zs.forEach(z=>{
+      srchByFz[z]=(srchByFz[z]||0)+1;
+      if(!uniqBldByFz[z])uniqBldByFz[z]=new Set();
+      blds.forEach(b=>uniqBldByFz[z].add(b));
+    });
   });
   (bldDocs||[]).forEach(d=>{
     const z=d.corredor||d.zona||d.submercado||'';
-    if(z)bldByZona[z]=(bldByZona[z]||0)+1;
+    if(z)invBldByFz[z]=(invBldByFz[z]||0)+1;
   });
-  const scores=CORREDORES.map(c=>{
-    const ppt=c.fz.reduce((s,f)=>s+(pptByZona[f]||0),0);
-    const bld=c.fz.reduce((s,f)=>s+(bldByZona[f]||0),0);
-    const score=ppt*2+bld;
-    return{...c,ppt,bld,score};
+  const scored=Z.map(z=>{
+    const srch=z.fz.reduce((s,f)=>s+(srchByFz[f]||0),0);
+    const bldSet=z.fz.reduce((s,f)=>{(uniqBldByFz[f]||new Set()).forEach(b=>s.add(b));return s;},new Set());
+    const inv=z.fz.reduce((s,f)=>s+(invBldByFz[f]||0),0);
+    const raw=srch*3+bldSet.size*2+inv;
+    return{...z,srch,bld:bldSet.size,inv,raw};
   });
-  const maxScore=Math.max(...scores.map(s=>s.score),1);
-  function dhmColor(score,max){
-    const r=score/max;
-    if(r===0)return{bg:'#F3F4F6',brd:'#D1D5DB',txt:'#6B7280',lbl:'Sin datos'};
-    if(r<0.25)return{bg:'#DCFCE7',brd:'#22C55E',txt:'#15803D',lbl:'Baja'};
-    if(r<0.5)return{bg:'#FEF9C3',brd:'#EAB308',txt:'#854D0E',lbl:'Media'};
-    if(r<0.75)return{bg:'#FFEDD5',brd:'#F97316',txt:'#9A3412',lbl:'Alta'};
-    return{bg:'#FEE2E2',brd:'#EF4444',txt:'#991B1B',lbl:'Muy alta'};
+  const maxRaw=Math.max(...scored.map(z=>z.raw),1);
+  const zones=scored.map(z=>({...z,score:Math.round(z.raw/maxRaw*100)}));
+  function dCol(s){
+    if(s===0) return{bg:'#F3F4F6',brd:'#D1D5DB',txt:'#6B7280'};
+    if(s<20)  return{bg:'#DCFCE7',brd:'#22C55E',txt:'#14532D'};
+    if(s<40)  return{bg:'#D1FAE5',brd:'#10B981',txt:'#065F46'};
+    if(s<60)  return{bg:'#FEF9C3',brd:'#EAB308',txt:'#713F12'};
+    if(s<80)  return{bg:'#FFEDD5',brd:'#F97316',txt:'#9A3412'};
+    return{bg:'#FEE2E2',brd:'#EF4444',txt:'#991B1B'};
   }
-  const cards=scores.map(c=>{
-    const col=dhmColor(c.score,maxScore);
-    const bar=Math.round((c.score/maxScore)*100);
-    return`<div class="dhm-card" style="background:${col.bg};border:1.5px solid ${col.brd};border-radius:10px;padding:.75rem 1rem;position:relative;overflow:hidden;cursor:default"
-      onmouseenter="_dhmShowTip(event,'${esc(c.name)}',${c.ppt},${c.bld},${c.score},'${col.lbl}')"
-      onmouseleave="_dhmHideTip()">
-      <div style="position:absolute;bottom:0;left:0;height:3px;width:${bar}%;background:${col.brd};opacity:.7;border-radius:0 0 0 9px"></div>
-      <div style="font-size:11.5px;font-weight:700;color:${col.txt};margin-bottom:4px">${esc(c.name)}</div>
-      <div style="font-size:10px;color:${col.txt};opacity:.75">${c.ppt} PPTs · ${c.bld} edificios</div>
-      <div style="position:absolute;top:.5rem;right:.5rem;font-size:9px;font-weight:700;color:${col.txt};opacity:.6;text-transform:uppercase">${col.lbl}</div>
-    </div>`;
-  }).join('');
-  body.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.6rem;padding:.25rem 0 .5rem">${cards}</div>
-  <div id="dhm-tooltip" style="position:fixed;background:#0A1B4D;color:#fff;font-size:12px;border-radius:8px;padding:8px 14px;pointer-events:none;z-index:9999;display:none;line-height:1.8;box-shadow:0 4px 16px rgba(10,27,77,.3);min-width:160px"></div>
-  <div style="display:flex;gap:14px;padding:10px 0 4px;flex-wrap:wrap">
-    <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#F3F4F6;border:1.5px solid #D1D5DB;display:inline-block"></span>Sin datos</span>
-    <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#DCFCE7;border:1.5px solid #22C55E;display:inline-block"></span>Baja demanda</span>
-    <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#FEF9C3;border:1.5px solid #EAB308;display:inline-block"></span>Media</span>
-    <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#FFEDD5;border:1.5px solid #F97316;display:inline-block"></span>Alta</span>
-    <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#FEE2E2;border:1.5px solid #EF4444;display:inline-block"></span>Muy alta</span>
-  </div>`;
+  function dTxt(cx,cy,lines,score,col){
+    const lH=14,cH=17,gap=3,n=lines.length;
+    const totH=n*lH+(score>0?gap+cH:0);
+    const topY=cy-totH/2;
+    let s=lines.map((l,i)=>`<text x="${cx}" y="${Math.round(topY+lH*(i+1))}" text-anchor="middle" font-size="11" font-weight="600" fill="${col.txt}" font-family="Inter,system-ui,sans-serif" style="user-select:none">${l}</text>`).join('');
+    if(score>0)s+=`<text x="${cx}" y="${Math.round(topY+n*lH+gap+cH)}" text-anchor="middle" font-size="16" font-weight="700" fill="${col.txt}" font-family="Inter,system-ui,sans-serif" style="user-select:none">${score}</text>`;
+    return s;
+  }
+  const svgZ=zones.map(z=>{
+    const col=dCol(z.score);
+    const isSel=z.fz.some(f=>_anFilters.zonas.has(f));
+    const dimmed=_anFilters.zonas.size>0&&!isSel;
+    const cx=Math.round(z.x+z.w/2),cy=Math.round(z.y+z.h/2);
+    return`<g class="dhm-z" id="${z.id}" data-fz="${z.fz.join('|')}" data-srch="${z.srch}" data-bld="${z.bld}" data-inv="${z.inv}" data-score="${z.score}" data-disp="${z.display}" style="cursor:pointer;opacity:${dimmed?'0.3':'1'};transition:opacity .15s">
+      <rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" fill="${col.bg}" stroke="${col.brd}" stroke-width="${isSel?'3':'1.5'}" rx="5"/>
+      ${dTxt(cx,cy,z.lines,z.score,col)}</g>`;
+  });
+  body.innerHTML=`<div style="width:100%;aspect-ratio:560/370;min-height:500px"><svg viewBox="0 0 560 370" width="100%" height="100%" style="display:block" id="dhm-svg">${svgZ.join('')}</svg></div><div id="dhm-tt" style="position:fixed;background:#0A1B4D;color:#fff;font-size:12px;border-radius:8px;padding:8px 14px;pointer-events:none;z-index:9999;display:none;line-height:1.8;box-shadow:0 4px 16px rgba(10,27,77,.3);min-width:160px"></div><div style="display:flex;gap:14px;padding:10px 0 4px;flex-wrap:wrap;border-top:1px solid #F0F4FA;margin-top:6px"><span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#F3F4F6;border:1.5px solid #D1D5DB;display:inline-block"></span>Sin datos</span><span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#DCFCE7;border:1.5px solid #22C55E;display:inline-block"></span>Baja (0–20)</span><span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#FEF9C3;border:1.5px solid #EAB308;display:inline-block"></span>Media (40–60)</span><span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#FFEDD5;border:1.5px solid #F97316;display:inline-block"></span>Alta (60–80)</span><span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#6B7280"><span style="width:10px;height:10px;border-radius:3px;background:#FEE2E2;border:1.5px solid #EF4444;display:inline-block"></span>Muy alta (80–100)</span></div>`;
+  const tt=document.getElementById('dhm-tt');
+  document.querySelectorAll('#dhm-svg .dhm-z').forEach(el=>{
+    el.addEventListener('mousemove',e=>{
+      tt.innerHTML=`<b style="font-size:13px">${el.dataset.disp}</b><br>B\xFAsquedas: <b style="color:#93C5FD">${el.dataset.srch}</b><br>Edificios en PPTs: <b style="color:#93C5FD">${el.dataset.bld}</b><br>Inventario: <b style="color:#93C5FD">${el.dataset.inv}</b><br>Score: <b style="color:#93C5FD">${el.dataset.score}/100</b>`;
+      tt.style.display='block';tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+    });
+    el.addEventListener('mouseleave',()=>tt.style.display='none');
+    el.addEventListener('click',()=>{
+      const zonas=el.dataset.fz.split('|');
+      const anyOn=zonas.some(z=>_anFilters.zonas.has(z));
+      zonas.forEach(z=>{
+        if(anyOn)_anFilters.zonas.delete(z);else _anFilters.zonas.add(z);
+        const chk=document.getElementById('an-zchk-'+z.replace(/[\s/]/g,'_'));
+        if(chk)chk.checked=!anyOn;
+      });
+      applyAnFilters();
+    });
+  });
 }
-
-function _dhmShowTip(e,name,ppt,bld,score,lbl){
-  const tt=document.getElementById('dhm-tooltip');
-  if(!tt)return;
-  tt.innerHTML=`<b style="font-size:13px">${esc(name)}</b><br>PPTs generados: <b style="color:#93C5FD">${ppt}</b><br>Edificios: <b style="color:#93C5FD">${bld}</b><br>Score: <b style="color:#93C5FD">${score}</b><br>Demanda: <b style="color:#93C5FD">${lbl}</b>`;
-  tt.style.display='block';
-  tt.style.left=(e.clientX+16)+'px';
-  tt.style.top=(e.clientY-10)+'px';
-}
-function _dhmHideTip(){const tt=document.getElementById('dhm-tooltip');if(tt)tt.style.display='none';}
 
 function _bldUpdatePromNivel(){
   const propiaCant=parseFloat(document.getElementById('be-supPropia')?.value)||0;
