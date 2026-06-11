@@ -6328,17 +6328,43 @@ window.closeLeadDetail=()=>{
 
 function _leadResumenText(d){
   const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
-  const subject='Nuevo Lead'+(d.buildingName?' - '+d.buildingName:'')+(d.empresa?' - '+d.empresa:'');
-  let body='INMUEBLE\n';
-  body+=(d.buildingName?'Inmueble: '+d.buildingName+'\n':'');
-  body+=(d.linkOrigen?'Link: '+d.linkOrigen+'\n':'');
-  if(d.empresa){body+='\nEMPRESA\nEmpresa: '+d.empresa+'\n';}
-  body+='\nCONTACTO\n';
-  body+='Nombre: '+fullname+'\n';
-  body+=(d.email?'Email: '+d.email+'\n':'');
-  body+=(d.telefono?'Teléfono: '+d.telefono+'\n':'');
-  body+=(d.puesto?'Puesto: '+d.puesto+'\n':'');
-  return {subject,body:body.trim()};
+  const subject='Nuevo Lead'+(d.empresa?' - '+d.empresa:'')+(d.buildingName?' ('+d.buildingName+')':'');
+  const lines=[];
+  lines.push('Hola,');
+  lines.push('');
+  lines.push('Se registró una nueva consulta comercial en Colliers Nexus.');
+  lines.push('Por favor comunicarse con este lead dentro de las próximas 24 horas.');
+  lines.push('');
+  lines.push('──────────────────────────────');
+  lines.push('PUBLICACIÓN DE ORIGEN');
+  lines.push('──────────────────────────────');
+  if(d.linkOrigen)lines.push(d.linkOrigen);
+  lines.push('');
+  if(d.empresa){
+    lines.push('──────────────────────────────');
+    lines.push('EMPRESA');
+    lines.push('──────────────────────────────');
+    lines.push('Empresa: '+d.empresa);
+    lines.push('');
+  }
+  lines.push('──────────────────────────────');
+  lines.push('CONTACTO');
+  lines.push('──────────────────────────────');
+  lines.push('Nombre:    '+fullname);
+  if(d.puesto)lines.push('Cargo:     '+d.puesto);
+  if(d.email)lines.push('Email:     '+d.email);
+  if(d.telefono)lines.push('Teléfono:  '+d.telefono);
+  if(d.linkedin)lines.push('LinkedIn:  '+d.linkedin);
+  lines.push('');
+  lines.push('──────────────────────────────');
+  lines.push('ACCIONES RECOMENDADAS');
+  lines.push('──────────────────────────────');
+  lines.push('• Contactar al prospecto dentro de las próximas 24 horas.');
+  lines.push('• Registrar el resultado del contacto en el CRM.');
+  lines.push('• Actualizar el estado de la oportunidad una vez realizada la gestión.');
+  lines.push('');
+  lines.push('Lead generado automáticamente desde Colliers Nexus.');
+  return {subject,body:lines.join('\n')};
 }
 
 window._leadSendToBroker=function(docId){
