@@ -2374,6 +2374,18 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
           <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearAnZonas()">✕ Limpiar</button></div>
         </div>
       </div>
+      <select class="an-fbar-sel" id="an-f-asset-type" onchange="applyAnFilters()">
+        <option value="">Todos los tipos</option>
+        <option value="office">Oficinas</option>
+        <option value="industrial">Industrial</option>
+        <option value="retail">Retail</option>
+      </select>
+      <select class="an-fbar-sel" id="an-f-asset-type" onchange="applyAnFilters()">
+        <option value="">Todos los tipos</option>
+        <option value="office">Oficinas</option>
+        <option value="industrial">Industrial</option>
+        <option value="retail">Retail</option>
+      </select>
       <select class="an-fbar-sel" id="an-f-ejecutivo" onchange="applyAnFilters()"><option value="">Todos los ejecutivos</option></select>
       <select class="an-fbar-sel" id="an-f-edificio" onchange="applyAnFilters()"><option value="">Todos los edificios</option></select>
       <div style="display:flex;align-items:center;gap:.3rem">
@@ -3121,46 +3133,8 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <!-- FILTER BAR -->
         <div class="bld-filter-bar" id="bld-filter-bar">
           <div class="bld-filter-bar-l">
-            <input id="bld-search" type="text" placeholder="🔍 Buscar por nombre, dirección, broker..." class="bld-filter-inp" oninput="filterBuildings()">
-            <select id="bld-filter-corredor" class="bld-filter-sel" onchange="filterBuildings()">
-              <option value="">Todos los corredores</option>
-              <option>Catalinas</option><option>Macrocentro</option><option>Macrocentro Norte</option>
-              <option>Macrocentro Sur</option><option>Microcentro</option><option>Norte CABA</option>
-              <option>Norte GBA</option><option>Plaza Roma</option><option>Plaza San Martín</option>
-              <option>Puerto Madero Este</option><option>Puerto Madero Oeste</option>
-            </select>
-            <div class="mz-dd" id="bld-cat-dd" style="position:relative">
-              <button class="bld-filter-sel mz-dd-btn" id="bld-cat-btn" onclick="toggleBldCatDD(event)" type="button" style="white-space:nowrap">Categoría ▾</button>
-              <div class="mz-dd-panel" id="bld-cat-panel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;min-width:160px;background:#fff;border:1px solid #DDE5F2;border-radius:10px;box-shadow:0 4px 16px rgba(10,27,77,.12);padding:8px 0">
-                <div id="bld-cat-list" style="padding:0 8px 4px">
-                  <label class="mz-dd-chk"><input type="checkbox" value="A+" onchange="_bldCatChg(this)"> A+</label>
-                  <label class="mz-dd-chk"><input type="checkbox" value="A" onchange="_bldCatChg(this)"> A</label>
-                  <label class="mz-dd-chk"><input type="checkbox" value="B+" onchange="_bldCatChg(this)"> B+</label>
-                  <label class="mz-dd-chk"><input type="checkbox" value="B" onchange="_bldCatChg(this)"> B</label>
-                  <label class="mz-dd-chk"><input type="checkbox" value="C" onchange="_bldCatChg(this)"> C</label>
-                </div>
-                <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldCat()">✕ Limpiar</button></div>
-              </div>
-            </div>
-            <div class="mz-dd" id="bld-to-dd" style="position:relative">
-              <button class="bld-filter-sel mz-dd-btn" id="bld-to-btn" onclick="toggleBldToDD(event)" type="button" style="white-space:nowrap">Oferta ▾</button>
-              <div class="mz-dd-panel" id="bld-to-panel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;min-width:190px;background:#fff;border:1px solid #DDE5F2;border-radius:10px;box-shadow:0 4px 16px rgba(10,27,77,.12);padding:8px 0">
-                <div id="bld-to-list" style="padding:0 8px 4px">
-                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Alquiler" onchange="_bldToChg(this)"> <span class="to-badge alq">ALQUILER</span></label>
-                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Venta" onchange="_bldToChg(this)"> <span class="to-badge vta">VENTA</span></label>
-                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Alquiler o Venta" onchange="_bldToChg(this)"> <span class="to-badge alqvta">ALQ + VTA</span></label>
-                  <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="No disponible" onchange="_bldToChg(this)"> <span class="to-badge nodisp">NO DISP.</span></label>
-                </div>
-                <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldTo()">✕ Limpiar</button></div>
-              </div>
-            </div>
-            <select id="bld-filter-etapa" class="bld-filter-sel" onchange="filterBuildings()">
-              <option value="">Todas las etapas</option>
-              <option>Proyecto</option><option>En Construcción</option><option>Existente</option>
-            </select>
-            <select id="bld-filter-estado" class="bld-filter-sel" onchange="filterBuildings()">
-              <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
-            </select>
+            <input id="bld-search" type="text" placeholder="🔍 Buscar..." class="bld-filter-inp" oninput="filterBuildings()">
+            <span id="bld-filter-dyn"></span>
             <button class="bld-filter-clear" id="bld-filter-clear-btn" onclick="bldClearFilters()" style="display:none">✕ Limpiar</button>
           </div>
           <div class="bld-filter-bar-r">
@@ -3407,426 +3381,150 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
   <div class="bld-wiz-modal">
     <div class="bld-wiz-hd">
       <div>
-        <div class="bld-wiz-title">Nuevo Industrial</div>
+        <div class="bld-wiz-title">Nuevo Activo Industrial</div>
         <div class="bld-wiz-subtitle" id="iwiz-subtitle">Paso 1 de 4</div>
       </div>
       <button class="bld-wiz-close" onclick="closeIndWizard()">✕</button>
     </div>
     <div class="bld-wiz-stepper">
-      <div class="bwiz-step active" data-step="1"><div class="bwiz-step-dot">1</div><div class="bwiz-step-lbl">Tipo</div></div>
+      <div class="bwiz-step active" data-step="1"><div class="bwiz-step-dot">1</div><div class="bwiz-step-lbl">General</div></div>
       <div class="bwiz-step-line"></div>
-      <div class="bwiz-step" data-step="2"><div class="bwiz-step-dot">2</div><div class="bwiz-step-lbl">General</div></div>
+      <div class="bwiz-step" data-step="2"><div class="bwiz-step-dot">2</div><div class="bwiz-step-lbl">Superficies</div></div>
       <div class="bwiz-step-line"></div>
-      <div class="bwiz-step" data-step="3"><div class="bwiz-step-dot">3</div><div class="bwiz-step-lbl">Infraestructura</div></div>
+      <div class="bwiz-step" data-step="3"><div class="bwiz-step-dot">3</div><div class="bwiz-step-lbl">Características</div></div>
       <div class="bwiz-step-line"></div>
       <div class="bwiz-step" data-step="4"><div class="bwiz-step-dot">4</div><div class="bwiz-step-lbl">Comercial</div></div>
     </div>
     <div class="bld-wiz-body">
-      <!-- Step 1: Sub-tipo -->
       <div class="bwiz-panel active" data-panel="1">
-        <div style="margin-bottom:.75rem;font-size:13px;color:#7B8BBD">Seleccioná el tipo de inmueble industrial:</div>
-        <div style="display:flex;flex-direction:column;gap:.65rem">
-          <div id="inw-st-cl" class="bwiz-subtipo-card" onclick="_indSelectSubtipo('cl')">
-            <div class="bwiz-subtipo-icon">🏗</div>
-            <div><div class="bwiz-subtipo-name">Centro Logístico</div><div class="bwiz-subtipo-desc">Inmueble industrial para renta de espacios de almacenamiento y distribución de alta calidad</div></div>
-          </div>
-          <div id="inw-st-nave" class="bwiz-subtipo-card" onclick="_indSelectSubtipo('nave')">
-            <div class="bwiz-subtipo-icon">🏭</div>
-            <div><div class="bwiz-subtipo-name">Nave Industrial</div><div class="bwiz-subtipo-desc">Inmueble para producción y/o almacenamiento. Superficie mínima: 2.500 m²</div></div>
-          </div>
-          <div id="inw-st-terreno" class="bwiz-subtipo-card" onclick="_indSelectSubtipo('terreno')">
-            <div class="bwiz-subtipo-icon">🌱</div>
-            <div><div class="bwiz-subtipo-name">Terreno</div><div class="bwiz-subtipo-desc">Tierra para desarrollos industriales, comerciales o mixtos</div></div>
-          </div>
-          <div id="inw-st-parque" class="bwiz-subtipo-card" onclick="_indSelectSubtipo('parque')">
-            <div class="bwiz-subtipo-icon">🏘</div>
-            <div><div class="bwiz-subtipo-name">Parque Industrial</div><div class="bwiz-subtipo-desc">Perímetro subdividido en parcelas para actividad industrial o logística</div></div>
-          </div>
-        </div>
-      </div>
-      <!-- Step 2: Características generales -->
-      <div class="bwiz-panel" data-panel="2">
-        <div class="bwiz-row" id="inw-nombre-row">
+        <div class="bwiz-row">
           <div class="bwiz-field bwiz-full">
-            <label class="bwiz-lbl">Building Name <span class="bwiz-req">*</span></label>
-            <input class="bwiz-inp" id="inw-nombre" placeholder="Nombre del inmueble">
+            <label class="bwiz-lbl">Nombre <span class="bwiz-req">*</span></label>
+            <input class="bwiz-inp" id="ind-nombre" placeholder="Nombre del activo industrial">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field bwiz-full">
             <label class="bwiz-lbl">Dirección <span class="bwiz-req">*</span></label>
-            <input class="bwiz-inp" id="inw-direccion" placeholder="Ej: Panamericana 3500, Tigre">
+            <input class="bwiz-inp" id="ind-direccion" placeholder="Ej: Ruta 8 km 30, Pilar">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Corredor <span class="bwiz-req">*</span></label>
-            <select class="bwiz-inp" id="inw-corredor">
-              <option value="">Seleccioná un corredor</option>
-              <option>CABA</option><option>GBA Norte</option><option>GBA Sur</option><option>GBA Oeste</option>
-              <option>Resto RMBA</option><option>Resto Pcia. BA</option><option>Interior Argentina</option>
-            </select>
+            <label class="bwiz-lbl">Localidad</label>
+            <input class="bwiz-inp" id="ind-localidad" placeholder="Ej: Pilar">
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Barrio / Municipio</label>
-            <input class="bwiz-inp" id="inw-barrio" placeholder="Ej: Tigre, Ezeiza, Pilar">
-          </div>
-        </div>
-        <!-- CL fields -->
-        <div id="inw-cl-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Tipo de producto</label>
-              <select class="bwiz-inp" id="inw-cl-producto">
-                <option value="">— Seleccionar —</option>
-                <option>Multi-inquilino</option><option>Uso propio</option><option>Centro de distribución</option>
-              </select>
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Etapa</label>
-              <select class="bwiz-inp" id="inw-cl-etapa">
-                <option>Existente</option><option>Proyecto</option><option>En Construcción</option><option>Expansión</option>
-              </select>
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Categoría</label>
-              <select class="bwiz-inp" id="inw-cl-categoria">
-                <option value="">— Seleccionar —</option>
-                <option>A</option><option>B</option>
-              </select>
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Año de construcción</label>
-              <input class="bwiz-inp" id="inw-cl-anio" type="number" min="1900" max="2035" placeholder="Ej: 2015">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. del terreno (m²)</label>
-              <input class="bwiz-inp" id="inw-cl-sup-terreno" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. cubierta (m²)</label>
-              <input class="bwiz-inp" id="inw-cl-sup-cubierta" type="number" min="0" placeholder="m²">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. de depósito (m²)</label>
-              <input class="bwiz-inp" id="inw-cl-sup-deposito" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. de oficinas (m²)</label>
-              <input class="bwiz-inp" id="inw-cl-sup-oficinas" type="number" min="0" placeholder="m²">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Playa de maniobras (m²)</label>
-              <input class="bwiz-inp" id="inw-cl-playa" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Potencial construible (m²)</label>
-              <input class="bwiz-inp" id="inw-cl-potencial" type="number" min="0" placeholder="m²">
-            </div>
-          </div>
-        </div>
-        <!-- Nave fields -->
-        <div id="inw-nave-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. del terreno (m²)</label>
-              <input class="bwiz-inp" id="inw-nave-sup-terreno" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. cubierta (m²) <span class="bwiz-req">*</span></label>
-              <input class="bwiz-inp" id="inw-nave-sup-cubierta" type="number" min="0" placeholder="mín. 2.500 m²">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. de depósito (m²)</label>
-              <input class="bwiz-inp" id="inw-nave-sup-deposito" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. de oficinas (m²)</label>
-              <input class="bwiz-inp" id="inw-nave-sup-oficinas" type="number" min="0" placeholder="m²">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Frente (m)</label>
-              <input class="bwiz-inp" id="inw-nave-frente" type="number" min="0" step="0.1" placeholder="metros">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Fondo (m)</label>
-              <input class="bwiz-inp" id="inw-nave-fondo" type="number" min="0" step="0.1" placeholder="metros">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field bwiz-full">
-              <label class="bwiz-lbl">Zonificación</label>
-              <input class="bwiz-inp" id="inw-nave-zonificacion" placeholder="Actividades permitidas, características de la zona">
-            </div>
-          </div>
-        </div>
-        <!-- Terreno fields -->
-        <div id="inw-terreno-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Uso del terreno</label>
-              <select class="bwiz-inp" id="inw-terreno-uso">
-                <option value="">— Seleccionar —</option>
-                <option>Comercial / Residencial</option><option>Industrial</option><option>Industrial / Mixto</option>
-              </select>
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Tiene construcción</label>
-              <select class="bwiz-inp" id="inw-terreno-construccion">
-                <option value="">— Seleccionar —</option>
-                <option value="no">No</option><option value="si">Sí</option>
-              </select>
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Superficie total (m²) <span class="bwiz-req">*</span></label>
-              <input class="bwiz-inp" id="inw-terreno-sup-total" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Superficie a construir (m²)</label>
-              <input class="bwiz-inp" id="inw-terreno-sup-construir" type="number" min="0" placeholder="m²">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Frente (m)</label>
-              <input class="bwiz-inp" id="inw-terreno-frente" type="number" min="0" step="0.1" placeholder="metros">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Fondo (m)</label>
-              <input class="bwiz-inp" id="inw-terreno-fondo" type="number" min="0" step="0.1" placeholder="metros">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field bwiz-full">
-              <label class="bwiz-lbl">Zonificación</label>
-              <input class="bwiz-inp" id="inw-terreno-zonificacion" placeholder="Actividades permitidas">
-            </div>
-          </div>
-        </div>
-        <!-- Parque fields -->
-        <div id="inw-parque-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Tipo de parque</label>
-              <select class="bwiz-inp" id="inw-parque-tipo">
-                <option value="">— Seleccionar —</option>
-                <option>Parque industrial</option><option>Agrupamiento industrial</option><option>Parque logístico</option>
-              </select>
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Superficie total (has)</label>
-              <input class="bwiz-inp" id="inw-parque-sup-has" type="number" min="0" step="0.1" placeholder="hectáreas">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. mínima de lotes (m²)</label>
-              <input class="bwiz-inp" id="inw-parque-lot-min" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. máxima de lotes (m²)</label>
-              <input class="bwiz-inp" id="inw-parque-lot-max" type="number" min="0" placeholder="m²">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Cantidad de lotes</label>
-              <input class="bwiz-inp" id="inw-parque-lotes" type="number" min="0" placeholder="cantidad">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Zonificación</label>
-              <input class="bwiz-inp" id="inw-parque-zonificacion" placeholder="Actividades permitidas">
-            </div>
-          </div>
-        </div>
-        <!-- En parque industrial (CL / Nave / Terreno) -->
-        <div id="inw-en-parque-row" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">¿Dentro de parque industrial?</label>
-              <select class="bwiz-inp" id="inw-en-parque" onchange="_indToggleParqueNombre()">
-                <option value="">— Seleccionar —</option>
-                <option value="no">No</option><option value="si">Sí</option>
-              </select>
-            </div>
-            <div class="bwiz-field" id="inw-parque-nombre-field" style="visibility:hidden">
-              <label class="bwiz-lbl">Nombre del parque</label>
-              <input class="bwiz-inp" id="inw-parque-nombre" placeholder="Nombre del parque industrial">
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Step 3: Infraestructura (CL / Nave) -->
-      <div class="bwiz-panel" data-panel="3">
-        <div id="inw-infra-cl" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Docks elevados</label>
-              <select class="bwiz-inp" id="inw-inf-docks-nivel">
-                <option value="">— Seleccionar —</option>
-                <option value="si">Sí</option><option value="no">No</option>
-              </select>
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Ratio de docks (por 1.000 m²)</label>
-              <input class="bwiz-inp" id="inw-inf-ratio-docks" type="number" min="0" step="0.1" placeholder="Ej: 1">
-            </div>
-          </div>
-        </div>
-        <div id="inw-infra-nave" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field bwiz-full">
-              <label class="bwiz-lbl">Tipo de docks</label>
-              <select class="bwiz-inp" id="inw-inf-docks-tipo">
-                <option value="">Sin docks</option>
-                <option>A nivel de piso</option><option>Elevados</option><option>Ambos</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="bwiz-row">
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Sistema contra incendios</label>
-            <select class="bwiz-inp" id="inw-inf-incendios">
+            <label class="bwiz-lbl">Provincia</label>
+            <select class="bwiz-inp" id="ind-provincia">
               <option value="">— Seleccionar —</option>
-              <option>Sprinklers</option><option>Hidrantes</option><option>Matafuegos</option>
+              <option>Buenos Aires</option><option>CABA</option><option>Córdoba</option>
+              <option>Santa Fe</option><option>Mendoza</option><option>Tucumán</option><option>Otra</option>
             </select>
-          </div>
-          <div id="inw-leed-field" class="bwiz-field" style="display:none">
-            <label class="bwiz-lbl">Certificación LEED</label>
-            <input class="bwiz-inp" id="inw-inf-leed" placeholder="Ej: LEED Gold">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Altura libre mínima (m)</label>
-            <input class="bwiz-inp" id="inw-inf-alt-min" type="number" min="0" step="0.1" placeholder="metros">
+            <label class="bwiz-lbl">Corredor Industrial <span class="bwiz-req">*</span></label>
+            <select class="bwiz-inp" id="ind-corredor">
+              <option value="">— Seleccionar —</option>
+              <option>GBA Norte</option><option>GBA Sur</option><option>GBA Oeste</option>
+              <option>CABA</option><option>Rosario</option><option>Córdoba</option>
+              <option>Interior Argentina</option><option>Otro</option>
+            </select>
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Altura libre máxima (m)</label>
-            <input class="bwiz-inp" id="inw-inf-alt-max" type="number" min="0" step="0.1" placeholder="metros">
+            <label class="bwiz-lbl">Etapa</label>
+            <select class="bwiz-inp" id="ind-etapa">
+              <option value="">— Seleccionar —</option>
+              <option>Existente</option><option>En Construcción</option><option>Proyecto</option>
+            </select>
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Categoría</label>
+            <select class="bwiz-inp" id="ind-categoria">
+              <option value="">— Seleccionar —</option>
+              <option>A</option><option>B</option><option>C</option>
+            </select>
           </div>
         </div>
       </div>
-      <!-- Step 4: Información comercial -->
+      <div class="bwiz-panel" data-panel="2">
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Terreno (m²)</label>
+            <input class="bwiz-inp" id="ind-sup-terreno" type="number" min="0" placeholder="m²">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Cubiertos (m²)</label>
+            <input class="bwiz-inp" id="ind-sup-cubiertos" type="number" min="0" placeholder="m²">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Semicubiertos (m²)</label>
+            <input class="bwiz-inp" id="ind-sup-semicubiertos" type="number" min="0" placeholder="m²">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Oficinas (m²)</label>
+            <input class="bwiz-inp" id="ind-sup-oficinas" type="number" min="0" placeholder="m²">
+          </div>
+        </div>
+      </div>
+      <div class="bwiz-panel" data-panel="3">
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Altura libre (m)</label>
+            <input class="bwiz-inp" id="ind-altura" type="number" min="0" step="0.1" placeholder="metros">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Cantidad de docks</label>
+            <input class="bwiz-inp" id="ind-docks" type="number" min="0" placeholder="cantidad">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Potencia eléctrica (kVA)</label>
+            <input class="bwiz-inp" id="ind-potencia" type="number" min="0" placeholder="kVA">
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Playa de maniobras (m²)</label>
+            <input class="bwiz-inp" id="ind-playa" type="number" min="0" placeholder="m²">
+          </div>
+        </div>
+        <div class="bwiz-row">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Sprinklers</label>
+            <select class="bwiz-inp" id="ind-sprinklers">
+              <option value="">— Seleccionar —</option>
+              <option value="si">Sí</option><option value="no">No</option>
+            </select>
+          </div>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Certificación</label>
+            <input class="bwiz-inp" id="ind-certificacion" placeholder="Ej: LEED Gold">
+          </div>
+        </div>
+      </div>
       <div class="bwiz-panel" data-panel="4">
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Tipo de oferta</label>
-            <select class="bwiz-inp" id="inw-com-tipo-oferta">
-              <option value="">— Seleccionar —</option>
-              <option>Alquiler</option><option>Venta</option><option>Venta / Alquiler</option><option>No disponible</option>
-            </select>
+            <label class="bwiz-lbl">Precio alquiler (USD/m²)</label>
+            <input class="bwiz-inp" id="ind-precio-alq" type="number" min="0" step="0.01" placeholder="USD/m²">
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Moneda</label>
-            <select class="bwiz-inp" id="inw-com-moneda">
-              <option>USD</option><option>ARS</option>
-            </select>
-          </div>
-        </div>
-        <div id="inw-com-cl-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Sup. disponible en alquiler (m²)</label>
-              <input class="bwiz-inp" id="inw-com-cl-sup-alquiler" type="number" min="0" placeholder="m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Precio de alquiler (USD/m²)</label>
-              <input class="bwiz-inp" id="inw-com-cl-precio-alquiler" type="number" min="0" step="0.01" placeholder="precio por m²">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Expensas (USD/m²)</label>
-              <input class="bwiz-inp" id="inw-com-cl-expensas" type="number" min="0" step="0.01" placeholder="expensas por m²">
-            </div>
-          </div>
-        </div>
-        <div id="inw-com-nave-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Precio alquiler (m²)</label>
-              <input class="bwiz-inp" id="inw-com-nave-precio-m2-alq" type="number" min="0" step="0.01" placeholder="precio/m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Precio alquiler mensual total</label>
-              <input class="bwiz-inp" id="inw-com-nave-precio-mensual" type="number" min="0" placeholder="total mensual">
-            </div>
-          </div>
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Precio venta total</label>
-              <input class="bwiz-inp" id="inw-com-nave-precio-venta" type="number" min="0" placeholder="precio total">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Precio venta (m²)</label>
-              <input class="bwiz-inp" id="inw-com-nave-precio-m2-venta" type="number" min="0" step="0.01" placeholder="precio/m²">
-            </div>
-          </div>
-        </div>
-        <div id="inw-com-terreno-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field bwiz-full">
-              <label class="bwiz-lbl">Precio total de venta</label>
-              <input class="bwiz-inp" id="inw-com-terreno-precio-venta" type="number" min="0" placeholder="precio total">
-            </div>
-          </div>
-        </div>
-        <div id="inw-com-parque-fields" style="display:none">
-          <div class="bwiz-row">
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Precio venta mínimo (USD/m²)</label>
-              <input class="bwiz-inp" id="inw-com-parque-precio-min" type="number" min="0" step="0.01" placeholder="USD/m²">
-            </div>
-            <div class="bwiz-field">
-              <label class="bwiz-lbl">Precio venta máximo (USD/m²)</label>
-              <input class="bwiz-inp" id="inw-com-parque-precio-max" type="number" min="0" step="0.01" placeholder="USD/m²">
-            </div>
-          </div>
-        </div>
-        <div class="bwiz-row">
-          <div class="bwiz-field bwiz-full">
-            <label class="bwiz-lbl">URL (fuente de la información)</label>
-            <input class="bwiz-inp" id="inw-com-url" type="url" placeholder="https://...">
+            <label class="bwiz-lbl">Precio venta (USD/m²)</label>
+            <input class="bwiz-inp" id="ind-precio-vta" type="number" min="0" step="0.01" placeholder="USD/m²">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Ejecutivo Comercial</label>
-            <select class="bwiz-inp" id="inw-com-broker">
-              <option value="">— Seleccionar —</option>
-              <option>Matienzo</option><option>Bartra</option><option>Farola</option>
-              <option>Troncoso</option><option>Giancontieri</option><option>Zuliani</option>
+            <label class="bwiz-lbl">Disponible</label>
+            <select class="bwiz-inp" id="ind-disponible">
+              <option value="si">Sí</option><option value="no">No</option>
             </select>
-          </div>
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Broker de origen</label>
-            <input class="bwiz-inp" id="inw-com-broker-origen" placeholder="Quién pasó el dato">
-          </div>
-        </div>
-        <div class="bwiz-row">
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Cuenta del propietario</label>
-            <input class="bwiz-inp" id="inw-com-propietario-cuenta" placeholder="Empresa propietaria">
-          </div>
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Contacto del propietario</label>
-            <input class="bwiz-inp" id="inw-com-propietario-contacto" placeholder="Nombre y datos de contacto">
           </div>
         </div>
       </div>
@@ -3844,38 +3542,37 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
   <div class="bld-wiz-modal">
     <div class="bld-wiz-hd">
       <div>
-        <div class="bld-wiz-title">Nuevo Local Comercial</div>
+        <div class="bld-wiz-title">Nuevo Local Retail</div>
         <div class="bld-wiz-subtitle" id="rwiz-subtitle">Paso 1 de 3</div>
       </div>
       <button class="bld-wiz-close" onclick="closeRetWizard()">✕</button>
     </div>
     <div class="bld-wiz-stepper">
-      <div class="bwiz-step active" data-step="1"><div class="bwiz-step-dot">1</div><div class="bwiz-step-lbl">Características</div></div>
+      <div class="bwiz-step active" data-step="1"><div class="bwiz-step-dot">1</div><div class="bwiz-step-lbl">General</div></div>
       <div class="bwiz-step-line"></div>
-      <div class="bwiz-step" data-step="2"><div class="bwiz-step-dot">2</div><div class="bwiz-step-lbl">Comercial</div></div>
+      <div class="bwiz-step" data-step="2"><div class="bwiz-step-dot">2</div><div class="bwiz-step-lbl">Características</div></div>
       <div class="bwiz-step-line"></div>
-      <div class="bwiz-step" data-step="3"><div class="bwiz-step-dot">3</div><div class="bwiz-step-lbl">Propietario</div></div>
+      <div class="bwiz-step" data-step="3"><div class="bwiz-step-dot">3</div><div class="bwiz-step-lbl">Comercial</div></div>
     </div>
     <div class="bld-wiz-body">
-      <!-- Step 1: Características -->
       <div class="bwiz-panel active" data-panel="1">
         <div class="bwiz-row">
           <div class="bwiz-field bwiz-full">
-            <label class="bwiz-lbl">Dirección <span class="bwiz-req">*</span></label>
-            <input class="bwiz-inp" id="rtw-direccion" placeholder="Ej: Av. Santa Fe 3245, CABA">
+            <label class="bwiz-lbl">Nombre</label>
+            <input class="bwiz-inp" id="ret-nombre" placeholder="Por defecto: la dirección">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field bwiz-full">
-            <label class="bwiz-lbl">Building Name</label>
-            <input class="bwiz-inp" id="rtw-nombre" placeholder="Por defecto: la dirección">
+            <label class="bwiz-lbl">Dirección <span class="bwiz-req">*</span></label>
+            <input class="bwiz-inp" id="ret-direccion" placeholder="Ej: Av. Santa Fe 3245, CABA">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Corredor <span class="bwiz-req">*</span></label>
-            <select class="bwiz-inp" id="rtw-corredor">
-              <option value="">Seleccioná un corredor</option>
+            <label class="bwiz-lbl">Corredor Retail <span class="bwiz-req">*</span></label>
+            <select class="bwiz-inp" id="ret-corredor">
+              <option value="">— Seleccionar —</option>
               <option>Florida</option><option>Av. Santa Fe</option><option>Av. Corrientes</option>
               <option>Av. Rivadavia</option><option>Av. Cabildo / Juramento</option>
               <option>Palermo Soho</option><option>Palermo Hollywood</option>
@@ -3885,112 +3582,64 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
             </select>
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Tipología <span class="bwiz-req">*</span></label>
-            <select class="bwiz-inp" id="rtw-tipologia">
-              <option value="">— Seleccionar —</option>
-              <option>Perímetro libre</option><option>Perímetro semilibre</option>
-              <option>Entre medianeras</option><option>En esquina</option>
-            </select>
-          </div>
-        </div>
-        <div class="bwiz-row">
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Sup. cubierta total (m²)</label>
-            <input class="bwiz-inp" id="rtw-sup-total" type="number" min="0" placeholder="m²">
-          </div>
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Sup. cubierta Planta Baja (m²)</label>
-            <input class="bwiz-inp" id="rtw-sup-pb" type="number" min="0" placeholder="m²">
-          </div>
-        </div>
-        <div class="bwiz-row">
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Cantidad de plantas</label>
-            <input class="bwiz-inp" id="rtw-plantas" type="number" min="1" placeholder="Ej: 2">
-          </div>
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Espacio aéreo</label>
-            <select class="bwiz-inp" id="rtw-espacio-aereo">
-              <option value="">— Seleccionar —</option>
-              <option value="si">Sí</option><option value="no">No</option>
-            </select>
-          </div>
-        </div>
-        <div class="bwiz-row">
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Frente (metros lineales)</label>
-            <input class="bwiz-inp" id="rtw-frente" type="number" min="0" step="0.1" placeholder="metros">
-          </div>
-          <div class="bwiz-field">
-            <label class="bwiz-lbl">Fondo (metros lineales)</label>
-            <input class="bwiz-inp" id="rtw-fondo" type="number" min="0" step="0.1" placeholder="metros">
+            <label class="bwiz-lbl">Ciudad</label>
+            <input class="bwiz-inp" id="ret-ciudad" placeholder="Ej: Buenos Aires">
           </div>
         </div>
       </div>
-      <!-- Step 2: Condiciones comerciales -->
       <div class="bwiz-panel" data-panel="2">
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Tipo de oferta</label>
-            <select class="bwiz-inp" id="rtw-tipo-oferta">
-              <option value="">— Seleccionar —</option>
-              <option>Alquiler</option><option>Venta</option><option>Venta y Alquiler</option><option>No disponible</option>
-            </select>
+            <label class="bwiz-lbl">Frente (m)</label>
+            <input class="bwiz-inp" id="ret-frente" type="number" min="0" step="0.1" placeholder="metros">
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Moneda</label>
-            <select class="bwiz-inp" id="rtw-moneda">
-              <option>USD</option><option>ARS</option>
-            </select>
+            <label class="bwiz-lbl">Fondo (m)</label>
+            <input class="bwiz-inp" id="ret-fondo" type="number" min="0" step="0.1" placeholder="metros">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Precio de alquiler (asking)</label>
-            <input class="bwiz-inp" id="rtw-precio-alquiler" type="number" min="0" placeholder="precio">
+            <label class="bwiz-lbl">Metros de vidriera</label>
+            <input class="bwiz-inp" id="ret-vidriera" type="number" min="0" step="0.1" placeholder="metros lineales">
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Precio de venta (asking)</label>
-            <input class="bwiz-inp" id="rtw-precio-venta" type="number" min="0" placeholder="precio">
+            <label class="bwiz-lbl">Superficie PB (m²)</label>
+            <input class="bwiz-inp" id="ret-sup-pb" type="number" min="0" placeholder="m²">
           </div>
         </div>
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Vencimiento de contrato</label>
-            <input class="bwiz-inp" id="rtw-vencimiento" type="date">
+            <label class="bwiz-lbl">Superficie SS (m²)</label>
+            <input class="bwiz-inp" id="ret-sup-ss" type="number" min="0" placeholder="m²">
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Ejecutivo Comercial</label>
-            <select class="bwiz-inp" id="rtw-broker">
-              <option value="">— Seleccionar —</option>
-              <option>Matienzo</option><option>Bartra</option><option>Farola</option>
-              <option>Troncoso</option><option>Giancontieri</option><option>Zuliani</option>
-            </select>
+            <label class="bwiz-lbl">Superficie PA (m²)</label>
+            <input class="bwiz-inp" id="ret-sup-pa" type="number" min="0" placeholder="m²">
           </div>
         </div>
       </div>
-      <!-- Step 3: Propietarios y ocupantes -->
       <div class="bwiz-panel" data-panel="3">
         <div class="bwiz-row">
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Ocupante actual</label>
-            <input class="bwiz-inp" id="rtw-ocupante" placeholder="Empresa o persona ocupante">
+            <label class="bwiz-lbl">Alquiler (USD/mes)</label>
+            <input class="bwiz-inp" id="ret-alquiler" type="number" min="0" placeholder="USD/mes">
           </div>
           <div class="bwiz-field">
-            <label class="bwiz-lbl">Cuenta del propietario</label>
-            <input class="bwiz-inp" id="rtw-propietario-cuenta" placeholder="Empresa propietaria">
+            <label class="bwiz-lbl">Venta (USD)</label>
+            <input class="bwiz-inp" id="ret-venta" type="number" min="0" placeholder="USD">
           </div>
         </div>
         <div class="bwiz-row">
-          <div class="bwiz-field bwiz-full">
-            <label class="bwiz-lbl">Contacto del propietario</label>
-            <input class="bwiz-inp" id="rtw-propietario-contacto" placeholder="Nombre y datos de contacto">
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Expensas (USD/mes)</label>
+            <input class="bwiz-inp" id="ret-expensas" type="number" min="0" placeholder="USD/mes">
           </div>
-        </div>
-        <div class="bwiz-row">
-          <div class="bwiz-field bwiz-full">
-            <label class="bwiz-lbl">Observaciones</label>
-            <textarea class="bwiz-inp" id="rtw-observaciones" rows="3" style="resize:vertical;min-height:72px" placeholder="Comentarios adicionales..."></textarea>
+          <div class="bwiz-field">
+            <label class="bwiz-lbl">Disponible</label>
+            <select class="bwiz-inp" id="ret-disponible">
+              <option value="si">Sí</option><option value="no">No</option>
+            </select>
           </div>
         </div>
       </div>
@@ -8052,21 +7701,42 @@ async function loadBuildings(){
 function renderBldKPIs(docs){
   const row=document.getElementById('bld-kpi-row');
   if(!row)return;
-  // docs = _bldFiltered when filtered, _bldDocs when showing all
   const src=docs||_bldDocs;
   const isFiltered=src!==_bldDocs&&src.length!==_bldDocs.length;
   const total=src.length;
-  const disponibles=src.filter(d=>!d.estado||d.estado==='Disponible').length;
-  const totalM2=src.reduce((s,d)=>s+(Number(d.superficieDisponible)||0),0);
-  const zonas=new Set(src.map(d=>d.zona||d.submercado).filter(Boolean)).size;
   const fc=isFiltered?' filtered':'';
-  const suffix=isFiltered?' <span style="font-size:9px;font-weight:700;color:#1C54F4;background:rgba(28,84,244,.1);border-radius:4px;padding:1px 5px;vertical-align:middle;margin-left:4px">FILTRADO</span>':'';
-  row.innerHTML=`
-    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏢</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Edificios${isFiltered?' en vista':' totales'}</div></div>
-    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
-    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v pop">${totalM2.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² disp.${isFiltered?' (vista)':''}</div></div>
-    <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${zonas}</div><div class="bld-kpi-l">Zona${zonas!==1?'s':''} activa${zonas!==1?'s':''}</div></div>
-  `;
+  if(_bldAssetType==='industrial'){
+    const disponibles=src.filter(d=>d.disponible!==false&&(!d.estado||d.estado==='Disponible')).length;
+    const totalCubiertos=src.reduce((s,d)=>s+(Number(d.superficieCubierta)||Number(d.superficieTotal)||0),0);
+    const corredores=new Set(src.map(d=>d.corredor||d.zona).filter(Boolean)).size;
+    row.innerHTML=`
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏭</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Activos${isFiltered?' en vista':' totales'}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v pop">${totalCubiertos.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² cubiertos</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${corredores}</div><div class="bld-kpi-l">Corredor${corredores!==1?'es':''}</div></div>
+    `;
+  } else if(_bldAssetType==='retail'){
+    const disponibles=src.filter(d=>d.disponible!==false&&(!d.estado||d.estado==='Disponible')).length;
+    const alqValues=src.map(d=>Number(d.precioAlquiler||d.alquiler||0)).filter(v=>v>0);
+    const alqProm=alqValues.length?Math.round(alqValues.reduce((a,b)=>a+b,0)/alqValues.length):0;
+    const corredores=new Set(src.map(d=>d.corredor||d.zona).filter(Boolean)).size;
+    row.innerHTML=`
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏪</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Locales${isFiltered?' en vista':' totales'}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">💵</div><div class="bld-kpi-v pop">${alqProm?'USD '+alqProm.toLocaleString('es-AR'):'–'}</div><div class="bld-kpi-l">Alq. promedio/mes</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${corredores}</div><div class="bld-kpi-l">Corredor${corredores!==1?'es':''}</div></div>
+    `;
+  } else {
+    const disponibles=src.filter(d=>!d.estado||d.estado==='Disponible').length;
+    const totalM2=src.reduce((s,d)=>s+(Number(d.superficieDisponible)||0),0);
+    const zonas=new Set(src.map(d=>d.zona||d.submercado).filter(Boolean)).size;
+    row.innerHTML=`
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏢</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Edificios${isFiltered?' en vista':' totales'}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v pop">${totalM2.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² disp.${isFiltered?' (vista)':''}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${zonas}</div><div class="bld-kpi-l">Zona${zonas!==1?'s':''} activa${zonas!==1?'s':''}</div></div>
+    `;
+  }
 }
 
 function populateBldZonaFilter(){
@@ -8110,29 +7780,60 @@ function clearBldZonas(){
 
 function filterBuildings(){
   const q=(document.getElementById('bld-search')?.value||'').toLowerCase().trim();
-  const estado=document.getElementById('bld-filter-estado')?.value||'';
-  const corredor=document.getElementById('bld-filter-corredor')?.value||'';
-  const cats=_bldCatSelSet||new Set();
-  const etapa=document.getElementById('bld-filter-etapa')?.value||'';
-  const tos=_bldToSelSet||new Set();
   _bldFiltered=_bldDocs.filter(d=>{
     if(q){
-      const haystack=[d.nombre||'',d.direccion||'',d.corredor||'',d.zona||'',d.submercado||'',d.broker||'',d.descripcion||''].join(' ').toLowerCase();
+      const haystack=[d.nombre||'',d.direccion||'',d.corredor||'',d.zona||'',d.submercado||'',d.localidad||'',d.provincia||'',d.ciudad||'',d.broker||'',d.descripcion||''].join(' ').toLowerCase();
       if(!haystack.includes(q))return false;
     }
-    if(corredor){const dc=d.corredor||d.zona||d.submercado||'';if(!dc.toLowerCase().includes(corredor.toLowerCase()))return false;}
-    if(cats.size){const dc=d.categoria||d.cat||'';if(!cats.has(dc))return false;}
-    if(etapa&&d.etapa!==etapa)return false;
-    if(estado&&d.estado!==estado)return false;
-    if(tos.size){
-      const dt=d.tiposDisponibles||[];
-      if(!dt.some(t=>tos.has(t)))return false;
+    if(_bldAssetType==='industrial'){
+      const localidad=document.getElementById('bld-f-localidad')?.value||'';
+      const provincia=document.getElementById('bld-f-provincia')?.value||'';
+      const m2min=parseFloat(document.getElementById('bld-f-m2-min')?.value)||0;
+      const m2max=parseFloat(document.getElementById('bld-f-m2-max')?.value)||0;
+      const disp=document.getElementById('bld-f-disponible')?.value||'';
+      if(localidad&&(d.localidad||'')!==localidad)return false;
+      if(provincia&&(d.provincia||'')!==provincia)return false;
+      const m2=(Number(d.superficieCubierta)||Number(d.superficieTotal)||0);
+      if(m2min&&m2<m2min)return false;
+      if(m2max&&m2>m2max)return false;
+      if(disp==='si'&&d.disponible===false)return false;
+      if(disp==='no'&&d.disponible!==false)return false;
+    } else if(_bldAssetType==='retail'){
+      const corredor=document.getElementById('bld-f-corredor-ret')?.value||'';
+      const ciudad=document.getElementById('bld-f-ciudad')?.value||'';
+      const alqmin=parseFloat(document.getElementById('bld-f-alq-min')?.value)||0;
+      const alqmax=parseFloat(document.getElementById('bld-f-alq-max')?.value)||0;
+      const disp=document.getElementById('bld-f-disponible')?.value||'';
+      if(corredor&&(d.corredor||d.zona||'').indexOf(corredor)===-1)return false;
+      if(ciudad&&(d.ciudad||'')!==ciudad)return false;
+      const alq=Number(d.precioAlquiler||d.alquiler||0);
+      if(alqmin&&alq<alqmin)return false;
+      if(alqmax&&alq>alqmax)return false;
+      if(disp==='si'&&d.disponible===false)return false;
+      if(disp==='no'&&d.disponible!==false)return false;
+    } else {
+      const estado=document.getElementById('bld-filter-estado')?.value||'';
+      const corredor=document.getElementById('bld-filter-corredor')?.value||'';
+      const cats=_bldCatSelSet||new Set();
+      const etapa=document.getElementById('bld-filter-etapa')?.value||'';
+      const tos=_bldToSelSet||new Set();
+      if(corredor){const dc=d.corredor||d.zona||d.submercado||'';if(!dc.toLowerCase().includes(corredor.toLowerCase()))return false;}
+      if(cats.size){const dc=d.categoria||d.cat||'';if(!cats.has(dc))return false;}
+      if(etapa&&d.etapa!==etapa)return false;
+      if(estado&&d.estado!==estado)return false;
+      if(tos.size){const dt=d.tiposDisponibles||[];if(!dt.some(t=>tos.has(t)))return false;}
     }
     return true;
   });
   _bldPage=0;
-  // Show/hide clear button
-  const hasFilters=q||estado||corredor||cats.size||etapa||tos.size;
+  const hasFilters=(document.getElementById('bld-search')?.value||'')||
+    (document.getElementById('bld-f-localidad')?.value||document.getElementById('bld-f-provincia')?.value||
+     document.getElementById('bld-f-corredor-ret')?.value||document.getElementById('bld-f-ciudad')?.value||
+     document.getElementById('bld-f-m2-min')?.value||document.getElementById('bld-f-m2-max')?.value||
+     document.getElementById('bld-f-alq-min')?.value||document.getElementById('bld-f-alq-max')?.value||
+     document.getElementById('bld-f-disponible')?.value||
+     document.getElementById('bld-filter-estado')?.value||document.getElementById('bld-filter-corredor')?.value||
+     document.getElementById('bld-filter-etapa')?.value||_bldCatSelSet.size||_bldToSelSet.size);
   const cb=document.getElementById('bld-filter-clear-btn');
   if(cb)cb.style.display=hasFilters?'inline-flex':'none';
   renderBldKPIs(_bldFiltered);
@@ -8142,11 +7843,13 @@ function filterBuildings(){
 }
 
 function bldClearFilters(){
-  ['bld-search','bld-filter-corredor','bld-filter-etapa','bld-filter-estado'].forEach(id=>{
+  ['bld-search','bld-filter-corredor','bld-filter-etapa','bld-filter-estado',
+   'bld-f-localidad','bld-f-provincia','bld-f-m2-min','bld-f-m2-max',
+   'bld-f-corredor-ret','bld-f-ciudad','bld-f-alq-min','bld-f-alq-max','bld-f-disponible'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
-  clearBldCat();
-  clearBldTo();
+  if(_bldAssetType==='office'){clearBldCat();clearBldTo();}
+  filterBuildings();
 }
 
 function _bldPaginationHTML(total, startI){
@@ -8184,27 +7887,56 @@ function renderBuildingsTable(){
   let h='<div class="bld-grid">';
   page.forEach(d=>{
     const foto=getBldFoto(d);
-    const imgHtml=foto
-      ?`<div class="bld-card-img"><img src="${foto}" loading="lazy" onerror="this.parentElement.innerHTML='🏢'"></div>`
-      :`<div class="bld-card-img">🏢</div>`;
     const sel=_bldEditId===d._id?' selected':'';
-    const corredor=d.corredor||d.zona||d.submercado||'–';
-    const cat=d.categoria||d.cat||'–';
-    const etapa=d.etapa||'–';
+    let icon='🏢', metaHtml='', estadoHtml='';
+    if(_bldAssetType==='industrial'){
+      icon='🏭';
+      const terreno=d.superficieTerreno?Number(d.superficieTerreno).toLocaleString('es-AR')+' m²':'–';
+      const cubiertos=d.superficieCubierta?Number(d.superficieCubierta).toLocaleString('es-AR')+' m²':'–';
+      const docks=d.cantidadDocks!=null?String(d.cantidadDocks):'–';
+      const altura=d.alturaLibre?d.alturaLibre+' m':'–';
+      metaHtml=`
+        <div class="bld-meta-item"><span class="bld-meta-val">${terreno}</span><span class="bld-meta-lbl">Terreno</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${cubiertos}</span><span class="bld-meta-lbl">Cubiertos</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${docks}</span><span class="bld-meta-lbl">Docks</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${altura}</span><span class="bld-meta-lbl">Altura libre</span></div>`;
+      estadoHtml=bldEstadoBadge(d.disponible===false?'Ocupado':'Disponible');
+    } else if(_bldAssetType==='retail'){
+      icon='🏪';
+      const frente=d.frente?d.frente+' m':'–';
+      const vidriera=d.metrosVidriera?d.metrosVidriera+' m':'–';
+      const supTotal=(d.superficieTotal||(Number(d.superficiePB||0)+Number(d.superficieSS||0)+Number(d.superficiePA||0)))||0;
+      const supTotalFmt=supTotal?supTotal.toLocaleString('es-AR')+' m²':'–';
+      const alq=d.precioAlquiler||d.alquiler?'USD '+(Number(d.precioAlquiler||d.alquiler)).toLocaleString('es-AR'):'–';
+      metaHtml=`
+        <div class="bld-meta-item"><span class="bld-meta-val">${frente}</span><span class="bld-meta-lbl">Frente</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${vidriera}</span><span class="bld-meta-lbl">Vidriera</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${supTotalFmt}</span><span class="bld-meta-lbl">Superficie</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${alq}</span><span class="bld-meta-lbl">Alquiler/mes</span></div>`;
+      estadoHtml=bldEstadoBadge(d.disponible===false?'Ocupado':'Disponible');
+    } else {
+      const corredor=d.corredor||d.zona||d.submercado||'–';
+      const cat=d.categoria||d.cat||'–';
+      const etapa=d.etapa||'–';
+      metaHtml=`
+        <div class="bld-meta-item"><span class="bld-meta-val">${esc(corredor)}</span><span class="bld-meta-lbl">Corredor</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${esc(cat)}</span><span class="bld-meta-lbl">Categ.</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+' m²':'–'}</span><span class="bld-meta-lbl">Disponible</span></div>
+        <div class="bld-meta-item"><span class="bld-meta-val">${esc(etapa)}</span><span class="bld-meta-lbl">Etapa</span></div>`;
+      estadoHtml=bldEstadoBadge(d.estado||'Disponible')+((d.tiposDisponibles&&d.tiposDisponibles.length)?tipoOfertaBadges(d.tiposDisponibles):'');
+    }
+    const imgHtml=foto
+      ?`<div class="bld-card-img"><img src="${foto}" loading="lazy" onerror="this.parentElement.innerHTML='${icon}'"></div>`
+      :`<div class="bld-card-img">${icon}</div>`;
+    const addr=d.direccion||(d.localidad?d.localidad+(d.provincia?', '+d.provincia:''):'')|| d.corredor||d.zona||'–';
     h+=`<div class="bld-card${sel}" onclick="openBuildingEditor('${d._id}')">
       ${imgHtml}
       <div class="bld-card-body">
         <div class="bld-card-name">${esc(d.nombre||d._id)}</div>
-        <div class="bld-card-addr">${esc(d.direccion||corredor)}</div>
-        <div class="bld-card-meta">
-          <div class="bld-meta-item"><span class="bld-meta-val">${esc(corredor)}</span><span class="bld-meta-lbl">Corredor</span></div>
-          <div class="bld-meta-item"><span class="bld-meta-val">${esc(cat)}</span><span class="bld-meta-lbl">Categ.</span></div>
-          <div class="bld-meta-item"><span class="bld-meta-val">${d.superficieDisponible?d.superficieDisponible.toLocaleString('es-AR')+' m²':'–'}</span><span class="bld-meta-lbl">Disponible</span></div>
-          <div class="bld-meta-item"><span class="bld-meta-val">${esc(etapa)}</span><span class="bld-meta-lbl">Etapa</span></div>
-        </div>
+        <div class="bld-card-addr">${esc(addr)}</div>
+        <div class="bld-card-meta">${metaHtml}</div>
         <div class="bld-card-footer">
-          ${bldEstadoBadge(d.estado||'Disponible')}
-          ${(d.tiposDisponibles&&d.tiposDisponibles.length)?tipoOfertaBadges(d.tiposDisponibles):''}
+          ${estadoHtml}
           <button class="bld-card-edit-btn" onclick="event.stopPropagation();openBuildingEditor('${d._id}')">Ver ficha →</button>
         </div>
       </div>
@@ -8230,63 +7962,87 @@ function renderBuildingsListView(){
   const page=_bldFiltered.slice(start,start+BLD_PAGE_SIZE);
   const fmtM2=v=>v?Number(v).toLocaleString('es-AR')+' m²':'–';
   const fmtDate=v=>{if(!v)return'–';try{const d=_tsToDate(v);if(!d)return'–';return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'2-digit'});}catch{return'–';}};
-  let h=`<div class="bld-list-view">
-    <table class="bld-list-table">
-      <thead><tr>
-        <th>Nombre</th>
-        <th>Corredor</th>
-        <th>Categ.</th>
-        <th>Etapa</th>
-        <th>Oferta</th>
-        <th>Sup. Propia</th>
-        <th>Sup. Total</th>
-        <th>Disponible</th>
-        <th>Vacancia</th>
-        <th>Pisos</th>
-        <th>Actualizado</th>
-        <th class="bld-lt-actions"></th>
-      </tr></thead><tbody>`;
-  page.forEach(d=>{
-    const corredor=d.corredor||d.zona||d.submercado||'–';
-    const cat=d.categoria||d.cat||'–';
-    const supPropia=fmtM2(d.superficiePropia||d.superficiePlanta);
-    const supDisp=fmtM2(d.superficieDisponible);
-    const supPropiaNum=parseFloat(d.superficiePropia||d.superficiePlanta)||0;
-    const supDispNum=parseFloat(d.superficieDisponible)||0;
-    const vacPct=supPropiaNum>0?(supDispNum/supPropiaNum*100).toFixed(1)+'%':'–';
-    const pisos=d.cantidadPisos||d.pisos||'–';
-    const upd=fmtDate(d.updatedAt||d.createdAt);
-    h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
-      <td class="bld-lt-name">
-        <div class="bld-lt-name-inner">
-          <div class="bld-lt-avatar">${(d.nombre||'O').charAt(0).toUpperCase()}</div>
-          <div>
-            <div class="bld-lt-nm">${esc(d.nombre||d._id)}</div>
-            <div class="bld-lt-addr">${esc(d.direccion||'')}</div>
-          </div>
-        </div>
-      </td>
-      <td>${esc(corredor)}</td>
-      <td><span class="bld-cat-badge cat-${(cat||'').replace('+','p')}">${esc(cat)}</span></td>
-      <td><span class="bld-etapa-badge">${esc(d.etapa||'–')}</span></td>
-      <td>${(d.tiposDisponibles&&d.tiposDisponibles.length)?tipoOfertaBadges(d.tiposDisponibles):'<span style="color:#94A3B8;font-size:11px">–</span>'}</td>
-      <td class="bld-lt-num">${supPropia}</td>
-      <td class="bld-lt-num">${fmtM2(d.superficieTotal)}</td>
-      <td class="bld-lt-num bld-lt-disp">${supDisp}</td>
-      <td class="bld-lt-num">${vacPct}</td>
-      <td class="bld-lt-num">${pisos}</td>
-      <td class="bld-lt-date">${upd}</td>
-      <td class="bld-lt-actions" onclick="event.stopPropagation()">
-        <button class="bld-lt-btn" onclick="openBuildingEditor('${d._id}')" title="Ver ficha">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-        <button class="bld-lt-btn del" onclick="_bldDeleteFromList('${d._id}')" title="Eliminar">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-        </button>
-      </td>
-    </tr>`;
-  });
-  h+=`</tbody></table></div>`;
+  let h='';
+  if(_bldAssetType==='industrial'){
+    h=`<div class="bld-list-view"><table class="bld-list-table"><thead><tr>
+      <th>Nombre</th><th>Localidad</th><th>Provincia</th><th>Corredor</th>
+      <th>Terreno m²</th><th>Cubiertos m²</th><th>Docks</th><th>Altura libre</th><th>Disponible</th>
+      <th class="bld-lt-actions"></th></tr></thead><tbody>`;
+    page.forEach(d=>{
+      h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
+        <td class="bld-lt-name"><div class="bld-lt-name-inner"><div class="bld-lt-avatar">🏭</div><div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
+        <td>${esc(d.localidad||'–')}</td>
+        <td>${esc(d.provincia||'–')}</td>
+        <td>${esc(d.corredor||d.zona||'–')}</td>
+        <td class="bld-lt-num">${d.superficieTerreno?Number(d.superficieTerreno).toLocaleString('es-AR')+' m²':'–'}</td>
+        <td class="bld-lt-num">${d.superficieCubierta?Number(d.superficieCubierta).toLocaleString('es-AR')+' m²':'–'}</td>
+        <td class="bld-lt-num">${d.cantidadDocks!=null?d.cantidadDocks:'–'}</td>
+        <td class="bld-lt-num">${d.alturaLibre?d.alturaLibre+' m':'–'}</td>
+        <td>${d.disponible===false?'<span style="color:#F59E0B;font-weight:600">No</span>':'<span style="color:#22C55E;font-weight:600">Sí</span>'}</td>
+        <td class="bld-lt-actions" onclick="event.stopPropagation()">
+          <button class="bld-lt-btn" onclick="openBuildingEditor('${d._id}')" title="Ver ficha"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="bld-lt-btn del" onclick="_bldDeleteFromList('${d._id}')" title="Eliminar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+        </td></tr>`;
+    });
+    h+=`</tbody></table></div>`;
+  } else if(_bldAssetType==='retail'){
+    h=`<div class="bld-list-view"><table class="bld-list-table"><thead><tr>
+      <th>Nombre</th><th>Corredor</th><th>Ciudad</th>
+      <th>Frente</th><th>Vidriera</th><th>Sup. Total</th><th>Alquiler/mes</th><th>Disponible</th>
+      <th class="bld-lt-actions"></th></tr></thead><tbody>`;
+    page.forEach(d=>{
+      const supTotal=d.superficieTotal||(Number(d.superficiePB||0)+Number(d.superficieSS||0)+Number(d.superficiePA||0));
+      const alq=Number(d.precioAlquiler||d.alquiler||0);
+      h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
+        <td class="bld-lt-name"><div class="bld-lt-name-inner"><div class="bld-lt-avatar">🏪</div><div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
+        <td>${esc(d.corredor||d.zona||'–')}</td>
+        <td>${esc(d.ciudad||'–')}</td>
+        <td class="bld-lt-num">${d.frente?d.frente+' m':'–'}</td>
+        <td class="bld-lt-num">${d.metrosVidriera?d.metrosVidriera+' m':'–'}</td>
+        <td class="bld-lt-num">${supTotal?Number(supTotal).toLocaleString('es-AR')+' m²':'–'}</td>
+        <td class="bld-lt-num">${alq?'USD '+alq.toLocaleString('es-AR'):'–'}</td>
+        <td>${d.disponible===false?'<span style="color:#F59E0B;font-weight:600">No</span>':'<span style="color:#22C55E;font-weight:600">Sí</span>'}</td>
+        <td class="bld-lt-actions" onclick="event.stopPropagation()">
+          <button class="bld-lt-btn" onclick="openBuildingEditor('${d._id}')" title="Ver ficha"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="bld-lt-btn del" onclick="_bldDeleteFromList('${d._id}')" title="Eliminar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+        </td></tr>`;
+    });
+    h+=`</tbody></table></div>`;
+  } else {
+    h=`<div class="bld-list-view"><table class="bld-list-table"><thead><tr>
+      <th>Nombre</th><th>Corredor</th><th>Categ.</th><th>Etapa</th>
+      <th>Oferta</th><th>Sup. Propia</th><th>Sup. Total</th><th>Disponible</th>
+      <th>Vacancia</th><th>Pisos</th><th>Actualizado</th>
+      <th class="bld-lt-actions"></th></tr></thead><tbody>`;
+    page.forEach(d=>{
+      const corredor=d.corredor||d.zona||d.submercado||'–';
+      const cat=d.categoria||d.cat||'–';
+      const supPropia=fmtM2(d.superficiePropia||d.superficiePlanta);
+      const supDisp=fmtM2(d.superficieDisponible);
+      const supPropiaNum=parseFloat(d.superficiePropia||d.superficiePlanta)||0;
+      const supDispNum=parseFloat(d.superficieDisponible)||0;
+      const vacPct=supPropiaNum>0?(supDispNum/supPropiaNum*100).toFixed(1)+'%':'–';
+      const pisos=d.cantidadPisos||d.pisos||'–';
+      const upd=fmtDate(d.updatedAt||d.createdAt);
+      h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
+        <td class="bld-lt-name"><div class="bld-lt-name-inner"><div class="bld-lt-avatar">${(d.nombre||'O').charAt(0).toUpperCase()}</div><div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
+        <td>${esc(corredor)}</td>
+        <td><span class="bld-cat-badge cat-${(cat||'').replace('+','p')}">${esc(cat)}</span></td>
+        <td><span class="bld-etapa-badge">${esc(d.etapa||'–')}</span></td>
+        <td>${(d.tiposDisponibles&&d.tiposDisponibles.length)?tipoOfertaBadges(d.tiposDisponibles):'<span style="color:#94A3B8;font-size:11px">–</span>'}</td>
+        <td class="bld-lt-num">${supPropia}</td>
+        <td class="bld-lt-num">${fmtM2(d.superficieTotal)}</td>
+        <td class="bld-lt-num bld-lt-disp">${supDisp}</td>
+        <td class="bld-lt-num">${vacPct}</td>
+        <td class="bld-lt-num">${pisos}</td>
+        <td class="bld-lt-date">${upd}</td>
+        <td class="bld-lt-actions" onclick="event.stopPropagation()">
+          <button class="bld-lt-btn" onclick="openBuildingEditor('${d._id}')" title="Ver ficha"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="bld-lt-btn del" onclick="_bldDeleteFromList('${d._id}')" title="Eliminar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+        </td></tr>`;
+    });
+    h+=`</tbody></table></div>`;
+  }
   wrap.innerHTML=h;
   _bldPaginationHTML(total,start);
 }
@@ -9154,59 +8910,109 @@ function _bldAdaptUI(){
   if(b)b.textContent=c.btn;
   if(bk)bk.textContent=c.back;
   if(imp)imp.style.display=_bldAssetType==='office'?'':'none';
+  _bldRenderFilterBar();
+}
+function _bldRenderFilterBar(){
+  const dyn=document.getElementById('bld-filter-dyn');
+  if(!dyn)return;
+  if(_bldAssetType==='industrial'){
+    const localidades=[...new Set(_bldDocs.map(d=>d.localidad).filter(Boolean))].sort();
+    const provincias=[...new Set(_bldDocs.map(d=>d.provincia).filter(Boolean))].sort();
+    dyn.innerHTML=`
+      <select id="bld-f-localidad" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Todas las localidades</option>
+        ${localidades.map(l=>`<option>${l}</option>`).join('')}
+      </select>
+      <select id="bld-f-provincia" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Todas las provincias</option>
+        ${provincias.map(p=>`<option>${p}</option>`).join('')}
+      </select>
+      <input id="bld-f-m2-min" type="number" min="0" placeholder="m² mín" class="bld-filter-inp" style="width:90px" oninput="filterBuildings()">
+      <input id="bld-f-m2-max" type="number" min="0" placeholder="m² máx" class="bld-filter-inp" style="width:90px" oninput="filterBuildings()">
+      <select id="bld-f-disponible" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Disponibilidad</option>
+        <option value="si">Disponible</option>
+        <option value="no">No disponible</option>
+      </select>`;
+  } else if(_bldAssetType==='retail'){
+    const corredores=[...new Set(_bldDocs.map(d=>d.corredor||d.zona).filter(Boolean))].sort();
+    const ciudades=[...new Set(_bldDocs.map(d=>d.ciudad).filter(Boolean))].sort();
+    dyn.innerHTML=`
+      <select id="bld-f-corredor-ret" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Todos los corredores</option>
+        ${corredores.map(c=>`<option>${c}</option>`).join('')}
+      </select>
+      <select id="bld-f-ciudad" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Todas las ciudades</option>
+        ${ciudades.map(c=>`<option>${c}</option>`).join('')}
+      </select>
+      <input id="bld-f-alq-min" type="number" min="0" placeholder="Alq. mín" class="bld-filter-inp" style="width:90px" oninput="filterBuildings()">
+      <input id="bld-f-alq-max" type="number" min="0" placeholder="Alq. máx" class="bld-filter-inp" style="width:90px" oninput="filterBuildings()">
+      <select id="bld-f-disponible" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Disponibilidad</option>
+        <option value="si">Disponible</option>
+        <option value="no">No disponible</option>
+      </select>`;
+  } else {
+    dyn.innerHTML=`
+      <select id="bld-filter-corredor" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Todos los corredores</option>
+        <option>Catalinas</option><option>Macrocentro</option><option>Macrocentro Norte</option>
+        <option>Macrocentro Sur</option><option>Microcentro</option><option>Norte CABA</option>
+        <option>Norte GBA</option><option>Plaza Roma</option><option>Plaza San Martín</option>
+        <option>Puerto Madero Este</option><option>Puerto Madero Oeste</option>
+      </select>
+      <div class="mz-dd" id="bld-cat-dd" style="position:relative">
+        <button class="bld-filter-sel mz-dd-btn" id="bld-cat-btn" onclick="toggleBldCatDD(event)" type="button" style="white-space:nowrap">Categoría ▾</button>
+        <div class="mz-dd-panel" id="bld-cat-panel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;min-width:160px;background:#fff;border:1px solid #DDE5F2;border-radius:10px;box-shadow:0 4px 16px rgba(10,27,77,.12);padding:8px 0">
+          <div id="bld-cat-list" style="padding:0 8px 4px">
+            <label class="mz-dd-chk"><input type="checkbox" value="A+" onchange="_bldCatChg(this)"> A+</label>
+            <label class="mz-dd-chk"><input type="checkbox" value="A" onchange="_bldCatChg(this)"> A</label>
+            <label class="mz-dd-chk"><input type="checkbox" value="B+" onchange="_bldCatChg(this)"> B+</label>
+            <label class="mz-dd-chk"><input type="checkbox" value="B" onchange="_bldCatChg(this)"> B</label>
+            <label class="mz-dd-chk"><input type="checkbox" value="C" onchange="_bldCatChg(this)"> C</label>
+          </div>
+          <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldCat()">✕ Limpiar</button></div>
+        </div>
+      </div>
+      <div class="mz-dd" id="bld-to-dd" style="position:relative">
+        <button class="bld-filter-sel mz-dd-btn" id="bld-to-btn" onclick="toggleBldToDD(event)" type="button" style="white-space:nowrap">Oferta ▾</button>
+        <div class="mz-dd-panel" id="bld-to-panel" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;min-width:190px;background:#fff;border:1px solid #DDE5F2;border-radius:10px;box-shadow:0 4px 16px rgba(10,27,77,.12);padding:8px 0">
+          <div id="bld-to-list" style="padding:0 8px 4px">
+            <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Alquiler" onchange="_bldToChg(this)"> <span class="to-badge alq">ALQUILER</span></label>
+            <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Venta" onchange="_bldToChg(this)"> <span class="to-badge vta">VENTA</span></label>
+            <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="Alquiler o Venta" onchange="_bldToChg(this)"> <span class="to-badge alqvta">ALQ + VTA</span></label>
+            <label class="mz-dd-chk" style="gap:8px"><input type="checkbox" value="No disponible" onchange="_bldToChg(this)"> <span class="to-badge nodisp">NO DISP.</span></label>
+          </div>
+          <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearBldTo()">✕ Limpiar</button></div>
+        </div>
+      </div>
+      <select id="bld-filter-etapa" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Todas las etapas</option>
+        <option>Proyecto</option><option>En Construcción</option><option>Existente</option>
+      </select>
+      <select id="bld-filter-estado" class="bld-filter-sel" onchange="filterBuildings()">
+        <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
+      </select>`;
+    _bldCatSelSet.clear();
+    _bldToSelSet.clear();
+  }
 }
 
 // ─── INDUSTRIAL WIZARD ───────────────────────────────
 let _indWizStep=1;
-let _indWizSubtipo='';
 const IND_WIZ_STEPS=4;
-const IND_WIZ_LABELS=['Sub-tipo','General','Infraestructura','Comercial'];
-const IND_WIZ_NO_INFRA=['terreno','parque'];
+const IND_WIZ_LABELS=['General','Superficies','Características','Comercial'];
 
 function openIndWizard(){
-  _indWizStep=1;_indWizSubtipo='';
+  _indWizStep=1;
   document.querySelectorAll('#ind-wizard-overlay .bwiz-inp').forEach(el=>{
     if(el.tagName==='SELECT'){el.selectedIndex=0;}else if(el.type==='checkbox'){el.checked=false;}else{el.value='';}
   });
-  document.querySelectorAll('#ind-wizard-overlay .bwiz-subtipo-card').forEach(c=>c.classList.remove('sel'));
   document.getElementById('ind-wizard-overlay').style.display='flex';
   _indWizRender();
 }
 function closeIndWizard(){document.getElementById('ind-wizard-overlay').style.display='none';}
-
-function _indSelectSubtipo(tipo){
-  _indWizSubtipo=tipo;
-  document.querySelectorAll('#ind-wizard-overlay .bwiz-subtipo-card').forEach(c=>c.classList.remove('sel'));
-  const card=document.getElementById('inw-st-'+tipo);
-  if(card)card.classList.add('sel');
-}
-
-function _indToggleParqueNombre(){
-  const v=document.getElementById('inw-en-parque')?.value;
-  const f=document.getElementById('inw-parque-nombre-field');
-  if(f)f.style.visibility=v==='si'?'visible':'hidden';
-}
-
-function _indWizShowSubtipoFields(){
-  ['cl','nave','terreno','parque'].forEach(t=>{
-    const f=document.getElementById('inw-'+t+'-fields');
-    if(f)f.style.display=t===_indWizSubtipo?'':'none';
-  });
-  const enParqueRow=document.getElementById('inw-en-parque-row');
-  if(enParqueRow)enParqueRow.style.display=['cl','nave','terreno'].includes(_indWizSubtipo)?'':'none';
-  const nRow=document.getElementById('inw-nombre-row');
-  if(nRow)nRow.style.display=_indWizSubtipo==='terreno'?'none':'';
-  const infCl=document.getElementById('inw-infra-cl');
-  const infNave=document.getElementById('inw-infra-nave');
-  const leedF=document.getElementById('inw-leed-field');
-  if(infCl)infCl.style.display=_indWizSubtipo==='cl'?'':'none';
-  if(infNave)infNave.style.display=_indWizSubtipo==='nave'?'':'none';
-  if(leedF)leedF.style.display=_indWizSubtipo==='cl'?'':'none';
-  ['cl','nave','terreno','parque'].forEach(t=>{
-    const cf=document.getElementById('inw-com-'+t+'-fields');
-    if(cf)cf.style.display=t===_indWizSubtipo?'':'none';
-  });
-}
 
 function _indWizRender(){
   const ovEl=document.getElementById('ind-wizard-overlay');
@@ -9224,37 +9030,27 @@ function _indWizRender(){
   const next=document.getElementById('iwiz-next');
   if(prev)prev.style.visibility=_indWizStep>1?'visible':'hidden';
   if(next){
-    next.textContent=_indWizStep===IND_WIZ_STEPS?'✓ Crear Inmueble':'Siguiente →';
+    next.textContent=_indWizStep===IND_WIZ_STEPS?'✓ Crear Activo':'Siguiente →';
     next.className='bwiz-btn-pri'+(_indWizStep===IND_WIZ_STEPS?' bwiz-save':'');
   }
   const dots=document.getElementById('iwiz-dots');
   if(dots)dots.innerHTML=Array.from({length:IND_WIZ_STEPS},(_,i)=>`<div class="bwiz-dot${i+1===_indWizStep?' active':''}"></div>`).join('');
-  if(_indWizStep>=2)_indWizShowSubtipoFields();
 }
 
 function indWizNav(dir){
   if(dir===1){
     if(!_indWizValidate())return;
     if(_indWizStep===IND_WIZ_STEPS){saveIndWizard();return;}
-    let next=_indWizStep+1;
-    if(next===3&&IND_WIZ_NO_INFRA.includes(_indWizSubtipo))next=4;
-    _indWizStep=next;
+    _indWizStep++;
   }else{
-    let prev=_indWizStep-1;
-    if(prev===3&&IND_WIZ_NO_INFRA.includes(_indWizSubtipo))prev=2;
-    _indWizStep=Math.max(1,prev);
+    _indWizStep=Math.max(1,_indWizStep-1);
   }
   _indWizRender();
 }
 
 function _indWizValidate(){
   if(_indWizStep===1){
-    if(!_indWizSubtipo){showBldToast('Seleccioná un tipo de inmueble para continuar');return false;}
-    return true;
-  }
-  if(_indWizStep===2){
-    const reqIds=['inw-direccion','inw-corredor'];
-    if(_indWizSubtipo!=='terreno')reqIds.push('inw-nombre');
+    const reqIds=['ind-nombre','ind-direccion','ind-corredor'];
     let ok=true;
     reqIds.forEach(id=>{
       const el=document.getElementById(id);
@@ -9272,105 +9068,53 @@ async function saveIndWizard(){
   if(!db)return;
   const btn=document.getElementById('iwiz-next');
   if(btn){btn.disabled=true;btn.textContent='Guardando...';}
-  const st=_indWizSubtipo;
   const g=(id)=>document.getElementById(id)?.value?.trim()||'';
   const gn=(id)=>{const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?null:v;};
   const data={
-    nombre:g('inw-nombre')||g('inw-direccion'),
-    direccion:g('inw-direccion'),
-    corredor:g('inw-corredor'),zona:g('inw-corredor'),submercado:g('inw-corredor'),
-    barrio:g('inw-barrio'),
-    _tipo:'industrial',_subtipo:st,tipo:'industrial',
+    nombre:g('ind-nombre'),
+    direccion:g('ind-direccion'),
+    localidad:g('ind-localidad'),
+    provincia:g('ind-provincia'),
+    corredor:g('ind-corredor'),zona:g('ind-corredor'),submercado:g('ind-corredor'),
+    etapa:g('ind-etapa'),
+    categoria:g('ind-categoria'),cat:g('ind-categoria'),
+    superficieTerreno:gn('ind-sup-terreno'),
+    superficieCubierta:gn('ind-sup-cubiertos'),superficieTotal:gn('ind-sup-cubiertos'),
+    superficieSemicubierta:gn('ind-sup-semicubiertos'),
+    superficieOficinas:gn('ind-sup-oficinas'),
+    alturaLibre:gn('ind-altura'),
+    cantidadDocks:gn('ind-docks'),
+    potenciaElectrica:gn('ind-potencia'),
+    playaManiobras:gn('ind-playa'),
+    sprinklers:g('ind-sprinklers')==='si',
+    certificacion:g('ind-certificacion'),
+    precioAlquilerM2:gn('ind-precio-alq'),askingRent:gn('ind-precio-alq'),
+    precioVentaM2:gn('ind-precio-vta'),
+    disponible:g('ind-disponible')!=='no',
+    _tipo:'industrial',tipo:'industrial',
     assetType:'industrial',
-    estado:'Disponible',activo:true,_source:'manual',
+    estado:g('ind-disponible')==='no'?'Ocupado':'Disponible',
+    activo:true,_source:'manual',
     createdAt:firebase.firestore.FieldValue.serverTimestamp(),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
   };
-  if(st==='cl'){
-    Object.assign(data,{
-      tipoProducto:g('inw-cl-producto'),
-      etapa:g('inw-cl-etapa')||'Existente',
-      categoria:g('inw-cl-categoria'),cat:g('inw-cl-categoria'),
-      anoConstruccion:gn('inw-cl-anio'),
-      superficieTerreno:gn('inw-cl-sup-terreno'),
-      superficieCubierta:gn('inw-cl-sup-cubierta'),superficieTotal:gn('inw-cl-sup-cubierta'),
-      superficieDeposito:gn('inw-cl-sup-deposito'),
-      superficieOficinas:gn('inw-cl-sup-oficinas'),
-      playaManiobras:gn('inw-cl-playa'),potencialConstruible:gn('inw-cl-potencial'),
-      enParqueIndustrial:g('inw-en-parque')==='si',parqueIndustrialNombre:g('inw-parque-nombre'),
-      docksElevados:g('inw-inf-docks-nivel')==='si',
-      ratioDocks:gn('inw-inf-ratio-docks'),
-      sistemaIncendios:g('inw-inf-incendios'),
-      alturaLibreMin:gn('inw-inf-alt-min'),alturaLibreMax:gn('inw-inf-alt-max'),
-      certificacion:g('inw-inf-leed'),
-      tipoOferta:g('inw-com-tipo-oferta'),moneda:g('inw-com-moneda'),
-      superficieDisponibleAlquiler:gn('inw-com-cl-sup-alquiler'),superficieDisponible:gn('inw-com-cl-sup-alquiler')||0,
-      precioAlquilerM2:gn('inw-com-cl-precio-alquiler'),askingRent:gn('inw-com-cl-precio-alquiler'),
-      expensas:gn('inw-com-cl-expensas'),
-    });
-  }else if(st==='nave'){
-    Object.assign(data,{
-      etapa:'Existente',
-      superficieTerreno:gn('inw-nave-sup-terreno'),
-      superficieCubierta:gn('inw-nave-sup-cubierta'),superficieTotal:gn('inw-nave-sup-cubierta'),
-      superficieDeposito:gn('inw-nave-sup-deposito'),superficieOficinas:gn('inw-nave-sup-oficinas'),
-      frente:gn('inw-nave-frente'),fondo:gn('inw-nave-fondo'),
-      zonificacion:g('inw-nave-zonificacion'),
-      enParqueIndustrial:g('inw-en-parque')==='si',parqueIndustrialNombre:g('inw-parque-nombre'),
-      tipoDocks:g('inw-inf-docks-tipo'),
-      sistemaIncendios:g('inw-inf-incendios'),
-      alturaLibreMin:gn('inw-inf-alt-min'),alturaLibreMax:gn('inw-inf-alt-max'),
-      tipoOferta:g('inw-com-tipo-oferta'),moneda:g('inw-com-moneda'),
-      precioAlquilerM2:gn('inw-com-nave-precio-m2-alq'),askingRent:gn('inw-com-nave-precio-m2-alq'),
-      precioAlquilerMensual:gn('inw-com-nave-precio-mensual'),
-      precioVentaTotal:gn('inw-com-nave-precio-venta'),precioVentaM2:gn('inw-com-nave-precio-m2-venta'),
-    });
-  }else if(st==='terreno'){
-    Object.assign(data,{
-      usoTerreno:g('inw-terreno-uso'),
-      tieneConstruccion:g('inw-terreno-construccion')==='si',
-      superficieTotal:gn('inw-terreno-sup-total'),superficieAConstruir:gn('inw-terreno-sup-construir'),
-      frente:gn('inw-terreno-frente'),fondo:gn('inw-terreno-fondo'),
-      zonificacion:g('inw-terreno-zonificacion'),
-      enParqueIndustrial:g('inw-en-parque')==='si',parqueIndustrialNombre:g('inw-parque-nombre'),
-      tipoOferta:g('inw-com-tipo-oferta')||'Venta',moneda:g('inw-com-moneda'),
-      precioVentaTotal:gn('inw-com-terreno-precio-venta'),
-    });
-  }else if(st==='parque'){
-    const has=gn('inw-parque-sup-has');
-    Object.assign(data,{
-      tipoParque:g('inw-parque-tipo'),
-      superficieHas:has,superficieTotal:has?Math.round(has*10000):null,
-      loteSupMin:gn('inw-parque-lot-min'),loteSupMax:gn('inw-parque-lot-max'),
-      cantidadLotes:gn('inw-parque-lotes'),zonificacion:g('inw-parque-zonificacion'),
-      tipoOferta:g('inw-com-tipo-oferta')||'Venta',moneda:g('inw-com-moneda'),
-      precioVentaMinM2:gn('inw-com-parque-precio-min'),precioVentaMaxM2:gn('inw-com-parque-precio-max'),
-    });
-  }
-  Object.assign(data,{
-    urlFuente:g('inw-com-url'),
-    broker:g('inw-com-broker'),brokerAsignado:g('inw-com-broker'),
-    brokerOrigen:g('inw-com-broker-origen'),
-    cuentaPropietario:g('inw-com-propietario-cuenta'),
-    contactoPropietario:g('inw-com-propietario-contacto'),
-  });
   try{
     const ref=await db.collection('buildings').add(data);
     closeIndWizard();
-    showBldToast('✅ Inmueble industrial creado');
-    addBldTimelineEvent(ref.id,'creacion','Inmueble industrial creado',data.nombre||'');
+    showBldToast('✅ Activo industrial creado');
+    addBldTimelineEvent(ref.id,'creacion','Activo industrial creado',data.nombre||'');
     await loadBuildings();
     openBuildingEditor(ref.id);
   }catch(e){
     showBldToast('❌ Error: '+e.message,4000);
-    if(btn){btn.disabled=false;btn.textContent='✓ Crear Inmueble';}
+    if(btn){btn.disabled=false;btn.textContent='✓ Crear Activo';}
   }
 }
 
 // ─── RETAIL WIZARD ───────────────────────────────────
 let _retWizStep=1;
 const RET_WIZ_STEPS=3;
-const RET_WIZ_LABELS=['Características','Comercial','Propietario'];
+const RET_WIZ_LABELS=['General','Características','Comercial'];
 
 function openRetWizard(){
   _retWizStep=1;
@@ -9418,7 +9162,7 @@ function retWizNav(dir){
 
 function _retWizValidate(){
   if(_retWizStep===1){
-    const reqIds=['rtw-direccion','rtw-corredor','rtw-tipologia'];
+    const reqIds=['ret-direccion','ret-corredor'];
     let ok=true;
     reqIds.forEach(id=>{
       const el=document.getElementById(id);
@@ -9438,35 +9182,38 @@ async function saveRetWizard(){
   if(btn){btn.disabled=true;btn.textContent='Guardando...';}
   const g=(id)=>document.getElementById(id)?.value?.trim()||'';
   const gn=(id)=>{const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?null:v;};
-  const direccion=g('rtw-direccion');
+  const direccion=g('ret-direccion');
+  const supPB=gn('ret-sup-pb')||0;
+  const supSS=gn('ret-sup-ss')||0;
+  const supPA=gn('ret-sup-pa')||0;
   const data={
-    nombre:g('rtw-nombre')||direccion,
+    nombre:g('ret-nombre')||direccion,
     direccion,
-    corredor:g('rtw-corredor'),zona:g('rtw-corredor'),submercado:g('rtw-corredor'),
-    tipologia:g('rtw-tipologia'),
+    corredor:g('ret-corredor'),zona:g('ret-corredor'),submercado:g('ret-corredor'),
+    ciudad:g('ret-ciudad'),
+    frente:gn('ret-frente'),
+    fondo:gn('ret-fondo'),
+    metrosVidriera:gn('ret-vidriera'),
+    superficiePB:supPB,
+    superficieSS:supSS,
+    superficiePA:supPA,
+    superficieTotal:supPB+supSS+supPA||null,
+    precioAlquiler:gn('ret-alquiler'),alquiler:gn('ret-alquiler'),
+    precioVenta:gn('ret-venta'),
+    expensas:gn('ret-expensas'),
+    disponible:g('ret-disponible')!=='no',
     _tipo:'retail',tipo:'retail',
     assetType:'retail',
-    superficieTotal:gn('rtw-sup-total'),superficiePB:gn('rtw-sup-pb'),
-    cantidadPlantas:gn('rtw-plantas'),
-    frente:gn('rtw-frente'),fondo:gn('rtw-fondo'),
-    espacioAereo:g('rtw-espacio-aereo')==='si',
-    tipoOferta:g('rtw-tipo-oferta'),moneda:g('rtw-moneda'),
-    precioAlquiler:gn('rtw-precio-alquiler'),precioVenta:gn('rtw-precio-venta'),
-    vencimientoContrato:g('rtw-vencimiento'),
-    broker:g('rtw-broker'),brokerAsignado:g('rtw-broker'),
-    ocupante:g('rtw-ocupante'),
-    cuentaPropietario:g('rtw-propietario-cuenta'),
-    contactoPropietario:g('rtw-propietario-contacto'),
-    observaciones:g('rtw-observaciones'),
-    estado:'Disponible',activo:true,_source:'manual',
+    estado:g('ret-disponible')==='no'?'Ocupado':'Disponible',
+    activo:true,_source:'manual',
     createdAt:firebase.firestore.FieldValue.serverTimestamp(),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
   };
   try{
     const ref=await db.collection('buildings').add(data);
     closeRetWizard();
-    showBldToast('✅ Local comercial creado');
-    addBldTimelineEvent(ref.id,'creacion','Local comercial creado',data.nombre||'');
+    showBldToast('✅ Local retail creado');
+    addBldTimelineEvent(ref.id,'creacion','Local retail creado',data.nombre||'');
     await loadBuildings();
     openBuildingEditor(ref.id);
   }catch(e){
