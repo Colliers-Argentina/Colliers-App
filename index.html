@@ -2230,9 +2230,9 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-inmuebles">
-        <button class="sb-item" data-mod="buildings" onclick="_sbItemClick('buildings',null)">Oficinas</button>
-        <button class="sb-item" disabled><span>Industrial</span><span class="sb-soon-badge">Pronto</span></button>
-        <button class="sb-item" disabled><span>Retail</span><span class="sb-soon-badge">Pronto</span></button>
+        <button class="sb-item" data-mod="office" onclick="_sbItemClick('office',null)">Oficinas</button>
+        <button class="sb-item" data-mod="industrial" onclick="_sbItemClick('industrial',null)">Industrial</button>
+        <button class="sb-item" data-mod="retail" onclick="_sbItemClick('retail',null)">Retail</button>
       </div>
     </div>
 
@@ -3107,11 +3107,11 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
       <div class="bld-wrap">
         <div class="bld-hz">
           <div class="bld-hz-l">
-            <div class="bld-title">Oficinas</div>
+            <div class="bld-title" id="bld-title">Oficinas</div>
             <div class="bld-subtitle" id="bld-subtitle">Cargando...</div>
           </div>
           <div class="bld-hz-r">
-            <button class="bld-btn bld-btn-primary" onclick="openBldTypePicker()" id="bld-new-btn">＋ Nuevo Inmueble</button>
+            <button class="bld-btn bld-btn-primary" onclick="_bldNewAction()" id="bld-new-btn">＋ Nuevo Edificio</button>
             <button class="bld-btn" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
             <button id="bld-crm-links-btn" class="bld-btn" style="display:none" onclick="openCrmLinksModal()">🔗 CRM Links</button>
             <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
@@ -3401,35 +3401,6 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 </div>
 
 
-<!-- TIPO PICKER -->
-<div id="bld-type-picker" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(2,6,23,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:20px;padding:2rem;width:580px;max-width:95vw">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
-      <div>
-        <div style="font-size:19px;font-weight:800;color:#0A1B4D">Nuevo Inmueble</div>
-        <div style="font-size:12px;color:#7B8BBD;margin-top:.2rem">Seleccioná el tipo de inmueble a registrar</div>
-      </div>
-      <button onclick="closeBldTypePicker()" style="background:none;border:none;font-size:20px;color:#7B8BBD;cursor:pointer;padding:4px 8px;line-height:1">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
-      <div class="btp-card" onclick="closeBldTypePicker();openBldNewWizard()">
-        <div style="font-size:2rem;margin-bottom:.6rem">🏢</div>
-        <div style="font-size:14px;font-weight:800;color:#0A1B4D;margin-bottom:.3rem">Oficina</div>
-        <div style="font-size:11px;color:#7B8BBD;line-height:1.5">Torres corporativas y espacios de oficinas</div>
-      </div>
-      <div class="btp-card" onclick="closeBldTypePicker();openIndWizard()">
-        <div style="font-size:2rem;margin-bottom:.6rem">🏭</div>
-        <div style="font-size:14px;font-weight:800;color:#0A1B4D;margin-bottom:.3rem">Industrial</div>
-        <div style="font-size:11px;color:#7B8BBD;line-height:1.5">Centros logísticos, naves, terrenos y parques</div>
-      </div>
-      <div class="btp-card" onclick="closeBldTypePicker();openRetWizard()">
-        <div style="font-size:2rem;margin-bottom:.6rem">🏪</div>
-        <div style="font-size:14px;font-weight:800;color:#0A1B4D;margin-bottom:.3rem">Retail</div>
-        <div style="font-size:11px;color:#7B8BBD;line-height:1.5">Locales comerciales y espacios de retail</div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- NUEVO INDUSTRIAL WIZARD -->
 <div id="ind-wizard-overlay" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(2,6,23,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center">
@@ -4035,7 +4006,7 @@ body.dark .cdr-footer{border-top-color:rgba(255,255,255,.08)}
 <!-- BUILDING DETAIL OVERLAY -->
 <div id="bld-detail-overlay">
   <div class="bld-det-hdr">
-    <button class="bld-det-back" onclick="closeBldDetail()">← Oficinas</button>
+    <button class="bld-det-back" id="bld-det-back-btn" onclick="closeBldDetail()">← Oficinas</button>
     <div class="bld-det-sep">/</div>
     <div class="bld-det-hdr-name" id="bld-det-hdr-name">Edificio</div>
     <div class="bld-det-hdr-actions">
@@ -7950,6 +7921,7 @@ const BLD_PAGE_SIZE=20;
 let _bldDocs=[], _bldFiltered=[], _bldPage=0, _bldEditId=null;
 let _bldZonasSel=new Set();
 let _bldCatSel='', _bldEtapaSel='', _bldM2Min=0, _bldM2Max=0;
+let _bldAssetType='office';
 let _bldToSelSet=new Set();
 let _bldListView='grid'; // 'grid' | 'list' | 'map'
 
@@ -8030,10 +8002,15 @@ async function loadBuildings(){
   document.getElementById('bld-table-wrap').innerHTML='<div class="bld-empty">Cargando...</div>';
   try{
     const snap=await db.collection('buildings').orderBy('nombre').get();
-    _bldDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    const allDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    _bldDocs=allDocs.filter(d=>{
+      const at=d.assetType||(d._tipo==='industrial'?'industrial':d._tipo==='retail'?'retail':'office');
+      return at===_bldAssetType;
+    });
+    _bldAdaptUI();
     // Sync masterBuildings from Firestore when Sheet hasn't loaded
-    // so Generator always sees the same dataset as Buildings
-    if(!masterBuildings.length&&_bldDocs.length){
+    // so Generator always sees the same dataset as Buildings (office only)
+    if(_bldAssetType==='office'&&!masterBuildings.length&&_bldDocs.length){
       const seen=new Map();
       _bldDocs.forEach(f=>{
         if(f.activo===false||f.estado==='Archivado')return;
@@ -8193,9 +8170,12 @@ function _bldPaginationHTML(total, startI){
 function renderBuildingsTable(){
   const wrap=document.getElementById('bld-table-wrap');
   const total=_bldFiltered.length;
-  document.getElementById('bld-subtitle').textContent=`${_bldDocs.length} edificio${_bldDocs.length!==1?'s':''} · ${total} en vista`;
+  const _bldUnit={office:'edificio',industrial:'activo',retail:'local'}[_bldAssetType]||'inmueble';
+  const _bldUnitP={office:'edificios',industrial:'activos',retail:'locales'}[_bldAssetType]||'inmuebles';
+  document.getElementById('bld-subtitle').textContent=`${_bldDocs.length} ${_bldDocs.length!==1?_bldUnitP:_bldUnit} · ${total} en vista`;
   if(!total){
-    wrap.innerHTML='<div class="bld-empty">Sin edificios. Usá el botón "Nueva Oficina" o importá desde Sheets.</div>';
+    const _bldNewLabel={office:'Nueva Oficina',industrial:'Nuevo Activo Industrial',retail:'Nuevo Local'}[_bldAssetType]||'Nuevo Inmueble';
+    wrap.innerHTML=`<div class="bld-empty">Sin ${_bldUnitP}. Usá el botón "${_bldNewLabel}" o importá desde Sheets.</div>`;
     document.getElementById('bld-pagination').style.display='none';
     return;
   }
@@ -8238,9 +8218,11 @@ function renderBuildingsTable(){
 function renderBuildingsListView(){
   const wrap=document.getElementById('bld-table-wrap');
   const total=_bldFiltered.length;
-  document.getElementById('bld-subtitle').textContent=`${_bldDocs.length} edificio${_bldDocs.length!==1?'s':''} · ${total} en vista`;
+  const _bldUnit2={office:'edificio',industrial:'activo',retail:'local'}[_bldAssetType]||'inmueble';
+  const _bldUnitP2={office:'edificios',industrial:'activos',retail:'locales'}[_bldAssetType]||'inmuebles';
+  document.getElementById('bld-subtitle').textContent=`${_bldDocs.length} ${_bldDocs.length!==1?_bldUnitP2:_bldUnit2} · ${total} en vista`;
   if(!total){
-    wrap.innerHTML='<div class="bld-empty">Sin edificios que coincidan con los filtros.</div>';
+    wrap.innerHTML=`<div class="bld-empty">Sin ${_bldUnitP2} que coincidan con los filtros.</div>`;
     document.getElementById('bld-pagination').style.display='none';
     return;
   }
@@ -9111,6 +9093,7 @@ async function saveBldWizard(){
     estado:'Disponible',
     activo:true,
     _source:'manual',
+    assetType:'office',
     createdAt:firebase.firestore.FieldValue.serverTimestamp(),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -9150,14 +9133,27 @@ async function saveBldWizard(){
 /* keep old renderUnitsTable as alias so existing callers don't break */
 function renderUnitsTable(buildingId,filterQ=''){renderDetailUnits(buildingId,filterQ);}
 
-// ─── TYPE PICKER ─────────────────────────────────────
-function openBldTypePicker(){
-  const el=document.getElementById('bld-type-picker');
-  if(el)el.style.display='flex';
+// ─── ASSET TYPE ROUTING ──────────────────────────────
+function _bldNewAction(){
+  if(_bldAssetType==='industrial')openIndWizard();
+  else if(_bldAssetType==='retail')openRetWizard();
+  else openBldNewWizard();
 }
-function closeBldTypePicker(){
-  const el=document.getElementById('bld-type-picker');
-  if(el)el.style.display='none';
+function _bldAdaptUI(){
+  const cfg={
+    office:   {title:'Oficinas',     btn:'＋ Nuevo Edificio',          back:'← Oficinas'},
+    industrial:{title:'Industrial',  btn:'＋ Nuevo Activo Industrial',  back:'← Industrial'},
+    retail:   {title:'Retail',       btn:'＋ Nuevo Local',              back:'← Retail'},
+  };
+  const c=cfg[_bldAssetType]||cfg.office;
+  const t=document.getElementById('bld-title');
+  const b=document.getElementById('bld-new-btn');
+  const bk=document.getElementById('bld-det-back-btn');
+  const imp=document.getElementById('bld-import-btn');
+  if(t)t.textContent=c.title;
+  if(b)b.textContent=c.btn;
+  if(bk)bk.textContent=c.back;
+  if(imp)imp.style.display=_bldAssetType==='office'?'':'none';
 }
 
 // ─── INDUSTRIAL WIZARD ───────────────────────────────
@@ -9285,6 +9281,7 @@ async function saveIndWizard(){
     corredor:g('inw-corredor'),zona:g('inw-corredor'),submercado:g('inw-corredor'),
     barrio:g('inw-barrio'),
     _tipo:'industrial',_subtipo:st,tipo:'industrial',
+    assetType:'industrial',
     estado:'Disponible',activo:true,_source:'manual',
     createdAt:firebase.firestore.FieldValue.serverTimestamp(),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
@@ -9448,6 +9445,7 @@ async function saveRetWizard(){
     corredor:g('rtw-corredor'),zona:g('rtw-corredor'),submercado:g('rtw-corredor'),
     tipologia:g('rtw-tipologia'),
     _tipo:'retail',tipo:'retail',
+    assetType:'retail',
     superficieTotal:gn('rtw-sup-total'),superficiePB:gn('rtw-sup-pb'),
     cantidadPlantas:gn('rtw-plantas'),
     frente:gn('rtw-frente'),fondo:gn('rtw-fondo'),
@@ -10860,7 +10858,8 @@ function showModule(mod){
       console.log('%c[masterBuildings] Generator opened — '+masterBuildings.length+' buildings loaded','color:#1C54F4;font-weight:bold');
       console.table(masterBuildings.map(b=>({nombre:b.nombre,zona:b.submercado,supDisp:b.supDisp,rent:b.rent})));
     });
-  } else if(mod==='buildings'){
+  } else if(mod==='office'||mod==='industrial'||mod==='retail'||mod==='buildings'){
+    _bldAssetType=mod==='buildings'?'office':mod;
     show('buildings-panel');
     loadBuildings();
   } else if(mod==='crm'){
