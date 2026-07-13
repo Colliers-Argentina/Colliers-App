@@ -2193,6 +2193,23 @@ body.dark .cdr-input::placeholder{color:#4a6080}
 .cdr-req{color:#ED1B34}
 .cdr-admin-tag{font-size:9px;font-weight:700;color:#1C54F4;background:rgba(28,84,244,.1);border-radius:4px;padding:1px 5px;vertical-align:middle;letter-spacing:.04em}
 body.dark .cdr-admin-tag{background:rgba(77,147,255,.18);color:#8FC0FF}
+.cdr-ms-wrap{position:relative}
+.cdr-ms-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.4rem}
+.cdr-ms-chips:empty{display:none}
+.cdr-ms-chip{display:inline-flex;align-items:center;gap:.35rem;background:#EAF1FF;color:#1C54F4;border:1px solid #C9DBFF;border-radius:7px;padding:2px 6px 2px 8px;font-size:12px;font-weight:600}
+body.dark .cdr-ms-chip{background:rgba(77,147,255,.16);color:#8FC0FF;border-color:rgba(77,147,255,.3)}
+.cdr-ms-chip-sub{background:#F0F4FB;color:#3A4A73;border-color:#DBE5F5}
+body.dark .cdr-ms-chip-sub{background:rgba(255,255,255,.06);color:#c8d6f0;border-color:rgba(255,255,255,.12)}
+.cdr-ms-chip-x{cursor:pointer;font-size:13px;line-height:1;color:#5B7BC0}
+.cdr-ms-chip-x:hover{color:#ED1B34}
+.cdr-ms-drop{position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:650;max-height:190px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)}
+body.dark .cdr-ms-drop{background:#1a2c52;border-color:rgba(255,255,255,.12)}
+.cdr-ms-item{padding:.5rem .7rem;font-size:13px;cursor:pointer;color:#000759}
+body.dark .cdr-ms-item{color:#e0eaff}
+.cdr-ms-item:hover{background:#F2F6FF}
+body.dark .cdr-ms-item:hover{background:#22335c}
+.cdr-ms-item small{color:#8898C0;font-weight:500}
+.cdr-ms-empty{padding:.5rem .7rem;font-size:12px;color:#8898C0}
 .cdr-row{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
 .cdr-toggle-group{display:flex;gap:.3rem;flex-wrap:wrap}
 .cdr-toggle-btn{padding:5px 13px;border:1.5px solid #E2E8F5;border-radius:7px;font-size:12px;font-weight:600;color:#56648F;background:none;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap;line-height:1.4}
@@ -2972,13 +2989,21 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       </div>
 
       <div class="cdr-field cdr-admin-only" id="cdr-rubro-field">
-        <div class="cdr-lbl">Rubro <span class="cdr-admin-tag">ADMIN</span></div>
-        <input id="cdr-rubro" class="cdr-input" type="text" placeholder="Ej: Tecnología, Salud...">
+        <div class="cdr-lbl">Rubro <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(uno o varios)</span></div>
+        <div id="cdr-rubro-chips" class="cdr-ms-chips"></div>
+        <div class="cdr-ms-wrap">
+          <input id="cdr-rubro-q" class="cdr-input" type="text" placeholder="Buscar rubro..." autocomplete="off" oninput="cdrRubroSearch(this.value)" onfocus="cdrRubroSearch(this.value)" onblur="cdrMsBlur('rubro')">
+          <div id="cdr-rubro-drop" class="cdr-ms-drop" style="display:none"></div>
+        </div>
       </div>
 
       <div class="cdr-field cdr-admin-only" id="cdr-subrubro-field" style="display:none">
-        <div class="cdr-lbl">Sub rubro <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(carga posterior)</span></div>
-        <input id="cdr-subRubro" class="cdr-input" type="text" placeholder="Ej: Fintech, Laboratorio...">
+        <div class="cdr-lbl">Sub rubro <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(según rubros)</span></div>
+        <div id="cdr-subrubro-chips" class="cdr-ms-chips"></div>
+        <div class="cdr-ms-wrap">
+          <input id="cdr-subrubro-q" class="cdr-input" type="text" placeholder="Buscar sub rubro..." autocomplete="off" oninput="cdrSubrubroSearch(this.value)" onfocus="cdrSubrubroSearch(this.value)" onblur="cdrMsBlur('subrubro')">
+          <div id="cdr-subrubro-drop" class="cdr-ms-drop" style="display:none"></div>
+        </div>
       </div>
 
       <div class="cdr-field">
@@ -5979,8 +6004,8 @@ function openClientDetail(docId){
           <div>
             <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">2</span> Segmentación</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-det-meta-val">${d.rubro||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-det-meta-val">${d.subRubro||'–'}</div></div>`:''}
+              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[])).map(r=>`<span class="crm-tag">${r}</span>`).join('')||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.subrubros)&&d.subrubros.length?d.subrubros.map(o=>o.s||o.sub||''):(d.subRubro?[d.subRubro]:[])).filter(Boolean).map(s=>`<span class="crm-tag">${s}</span>`).join('')||'–'}</div></div>`:''}
               <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">Unidades de negocio de interés</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean).map(b=>`<span class="crm-tag">${b}</span>`).join('')||'–'}</div></div>
             </div>
           </div>
@@ -6513,6 +6538,8 @@ function _diffFields(oldD,newD,labels){
 // ===== LEADS =====
 let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente';
 let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null;
+let _cdrRubros=[];        // rubros seleccionados (many-to-many) -> string[]
+let _cdrSubrubros=[];     // subrubros seleccionados -> [{r:rubro, s:subrubro}]
 
 const LEAD_ESTADOS=['Nuevo','Intento de contacto','Contactado','Calificado','Visita coordinada','Visita realizada','Propuesta enviada','Descartado','Convertido'];
 const LEAD_ESTADO_CLS={'Nuevo':'nuevo','Intento de contacto':'intento','Contactado':'contactado','Calificado':'calificado','Visita coordinada':'visita-c','Visita realizada':'visita-r','Propuesta enviada':'propuesta','Descartado':'descartado','Convertido':'convertido'};
@@ -7133,6 +7160,103 @@ window.cdrToggle=function(btn){
 };
 
 function _cdrIsAdmin(){return ANALYTICS_ALLOWED.includes(user?.email);}
+
+// ===== Catálogo Rubro -> Subrubros (editable; agregar entradas NO requiere tocar lógica) =====
+const RUBROS_CATALOG={
+  'Tecnología':['Software','Fintech','Hardware','Telecomunicaciones','E-commerce','Ciberseguridad','Datacenter'],
+  'Servicios Financieros':['Banco','Seguros','Fondos de Inversión','Medios de Pago','Financiera'],
+  'Salud':['Laboratorio','Farmacéutica','Clínica / Sanatorio','Equipamiento Médico','Obra Social / Prepaga'],
+  'Consumo Masivo':['Alimentos','Bebidas','Cuidado Personal','Limpieza'],
+  'Retail':['Indumentaria','Electrodomésticos','Supermercado','Deportes','Hogar / Decoración'],
+  'Industria':['Automotriz','Metalúrgica','Química','Plásticos','Maquinaria','Textil'],
+  'Logística':['Operador Logístico','Courier / Última Milla','Transporte','Almacenamiento','Distribución'],
+  'Agroindustria':['Agroquímicos','Semillas','Maquinaria Agrícola','Alimentos Balanceados','Exportación'],
+  'Energía':['Petróleo y Gas','Energías Renovables','Servicios Petroleros','Electricidad'],
+  'Construcción y Real Estate':['Desarrollador','Constructora','Administración de Inmuebles','Arquitectura / Ingeniería'],
+  'Servicios Profesionales':['Estudio Jurídico','Consultora','Auditoría / Contable','Recursos Humanos','Publicidad / Marketing'],
+  'Educación':['Universidad','Colegio','Capacitación / e-Learning','Editorial'],
+  'Gobierno y ONG':['Organismo Público','Embajada / Organismo Internacional','Fundación / ONG','Cámara / Asociación'],
+  'Hotelería y Turismo':['Hotel','Gastronomía','Agencia de Viajes','Entretenimiento'],
+  'Medios y Entretenimiento':['Productora','Editorial / Prensa','Streaming / Contenidos','Gaming'],
+};
+
+function _cdrRenderRubroChips(){
+  const c=document.getElementById('cdr-rubro-chips');if(!c)return;
+  c.innerHTML=_cdrRubros.map(r=>`<span class="cdr-ms-chip">${esc(r)}<span class="cdr-ms-chip-x" onclick="cdrRemoveRubro(${JSON.stringify(r)})" title="Quitar">✕</span></span>`).join('');
+}
+function _cdrRenderSubrubroChips(){
+  const c=document.getElementById('cdr-subrubro-chips');if(!c)return;
+  c.innerHTML=_cdrSubrubros.map(o=>`<span class="cdr-ms-chip cdr-ms-chip-sub">${esc(o.s)} <small style="opacity:.6;font-weight:500">· ${esc(o.r)}</small><span class="cdr-ms-chip-x" onclick="cdrRemoveSubrubro(${JSON.stringify(o.r)},${JSON.stringify(o.s)})" title="Quitar">✕</span></span>`).join('');
+}
+function _cdrUpdateSubrubroVisibility(){
+  const f=document.getElementById('cdr-subrubro-field');if(!f)return;
+  f.style.display=(_cdrIsAdmin()&&_cdrRubros.length)?'':'none';
+}
+function _cdrResetRubros(){
+  _cdrRubros=[];_cdrSubrubros=[];
+  ['cdr-rubro-q','cdr-subrubro-q'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['cdr-rubro-drop','cdr-subrubro-drop'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
+  _cdrRenderRubroChips();_cdrRenderSubrubroChips();_cdrUpdateSubrubroVisibility();
+}
+function _cdrSeedRubros(d){
+  _cdrRubros=(Array.isArray(d.rubros)&&d.rubros.length)?[...d.rubros]:(d.rubro?[d.rubro]:[]);
+  if(Array.isArray(d.subrubros)&&d.subrubros.length){
+    _cdrSubrubros=d.subrubros.map(o=>({r:o.r||o.rubro||'',s:o.s||o.sub||''})).filter(o=>o.s);
+  } else if(d.subRubro){
+    _cdrSubrubros=[{r:(d.rubro||_cdrRubros[0]||''),s:d.subRubro}];
+  } else {_cdrSubrubros=[];}
+  _cdrRenderRubroChips();_cdrRenderSubrubroChips();_cdrUpdateSubrubroVisibility();
+}
+window.cdrRubroSearch=function(q){
+  const drop=document.getElementById('cdr-rubro-drop');if(!drop)return;
+  q=(q||'').toLowerCase().trim();
+  const opts=Object.keys(RUBROS_CATALOG).filter(r=>!_cdrRubros.includes(r)&&r.toLowerCase().includes(q));
+  drop.innerHTML=opts.length?opts.map(r=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();cdrAddRubro(${JSON.stringify(r)})">${esc(r)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
+  drop.style.display='block';
+};
+window.cdrAddRubro=function(r){
+  if(!_cdrRubros.includes(r))_cdrRubros.push(r);
+  const q=document.getElementById('cdr-rubro-q');if(q)q.value='';
+  document.getElementById('cdr-rubro-drop').style.display='none';
+  _cdrRenderRubroChips();_cdrUpdateSubrubroVisibility();
+};
+window.cdrRemoveRubro=function(r){
+  _cdrRubros=_cdrRubros.filter(x=>x!==r);
+  _cdrSubrubros=_cdrSubrubros.filter(o=>o.r!==r);   // cascada: elimina subrubros del rubro quitado
+  _cdrRenderRubroChips();_cdrRenderSubrubroChips();_cdrUpdateSubrubroVisibility();
+};
+window.cdrSubrubroSearch=function(q){
+  const drop=document.getElementById('cdr-subrubro-drop');if(!drop)return;
+  q=(q||'').toLowerCase().trim();
+  if(!_cdrRubros.length){drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}
+  const avail=[];
+  _cdrRubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>{
+    if(q&&!s.toLowerCase().includes(q))return;
+    if(_cdrSubrubros.some(o=>o.r===r&&o.s===s))return;
+    avail.push({r,s});
+  }));
+  drop.innerHTML=avail.length?avail.map(o=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();cdrAddSubrubro(${JSON.stringify(o.r)},${JSON.stringify(o.s)})">${esc(o.s)} <small>· ${esc(o.r)}</small></div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
+  drop.style.display='block';
+};
+window.cdrAddSubrubro=function(r,s){
+  if(!_cdrRubros.includes(r))return;                       // integridad: rubro debe estar seleccionado
+  if(!(RUBROS_CATALOG[r]||[]).includes(s))return;          // integridad: sub debe pertenecer al rubro
+  if(!_cdrSubrubros.some(o=>o.r===r&&o.s===s))_cdrSubrubros.push({r,s});
+  const q=document.getElementById('cdr-subrubro-q');if(q)q.value='';
+  document.getElementById('cdr-subrubro-drop').style.display='none';
+  _cdrRenderSubrubroChips();
+};
+window.cdrRemoveSubrubro=function(r,s){
+  _cdrSubrubros=_cdrSubrubros.filter(o=>!(o.r===r&&o.s===s));
+  _cdrRenderSubrubroChips();
+};
+window.cdrMsBlur=function(which){setTimeout(()=>{const d=document.getElementById('cdr-'+which+'-drop');if(d)d.style.display='none';},150);};
+// Validación de integridad (usada al guardar): descarta subrubros cuyo rubro no está
+// seleccionado o que no pertenecen al rubro según el catálogo. Preserva rubros legacy
+// fuera de catálogo para no romper cuentas existentes.
+function _cdrValidSubrubros(rubros,subs){
+  return subs.filter(o=>rubros.includes(o.r)&&(!(o.r in RUBROS_CATALOG)||RUBROS_CATALOG[o.r].includes(o.s)));
+}
 window.cdrToggleGestion=function(btn){
   const active=[...document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip.active')];
   if(!btn.classList.contains('active')&&active.length>=3)return;
@@ -7143,7 +7267,7 @@ window.openClientDrawer=function(callbackFn){
   _cdrEditId=null;
   _cdrCallback=callbackFn||null;
   const isAdmin=_cdrIsAdmin();
-  ['cdr-nombre','cdr-rubro','cdr-subRubro'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('cdr-nombre').value='';
   document.getElementById('cdr-categoria').value='';
   document.getElementById('cdr-capturadoPor').value=user?.displayName||user?.email||'';
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip, #cdr-gestionado-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
@@ -7152,6 +7276,7 @@ window.openClientDrawer=function(callbackFn){
     document.querySelectorAll(`#cdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
+  _cdrResetRubros();
   document.querySelectorAll('#cdr-drawer .cdr-admin-only').forEach(el=>el.style.display=isAdmin?'':'none');
   document.getElementById('cdr-subrubro-field').style.display='none';
   document.querySelector('#cdr-drawer .cdr-title').textContent='Nueva Cuenta';
@@ -7167,10 +7292,10 @@ window.openClientDrawer_edit=function(docId){
   if(!d)return;
   window.openClientDrawer();
   _cdrEditId=docId;
-  const isAdmin=_cdrIsAdmin();
   const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-  setV('cdr-nombre',d.nombre);setV('cdr-rubro',d.rubro);setV('cdr-subRubro',d.subRubro);
+  setV('cdr-nombre',d.nombre);
   setV('cdr-capturadoPor',d.capturadoPor||d.brokerCreador||'');
+  _cdrSeedRubros(d);
   document.getElementById('cdr-categoria').value=d.categoria||'';
   const buArr=Array.isArray(d.bu)?d.bu:[d.bu].filter(Boolean);
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',buArr.includes(c.dataset.bu));});
@@ -7184,7 +7309,7 @@ window.openClientDrawer_edit=function(docId){
   setToggle('clienteColliers',d.clienteColliers==='Sí'?'Sí':'No');
   const tipo=d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');
   setToggle('tipoCuenta',tipo);
-  document.getElementById('cdr-subrubro-field').style.display=isAdmin?'':'none';
+  _cdrUpdateSubrubroVisibility();
   document.querySelector('#cdr-drawer .cdr-title').textContent='Editar Cuenta';
   const btn=document.getElementById('cdr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
 };
@@ -7232,11 +7357,16 @@ window.saveClientDrawer=async function(){
     // así los usuarios estándar nunca los modifican (ni siquiera al editar).
     if(isAdmin){
       newData.categoria=document.getElementById('cdr-categoria').value||'';
-      newData.rubro=cdrVal('cdr-rubro')||'';
+      // Rubro / Subrubro many-to-many con validación de integridad al escribir.
+      const rubros=[..._cdrRubros];
+      const subrubros=_cdrValidSubrubros(rubros,_cdrSubrubros);
+      newData.rubros=rubros;
+      newData.subrubros=subrubros;
+      newData.rubro=rubros[0]||'';                    // compat legacy (valor único)
+      newData.subRubro=subrubros[0]?subrubros[0].s:'';// compat legacy (valor único)
       const gestionadoPor=[...document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip.active')].map(c=>c.dataset.ejec).slice(0,3);
       newData.gestionadoPor=gestionadoPor;
       newData.ejecutivoComercial=gestionadoPor[0]||'';
-      if(_cdrEditId)newData.subRubro=cdrVal('cdr-subRubro')||'';
     }
     if(_cdrEditId){
       const oldD=_crmDocs.find(x=>x._id===_cdrEditId)||{};
