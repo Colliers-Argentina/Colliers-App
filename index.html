@@ -2191,6 +2191,8 @@ body.dark .cdr-select{background:#fff;color:#1F2937;border-color:rgba(255,255,25
 .cdr-input::placeholder{color:#B0BDDA}
 body.dark .cdr-input::placeholder{color:#4a6080}
 .cdr-req{color:#ED1B34}
+.cdr-admin-tag{font-size:9px;font-weight:700;color:#1C54F4;background:rgba(28,84,244,.1);border-radius:4px;padding:1px 5px;vertical-align:middle;letter-spacing:.04em}
+body.dark .cdr-admin-tag{background:rgba(77,147,255,.18);color:#8FC0FF}
 .cdr-row{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
 .cdr-toggle-group{display:flex;gap:.3rem;flex-wrap:wrap}
 .cdr-toggle-btn{padding:5px 13px;border:1.5px solid #E2E8F5;border-radius:7px;font-size:12px;font-weight:600;color:#56648F;background:none;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap;line-height:1.4}
@@ -2937,159 +2939,80 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 
   <!-- CUENTA DRAWER (shared: CRM + Generator) -->
   <div id="cdr-overlay" class="cdr-overlay" onclick="closeClientDrawer()"></div>
-  <div id="cdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nueva Ficha de Cuenta">
+  <div id="cdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nueva Cuenta">
     <div class="cdr-hd">
       <div class="cdr-title">Nueva Cuenta</div>
       <button class="cdr-close" onclick="closeClientDrawer()" title="Cerrar">✕</button>
     </div>
     <div class="cdr-body">
 
-      <!-- 1 · Información General -->
-      <div class="cdr-section">
-        <div class="cdr-section-hd">
-          <div class="cdr-section-num">1</div>
-          <div class="cdr-section-name">Información General</div>
-          <div class="cdr-section-line"></div>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Nombre comercial <span class="cdr-req">*</span></div>
-          <input id="cdr-nombre" class="cdr-input" type="text" placeholder="Ej: Empresa SA" autocomplete="off">
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Categoría</div>
-          <select id="cdr-categoria" class="cdr-select">
-            <option value="">— Seleccionar —</option>
-            <option>A</option>
-            <option>B</option>
-            <option>C</option>
-            <option>No Aplica</option>
-          </select>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Cliente Colliers</div>
-          <div class="cdr-toggle-group">
-            <button type="button" class="cdr-toggle-btn active" data-field="clienteColliers" data-value="Sí" data-default onclick="cdrToggle(this)">Sí</button>
-            <button type="button" class="cdr-toggle-btn" data-field="clienteColliers" data-value="No" onclick="cdrToggle(this)">No</button>
-            <button type="button" class="cdr-toggle-btn" data-field="clienteColliers" data-value="Ex cliente" onclick="cdrToggle(this)">Ex cliente</button>
-          </div>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Propietario / Ocupante</div>
-          <div class="cdr-toggle-group">
-            <button type="button" class="cdr-toggle-btn" data-field="propOcup" data-value="Propietario" onclick="cdrToggle(this)">Propietario</button>
-            <button type="button" class="cdr-toggle-btn active" data-field="propOcup" data-value="Ocupante" data-default onclick="cdrToggle(this)">Ocupante</button>
-            <button type="button" class="cdr-toggle-btn" data-field="propOcup" data-value="Ambos" onclick="cdrToggle(this)">Ambos</button>
-          </div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Nombre comercial <span class="cdr-req">*</span></div>
+        <input id="cdr-nombre" class="cdr-input" type="text" placeholder="Ej: Empresa SA" autocomplete="off">
+      </div>
+
+      <div class="cdr-field cdr-admin-only" id="cdr-categoria-field">
+        <div class="cdr-lbl">Categoría <span class="cdr-admin-tag">ADMIN</span></div>
+        <select id="cdr-categoria" class="cdr-select">
+          <option value="">— Seleccionar —</option>
+          <option>Top</option>
+          <option>A</option>
+          <option>B</option>
+          <option>C</option>
+          <option>No aplica</option>
+        </select>
+      </div>
+
+      <div class="cdr-field">
+        <div class="cdr-lbl">Cliente Colliers</div>
+        <div class="cdr-toggle-group">
+          <button type="button" class="cdr-toggle-btn active" data-field="clienteColliers" data-value="Sí" data-default onclick="cdrToggle(this)">Sí</button>
+          <button type="button" class="cdr-toggle-btn" data-field="clienteColliers" data-value="No" onclick="cdrToggle(this)">No</button>
         </div>
       </div>
 
-      <!-- 2 · Contacto -->
-      <div class="cdr-section">
-        <div class="cdr-section-hd">
-          <div class="cdr-section-num">2</div>
-          <div class="cdr-section-name">Contacto</div>
-          <div class="cdr-section-line"></div>
-        </div>
-        <div class="cdr-row">
-          <div class="cdr-field">
-            <div class="cdr-lbl">Contacto principal</div>
-            <input id="cdr-contactoPrincipal" class="cdr-input" type="text" placeholder="Nombre y apellido" autocomplete="off">
-          </div>
-          <div class="cdr-field">
-            <div class="cdr-lbl">Cargo</div>
-            <input id="cdr-cargo" class="cdr-input" type="text" placeholder="Ej: CEO, CFO, RRHH...">
-          </div>
-        </div>
-        <div class="cdr-row">
-          <div class="cdr-field">
-            <div class="cdr-lbl">Email</div>
-            <input id="cdr-email" class="cdr-input" type="email" placeholder="contacto@empresa.com" autocomplete="off">
-          </div>
-          <div class="cdr-field">
-            <div class="cdr-lbl">Teléfono</div>
-            <input id="cdr-telefono" class="cdr-input" type="tel" placeholder="+54 11...">
-          </div>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Sitio web</div>
-          <input id="cdr-sitioWeb" class="cdr-input" type="url" placeholder="https://empresa.com">
+      <div class="cdr-field cdr-admin-only" id="cdr-rubro-field">
+        <div class="cdr-lbl">Rubro <span class="cdr-admin-tag">ADMIN</span></div>
+        <input id="cdr-rubro" class="cdr-input" type="text" placeholder="Ej: Tecnología, Salud...">
+      </div>
+
+      <div class="cdr-field cdr-admin-only" id="cdr-subrubro-field" style="display:none">
+        <div class="cdr-lbl">Sub rubro <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(carga posterior)</span></div>
+        <input id="cdr-subRubro" class="cdr-input" type="text" placeholder="Ej: Fintech, Laboratorio...">
+      </div>
+
+      <div class="cdr-field">
+        <div class="cdr-lbl">Unidades de negocio de interés</div>
+        <div class="cdr-toggle-group" id="cdr-bu-chips">
+          <button type="button" class="cto-pref-chip" data-bu="Retail" onclick="this.classList.toggle('active')">Retail</button>
+          <button type="button" class="cto-pref-chip" data-bu="Industria" onclick="this.classList.toggle('active')">Industria</button>
+          <button type="button" class="cto-pref-chip" data-bu="Oficinas" onclick="this.classList.toggle('active')">Oficinas</button>
         </div>
       </div>
 
-      <!-- 3 · Segmentación -->
-      <div class="cdr-section">
-        <div class="cdr-section-hd">
-          <div class="cdr-section-num">3</div>
-          <div class="cdr-section-name">Segmentación</div>
-          <div class="cdr-section-line"></div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Tipo de cuenta</div>
+        <div class="cdr-toggle-group">
+          <button type="button" class="cdr-toggle-btn" data-field="tipoCuenta" data-value="Broker" onclick="cdrToggle(this)">Broker</button>
+          <button type="button" class="cdr-toggle-btn" data-field="tipoCuenta" data-value="Desarrollador" onclick="cdrToggle(this)">Desarrollador</button>
+          <button type="button" class="cdr-toggle-btn active" data-field="tipoCuenta" data-value="Ninguno" data-default onclick="cdrToggle(this)">Ninguno</button>
         </div>
-        <div class="cdr-row">
-          <div class="cdr-field">
-            <div class="cdr-lbl">Rubro</div>
-            <input id="cdr-rubro" class="cdr-input" type="text" placeholder="Ej: Tecnología, Salud...">
-          </div>
-          <div class="cdr-field">
-            <div class="cdr-lbl">Sub rubro</div>
-            <input id="cdr-subRubro" class="cdr-input" type="text" placeholder="Ej: Fintech, Laboratorio...">
-          </div>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">BU (Business Unit)</div>
-          <div class="cdr-toggle-group" id="cdr-bu-chips">
-            <button type="button" class="cto-pref-chip" data-bu="Oficina" onclick="this.classList.toggle('active')">Oficina</button>
-            <button type="button" class="cto-pref-chip" data-bu="Industria" onclick="this.classList.toggle('active')">Industria</button>
-            <button type="button" class="cto-pref-chip" data-bu="Retail" onclick="this.classList.toggle('active')">Retail</button>
-          </div>
-        </div>
-        <div class="cdr-row" style="row-gap:.65rem">
-          <div class="cdr-field" style="margin-bottom:0">
-            <div class="cdr-lbl">Es Ejecutivo Comercial</div>
-            <div class="cdr-toggle-group">
-              <button type="button" class="cdr-toggle-btn" data-field="esBroker" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
-              <button type="button" class="cdr-toggle-btn active" data-field="esBroker" data-value="No" data-default onclick="cdrToggle(this)">No</button>
-            </div>
-          </div>
-          <div class="cdr-field" style="margin-bottom:0">
-            <div class="cdr-lbl">Cuenta corporativa</div>
-            <div class="cdr-toggle-group">
-              <button type="button" class="cdr-toggle-btn" data-field="cuentaCorp" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
-              <button type="button" class="cdr-toggle-btn active" data-field="cuentaCorp" data-value="No" data-default onclick="cdrToggle(this)">No</button>
-            </div>
-          </div>
-          <div class="cdr-field" style="margin-bottom:0">
-            <div class="cdr-lbl">Desarrollador</div>
-            <div class="cdr-toggle-group">
-              <button type="button" class="cdr-toggle-btn" data-field="esDesarrollador" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
-              <button type="button" class="cdr-toggle-btn active" data-field="esDesarrollador" data-value="No" data-default onclick="cdrToggle(this)">No</button>
-            </div>
-          </div>
-          <div class="cdr-field" style="margin-bottom:0">
-            <div class="cdr-lbl">Administradora</div>
-            <div class="cdr-toggle-group">
-              <button type="button" class="cdr-toggle-btn" data-field="esAdmin" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
-              <button type="button" class="cdr-toggle-btn active" data-field="esAdmin" data-value="No" data-default onclick="cdrToggle(this)">No</button>
-            </div>
-          </div>
-        </div>
-        <div class="cdr-field" style="margin-top:.75rem">
-          <div class="cdr-lbl">Ejecutivo Comercial</div>
-          <select id="cdr-ejecutivo" class="cdr-select">
-            <option value="">— Sin asignar —</option>
-            <option>Matienzo</option>
-            <option>Bartra</option>
-            <option>Farola</option>
-            <option>Troncoso</option>
-            <option>Giancontieri</option>
-            <option>Zuliani</option>
-          </select>
-        </div>
-        <div class="cdr-field" style="margin-top:.75rem">
-          <div class="cdr-lbl">Superficie buscada (m²)</div>
-          <div style="display:flex;align-items:center;gap:.5rem">
-            <input id="cdr-m2min" class="cdr-input" type="number" placeholder="600" min="0" style="flex:1">
-            <span style="font-size:12px;color:#8898C0;flex-shrink:0">hasta</span>
-            <input id="cdr-m2max" class="cdr-input" type="number" placeholder="1.000" min="0" style="flex:1">
-          </div>
+      </div>
+
+      <div class="cdr-field">
+        <div class="cdr-lbl">Capturado por</div>
+        <input id="cdr-capturadoPor" class="cdr-input" type="text" readonly title="Se completa automáticamente con el usuario autenticado" style="opacity:.75;cursor:default;background:#F4F7FC">
+      </div>
+
+      <div class="cdr-field cdr-admin-only" id="cdr-gestionado-field">
+        <div class="cdr-lbl">Gestionado por <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(hasta 3)</span></div>
+        <div class="cdr-toggle-group" id="cdr-gestionado-chips">
+          <button type="button" class="cto-pref-chip" data-ejec="Matienzo" onclick="cdrToggleGestion(this)">Matienzo</button>
+          <button type="button" class="cto-pref-chip" data-ejec="Bartra" onclick="cdrToggleGestion(this)">Bartra</button>
+          <button type="button" class="cto-pref-chip" data-ejec="Farola" onclick="cdrToggleGestion(this)">Farola</button>
+          <button type="button" class="cto-pref-chip" data-ejec="Troncoso" onclick="cdrToggleGestion(this)">Troncoso</button>
+          <button type="button" class="cto-pref-chip" data-ejec="Giancontieri" onclick="cdrToggleGestion(this)">Giancontieri</button>
+          <button type="button" class="cto-pref-chip" data-ejec="Zuliani" onclick="cdrToggleGestion(this)">Zuliani</button>
         </div>
       </div>
 
@@ -6022,8 +5945,7 @@ function openClientDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${d.broker||'–'}</div></div>
     ${d.ejecutivoComercial?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.ejecutivoComercial}</div></div>`:''}
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||(d.m2?fmtM2Range(d.m2,null):'–')}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+        <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">PPTs generados</div><div class="crm-det-meta-val" style="color:#1C54F4;font-size:20px">${ppts}</div></div>
     ${d.ultimaModificacion?`<div class="crm-det-meta-item" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF3FF"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${fmtDate(d.ultimaModificacion)}${d.usuarioUltimaModificacion?' · '+d.usuarioUltimaModificacion:''}</div></div>`:''}
@@ -6047,34 +5969,19 @@ function openClientDetail(docId){
           <div>
             <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">1</span> Información General</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Categoría</div><div class="crm-det-meta-val">${d.categoria||'–'}</div></div>
+              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Categoría</div><div class="crm-det-meta-val">${d.categoria||'–'}</div></div>`:''}
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cliente Colliers</div><div class="crm-det-meta-val">${d.clienteColliers||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario / Ocupante</div><div class="crm-det-meta-val">${d.propietarioOcupante||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial creador</div><div class="crm-det-meta-val">${d.brokerCreador||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.ejecutivoComercial||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Tipo de cuenta</div><div class="crm-det-meta-val">${d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno')}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Capturado por</div><div class="crm-det-meta-val">${d.capturadoPor||d.brokerCreador||'–'}</div></div>
+              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Gestionado por</div><div class="crm-det-meta-val">${(Array.isArray(d.gestionadoPor)&&d.gestionadoPor.length?d.gestionadoPor:(d.ejecutivoComercial?[d.ejecutivoComercial]:[])).join(', ')||'–'}</div></div>`:''}
             </div>
           </div>
           <div>
-            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">2</span> Contacto</div>
+            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">2</span> Segmentación</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Contacto principal</div><div class="crm-det-meta-val">${d.contactoPrincipal||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cargo</div><div class="crm-det-meta-val">${d.cargo||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.emailContacto||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
-              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">Sitio web</div><div class="crm-det-meta-val">${d.sitioWeb?`<a href="${d.sitioWeb}" target="_blank" rel="noopener" style="color:#1C54F4">${d.sitioWeb}</a>`:'–'}</div></div>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">3</span> Segmentación</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-det-meta-val">${d.rubro||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-det-meta-val">${d.subRubro||'–'}</div></div>
-              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">BU</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean).map(b=>`<span class="crm-tag">${b}</span>`).join('')||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Es Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.esBroker||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta corporativa</div><div class="crm-det-meta-val">${d.cuentaCorporativa||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Desarrollador</div><div class="crm-det-meta-val">${d.esDesarrollador||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Administradora</div><div class="crm-det-meta-val">${d.esAdministradora||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||'–'}</div></div>
+              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-det-meta-val">${d.rubro||'–'}</div></div>
+              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-det-meta-val">${d.subRubro||'–'}</div></div>`:''}
+              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">Unidades de negocio de interés</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean).map(b=>`<span class="crm-tag">${b}</span>`).join('')||'–'}</div></div>
             </div>
           </div>
         </div>
@@ -6086,8 +5993,7 @@ function openClientDetail(docId){
             <div style="display:flex;flex-direction:column;gap:.5rem">
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Zonas de interés</div><div class="crm-tags" style="margin-top:.25rem">${tags(d.zonasInteres)}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Superficie buscada</div><div class="crm-det-meta-val">${(d.rangoM2||[]).join(', ')||(d.m2?fmtM2Range(d.m2,null):'–')}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Presupuesto</div><div class="crm-det-meta-val">A definir</div></div>
+                            <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Presupuesto</div><div class="crm-det-meta-val">A definir</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Pipeline</div><select class="crm-estado-sel" style="margin-top:3px" onchange="saveClientEstado('${docId}',this.value)">${opts}</select></div>
             </div>
           </div>
@@ -7226,23 +7132,31 @@ window.cdrToggle=function(btn){
   btn.classList.add('active');
 };
 
+function _cdrIsAdmin(){return ANALYTICS_ALLOWED.includes(user?.email);}
+window.cdrToggleGestion=function(btn){
+  const active=[...document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip.active')];
+  if(!btn.classList.contains('active')&&active.length>=3)return;
+  btn.classList.toggle('active');
+};
+
 window.openClientDrawer=function(callbackFn){
   _cdrEditId=null;
   _cdrCallback=callbackFn||null;
-  ['cdr-nombre','cdr-contactoPrincipal','cdr-cargo',
-   'cdr-email','cdr-telefono','cdr-sitioWeb','cdr-rubro','cdr-subRubro',
-   'cdr-m2min','cdr-m2max'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const isAdmin=_cdrIsAdmin();
+  ['cdr-nombre','cdr-rubro','cdr-subRubro'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('cdr-categoria').value='';
-  document.getElementById('cdr-ejecutivo').value='';
-  document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
-  document.querySelectorAll('.cdr-toggle-btn[data-default]').forEach(btn=>{
+  document.getElementById('cdr-capturadoPor').value=user?.displayName||user?.email||'';
+  document.querySelectorAll('#cdr-bu-chips .cto-pref-chip, #cdr-gestionado-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#cdr-drawer .cdr-toggle-btn[data-default]').forEach(btn=>{
     const field=btn.dataset.field;
-    document.querySelectorAll(`.cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll(`#cdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
+  document.querySelectorAll('#cdr-drawer .cdr-admin-only').forEach(el=>el.style.display=isAdmin?'':'none');
+  document.getElementById('cdr-subrubro-field').style.display='none';
   document.querySelector('#cdr-drawer .cdr-title').textContent='Nueva Cuenta';
   const btn=document.getElementById('cdr-save-btn');
-  btn.textContent='Crear cliente';btn.disabled=false;
+  btn.textContent='Crear cuenta';btn.disabled=false;
   document.getElementById('cdr-overlay').classList.add('open');
   document.getElementById('cdr-drawer').classList.add('open');
   setTimeout(()=>document.getElementById('cdr-nombre').focus(),60);
@@ -7253,23 +7167,24 @@ window.openClientDrawer_edit=function(docId){
   if(!d)return;
   window.openClientDrawer();
   _cdrEditId=docId;
+  const isAdmin=_cdrIsAdmin();
   const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
-  setV('cdr-nombre',d.nombre);setV('cdr-contactoPrincipal',d.contactoPrincipal);setV('cdr-cargo',d.cargo);
-  setV('cdr-email',d.emailContacto);setV('cdr-telefono',d.telefono);setV('cdr-sitioWeb',d.sitioWeb);
-  setV('cdr-rubro',d.rubro);setV('cdr-subRubro',d.subRubro);
-  setV('cdr-m2min',d.m2Min||'');setV('cdr-m2max',d.m2Max||'');
+  setV('cdr-nombre',d.nombre);setV('cdr-rubro',d.rubro);setV('cdr-subRubro',d.subRubro);
+  setV('cdr-capturadoPor',d.capturadoPor||d.brokerCreador||'');
   document.getElementById('cdr-categoria').value=d.categoria||'';
-  document.getElementById('cdr-ejecutivo').value=d.ejecutivoComercial||'';
   const buArr=Array.isArray(d.bu)?d.bu:[d.bu].filter(Boolean);
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',buArr.includes(c.dataset.bu));});
+  const gest=Array.isArray(d.gestionadoPor)?d.gestionadoPor:(d.ejecutivoComercial?[d.ejecutivoComercial]:[]);
+  document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',gest.includes(c.dataset.ejec));});
   const setToggle=(field,val)=>{
-    document.querySelectorAll(`.cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{
+    document.querySelectorAll(`#cdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{
       b.classList.toggle('active',b.dataset.value===val);
     });
   };
-  setToggle('clienteColliers',d.clienteColliers);setToggle('propOcup',d.propietarioOcupante);
-  setToggle('esBroker',d.esBroker);setToggle('cuentaCorp',d.cuentaCorporativa);
-  setToggle('esDesarrollador',d.esDesarrollador);setToggle('esAdmin',d.esAdministradora);
+  setToggle('clienteColliers',d.clienteColliers==='Sí'?'Sí':'No');
+  const tipo=d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');
+  setToggle('tipoCuenta',tipo);
+  document.getElementById('cdr-subrubro-field').style.display=isAdmin?'':'none';
   document.querySelector('#cdr-drawer .cdr-title').textContent='Editar Cuenta';
   const btn=document.getElementById('cdr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
 };
@@ -7301,38 +7216,33 @@ window.saveClientDrawer=async function(){
   const btn=document.getElementById('cdr-save-btn');
   btn.textContent='Guardando...';btn.disabled=true;
   try{
-    const m2Min=parseFloat(document.getElementById('cdr-m2min').value)||0;
-    const m2Max=parseFloat(document.getElementById('cdr-m2max').value)||0;
-    const m2RangeLabel=fmtM2Range(m2Min,m2Max);
     const now=firebase.firestore.Timestamp.now();
+    const isAdmin=_cdrIsAdmin();
+    const userName=user?.displayName||user?.email||'';
+    const tipoCuenta=cdrToggleVal('tipoCuenta')||'Ninguno';
     const newData={
       nombre,
-      categoria:document.getElementById('cdr-categoria').value||'',
       clienteColliers:cdrToggleVal('clienteColliers')||'Sí',
-      propietarioOcupante:cdrToggleVal('propOcup')||'Ocupante',
-      contactoPrincipal:cdrVal('cdr-contactoPrincipal')||'',
-      cargo:cdrVal('cdr-cargo')||'',
-      emailContacto:cdrVal('cdr-email')||'',
-      telefono:cdrVal('cdr-telefono')||'',
-      sitioWeb:cdrVal('cdr-sitioWeb')||'',
-      rubro:cdrVal('cdr-rubro')||'',
-      subRubro:cdrVal('cdr-subRubro')||'',
       bu:[...document.querySelectorAll('#cdr-bu-chips .cto-pref-chip.active')].map(c=>c.dataset.bu),
-      esBroker:cdrToggleVal('esBroker')||'No',
-      ejecutivoComercial:document.getElementById('cdr-ejecutivo').value||'',
-      cuentaCorporativa:cdrToggleVal('cuentaCorp')||'No',
-      esDesarrollador:cdrToggleVal('esDesarrollador')||'No',
-      esAdministradora:cdrToggleVal('esAdmin')||'No',
-      m2Min:m2Min||null,
-      m2Max:m2Max||null,
-      m2Range:m2RangeLabel||'',
-      rangoM2:m2RangeLabel?[m2RangeLabel]:[],
+      tipoCuenta,
+      esBroker:tipoCuenta==='Broker'?'Sí':'No',
+      esDesarrollador:tipoCuenta==='Desarrollador'?'Sí':'No',
     };
+    // Campos restringidos a Administradores: solo se escriben si el usuario es admin,
+    // así los usuarios estándar nunca los modifican (ni siquiera al editar).
+    if(isAdmin){
+      newData.categoria=document.getElementById('cdr-categoria').value||'';
+      newData.rubro=cdrVal('cdr-rubro')||'';
+      const gestionadoPor=[...document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip.active')].map(c=>c.dataset.ejec).slice(0,3);
+      newData.gestionadoPor=gestionadoPor;
+      newData.ejecutivoComercial=gestionadoPor[0]||'';
+      if(_cdrEditId)newData.subRubro=cdrVal('cdr-subRubro')||'';
+    }
     if(_cdrEditId){
       const oldD=_crmDocs.find(x=>x._id===_cdrEditId)||{};
-      const labels={nombre:'Nombre',categoria:'Categoría',clienteColliers:'Cliente Colliers',propietarioOcupante:'Prop/Ocup',contactoPrincipal:'Contacto principal',cargo:'Cargo',emailContacto:'Email',telefono:'Teléfono',sitioWeb:'Sitio web',rubro:'Rubro',subRubro:'Sub rubro',esBroker:'Es Ejecutivo Comercial',ejecutivoComercial:'Ejecutivo Comercial',cuentaCorporativa:'Cuenta corporativa',esDesarrollador:'Es Desarrollador',esAdministradora:'Es Administradora'};
+      const labels={nombre:'Nombre',categoria:'Categoría',clienteColliers:'Cliente Colliers',rubro:'Rubro',subRubro:'Sub rubro',bu:'Unidades de negocio',tipoCuenta:'Tipo de cuenta',gestionadoPor:'Gestionado por'};
       const diffs=_diffFields(oldD,newData,labels);
-      const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
+      const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:userName};
       await db.collection('clientes').doc(_cdrEditId).update(updatePayload);
       const idx=_crmDocs.findIndex(d=>d._id===_cdrEditId);
       if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],...updatePayload};
@@ -7345,18 +7255,48 @@ window.saveClientDrawer=async function(){
       openClientDetail(_cdrEditId);
       filterCRM();
     } else {
-      const createData={...newData,pptsGenerados:0,cantidadPPTs:0,estadoRegistro:'activo',brokerCreador:user?.displayName||user?.email||'',fechaCreacion:now,ultimaActividad:now};
+      const createData={...newData,capturadoPor:userName,pptsGenerados:0,cantidadPPTs:0,estadoRegistro:'activo',brokerCreador:userName,fechaCreacion:now,ultimaActividad:now};
       const ref=await db.collection('clientes').add(createData);
       _clientesCache=[];
-      addClientTimeline(ref.id,{tipo:'cliente_creado',descripcion:'Cliente creado'});
+      addClientTimeline(ref.id,{tipo:'cliente_creado',descripcion:'Cuenta creada'});
       const cb=_cdrCallback;
       closeClientDrawer();
-      if(typeof cb==='function')await cb(nombre,ref.id);
+      if(typeof cb==='function'){await cb(nombre,ref.id);}
+      else{
+        _crmDocs.unshift({_id:ref.id,...createData});
+        if(typeof filterCRM==='function')filterCRM();
+        _promptAddContacto(nombre,ref.id);
+      }
     }
   }catch(e){
     alert('Error: '+e.message);
-    btn.textContent=_cdrEditId?'Guardar cambios':'Crear cliente';btn.disabled=false;
+    btn.textContent=_cdrEditId?'Guardar cambios':'Crear cuenta';btn.disabled=false;
   }
+};
+
+let _pendingContactCuenta=null;
+function _promptAddContacto(nombre,cuentaId){
+  _pendingContactCuenta={id:cuentaId,nombre};
+  const prev=document.getElementById('cdr-postcreate-ov');if(prev)prev.remove();
+  const ov=document.createElement('div');
+  ov.id='cdr-postcreate-ov';
+  ov.style.cssText='position:fixed;inset:0;z-index:700;background:rgba(10,27,77,.45);display:flex;align-items:center;justify-content:center;padding:1rem';
+  ov.innerHTML=`<div style="background:#fff;border-radius:16px;padding:2rem 1.75rem;max-width:400px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,7,89,.25)">
+    <div style="width:52px;height:52px;border-radius:50%;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;font-size:26px;color:#16A34A">✓</div>
+    <div style="font-size:17px;font-weight:700;color:#0A1B4D;margin-bottom:.4rem">Cuenta creada</div>
+    <div style="font-size:13px;color:#56648F;margin-bottom:1.5rem;line-height:1.5">“${esc(nombre)}” se creó correctamente.<br>¿Querés agregar el primer contacto asociado?</div>
+    <div style="display:flex;gap:.6rem;justify-content:center">
+      <button onclick="_closePostCreate()" style="height:40px;padding:0 18px;border:1px solid #DDE5F2;border-radius:9px;background:#fff;color:#56648F;font-weight:600;font-family:inherit;font-size:13px;cursor:pointer">Más tarde</button>
+      <button onclick="_goAddContacto()" style="height:40px;padding:0 22px;border:none;border-radius:9px;background:#1C54F4;color:#fff;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer">＋ Agregar contacto</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+window._closePostCreate=function(){const o=document.getElementById('cdr-postcreate-ov');if(o)o.remove();};
+window._goAddContacto=function(){
+  _closePostCreate();
+  const p=_pendingContactCuenta;_pendingContactCuenta=null;
+  if(p&&typeof openContactoDrawer==='function')openContactoDrawer(p.id,p.nombre);
 };
 
 function selectClientByName(nombre){
@@ -7376,7 +7316,7 @@ function openDrawerFromGenerator(){
   });
 }
 
-window.openNewClientModal=()=>openClientDrawer(()=>loadCRM());
+window.openNewClientModal=()=>openClientDrawer((nombre,newId)=>{loadCRM();_promptAddContacto(nombre,newId);});
 
 /* ===== UNIT CRM AUTOCOMPLETE ===== */
 let _duAcState={};
