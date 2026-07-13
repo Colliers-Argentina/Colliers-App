@@ -6540,6 +6540,8 @@ let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente';
 let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null;
 let _cdrRubros=[];        // rubros seleccionados (many-to-many) -> string[]
 let _cdrSubrubros=[];     // subrubros seleccionados -> [{r:rubro, s:subrubro}]
+let _cdrRubroOpts=[];     // opciones actuales del dropdown de rubro (para handlers por índice)
+let _cdrSubOpts=[];       // opciones actuales del dropdown de subrubro (para handlers por índice)
 
 const LEAD_ESTADOS=['Nuevo','Intento de contacto','Contactado','Calificado','Visita coordinada','Visita realizada','Propuesta enviada','Descartado','Convertido'];
 const LEAD_ESTADO_CLS={'Nuevo':'nuevo','Intento de contacto':'intento','Contactado':'contactado','Calificado':'calificado','Visita coordinada':'visita-c','Visita realizada':'visita-r','Propuesta enviada':'propuesta','Descartado':'descartado','Convertido':'convertido'};
@@ -7184,11 +7186,11 @@ const RUBROS_CATALOG={
 
 function _cdrRenderRubroChips(){
   const c=document.getElementById('cdr-rubro-chips');if(!c)return;
-  c.innerHTML=_cdrRubros.map(r=>`<span class="cdr-ms-chip">${esc(r)}<span class="cdr-ms-chip-x" onclick="cdrRemoveRubro(${JSON.stringify(r)})" title="Quitar">✕</span></span>`).join('');
+  c.innerHTML=_cdrRubros.map((r,i)=>`<span class="cdr-ms-chip">${esc(r)}<span class="cdr-ms-chip-x" onclick="cdrRemoveRubroIdx(${i})" title="Quitar">✕</span></span>`).join('');
 }
 function _cdrRenderSubrubroChips(){
   const c=document.getElementById('cdr-subrubro-chips');if(!c)return;
-  c.innerHTML=_cdrSubrubros.map(o=>`<span class="cdr-ms-chip cdr-ms-chip-sub">${esc(o.s)} <small style="opacity:.6;font-weight:500">· ${esc(o.r)}</small><span class="cdr-ms-chip-x" onclick="cdrRemoveSubrubro(${JSON.stringify(o.r)},${JSON.stringify(o.s)})" title="Quitar">✕</span></span>`).join('');
+  c.innerHTML=_cdrSubrubros.map((o,i)=>`<span class="cdr-ms-chip cdr-ms-chip-sub">${esc(o.s)} <small style="opacity:.6;font-weight:500">· ${esc(o.r)}</small><span class="cdr-ms-chip-x" onclick="cdrRemoveSubrubroIdx(${i})" title="Quitar">✕</span></span>`).join('');
 }
 function _cdrUpdateSubrubroVisibility(){
   const f=document.getElementById('cdr-subrubro-field');if(!f)return;
@@ -7209,19 +7211,24 @@ function _cdrSeedRubros(d){
   } else {_cdrSubrubros=[];}
   _cdrRenderRubroChips();_cdrRenderSubrubroChips();_cdrUpdateSubrubroVisibility();
 }
+// Handlers de los items del dropdown y de los chips usan ÍNDICE (entero) en vez de
+// pasar el string por el atributo HTML. Evita romper el atributo cuando el valor
+// contiene comillas/acentos/etc. (causa del bug: JSON.stringify dentro de onmousedown="").
 window.cdrRubroSearch=function(q){
   const drop=document.getElementById('cdr-rubro-drop');if(!drop)return;
   q=(q||'').toLowerCase().trim();
-  const opts=Object.keys(RUBROS_CATALOG).filter(r=>!_cdrRubros.includes(r)&&r.toLowerCase().includes(q));
-  drop.innerHTML=opts.length?opts.map(r=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();cdrAddRubro(${JSON.stringify(r)})">${esc(r)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
+  _cdrRubroOpts=Object.keys(RUBROS_CATALOG).filter(r=>!_cdrRubros.includes(r)&&r.toLowerCase().includes(q));
+  drop.innerHTML=_cdrRubroOpts.length?_cdrRubroOpts.map((r,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();cdrAddRubroIdx(${i})">${esc(r)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
   drop.style.display='block';
 };
+window.cdrAddRubroIdx=function(i){const r=_cdrRubroOpts[i];if(r!=null)cdrAddRubro(r);};
 window.cdrAddRubro=function(r){
   if(!_cdrRubros.includes(r))_cdrRubros.push(r);
   const q=document.getElementById('cdr-rubro-q');if(q)q.value='';
   document.getElementById('cdr-rubro-drop').style.display='none';
   _cdrRenderRubroChips();_cdrUpdateSubrubroVisibility();
 };
+window.cdrRemoveRubroIdx=function(i){const r=_cdrRubros[i];if(r!=null)cdrRemoveRubro(r);};
 window.cdrRemoveRubro=function(r){
   _cdrRubros=_cdrRubros.filter(x=>x!==r);
   _cdrSubrubros=_cdrSubrubros.filter(o=>o.r!==r);   // cascada: elimina subrubros del rubro quitado
@@ -7230,16 +7237,17 @@ window.cdrRemoveRubro=function(r){
 window.cdrSubrubroSearch=function(q){
   const drop=document.getElementById('cdr-subrubro-drop');if(!drop)return;
   q=(q||'').toLowerCase().trim();
-  if(!_cdrRubros.length){drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}
-  const avail=[];
+  if(!_cdrRubros.length){_cdrSubOpts=[];drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}
+  _cdrSubOpts=[];
   _cdrRubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>{
     if(q&&!s.toLowerCase().includes(q))return;
     if(_cdrSubrubros.some(o=>o.r===r&&o.s===s))return;
-    avail.push({r,s});
+    _cdrSubOpts.push({r,s});
   }));
-  drop.innerHTML=avail.length?avail.map(o=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();cdrAddSubrubro(${JSON.stringify(o.r)},${JSON.stringify(o.s)})">${esc(o.s)} <small>· ${esc(o.r)}</small></div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
+  drop.innerHTML=_cdrSubOpts.length?_cdrSubOpts.map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();cdrAddSubIdx(${i})">${esc(o.s)} <small>· ${esc(o.r)}</small></div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
   drop.style.display='block';
 };
+window.cdrAddSubIdx=function(i){const o=_cdrSubOpts[i];if(o)cdrAddSubrubro(o.r,o.s);};
 window.cdrAddSubrubro=function(r,s){
   if(!_cdrRubros.includes(r))return;                       // integridad: rubro debe estar seleccionado
   if(!(RUBROS_CATALOG[r]||[]).includes(s))return;          // integridad: sub debe pertenecer al rubro
@@ -7248,6 +7256,7 @@ window.cdrAddSubrubro=function(r,s){
   document.getElementById('cdr-subrubro-drop').style.display='none';
   _cdrRenderSubrubroChips();
 };
+window.cdrRemoveSubrubroIdx=function(i){const o=_cdrSubrubros[i];if(o)cdrRemoveSubrubro(o.r,o.s);};
 window.cdrRemoveSubrubro=function(r,s){
   _cdrSubrubros=_cdrSubrubros.filter(o=>!(o.r===r&&o.s===s));
   _cdrRenderSubrubroChips();
