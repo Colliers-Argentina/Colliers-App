@@ -2467,6 +2467,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <button class="sb-item" data-mod="analytics" data-submod="tendencias" onclick="_sbItemClick('analytics','tendencias')">Tendencias</button>
         <button class="sb-item" data-mod="analytics" data-submod="rankings" onclick="_sbItemClick('analytics','rankings')">Rankings</button>
         <button class="sb-item" data-mod="analytics" data-submod="cuentas" onclick="_sbItemClick('analytics','cuentas')">Cuentas</button>
+        <button class="sb-item" data-mod="analytics" data-submod="contactos" onclick="_sbItemClick('analytics','contactos')">Contactos</button>
       </div>
     </div>
 
@@ -2737,6 +2738,15 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div id="anc-chips" class="crm-flt-chips" style="margin-bottom:.6rem"></div>
       <div id="anc-kpis" class="anc-tiles"></div>
       <div id="anc-charts" class="anc-charts"><div class="anc-empty" style="padding:1.5rem">Cargando análisis de cuentas...</div></div>
+    </div>
+
+    <!-- ANALYTICS · CONTACTOS (submódulo) -->
+    <div id="an-contactos-section" style="margin-top:1.2rem">
+      <div style="display:flex;align-items:center;gap:.4rem;margin:-.1rem 0 .65rem"><div class="an-card-accent"></div><div class="an-card-title" style="font-size:13px;font-weight:700;color:#0A1B4D">Comercial · Análisis de Contactos</div><div id="antc-subtitle" style="font-size:11px;color:#8898C0;margin-left:.2rem"></div></div>
+      <div id="antc-panel"></div>
+      <div id="antc-chips" class="crm-flt-chips" style="margin-bottom:.6rem"></div>
+      <div id="antc-kpis" class="anc-tiles"></div>
+      <div id="antc-charts" class="anc-charts"><div class="anc-empty" style="padding:1.5rem">Cargando análisis de contactos...</div></div>
     </div>
   </div>
 </div>
@@ -6111,6 +6121,105 @@ window.renderCuentasAnalytics=function(docs,totalBase){
     _ancCard('Top Rubros',_ancBars([...rubM],{max:8}))+
     _ancCard('Cuentas por Ejecutivo',_ancBars([...ejeM],{max:8}))+
     `<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Cuentas creadas por mes (12m)</div>${vbars}</div>`;
+};
+
+// ============================================================================
+//  ANALYTICS · CONTACTOS (submódulo del panel Analytics, admin-only)
+//  Mismo patrón que Cuentas: motor NexusFilters + defs propias (prefijo antc-).
+// ============================================================================
+function _ancMonthlyVbars(docs,field){
+  const base=new Date();base.setDate(1);const months=[];
+  for(let i=11;i>=0;i--){const dt=new Date(base.getFullYear(),base.getMonth()-i,1);months.push({key:dt.getFullYear()+'-'+(dt.getMonth()+1),lbl:dt.toLocaleDateString('es-AR',{month:'short'}),count:0});}
+  const midx={};months.forEach((m,i)=>midx[m.key]=i);
+  docs.forEach(d=>{const t=_tsToDate(d[field]);if(!t)return;const k=t.getFullYear()+'-'+(t.getMonth()+1);if(k in midx)months[midx[k]].count++;});
+  const mmx=Math.max(1,...months.map(m=>m.count));
+  return`<div class="anc-vbars">${months.map(m=>`<div class="anc-vbar-wrap"><div class="anc-vbar-val">${m.count||''}</div><div class="anc-vbar" style="height:${Math.round(m.count/mmx*92)}px" title="${m.lbl}: ${m.count}"></div><div class="anc-vbar-lbl">${m.lbl}</div></div>`).join('')}</div>`;
+}
+const CONTACTO_CARGOS=['CEO','CFO','Compras','Real Estate','Facilities','RRHH','Operaciones','IT','Administración','Marketing','Otro'];
+const _ESTADO_CORREO_LBL={funcional:'🟢 Funcional',sin_comprobar:'🟡 Sin comprobar',rebotado:'🔴 Rebotado'};
+const _ctoEjecutivo=d=>d.ejecutivoComercial||d.brokerResponsable||'';
+const CONTACTOS_FILTER_DEFS=[
+  {key:'text',label:'Texto',multi:false,noChip:true,test:(d,v)=>((d.nombre||'')+' '+(d.apellidos||'')+' '+(d.cuentaNombre||'')).toLowerCase().includes(v.toLowerCase())},
+  {key:'cargo',label:'Cargo',multi:true,test:(d,v)=>v.includes(d.cargo||'')},
+  {key:'estadoCorreo',label:'Correo',multi:false,test:(d,v)=>(d.estadoCorreo||'sin_comprobar')===v,fmt:v=>_ESTADO_CORREO_LBL[v]||v},
+  {key:'propietario',label:'Propietario',multi:false,test:(d,v)=>(d.propietario||'No')===v},
+  {key:'conCuenta',label:'Cuenta',multi:false,test:(d,v)=>v==='Sí'?!!d.cuentaId:!d.cuentaId,fmt:v=>v==='Sí'?'Con cuenta':'Sin cuenta'},
+  {key:'ejecutivo',label:'Ejecutivo',multi:true,test:(d,v)=>v.includes(_ctoEjecutivo(d))},
+];
+let _anCtoDocs=[], _anCtoLoaded=false;
+const _anCtoEngine=createFilterEngine(CONTACTOS_FILTER_DEFS);
+window.NexusFilters.CONTACTOS_FILTER_DEFS=CONTACTOS_FILTER_DEFS;
+let _antcFltOpts={cargo:[],ejecutivo:[]};
+let _antcActiveChips=[];
+const _antcMultiCfg={
+  cargo:{opts:()=>CONTACTO_CARGOS},
+  ejecutivo:{opts:()=>[...new Set([...CRM_EJECUTIVOS,..._anCtoDocs.map(_ctoEjecutivo).filter(Boolean)])].sort()},
+};
+window.loadContactosAnalytics=async function(){
+  const charts=document.getElementById('antc-charts');
+  if(_anCtoLoaded){applyAntcFilters();return;}
+  try{
+    let docs;
+    if(Array.isArray(_ctoDocs)&&_ctoDocs.length){docs=_ctoDocs;}
+    else if(db){const snap=await db.collection('contactos').get();docs=snap.docs.map(d=>({...d.data(),_id:d.id}));}
+    else{if(charts)charts.innerHTML='<div class="anc-empty" style="padding:1.5rem">Firebase no disponible.</div>';return;}
+    _anCtoDocs=docs.filter(d=>(d.estadoRegistro||'activo')!=='archivado');
+    _anCtoLoaded=true;
+    renderAntcPanel();
+    applyAntcFilters();
+  }catch(e){if(charts)charts.innerHTML=`<div class="anc-empty" style="padding:1.5rem">Error al cargar: ${e.message}</div>`;}
+};
+function renderAntcPanel(){
+  const p=document.getElementById('antc-panel');if(!p)return;
+  p.className='crm-flt-panel';p.style.display='grid';
+  const ms=(key,label,ph)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div><div id="antc-flt-${key}-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="antc-flt-${key}-q" class="crm-flt-sel" type="text" placeholder="${ph}" autocomplete="off" oninput="antcFltMultiSearch('${key}',this.value)" onfocus="antcFltMultiSearch('${key}',this.value)" onblur="antcFltMultiBlur('${key}')"><div id="antc-flt-${key}-drop" class="cdr-ms-drop" style="display:none"></div></div></div>`;
+  const sel=(key,label,opts)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div><select id="antc-flt-${key}" class="crm-flt-sel" onchange="antcFltSelect('${key}',this.value)">${opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join('')}</select></div>`;
+  p.innerHTML=
+    `<div class="crm-flt-field"><div class="crm-flt-lbl">Buscar</div><input id="antc-flt-text" class="crm-flt-sel" type="text" placeholder="Nombre, apellido o cuenta..." autocomplete="off" oninput="antcFltText(this.value)"></div>`+
+    ms('cargo','Cargo segmentado','Buscar cargo...')+
+    sel('estadoCorreo','Estado del correo',[{v:'',t:'Todos'},{v:'funcional',t:'🟢 Funcional'},{v:'sin_comprobar',t:'🟡 Sin comprobar'},{v:'rebotado',t:'🔴 Rebotado'}])+
+    sel('propietario','Propietario',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
+    sel('conCuenta','Cuenta asociada',[{v:'',t:'Todos'},{v:'Sí',t:'Con cuenta'},{v:'No',t:'Sin cuenta'}])+
+    ms('ejecutivo','Ejecutivo Comercial','Buscar ejecutivo...');
+  _antcSyncControls();
+}
+function _antcRenderMultiChips(key){const el=document.getElementById('antc-flt-'+key+'-chips');if(!el)return;el.innerHTML=_anCtoEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(v)}<span class="cdr-ms-chip-x" onclick="antcFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');}
+function _antcSyncControls(){const st=_anCtoEngine.state;['estadoCorreo','propietario','conCuenta'].forEach(k=>{const el=document.getElementById('antc-flt-'+k);if(el)el.value=st[k]||'';});['cargo','ejecutivo'].forEach(_antcRenderMultiChips);const t=document.getElementById('antc-flt-text');if(t)t.value=st.text||'';}
+window.antcFltMultiSearch=function(key,q){const drop=document.getElementById('antc-flt-'+key+'-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=_anCtoEngine.state[key];_antcFltOpts[key]=_antcMultiCfg[key].opts().filter(o=>!sel.includes(o)&&o.toLowerCase().includes(q));drop.innerHTML=_antcFltOpts[key].length?_antcFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();antcFltMultiAddIdx('${key}',${i})">${esc(o)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.antcFltMultiAddIdx=function(key,i){const o=_antcFltOpts[key][i];if(o==null)return;const st=_anCtoEngine.state[key];if(!st.includes(o))st.push(o);const inp=document.getElementById('antc-flt-'+key+'-q');if(inp)inp.value='';document.getElementById('antc-flt-'+key+'-drop').style.display='none';_antcRenderMultiChips(key);applyAntcFilters();};
+window.antcFltMultiRemoveIdx=function(key,i){const st=_anCtoEngine.state[key];if(i<0||i>=st.length)return;st.splice(i,1);_antcRenderMultiChips(key);applyAntcFilters();};
+window.antcFltMultiBlur=function(key){setTimeout(()=>{const d=document.getElementById('antc-flt-'+key+'-drop');if(d)d.style.display='none';},150);};
+window.antcFltSelect=function(key,val){_anCtoEngine.state[key]=val;applyAntcFilters();};
+window.antcFltText=function(v){_anCtoEngine.state.text=v;applyAntcFilters();};
+window.antcClearFilters=function(){_anCtoEngine.clear();_antcSyncControls();applyAntcFilters();};
+window.antcRemoveChipIdx=function(i){const c=_antcActiveChips[i];if(!c)return;_anCtoEngine.removeChip(c.key,c.token);_antcSyncControls();applyAntcFilters();};
+function renderAntcChips(){_antcActiveChips=_anCtoEngine.chips();const el=document.getElementById('antc-chips');if(!el)return;el.innerHTML=_antcActiveChips.length?_antcActiveChips.map((c,i)=>`<span class="crm-flt-chip">${esc(c.label)}<span class="crm-flt-chip-x" onclick="antcRemoveChipIdx(${i})">✕</span></span>`).join('')+`<button class="crm-flt-clear" onclick="antcClearFilters()">Limpiar filtros</button>`:'';}
+window.applyAntcFilters=function(){const filtered=_anCtoEngine.apply(_anCtoDocs);renderAntcChips();renderContactosAnalytics(filtered,_anCtoDocs.length);};
+window.renderContactosAnalytics=function(docs,totalBase){
+  const kp=document.getElementById('antc-kpis'),ch=document.getElementById('antc-charts'),st=document.getElementById('antc-subtitle');
+  if(!kp||!ch)return;
+  const total=docs.length;
+  const func=docs.filter(d=>d.estadoCorreo==='funcional').length;
+  const reb=docs.filter(d=>d.estadoCorreo==='rebotado').length;
+  const conCta=docs.filter(d=>!!d.cuentaId).length;
+  const now=Date.now();
+  const d30=docs.filter(d=>{const t=_tsToDate(d.fechaCreacion);return t&&(now-t.getTime())<=30*864e5;}).length;
+  const pct=n=>total?Math.round(n/total*100):0;
+  if(st)st.textContent=(totalBase!=null&&total!==totalBase)?`· ${total} de ${totalBase} (filtro aplicado)`:`· ${total} contactos`;
+  const tile=(v,l,sub)=>`<div class="anc-tile"><div class="anc-tile-v">${v}</div><div class="anc-tile-l">${l}</div>${sub?`<div class="anc-tile-sub">${sub}</div>`:''}</div>`;
+  kp.innerHTML=tile(total,'Contactos')+tile(func,'Emails funcionales',pct(func)+'%')+tile(reb,'Emails rebotados',pct(reb)+'%')+tile(conCta,'Con cuenta asociada',pct(conCta)+'%')+tile(d30,'Nuevos (30 días)');
+  const cargoM=_ancCountBy(docs,d=>d.cargo||'Sin cargo');
+  const correoM=_ancCountBy(docs,d=>_ESTADO_CORREO_LBL[d.estadoCorreo||'sin_comprobar']);
+  const propM=_ancCountBy(docs,d=>d.propietario||'No');
+  const ejeM=_ancCountBy(docs,d=>_ctoEjecutivo(d));
+  const ctaM=_ancCountBy(docs,d=>d.cuentaNombre||'');
+  ch.innerHTML=
+    _ancCard('Por Cargo segmentado',_ancBars([...cargoM],{max:8}))+
+    _ancCard('Estado del correo',_ancBars([...correoM],{order:[_ESTADO_CORREO_LBL.funcional,_ESTADO_CORREO_LBL.sin_comprobar,_ESTADO_CORREO_LBL.rebotado]}))+
+    _ancCard('Propietario de inmueble',_ancBars([...propM],{order:['Sí','No']}))+
+    _ancCard('Por Ejecutivo Comercial',_ancBars([...ejeM],{max:8}))+
+    _ancCard('Top Cuentas por contactos',_ancBars([...ctaM],{max:8}))+
+    `<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Contactos creados por mes (12m)</div>${_ancMonthlyVbars(docs,'fechaCreacion')}</div>`;
 };
 
 function renderCRMKPIs(docs){
@@ -10083,8 +10192,8 @@ const _anCharts={};
 let _anDocs=[];
 let _anPendingScroll=null;
 let _anActiveSubmod='intel';
-const _AN_SCROLL={intel:'an-kpis',heatmaps:'an-demand-heatmap-card',brokers:'an-brokers-dash-card',tendencias:'an-tend-card',rankings:'an-leads-section',cuentas:'an-cuentas-section'};
-const _AN_TITLES={intel:'Inteligencia Comercial',heatmaps:'Heatmaps',brokers:'Dashboard Brokers',tendencias:'Tendencias',rankings:'Rankings',cuentas:'Cuentas'};
+const _AN_SCROLL={intel:'an-kpis',heatmaps:'an-demand-heatmap-card',brokers:'an-brokers-dash-card',tendencias:'an-tend-card',rankings:'an-leads-section',cuentas:'an-cuentas-section',contactos:'an-contactos-section'};
+const _AN_TITLES={intel:'Inteligencia Comercial',heatmaps:'Heatmaps',brokers:'Dashboard Brokers',tendencias:'Tendencias',rankings:'Rankings',cuentas:'Cuentas',contactos:'Contactos'};
 const ANALYTICS_ALLOWED=['mazaretto@gmail.com','matias.azaretto@colliers.com','colliers.arg@gmail.com','desarrollo@colliers.com.ar'];
 const _anFilters={periodo:0,zonas:new Set(),ejecutivo:'',edificio:'',m2min:0,m2max:0};
 
@@ -10997,9 +11106,10 @@ function _anGoTo(submod){
   _anActiveSubmod=submod;
   const titleEl=document.getElementById('an-page-title');
   if(titleEl)titleEl.textContent='Analítica · '+(_AN_TITLES[submod]||'Analytics');
-  // La filter-bar de edificios no aplica a Cuentas: se oculta en ese submódulo.
-  const fbar=document.getElementById('an-fbar');if(fbar)fbar.style.display=(submod==='cuentas')?'none':'';
+  // La filter-bar de edificios no aplica a Cuentas/Contactos: se oculta ahí.
+  const fbar=document.getElementById('an-fbar');if(fbar)fbar.style.display=(submod==='cuentas'||submod==='contactos')?'none':'';
   if(submod==='cuentas')loadCuentasAnalytics();
+  if(submod==='contactos')loadContactosAnalytics();
   document.querySelectorAll('#sb-nav .sb-item[data-mod="analytics"]').forEach(el=>el.classList.remove('active'));
   const sbBtn=document.querySelector(`#sb-nav .sb-item[data-mod="analytics"][data-submod="${submod}"]`);
   if(sbBtn)sbBtn.classList.add('active');
