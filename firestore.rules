@@ -1,0 +1,97 @@
+rules_version = '2';
+
+// =============================================================================
+//  Colliers Nexus — Firestore Security Rules
+//  Foco: colección `clientes` (Cuentas del CRM) — integridad de Rubro/Subrubro
+//        y base para el refuerzo de permisos por rol.
+//
+//  ⚠️  CONTEXTO IMPORTANTE — LEER ANTES DE DEPLOYAR
+//  • La app se autentica con Google Identity Services (GSI) en el cliente, pero
+//    NO inicia sesión en Firebase Auth (no hay signInWithCredential). Por eso,
+//    para Firestore las peticiones llegan SIN `request.auth`.
+//  • En consecuencia, las reglas basadas en `request.auth` (identificar al
+//    usuario / saber si es admin) NO funcionan hoy: bloquearían la app entera.
+//  • Este archivo trae DOS variantes:
+//        SECCIÓN A (ACTIVA)  → valida la INTEGRIDAD de rubros/subrubros SIN
+//                              requerir auth. Es segura para deployar ya.
+//        SECCIÓN B (comentada, RECOMENDADA) → enforcement de PERMISOS por rol
+//                              (admin). Requiere integrar Firebase Auth primero.
+//  • Limitación del lenguaje de reglas: no permite iterar listas. Por eso la
+//    relación "cada subrubro pertenece a un rubro seleccionado" se valida en el
+//    CLIENTE al escribir (función _cdrValidSubrubros en index.html). Acá sólo se
+//    validan tipos, estructura y tamaños.
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Validación de integridad de una Cuenta (no requiere auth) ----
+    function validCuentaData(data) {
+      return (!('rubros' in data)        || (data.rubros is list && data.rubros.size() <= 30))
+          && (!('subrubros' in data)     || (data.subrubros is list && data.subrubros.size() <= 100))
+          && (!('bu' in data)            || data.bu is list)
+          && (!('gestionadoPor' in data) || (data.gestionadoPor is list && data.gestionadoPor.size() <= 3))
+          && (!('categoria' in data)     || data.categoria is string)
+          && (!('rubro' in data)         || data.rubro is string)
+          && (!('subRubro' in data)      || data.subRubro is string)
+          && (!('tipoCuenta' in data)    || data.tipoCuenta in ['Broker','Desarrollador','Ninguno'])
+          && (!('nombre' in data)        || (data.nombre is string && data.nombre.size() > 0));
+    }
+
+    // ============ SECCIÓN A — ACTIVA (sin Firebase Auth) =====================
+    match /clientes/{cuentaId} {
+      allow read:          if true;
+      allow create, update: if validCuentaData(request.resource.data);
+      allow delete:        if true;
+    }
+
+    // Resto de colecciones: se preserva el acceso actual de la app.
+    // (Endurecer cuando se integre Firebase Auth — ver SECCIÓN B.)
+    match /contactos/{id}         { allow read, write: if true; }
+    match /contactoTimeline/{id}  { allow read, write: if true; }
+    match /buildings/{id}         { allow read, write: if true;
+      match /{sub=**}             { allow read, write: if true; } }
+    match /leads/{id}             { allow read, write: if true;
+      match /{sub=**}             { allow read, write: if true; } }
+    match /descargas/{id}         { allow read, write: if true; }
+    match /transacciones/{id}     { allow read, write: if true; }
+    match /timeline/{id}          { allow read, write: if true; }
+    match /history/{id}           { allow read, write: if true; }
+    match /sheets/{id}            { allow read, write: if true; }
+    match /feedback/{id}          { allow read, write: if true; }
+
+    // ============ SECCIÓN B — RECOMENDADA (requiere Firebase Auth) ============
+    // Para activarla:
+    //   1) En index.html, tras el login GSI, hacer sign-in en Firebase Auth:
+    //        const cred = firebase.auth.GoogleAuthProvider.credential(id_token);
+    //        await firebase.auth().signInWithCredential(cred);
+    //   2) Reemplazar el bloque `match /clientes/...` de la SECCIÓN A por este.
+    //
+    // function isSignedIn() { return request.auth != null; }
+    // function userEmail()  { return request.auth.token.email; }
+    // function isAdmin() {
+    //   return isSignedIn() && userEmail() in [
+    //     'mazaretto@gmail.com',
+    //     'matias.azaretto@colliers.com',
+    //     'colliers.arg@gmail.com',
+    //     'desarrollo@colliers.com.ar'
+    //   ];
+    // }
+    // // Campos que SÓLO un admin puede crear o modificar en una Cuenta:
+    // function restrictedFields() {
+    //   return ['categoria','rubro','subRubro','rubros','subrubros',
+    //           'gestionadoPor','ejecutivoComercial'];
+    // }
+    // match /clientes/{cuentaId} {
+    //   allow read:   if isSignedIn();
+    //   allow create: if isSignedIn() && validCuentaData(request.resource.data)
+    //                 && ( isAdmin() ||
+    //                      !request.resource.data.keys().hasAny(restrictedFields()) );
+    //   allow update: if isSignedIn() && validCuentaData(request.resource.data)
+    //                 && ( isAdmin() ||
+    //                      !request.resource.data.diff(resource.data)
+    //                        .affectedKeys().hasAny(restrictedFields()) );
+    //   allow delete: if isAdmin();
+    // }
+  }
+}

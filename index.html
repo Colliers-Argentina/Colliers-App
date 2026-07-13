@@ -7161,7 +7161,9 @@ window.cdrToggle=function(btn){
 
 function _cdrIsAdmin(){return ANALYTICS_ALLOWED.includes(user?.email);}
 
-// ===== Catálogo Rubro -> Subrubros (editable; agregar entradas NO requiere tocar lógica) =====
+// ===== Catálogo Rubro -> Subrubros — PROVISORIO =====
+// Reemplazar por la taxonomía oficial de Colliers cuando esté disponible.
+// Es data-driven: agregar/quitar rubros o subrubros NO requiere tocar la lógica.
 const RUBROS_CATALOG={
   'Tecnología':['Software','Fintech','Hardware','Telecomunicaciones','E-commerce','Ciberseguridad','Datacenter'],
   'Servicios Financieros':['Banco','Seguros','Fondos de Inversión','Medios de Pago','Financiera'],
