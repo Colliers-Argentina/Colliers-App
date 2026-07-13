@@ -3142,46 +3142,6 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div class="cdr-lbl">LinkedIn</div>
           <input id="ctdr-linkedin" class="cdr-input" type="url" placeholder="https://linkedin.com/in/...">
         </div>
-      </div>
-
-      <!-- 3 · Perfil Comercial -->
-      <div class="cdr-section">
-        <div class="cdr-section-hd">
-          <div class="cdr-section-num">3</div>
-          <div class="cdr-section-name">Perfil Comercial</div>
-          <div class="cdr-section-line"></div>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Inversor</div>
-          <div class="cdr-toggle-group">
-            <button type="button" class="cdr-toggle-btn" data-field="ctdrInversor" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
-            <button type="button" class="cdr-toggle-btn active" data-field="ctdrInversor" data-value="No" data-default onclick="cdrToggle(this)">No</button>
-          </div>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Preferencia de inversión (multiselección)</div>
-          <div class="cdr-toggle-group" id="ctdr-prefs">
-            <button type="button" class="cto-pref-chip" data-pref="Oficinas" onclick="ctdrTogglePref(this)">Oficinas</button>
-            <button type="button" class="cto-pref-chip" data-pref="Industrial" onclick="ctdrTogglePref(this)">Industrial</button>
-            <button type="button" class="cto-pref-chip" data-pref="Retail" onclick="ctdrTogglePref(this)">Retail</button>
-            <button type="button" class="cto-pref-chip" data-pref="Logística" onclick="ctdrTogglePref(this)">Logística</button>
-            <button type="button" class="cto-pref-chip" data-pref="Terrenos" onclick="ctdrTogglePref(this)">Terrenos</button>
-            <button type="button" class="cto-pref-chip" data-pref="Residencial" onclick="ctdrTogglePref(this)">Residencial</button>
-            <button type="button" class="cto-pref-chip" data-pref="Hotelería" onclick="ctdrTogglePref(this)">Hotelería</button>
-          </div>
-        </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Volumen de inversión</div>
-          <select id="ctdr-volumen" class="cdr-select">
-            <option value="">Sin información</option>
-            <option>Menos de USD 1M</option>
-            <option>USD 1M - 5M</option>
-            <option>USD 5M - 10M</option>
-            <option>USD 10M - 25M</option>
-            <option>USD 25M - 50M</option>
-            <option>Más de USD 50M</option>
-          </select>
-        </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Ejecutivo Comercial responsable</div>
           <select id="ctdr-ejecutivo" class="cdr-select">
@@ -3199,7 +3159,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <!-- 4 · Comentarios -->
       <div class="cdr-section">
         <div class="cdr-section-hd">
-          <div class="cdr-section-num">4</div>
+          <div class="cdr-section-num">3</div>
           <div class="cdr-section-name">Comentarios</div>
           <div class="cdr-section-line"></div>
         </div>
@@ -6114,12 +6074,10 @@ function renderContactosKPIs(docs){
   const total=docs.length;
   const funcionales=docs.filter(d=>d.estadoCorreo==='funcional').length;
   const rebotados=docs.filter(d=>d.estadoCorreo==='rebotado').length;
-  const inversores=docs.filter(d=>d.inversor==='Sí').length;
   row.innerHTML=`
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">👤</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Contactos totales</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">🟢</div><div class="crm-kpi-data"><div class="crm-kpi-v">${funcionales}</div><div class="crm-kpi-l">Emails funcionales</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FEF2F2">🔴</div><div class="crm-kpi-data"><div class="crm-kpi-v">${rebotados}</div><div class="crm-kpi-l">Emails rebotados</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FFF7EC">💼</div><div class="crm-kpi-data"><div class="crm-kpi-v">${inversores}</div><div class="crm-kpi-l">Inversores</div></div></div>
   `;
 }
 
@@ -6159,7 +6117,6 @@ function openContactoDetail(docId){
   const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
   const bg=crmAvatarBg(fullname);
   const ini=crmInitials(fullname);
-  const prefs=(d.prefsInversion||[]).map(p=>`<span class="crm-tag">${p}</span>`).join('')||'–';
   document.getElementById('cto-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       <div class="crm-det-av" style="background:${bg};border-radius:50%">${ini}</div>
@@ -6177,7 +6134,6 @@ function openContactoDetail(docId){
   document.getElementById('cto-det-right').innerHTML=`
     <div class="crm-det-tabs">
       <button class="crm-det-tab active" onclick="ctoDetTab(this,'cto-dt-info')">Información</button>
-      <button class="crm-det-tab" onclick="ctoDetTab(this,'cto-dt-comercial')">Perfil Comercial</button>
       <button class="crm-det-tab" onclick="ctoDetTab(this,'cto-dt-inventario');loadContactoInventario('${docId}')">Inventario</button>
     </div>
     <div class="crm-det-tab-body">
@@ -6203,18 +6159,6 @@ function openContactoDetail(docId){
             </div>
           </div>
           ${d.comentarios?`<div><div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.65;white-space:pre-wrap">${d.comentarios}</div></div>`:''}
-        </div>
-      </div>
-      <div id="cto-dt-comercial" style="display:none">
-        <div style="display:flex;flex-direction:column;gap:1.2rem">
-          <div>
-            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Perfil de Inversión</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inversor</div><div class="crm-det-meta-val">${d.inversor||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Volumen</div><div class="crm-det-meta-val">${d.volumenInversion||'Sin información'}</div></div>
-              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">Preferencias</div><div class="crm-tags" style="margin-top:.3rem">${prefs}</div></div>
-            </div>
-          </div>
         </div>
       </div>
       <div id="cto-dt-inventario" style="display:none">
@@ -6392,7 +6336,7 @@ window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
   _ctdrEditId=null;
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-interno','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['ctdr-cargo','ctdr-estadoCorreo','ctdr-volumen','ctdr-ejecutivo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
+  ['ctdr-cargo','ctdr-estadoCorreo','ctdr-ejecutivo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
   document.getElementById('ctdr-cuentaId').value='';
   document.getElementById('ctdr-cuentaNombre').value='';
   document.getElementById('ctdr-comentarios').value='';
@@ -6401,7 +6345,6 @@ window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
     document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
-  document.querySelectorAll('#ctdr-prefs .cto-pref-chip').forEach(c=>c.classList.remove('active'));
   if(prefillCuentaId&&prefillCuentaNombre){
     document.getElementById('ctdr-cuentaId').value=prefillCuentaId;
     document.getElementById('ctdr-cuentaNombre').value=prefillCuentaNombre;
@@ -6427,14 +6370,11 @@ window.openContactoDrawer_edit=function(docId){
   set('ctdr-linkedin',d.linkedin);set('ctdr-comentarios',d.comentarios);
   document.getElementById('ctdr-cargo').value=d.cargo||'';
   document.getElementById('ctdr-estadoCorreo').value=d.estadoCorreo||'sin_comprobar';
-  document.getElementById('ctdr-volumen').value=d.volumenInversion||'';
   document.getElementById('ctdr-ejecutivo').value=d.ejecutivoComercial||'';
   const setToggle=(field,val)=>{
     document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{b.classList.toggle('active',b.dataset.value===val);});
   };
-  setToggle('ctdrPropietario',d.propietario);setToggle('ctdrInversor',d.inversor);
-  const prefs=d.prefsInversion||[];
-  document.querySelectorAll('#ctdr-prefs .cto-pref-chip').forEach(c=>{c.classList.toggle('active',prefs.includes(c.dataset.pref));});
+  setToggle('ctdrPropietario',d.propietario);
   document.querySelector('#ctdr-drawer .cdr-title').textContent='Editar Contacto';
   const btn=document.getElementById('ctdr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
 };
@@ -6464,7 +6404,6 @@ window.ctdrSelectCuenta=function(id,nombre){
   _ctdrAccountSelected=true;
 };
 
-window.ctdrTogglePref=function(btn){btn.classList.toggle('active');};
 
 window.saveContactoDrawer=async function(){
   const nombre=(document.getElementById('ctdr-nombre').value||'').trim();
@@ -6481,7 +6420,6 @@ window.saveContactoDrawer=async function(){
   const btn=document.getElementById('ctdr-save-btn');
   btn.textContent='Guardando...';btn.disabled=true;
   try{
-    const prefs=[...document.querySelectorAll('#ctdr-prefs .cto-pref-chip.active')].map(c=>c.dataset.pref);
     const now=firebase.firestore.Timestamp.now();
     const newData={
       cuentaId:document.getElementById('ctdr-cuentaId').value||'',
@@ -6494,15 +6432,12 @@ window.saveContactoDrawer=async function(){
       telefono:(document.getElementById('ctdr-telefono').value||'').trim(),
       interno:(document.getElementById('ctdr-interno').value||'').trim(),
       linkedin:(document.getElementById('ctdr-linkedin').value||'').trim(),
-      inversor:cdrToggleVal('ctdrInversor')||'No',
-      prefsInversion:prefs,
-      volumenInversion:document.getElementById('ctdr-volumen').value||'',
       ejecutivoComercial:document.getElementById('ctdr-ejecutivo').value||'',
       comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
     };
     if(_ctdrEditId){
       const oldD=_ctoDocs.find(x=>x._id===_ctdrEditId)||{};
-      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',inversor:'Inversor',cuentaNombre:'Cuenta',ejecutivoComercial:'Ejecutivo Comercial'};
+      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',cuentaNombre:'Cuenta',ejecutivoComercial:'Ejecutivo Comercial'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('contactos').doc(_ctdrEditId).update(updatePayload);
@@ -7035,7 +6970,6 @@ window.executeLeadConversion=async function(){
       comentarios:lead.comentarios||'',
       brokerResponsable:lead.brokerAsignado||user?.displayName||'',
       fechaCreacion:now,ultimoContacto:now,ultimaActividad:now,
-      inversor:'No',prefsInversion:[],
     });
     await db.collection('leads').doc(_currentLeadId).update({estado:'Convertido',contactoId:contactRef.id,cuentaId,ultimaActividad:now});
     await addLeadTimeline(_currentLeadId,{tipo:'convertido',descripcion:`Convertido → Contacto${cuentaNombre?' en '+cuentaNombre:''}`});
