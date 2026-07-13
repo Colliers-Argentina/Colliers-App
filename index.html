@@ -2232,6 +2232,33 @@ body.dark .crm-flt-chip{background:rgba(77,147,255,.16);color:#8FC0FF;border-col
 .crm-flt-chip-x:hover{color:#ED1B34}
 .crm-flt-clear{background:none;border:none;color:#ED1B34;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;padding:3px 6px;border-radius:6px}
 .crm-flt-clear:hover{background:rgba(237,27,52,.08)}
+/* ===== Analytics · Cuentas (stat tiles + barras 1 serie) ===== */
+.anc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.65rem;margin-bottom:.9rem}
+.anc-tile{background:#fff;border:1px solid #E7EDF7;border-radius:12px;padding:.85rem 1rem}
+body.dark .anc-tile{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
+.anc-tile-v{font-size:25px;font-weight:800;color:#0A1B4D;line-height:1.05}
+body.dark .anc-tile-v{color:#fff}
+.anc-tile-l{font-size:11px;font-weight:600;color:#56648F;margin-top:.2rem}
+.anc-tile-sub{font-size:11px;font-weight:700;color:#1C54F4;margin-top:.15rem}
+.anc-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:.75rem}
+.anc-chart-card{background:#fff;border:1px solid #E7EDF7;border-radius:12px;padding:.9rem 1rem}
+body.dark .anc-chart-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
+.anc-chart-title{font-size:12px;font-weight:700;color:#0A1B4D;margin-bottom:.75rem}
+body.dark .anc-chart-title{color:#e0eaff}
+.anc-bar-row{display:grid;grid-template-columns:118px 1fr auto;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.anc-bar-lbl{font-size:11.5px;color:#56648F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.anc-bar-track{height:9px;background:#EEF2FA;border-radius:5px;overflow:hidden}
+body.dark .anc-bar-track{background:rgba(255,255,255,.07)}
+.anc-bar-fill{height:100%;background:#1C54F4;border-radius:5px;min-width:2px}
+.anc-bar-val{font-size:11.5px;font-weight:700;color:#0A1B4D;min-width:22px;text-align:right}
+body.dark .anc-bar-val{color:#e0eaff}
+.anc-empty{font-size:12px;color:#8898C0}
+.anc-vbars{display:flex;align-items:flex-end;gap:.35rem;height:130px;padding-top:.5rem}
+.anc-vbar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.2rem;min-width:0}
+.anc-vbar{width:70%;max-width:26px;background:#1C54F4;border-radius:4px 4px 0 0;min-height:2px}
+.anc-vbar-lbl{font-size:9px;color:#8898C0;white-space:nowrap}
+.anc-vbar-val{font-size:9.5px;font-weight:700;color:#0A1B4D;height:12px}
+body.dark .anc-vbar-val{color:#e0eaff}
 .cdr-row{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
 .cdr-toggle-group{display:flex;gap:.3rem;flex-wrap:wrap}
 .cdr-toggle-btn{padding:5px 13px;border:1.5px solid #E2E8F5;border-radius:7px;font-size:12px;font-weight:600;color:#56648F;background:none;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap;line-height:1.4}
@@ -2439,6 +2466,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <button class="sb-item" data-mod="analytics" data-submod="brokers" onclick="_sbItemClick('analytics','brokers')">Dashboard Brokers</button>
         <button class="sb-item" data-mod="analytics" data-submod="tendencias" onclick="_sbItemClick('analytics','tendencias')">Tendencias</button>
         <button class="sb-item" data-mod="analytics" data-submod="rankings" onclick="_sbItemClick('analytics','rankings')">Rankings</button>
+        <button class="sb-item" data-mod="analytics" data-submod="cuentas" onclick="_sbItemClick('analytics','cuentas')">Cuentas</button>
       </div>
     </div>
 
@@ -2700,6 +2728,15 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ranking Ejecutivos Comerciales</div></div><div class="an-card-body" id="an-leads-brokers" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
         <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Motivos de Descarte</div></div><div class="an-card-body" id="an-leads-descarte" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
       </div>
+    </div>
+
+    <!-- ANALYTICS · CUENTAS (submódulo) -->
+    <div id="an-cuentas-section" style="margin-top:1.2rem">
+      <div style="display:flex;align-items:center;gap:.4rem;margin:-.1rem 0 .65rem"><div class="an-card-accent"></div><div class="an-card-title" style="font-size:13px;font-weight:700;color:#0A1B4D">Comercial · Análisis de Cuentas</div><div id="anc-subtitle" style="font-size:11px;color:#8898C0;margin-left:.2rem"></div></div>
+      <div id="anc-panel"></div>
+      <div id="anc-chips" class="crm-flt-chips" style="margin-bottom:.6rem"></div>
+      <div id="anc-kpis" class="anc-tiles"></div>
+      <div id="anc-charts" class="anc-charts"><div class="anc-empty" style="padding:1.5rem">Cargando análisis de cuentas...</div></div>
     </div>
   </div>
 </div>
@@ -5978,6 +6015,103 @@ function filterCRM(){
     ?`${filtered.length} de ${base.length} cuenta${base.length!==1?'s':''}`
     :`${base.length} cuenta${base.length!==1?'s':''} registradas`;
 }
+
+// ============================================================================
+//  ANALYTICS · CUENTAS (submódulo del panel Analytics, admin-only)
+//  Reutiliza el motor NexusFilters + CUENTAS_FILTER_DEFS con su propia UI (anc-).
+// ============================================================================
+let _anCtaDocs=[], _anCtaLoaded=false;
+const _anCtaEngine=createFilterEngine(CUENTAS_FILTER_DEFS);
+let _ancFltOpts={rubros:[],subrubros:[],gestionadoPor:[],capturadoPor:[]};
+let _ancActiveChips=[];
+const _ancMultiCfg={
+  rubros:{opts:()=>Object.keys(RUBROS_CATALOG)},
+  subrubros:{needsRubro:true,opts:()=>{const s=new Set();_anCtaEngine.state.rubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(x=>s.add(x)));return[...s];}},
+  gestionadoPor:{opts:()=>CRM_EJECUTIVOS},
+  capturadoPor:{opts:()=>[...new Set(_anCtaDocs.map(d=>d.capturadoPor||d.brokerCreador).filter(Boolean))].sort()},
+};
+window.loadCuentasAnalytics=async function(){
+  const charts=document.getElementById('anc-charts');
+  if(_anCtaLoaded){applyAncFilters();return;}
+  try{
+    let docs;
+    if(Array.isArray(_crmDocs)&&_crmDocs.length){docs=_crmDocs;}
+    else if(db){const snap=await db.collection('clientes').get();docs=snap.docs.map(d=>({...d.data(),_id:d.id}));}
+    else{if(charts)charts.innerHTML='<div class="anc-empty" style="padding:1.5rem">Firebase no disponible.</div>';return;}
+    _anCtaDocs=docs.filter(d=>(d.estadoRegistro||'activo')!=='archivado');
+    _anCtaLoaded=true;
+    renderAncPanel();
+    applyAncFilters();
+  }catch(e){if(charts)charts.innerHTML=`<div class="anc-empty" style="padding:1.5rem">Error al cargar: ${e.message}</div>`;}
+};
+function renderAncPanel(){
+  const p=document.getElementById('anc-panel');if(!p)return;
+  p.className='crm-flt-panel';p.style.display='grid';
+  const ms=(key,label,ph)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div><div id="anc-flt-${key}-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="anc-flt-${key}-q" class="crm-flt-sel" type="text" placeholder="${ph}" autocomplete="off" oninput="ancFltMultiSearch('${key}',this.value)" onfocus="ancFltMultiSearch('${key}',this.value)" onblur="ancFltMultiBlur('${key}')"><div id="anc-flt-${key}-drop" class="cdr-ms-drop" style="display:none"></div></div></div>`;
+  const sel=(key,label,opts)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div><select id="anc-flt-${key}" class="crm-flt-sel" onchange="ancFltSelect('${key}',this.value)">${opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join('')}</select></div>`;
+  p.innerHTML=
+    `<div class="crm-flt-field"><div class="crm-flt-lbl">Buscar</div><input id="anc-flt-text" class="crm-flt-sel" type="text" placeholder="Nombre..." autocomplete="off" oninput="ancFltText(this.value)"></div>`+
+    ms('rubros','Rubro','Buscar rubro...')+ms('subrubros','Subrubro','Según rubros...')+
+    sel('clienteColliers','Cliente Colliers',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
+    sel('categoria','Categoría',[{v:'',t:'Todas'},{v:'Top',t:'Top'},{v:'A',t:'A'},{v:'B',t:'B'},{v:'C',t:'C'},{v:'No aplica',t:'No aplica'}])+
+    sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Broker',t:'Broker'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
+    `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="anc-flt-bu">${['Oficinas','Industria','Retail'].map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="ancFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
+    ms('gestionadoPor','Gestionado por','Buscar ejecutivo...')+ms('capturadoPor','Capturado por','Buscar usuario...');
+  _ancSyncControls();
+}
+function _ancRenderMultiChips(key){const el=document.getElementById('anc-flt-'+key+'-chips');if(!el)return;el.innerHTML=_anCtaEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(v)}<span class="cdr-ms-chip-x" onclick="ancFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');}
+function _ancSyncControls(){const st=_anCtaEngine.state;['clienteColliers','categoria','tipoCuenta'].forEach(k=>{const el=document.getElementById('anc-flt-'+k);if(el)el.value=st[k]||'';});['rubros','subrubros','gestionadoPor','capturadoPor'].forEach(_ancRenderMultiChips);document.querySelectorAll('#anc-flt-bu .cto-pref-chip').forEach(b=>b.classList.toggle('active',st.bu.includes(b.dataset.bu)));const t=document.getElementById('anc-flt-text');if(t)t.value=st.text||'';}
+window.ancFltMultiSearch=function(key,q){const drop=document.getElementById('anc-flt-'+key+'-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const cfg=_ancMultiCfg[key];if(cfg.needsRubro&&!_anCtaEngine.state.rubros.length){_ancFltOpts[key]=[];drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}const sel=_anCtaEngine.state[key];_ancFltOpts[key]=cfg.opts().filter(o=>!sel.includes(o)&&o.toLowerCase().includes(q));drop.innerHTML=_ancFltOpts[key].length?_ancFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ancFltMultiAddIdx('${key}',${i})">${esc(o)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.ancFltMultiAddIdx=function(key,i){const o=_ancFltOpts[key][i];if(o==null)return;const st=_anCtaEngine.state[key];if(!st.includes(o))st.push(o);const inp=document.getElementById('anc-flt-'+key+'-q');if(inp)inp.value='';document.getElementById('anc-flt-'+key+'-drop').style.display='none';_ancRenderMultiChips(key);if(key==='rubros')_ancRenderMultiChips('subrubros');applyAncFilters();};
+window.ancFltMultiRemoveIdx=function(key,i){const st=_anCtaEngine.state[key];if(i<0||i>=st.length)return;st.splice(i,1);if(key==='rubros'){const av=new Set();st.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>av.add(s)));_anCtaEngine.state.subrubros=_anCtaEngine.state.subrubros.filter(s=>av.has(s));_ancRenderMultiChips('subrubros');}_ancRenderMultiChips(key);applyAncFilters();};
+window.ancFltMultiBlur=function(key){setTimeout(()=>{const d=document.getElementById('anc-flt-'+key+'-drop');if(d)d.style.display='none';},150);};
+window.ancFltSelect=function(key,val){_anCtaEngine.state[key]=val;applyAncFilters();};
+window.ancFltToggleBU=function(btn){const v=btn.dataset.bu;const st=_anCtaEngine.state.bu;const i=st.indexOf(v);if(i>=0)st.splice(i,1);else st.push(v);btn.classList.toggle('active');applyAncFilters();};
+window.ancFltText=function(v){_anCtaEngine.state.text=v;applyAncFilters();};
+window.ancClearFilters=function(){_anCtaEngine.clear();_ancSyncControls();applyAncFilters();};
+window.ancRemoveChipIdx=function(i){const c=_ancActiveChips[i];if(!c)return;_anCtaEngine.removeChip(c.key,c.token);if(c.key==='rubros'){const av=new Set();_anCtaEngine.state.rubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>av.add(s)));_anCtaEngine.state.subrubros=_anCtaEngine.state.subrubros.filter(s=>av.has(s));}_ancSyncControls();applyAncFilters();};
+function renderAncChips(){_ancActiveChips=_anCtaEngine.chips();const el=document.getElementById('anc-chips');if(!el)return;el.innerHTML=_ancActiveChips.length?_ancActiveChips.map((c,i)=>`<span class="crm-flt-chip">${esc(c.label)}<span class="crm-flt-chip-x" onclick="ancRemoveChipIdx(${i})">✕</span></span>`).join('')+`<button class="crm-flt-clear" onclick="ancClearFilters()">Limpiar filtros</button>`:'';}
+window.applyAncFilters=function(){const filtered=_anCtaEngine.apply(_anCtaDocs);renderAncChips();renderCuentasAnalytics(filtered,_anCtaDocs.length);};
+
+// --- Agregación + barras (1 serie, magnitud → un solo hue) ---
+function _ancCountBy(docs,fn){const m=new Map();docs.forEach(d=>{const v=fn(d);(Array.isArray(v)?v:[v]).forEach(k=>{if(k==null||k==='')return;m.set(k,(m.get(k)||0)+1);});});return m;}
+function _ancBars(entries,opt){opt=opt||{};let arr=[...entries];if(opt.order)arr.sort((a,b)=>{const ia=opt.order.indexOf(a[0]),ib=opt.order.indexOf(b[0]);return(ia<0?99:ia)-(ib<0?99:ib);});else arr.sort((a,b)=>b[1]-a[1]);if(opt.max)arr=arr.slice(0,opt.max);if(!arr.length)return'<div class="anc-empty">Sin datos</div>';const mx=Math.max(1,...arr.map(e=>e[1]));return arr.map(([l,c])=>`<div class="anc-bar-row"><div class="anc-bar-lbl" title="${esc(String(l))}">${esc(String(l))}</div><div class="anc-bar-track"><div class="anc-bar-fill" style="width:${Math.round(c/mx*100)}%"></div></div><div class="anc-bar-val">${c}</div></div>`).join('');}
+function _ancCard(title,inner){return`<div class="anc-chart-card"><div class="anc-chart-title">${title}</div>${inner}</div>`;}
+window.renderCuentasAnalytics=function(docs,totalBase){
+  const kp=document.getElementById('anc-kpis'),ch=document.getElementById('anc-charts'),st=document.getElementById('anc-subtitle');
+  if(!kp||!ch)return;
+  const total=docs.length;
+  const cli=docs.filter(d=>d.clienteColliers==='Sí').length;
+  const now=Date.now();
+  const d30=docs.filter(d=>{const t=_tsToDate(d.fechaCreacion);return t&&(now-t.getTime())<=30*864e5;}).length;
+  const ppts=docs.reduce((s,d)=>s+(d.cantidadPPTs||0),0);
+  const conEjec=docs.filter(d=>_docGestion(d).length).length;
+  const pct=n=>total?Math.round(n/total*100):0;
+  if(st)st.textContent=(totalBase!=null&&total!==totalBase)?`· ${total} de ${totalBase} (filtro aplicado)`:`· ${total} cuentas`;
+  const tile=(v,l,sub)=>`<div class="anc-tile"><div class="anc-tile-v">${v}</div><div class="anc-tile-l">${l}</div>${sub?`<div class="anc-tile-sub">${sub}</div>`:''}</div>`;
+  kp.innerHTML=tile(total,'Cuentas')+tile(cli,'Clientes Colliers',pct(cli)+'%')+tile(d30,'Nuevas (30 días)')+tile(ppts,'PPTs generados')+tile(pct(conEjec)+'%','Con ejecutivo asignado');
+  const catM=_ancCountBy(docs,d=>d.categoria||'Sin categoría');
+  const tipoM=_ancCountBy(docs,d=>_efectivoTipoCuenta(d));
+  const cliM=_ancCountBy(docs,d=>d.clienteColliers||'—');
+  const norm=x=>{const n=_normBU(x);return n==='oficina'?'Oficinas':n==='industria'?'Industria':n==='retail'?'Retail':x;};
+  const buM=_ancCountBy(docs,d=>(Array.isArray(d.bu)?d.bu:(d.bu?[d.bu]:[])).map(norm));
+  const rubM=_ancCountBy(docs,d=>_docRubros(d));
+  const ejeM=_ancCountBy(docs,d=>_docGestion(d));
+  const base=new Date();base.setDate(1);const months=[];
+  for(let i=11;i>=0;i--){const dt=new Date(base.getFullYear(),base.getMonth()-i,1);months.push({key:dt.getFullYear()+'-'+(dt.getMonth()+1),lbl:dt.toLocaleDateString('es-AR',{month:'short'}),count:0});}
+  const midx={};months.forEach((m,i)=>midx[m.key]=i);
+  docs.forEach(d=>{const t=_tsToDate(d.fechaCreacion);if(!t)return;const k=t.getFullYear()+'-'+(t.getMonth()+1);if(k in midx)months[midx[k]].count++;});
+  const mmx=Math.max(1,...months.map(m=>m.count));
+  const vbars=`<div class="anc-vbars">${months.map(m=>`<div class="anc-vbar-wrap"><div class="anc-vbar-val">${m.count||''}</div><div class="anc-vbar" style="height:${Math.round(m.count/mmx*92)}px" title="${m.lbl}: ${m.count}"></div><div class="anc-vbar-lbl">${m.lbl}</div></div>`).join('')}</div>`;
+  ch.innerHTML=
+    _ancCard('Por Categoría',_ancBars([...catM],{order:['Top','A','B','C','No aplica','Sin categoría']}))+
+    _ancCard('Por Tipo de Cuenta',_ancBars([...tipoM],{order:['Broker','Desarrollador','Ninguno']}))+
+    _ancCard('Cliente Colliers',_ancBars([...cliM]))+
+    _ancCard('Por Unidad de Negocio',_ancBars([...buM]))+
+    _ancCard('Top Rubros',_ancBars([...rubM],{max:8}))+
+    _ancCard('Cuentas por Ejecutivo',_ancBars([...ejeM],{max:8}))+
+    `<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Cuentas creadas por mes (12m)</div>${vbars}</div>`;
+};
 
 function renderCRMKPIs(docs){
   const row=document.getElementById('crm-kpi-row');
@@ -9949,8 +10083,8 @@ const _anCharts={};
 let _anDocs=[];
 let _anPendingScroll=null;
 let _anActiveSubmod='intel';
-const _AN_SCROLL={intel:'an-kpis',heatmaps:'an-demand-heatmap-card',brokers:'an-brokers-dash-card',tendencias:'an-tend-card',rankings:'an-leads-section'};
-const _AN_TITLES={intel:'Inteligencia Comercial',heatmaps:'Heatmaps',brokers:'Dashboard Brokers',tendencias:'Tendencias',rankings:'Rankings'};
+const _AN_SCROLL={intel:'an-kpis',heatmaps:'an-demand-heatmap-card',brokers:'an-brokers-dash-card',tendencias:'an-tend-card',rankings:'an-leads-section',cuentas:'an-cuentas-section'};
+const _AN_TITLES={intel:'Inteligencia Comercial',heatmaps:'Heatmaps',brokers:'Dashboard Brokers',tendencias:'Tendencias',rankings:'Rankings',cuentas:'Cuentas'};
 const ANALYTICS_ALLOWED=['mazaretto@gmail.com','matias.azaretto@colliers.com','colliers.arg@gmail.com','desarrollo@colliers.com.ar'];
 const _anFilters={periodo:0,zonas:new Set(),ejecutivo:'',edificio:'',m2min:0,m2max:0};
 
@@ -10863,6 +10997,9 @@ function _anGoTo(submod){
   _anActiveSubmod=submod;
   const titleEl=document.getElementById('an-page-title');
   if(titleEl)titleEl.textContent='Analítica · '+(_AN_TITLES[submod]||'Analytics');
+  // La filter-bar de edificios no aplica a Cuentas: se oculta en ese submódulo.
+  const fbar=document.getElementById('an-fbar');if(fbar)fbar.style.display=(submod==='cuentas')?'none':'';
+  if(submod==='cuentas')loadCuentasAnalytics();
   document.querySelectorAll('#sb-nav .sb-item[data-mod="analytics"]').forEach(el=>el.classList.remove('active'));
   const sbBtn=document.querySelector(`#sb-nav .sb-item[data-mod="analytics"][data-submod="${submod}"]`);
   if(sbBtn)sbBtn.classList.add('active');
