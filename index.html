@@ -2206,8 +2206,8 @@ body.dark .cdr-ms-chip-sub{background:rgba(255,255,255,.06);color:#c8d6f0;border
 body.dark .cdr-ms-drop{background:#1a2c52;border-color:rgba(255,255,255,.12)}
 .cdr-ms-item{padding:.5rem .7rem;font-size:13px;cursor:pointer;color:#000759}
 body.dark .cdr-ms-item{color:#e0eaff}
-.cdr-ms-item:hover{background:#F2F6FF}
-body.dark .cdr-ms-item:hover{background:#22335c}
+.cdr-ms-item:hover,.cdr-ms-item.hi{background:#F2F6FF}
+body.dark .cdr-ms-item:hover,body.dark .cdr-ms-item.hi{background:#22335c}
 .cdr-ms-item small{color:#8898C0;font-weight:500}
 .cdr-ms-empty{padding:.5rem .7rem;font-size:12px;color:#8898C0}
 /* ===== Filtros avanzados (Cuentas; motor reutilizable) ===== */
@@ -3213,7 +3213,10 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           </div>
           <div class="cdr-field">
             <div class="cdr-lbl">Puesto (texto libre)</div>
-            <input id="ctdr-puesto" class="cdr-input" type="text" placeholder="Ej: Director Comercial">
+            <div style="position:relative">
+              <input id="ctdr-puesto" class="cdr-input" type="text" placeholder="Ej: Director Comercial" autocomplete="off" oninput="puestoAcInput('ctdr',this.value)" onfocus="puestoAcInput('ctdr',this.value)" onblur="puestoAcBlur('ctdr')" onkeydown="puestoAcKey('ctdr',event)">
+              <div id="ctdr-puesto-drop" class="cdr-ms-drop" style="display:none"></div>
+            </div>
           </div>
         </div>
         <div class="cdr-field">
@@ -6748,7 +6751,67 @@ function navToBuilding(bldId){
 // ===== CONTACTO DRAWER =====
 let _ctdrAccountSelected=false;
 
+// ============================================================================
+//  AUTOCOMPLETE DE PUESTO — catálogo dinámico construido desde los contactos.
+//  Se arma UNA vez en memoria (reusa _ctoDocs o un único fetch) y crece solo al
+//  guardar. registerPuestoAC permite enchufarlo a otros inputs (ej. Leads).
+// ============================================================================
+const _puestoAc={};
+let _puestoCat=null,_puestoCatLoading=false;
+function _puestoNorm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();}
+function _puestoCatAdd(p){
+  const label=String(p||'').trim();const n=_puestoNorm(label);if(!n)return;
+  if(!_puestoCat)_puestoCat=new Map();
+  let e=_puestoCat.get(n);
+  if(!e){e={count:0,variants:new Map()};_puestoCat.set(n,e);}
+  e.count++;e.variants.set(label,(e.variants.get(label)||0)+1);
+}
+function _puestoLabel(e){let best='',bc=-1;e.variants.forEach((c,v)=>{if(c>bc){bc=c;best=v;}});return best;}
+async function _puestoEnsureCat(){
+  if(_puestoCat||_puestoCatLoading)return;
+  _puestoCatLoading=true;
+  try{
+    let docs=Array.isArray(_ctoDocs)&&_ctoDocs.length?_ctoDocs:null;
+    if(!docs&&db){const snap=await db.collection('contactos').get();docs=snap.docs.map(d=>d.data());}
+    _puestoCat=new Map();
+    (docs||[]).forEach(d=>{if(d.puesto)_puestoCatAdd(d.puesto);});
+  }catch(e){_puestoCat=_puestoCat||new Map();}
+  finally{_puestoCatLoading=false;}
+}
+window.registerPuestoAC=function(key,cfg){_puestoAc[key]={...cfg,_opts:[],_hi:-1};};
+window.puestoAcInput=function(key,val){
+  const c=_puestoAc[key];if(!c)return;
+  const drop=document.getElementById(c.dropId);if(!drop)return;
+  const q=_puestoNorm(val);
+  if(!_puestoCat){
+    _puestoEnsureCat().then(()=>{const inp=document.getElementById(c.inputId);if(inp&&document.activeElement===inp)puestoAcInput(key,inp.value);});
+    drop.style.display='none';return;
+  }
+  if(!q){drop.style.display='none';c._opts=[];c._hi=-1;return;}
+  const res=[];
+  _puestoCat.forEach((e,n)=>{if(n.includes(q))res.push({label:_puestoLabel(e),count:e.count,starts:n.startsWith(q)?1:0});});
+  res.sort((a,b)=>(b.starts-a.starts)||(b.count-a.count)||a.label.localeCompare(b.label));
+  c._opts=res.slice(0,8);c._hi=-1;
+  drop.innerHTML=c._opts.map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();puestoAcPickIdx('${key}',${i})">${esc(o.label)} <small style="color:#8898C0">· ${o.count} uso${o.count!==1?'s':''}</small></div>`).join('');
+  drop.style.display=c._opts.length?'block':'none';
+};
+window.puestoAcPickIdx=function(key,i){const c=_puestoAc[key];const o=c&&c._opts[i];if(!o)return;const inp=document.getElementById(c.inputId);if(inp)inp.value=o.label;const d=document.getElementById(c.dropId);if(d)d.style.display='none';c._hi=-1;};
+window.puestoAcBlur=function(key){const c=_puestoAc[key];if(!c)return;setTimeout(()=>{const d=document.getElementById(c.dropId);if(d)d.style.display='none';},150);};
+window.puestoAcKey=function(key,ev){
+  const c=_puestoAc[key];if(!c||!c._opts.length)return;
+  const drop=document.getElementById(c.dropId);if(!drop||drop.style.display==='none')return;
+  if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){
+    ev.preventDefault();
+    c._hi=ev.key==='ArrowDown'?Math.min(c._hi+1,c._opts.length-1):Math.max(c._hi-1,0);
+    [...drop.querySelectorAll('.cdr-ms-item')].forEach((el,i)=>el.classList.toggle('hi',i===c._hi));
+  }else if(ev.key==='Enter'){
+    if(c._hi>=0){ev.preventDefault();puestoAcPickIdx(key,c._hi);}
+  }else if(ev.key==='Escape'){drop.style.display='none';c._hi=-1;}
+};
+registerPuestoAC('ctdr',{inputId:'ctdr-puesto',dropId:'ctdr-puesto-drop'});
+
 window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
+  _puestoEnsureCat();
   _ctdrEditId=null;
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -6859,6 +6922,7 @@ window.saveContactoDrawer=async function(){
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('contactos').doc(_ctdrEditId).update(updatePayload);
+      if(newData.puesto)_puestoCatAdd(newData.puesto);
       const idx=_ctoDocs.findIndex(d=>d._id===_ctdrEditId);
       if(idx>=0)_ctoDocs[idx]={..._ctoDocs[idx],...updatePayload};
       if(diffs.length){
@@ -6870,6 +6934,7 @@ window.saveContactoDrawer=async function(){
     } else {
       const createData={...newData,estadoRegistro:'activo',brokerResponsable:user?.displayName||user?.email||'',fechaCreacion:now,ultimoContacto:now,ultimaActividad:now};
       await db.collection('contactos').add(createData);
+      if(newData.puesto)_puestoCatAdd(newData.puesto);
       closeContactoDrawer();
       loadContactos();
     }
