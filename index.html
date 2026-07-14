@@ -3256,8 +3256,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <input id="ctdr-interno" class="cdr-input" type="text" placeholder="Ej: 2405">
           </div>
         </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">LinkedIn</div>
+        <div class="cdr-field cdr-admin-only" id="ctdr-linkedin-field">
+          <div class="cdr-lbl">LinkedIn <span class="cdr-admin-tag">ADMIN</span></div>
           <input id="ctdr-linkedin" class="cdr-input" type="url" placeholder="https://linkedin.com/in/...">
         </div>
         <div class="cdr-field">
@@ -6568,7 +6568,7 @@ function openContactoDetail(docId){
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado correo</div>${emailBadge(d.estadoCorreo)}</div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
               <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Interno</div><div class="crm-det-meta-val">${d.interno||'–'}</div></div>
-              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">LinkedIn</div><div class="crm-det-meta-val">${d.linkedin?`<a href="${d.linkedin}" target="_blank" rel="noopener" style="color:#1C54F4">${d.linkedin}</a>`:'–'}</div></div>
+              ${_cdrIsAdmin()?`<div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">LinkedIn</div><div class="crm-det-meta-val">${d.linkedin?`<a href="${d.linkedin}" target="_blank" rel="noopener" style="color:#1C54F4">${d.linkedin}</a>`:'–'}</div></div>`:''}
             </div>
           </div>
           <div>
@@ -6767,6 +6767,7 @@ window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
     document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
+  document.querySelectorAll('#ctdr-drawer .cdr-admin-only').forEach(el=>el.style.display=_cdrIsAdmin()?'':'none');
   if(prefillCuentaId&&prefillCuentaNombre){
     document.getElementById('ctdr-cuentaId').value=prefillCuentaId;
     document.getElementById('ctdr-cuentaNombre').value=prefillCuentaNombre;
@@ -6853,10 +6854,12 @@ window.saveContactoDrawer=async function(){
       estadoCorreo:document.getElementById('ctdr-estadoCorreo').value||'sin_comprobar',
       telefono:(document.getElementById('ctdr-telefono').value||'').trim(),
       interno:(document.getElementById('ctdr-interno').value||'').trim(),
-      linkedin:(document.getElementById('ctdr-linkedin').value||'').trim(),
       ejecutivoComercial:document.getElementById('ctdr-ejecutivo').value||'',
       comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
     };
+    // LinkedIn es exclusivo de Administradores: sólo un admin lo escribe, así un
+    // usuario estándar nunca lo pisa (ni siquiera al editar).
+    if(_cdrIsAdmin())newData.linkedin=(document.getElementById('ctdr-linkedin').value||'').trim();
     if(_ctdrEditId){
       const oldD=_ctoDocs.find(x=>x._id===_ctdrEditId)||{};
       const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',cuentaNombre:'Cuenta',ejecutivoComercial:'Ejecutivo Comercial'};
