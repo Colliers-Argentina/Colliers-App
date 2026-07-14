@@ -2232,6 +2232,34 @@ body.dark .crm-flt-chip{background:rgba(77,147,255,.16);color:#8FC0FF;border-col
 .crm-flt-chip-x:hover{color:#ED1B34}
 .crm-flt-clear{background:none;border:none;color:#ED1B34;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;padding:3px 6px;border-radius:6px}
 .crm-flt-clear:hover{background:rgba(237,27,52,.08)}
+/* ===== Ficha de Cuenta (dashboard) ===== */
+.nx-tip{position:relative;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#E2EAF7;color:#56648F;font-size:9px;font-weight:700;cursor:help;margin-left:.35rem;vertical-align:middle;outline:none;flex-shrink:0}
+body.dark .nx-tip{background:rgba(255,255,255,.12);color:#a8b3d1}
+.nx-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#0A1B4D;color:#fff;font-size:11px;font-weight:500;line-height:1.55;padding:.6rem .75rem;border-radius:8px;width:270px;white-space:pre-line;text-align:left;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s;z-index:800;box-shadow:0 8px 24px rgba(0,7,89,.3)}
+.nx-tip::before{content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#0A1B4D;opacity:0;visibility:hidden;transition:opacity .12s;z-index:800}
+.nx-tip:hover::after,.nx-tip:focus::after,.nx-tip:hover::before,.nx-tip:focus::before{opacity:1;visibility:visible}
+.cta-logo{width:74px;height:74px;border-radius:14px;object-fit:contain;background:#fff;border:1px solid #E7EDF7;margin:0 auto .5rem;display:block}
+.cta-estado{display:inline-flex;align-items:center;gap:.35rem;font-size:11.5px;font-weight:700;border-radius:20px;padding:3px 11px}
+.cta-estado.on{background:#EDFAF2;color:#16A34A;border:1px solid #BBE9CD}
+.cta-estado.off{background:#FDECEE;color:#DC2626;border:1px solid #F6C6CC}
+.cta-stats{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin:.7rem 0}
+.cta-stat{background:#F6F9FF;border:1px solid #E7EDF7;border-radius:10px;padding:.5rem .4rem;text-align:center}
+body.dark .cta-stat{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+.cta-stat-v{font-size:17px;font-weight:800;color:#0A1B4D;line-height:1.1}
+body.dark .cta-stat-v{color:#fff}
+.cta-stat-l{font-size:9px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.cta-gest-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:#F8FAFF;border:1px solid #EAF0FB;border-radius:9px;padding:.5rem .7rem;margin-bottom:.4rem}
+body.dark .cta-gest-row{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+.cta-gest-n{font-size:12.5px;font-weight:700;color:#0A1B4D}
+body.dark .cta-gest-n{color:#e0eaff}
+.cta-gest-f{font-size:11px;color:#8898C0;white-space:nowrap}
+.cta-act-item{display:flex;gap:.6rem;padding:.55rem 0;border-bottom:1px solid #F0F4FB}
+body.dark .cta-act-item{border-color:rgba(255,255,255,.06)}
+.cta-act-badge{font-size:8.5px;font-weight:800;letter-spacing:.05em;border-radius:4px;padding:2px 6px;white-space:nowrap;align-self:flex-start;margin-top:2px}
+.cta-act-badge.c{background:#EAF1FF;color:#1C54F4}
+.cta-act-badge.m{background:#F3EBFF;color:#7C3AED}
+.cta-sec-title{font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .55rem}
+body.dark .cta-sec-title{color:#e0eaff}
 /* ===== Analytics · Cuentas (stat tiles + barras 1 serie) ===== */
 .anc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.65rem;margin-bottom:.9rem}
 .anc-tile{background:#fff;border:1px solid #E7EDF7;border-radius:12px;padding:.85rem 1rem}
@@ -3127,9 +3155,10 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div class="cdr-field">
         <div class="cdr-lbl">Unidades de negocio de interés</div>
         <div class="cdr-toggle-group" id="cdr-bu-chips">
+          <button type="button" class="cto-pref-chip" data-bu="Oficinas" onclick="this.classList.toggle('active')">Oficinas</button>
           <button type="button" class="cto-pref-chip" data-bu="Retail" onclick="this.classList.toggle('active')">Retail</button>
           <button type="button" class="cto-pref-chip" data-bu="Industria" onclick="this.classList.toggle('active')">Industria</button>
-          <button type="button" class="cto-pref-chip" data-bu="Oficinas" onclick="this.classList.toggle('active')">Oficinas</button>
+          <button type="button" class="cto-pref-chip" data-bu="Logística" onclick="this.classList.toggle('active')">Logística</button>
         </div>
       </div>
 
@@ -3147,17 +3176,6 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <input id="cdr-capturadoPor" class="cdr-input" type="text" readonly title="Se completa automáticamente con el usuario autenticado" style="opacity:.75;cursor:default;background:#F4F7FC">
       </div>
 
-      <div class="cdr-field cdr-admin-only" id="cdr-gestionado-field">
-        <div class="cdr-lbl">Gestionado por <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(hasta 3)</span></div>
-        <div class="cdr-toggle-group" id="cdr-gestionado-chips">
-          <button type="button" class="cto-pref-chip" data-ejec="Matienzo" onclick="cdrToggleGestion(this)">Matienzo</button>
-          <button type="button" class="cto-pref-chip" data-ejec="Bartra" onclick="cdrToggleGestion(this)">Bartra</button>
-          <button type="button" class="cto-pref-chip" data-ejec="Farola" onclick="cdrToggleGestion(this)">Farola</button>
-          <button type="button" class="cto-pref-chip" data-ejec="Troncoso" onclick="cdrToggleGestion(this)">Troncoso</button>
-          <button type="button" class="cto-pref-chip" data-ejec="Giancontieri" onclick="cdrToggleGestion(this)">Giancontieri</button>
-          <button type="button" class="cto-pref-chip" data-ejec="Zuliani" onclick="cdrToggleGestion(this)">Zuliani</button>
-        </div>
-      </div>
 
     </div>
     <div class="cdr-footer">
@@ -5903,7 +5921,7 @@ function estadoBadge(e){
   const c=ESTADO_COLORS[e]||{bg:'rgba(123,139,189,.1)',border:'rgba(123,139,189,.3)',text:'#7B8BBD'};
   return`<span class="estado-badge" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${e||'Activo'}</span>`;
 }
-function fmtDate(ts){if(!ts)return'–';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtDate(ts){const d=_tsToDate(ts);return d&&!isNaN(d)?d.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}):'–';}
 
 window.toggleCRM=()=>{
   const panel=document.getElementById('crm-panel');
@@ -6001,7 +6019,7 @@ function renderCrmFilterPanel(){
     sel('clienteColliers','Cliente Colliers',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
     sel('categoria','Categoría',[{v:'',t:'Todas'},{v:'Top',t:'Top'},{v:'A',t:'A'},{v:'B',t:'B'},{v:'C',t:'C'},{v:'No aplica',t:'No aplica'}])+
     sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Broker',t:'Broker'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
-    `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="crm-flt-bu">${['Oficinas','Industria','Retail'].map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="crmFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
+    `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="crm-flt-bu">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="crmFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
     ms('gestionadoPor','Gestionado por','Buscar ejecutivo...')+
     ms('capturadoPor','Capturado por','Buscar usuario...');
   _crmSyncControls();
@@ -6115,7 +6133,7 @@ function renderAncPanel(){
     sel('clienteColliers','Cliente Colliers',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
     sel('categoria','Categoría',[{v:'',t:'Todas'},{v:'Top',t:'Top'},{v:'A',t:'A'},{v:'B',t:'B'},{v:'C',t:'C'},{v:'No aplica',t:'No aplica'}])+
     sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Broker',t:'Broker'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
-    `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="anc-flt-bu">${['Oficinas','Industria','Retail'].map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="ancFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
+    `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="anc-flt-bu">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="ancFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
     ms('gestionadoPor','Gestionado por','Buscar ejecutivo...')+ms('capturadoPor','Capturado por','Buscar usuario...');
   _ancSyncControls();
 }
@@ -6276,12 +6294,12 @@ function renderCRMKPIs(docs){
   const row=document.getElementById('crm-kpi-row');
   if(!row)return;
   const total=docs.length;
-  const activos=docs.filter(d=>!d.estado||d.estado==='Activo').length;
+  const activos=docs.filter(d=>cuentaEstadoAuto(d).activa).length;
   const totalPPTs=docs.reduce((s,d)=>s+(d.cantidadPPTs||0),0);
   const negociacion=docs.filter(d=>d.estado==='Negociación').length;
   row.innerHTML=`
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🏢</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Cuentas totales</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${activos}</div><div class="crm-kpi-l">Activos</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${activos}</div><div class="crm-kpi-l">Activas</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">📄</div><div class="crm-kpi-data"><div class="crm-kpi-v">${totalPPTs}</div><div class="crm-kpi-l">PPTs generados</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FFF7EC">🤝</div><div class="crm-kpi-data"><div class="crm-kpi-v">${negociacion}</div><div class="crm-kpi-l">En negociación</div></div></div>
   `;
@@ -6314,7 +6332,7 @@ function renderCRMTable(docs){
       <td class="crm-date">${fmtDate(d.ultimaActividad)}</td>
       <td class="crm-ppts">${d.cantidadPPTs||0}</td>
       <td class="crm-zonas-cell">${zonas||'–'}</td>
-      <td>${estadoBadge(d.estado||'Activo')}</td>
+      <td>${cuentaEstadoAuto(d).html}</td>
       <td><button class="crm-action-btn" onclick="event.stopPropagation();openClientDetail('${d._id}')">Ver ficha →</button></td>
     </tr>`;
   });
@@ -6332,118 +6350,271 @@ function detTab(el,tabId){
   if(target)target.style.display='';
 }
 
+// ===== Roles (estructura preparada; hoy direccion = ANALYTICS_ALLOWED) =====
+const MARKETING_EMAILS=[];   // completar con los emails de Marketing & Research
+function _nexusRole(){
+  if(ANALYTICS_ALLOWED.includes(user?.email))return'direccion';
+  if(MARKETING_EMAILS.includes(user?.email))return'marketing';
+  return'ejecutivo';
+}
+function _canEditFicha(){const r=_nexusRole();return r==='direccion'||r==='marketing';}
+
+// Estado automático: Activa si hubo actividad en los últimos 365 días. No editable.
+function cuentaEstadoAuto(d){
+  const t=_tsToDate(d.ultimaActividad)||_tsToDate(d.fechaCreacion);
+  const activa=!!t&&(Date.now()-t.getTime())<=365*864e5;
+  return{activa,html:`<span class="cta-estado ${activa?'on':'off'}" title="Estado automático según actividad de los últimos 365 días. No editable.">${activa?'🟢 Activa':'🔴 No Activa'}</span>`};
+}
+function _logoValida(u){return /^https?:\/\/.+\.(jpg|jpeg|png|webp|svg)(\?.*)?$/i.test(String(u||'').trim());}
+function _gestDet(d){
+  if(Array.isArray(d.gestionadoPorDet)&&d.gestionadoPorDet.length)return d.gestionadoPorDet.map(o=>({n:o.n||o.nombre||'',f:o.f||o.fecha||null})).filter(o=>o.n);
+  const arr=Array.isArray(d.gestionadoPor)&&d.gestionadoPor.length?d.gestionadoPor:(d.ejecutivoComercial?[d.ejecutivoComercial]:[]);
+  return arr.map(n=>({n,f:null}));
+}
+const TIP_CLIENTE_COLLIERS='Empresa a la que Colliers le brindó algún servicio (Brokerage, Valuation & Consulting o Project & Development Services) o firmó un contrato de exclusividad, aunque la operación no haya prosperado.';
+const TIP_BU='Tipo de inmueble que principalmente utiliza una empresa para desarrollar su actividad.\n\nEjemplos:\nFarmacity → Retail + Logística\nDanone → Oficinas + Industria';
+const BU_OPCIONES=['Oficinas','Retail','Industria','Logística'];
+
+let _fichaCuentaId=null;
+const _ctaQuickCache={};
+
 function openClientDetail(docId){
   const d=_crmDocs.find(x=>x._id===docId);
   if(!d)return;
+  _fichaCuentaId=docId;
   const nombre=d.nombre||d._id;
-  const ppts=d.cantidadPPTs||0;
-  const opts=['Activo','Visitas','Negociación','Cerrado','Perdido'].map(e=>`<option value="${e}"${d.estado===e?' selected':''}>${e}</option>`).join('');
-  const tags=(arr)=>arr?.length?arr.map(t=>`<span class="crm-tag">${t}</span>`).join(''):'–';
-  // Left panel
+  const est=cuentaEstadoAuto(d);
+  const gest=_gestDet(d);
+  const logo=_logoValida(d.logoUrl)
+    ?`<img class="cta-logo" src="${esc(d.logoUrl)}" alt="" onerror="this.style.display='none';document.getElementById('cta-logo-fb').style.display='flex'"><div id="cta-logo-fb" class="crm-det-av" style="background:${crmAvatarBg(nombre)};display:none;margin:0 auto .5rem">${crmInitials(nombre)}</div>`
+    :`<div class="crm-det-av" style="background:${crmAvatarBg(nombre)};margin:0 auto .5rem">${crmInitials(nombre)}</div>`;
   document.getElementById('crm-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
-      <div class="crm-det-av" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>
-      <div class="crm-det-av-name">${nombre}</div>
-      ${d.broker_email?`<div class="crm-det-av-email">${d.broker_email}</div>`:''}
+      ${logo}
+      <div class="crm-det-av-name">${esc(nombre)}</div>
+      ${d.sitioWeb?`<div class="crm-det-av-email"><a href="${esc(d.sitioWeb)}" target="_blank" rel="noopener" style="color:#1C54F4">${esc(d.sitioWeb.replace(/^https?:\/\//,''))}</a></div>`:''}
+      <div style="margin-top:.5rem">${est.html}</div>
     </div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${d.broker||'–'}</div></div>
-    ${d.ejecutivoComercial?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.ejecutivoComercial}</div></div>`:''}
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
-        <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+    <div class="cta-stats">
+      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-contactos">–</div><div class="cta-stat-l">Contactos</div></div>
+      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-oportunidades">–</div><div class="cta-stat-l">Oportunidades</div></div>
+      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-inmuebles">–</div><div class="cta-stat-l">Inmuebles</div></div>
+      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-servicios">–</div><div class="cta-stat-l">Serv. ganados</div></div>
+    </div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${esc(gest[0]?.n||d.ejecutivoComercial||'–')}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Gestionado por</div><div class="crm-det-meta-val" style="font-size:12px">${gest.length?gest.map(g=>esc(g.n)).join(', '):'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">PPTs generados</div><div class="crm-det-meta-val" style="color:#1C54F4;font-size:20px">${ppts}</div></div>
-    ${d.ultimaModificacion?`<div class="crm-det-meta-item" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF3FF"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${fmtDate(d.ultimaModificacion)}${d.usuarioUltimaModificacion?' · '+d.usuarioUltimaModificacion:''}</div></div>`:''}
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${d.ultimaModificacion?fmtDate(d.ultimaModificacion)+(d.usuarioUltimaModificacion?' · '+esc(d.usuarioUltimaModificacion):''):'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">PPTs generados</div><div class="crm-det-meta-val" style="color:#1C54F4;font-size:20px">${d.cantidadPPTs||0}</div></div>
   `;
-  // Right panel
   document.getElementById('crm-det-right').innerHTML=`
     <div class="crm-det-tabs">
       <button class="crm-det-tab active" onclick="detTab(this,'crm-dt-info')">Información</button>
-      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-resumen')">Resumen</button>
-      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-busquedas')">Búsquedas</button>
-      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-ppts')">PPTs generados</button>
-      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-alt')">Alternativas enviadas</button>
-      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-notas')">Notas</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-actividades');loadCuentaActividades('${docId}')">Actividades</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-contactos');loadCuentaContactos('${docId}')">Contactos</button>
+      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-inventario');loadCuentaInventario('${docId}')">Inmuebles</button>
       <button class="crm-det-tab" onclick="detTab(this,'crm-dt-timeline');loadClientTimeline('${docId}')">Timeline</button>
-      <button class="crm-det-tab" onclick="detTab(this,'crm-dt-inventario');loadCuentaInventario('${docId}')">Inventario</button>
     </div>
     <div class="crm-det-tab-body">
-      <div id="crm-dt-info">
-        <div style="display:flex;flex-direction:column;gap:1.2rem">
-          <div>
-            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">1</span> Información General</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Categoría</div><div class="crm-det-meta-val">${d.categoria||'–'}</div></div>`:''}
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cliente Colliers</div><div class="crm-det-meta-val">${d.clienteColliers||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Tipo de cuenta</div><div class="crm-det-meta-val">${d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno')}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Capturado por</div><div class="crm-det-meta-val">${d.capturadoPor||d.brokerCreador||'–'}</div></div>
-              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Gestionado por</div><div class="crm-det-meta-val">${(Array.isArray(d.gestionadoPor)&&d.gestionadoPor.length?d.gestionadoPor:(d.ejecutivoComercial?[d.ejecutivoComercial]:[])).join(', ')||'–'}</div></div>`:''}
-            </div>
-          </div>
-          <div>
-            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem"><span style="width:18px;height:18px;border-radius:5px;background:#1C54F4;color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">2</span> Segmentación</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              ${ANALYTICS_ALLOWED.includes(user?.email)?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[])).map(r=>`<span class="crm-tag">${r}</span>`).join('')||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.subrubros)&&d.subrubros.length?d.subrubros.map(o=>o.s||o.sub||''):(d.subRubro?[d.subRubro]:[])).filter(Boolean).map(s=>`<span class="crm-tag">${s}</span>`).join('')||'–'}</div></div>`:''}
-              <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">Unidades de negocio de interés</div><div class="crm-tags" style="margin-top:.3rem">${(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean).map(b=>`<span class="crm-tag">${b}</span>`).join('')||'–'}</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="crm-dt-resumen" style="display:none">
-        <div class="crm-det-grid">
-          <div>
-            <div class="crm-det-section-title" style="font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem">Información general</div>
-            <div style="display:flex;flex-direction:column;gap:.5rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Zonas de interés</div><div class="crm-tags" style="margin-top:.25rem">${tags(d.zonasInteres)}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${estadoBadge(d.estado||'Activo')}</div>
-                            <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Presupuesto</div><div class="crm-det-meta-val">A definir</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Pipeline</div><select class="crm-estado-sel" style="margin-top:3px" onchange="saveClientEstado('${docId}',this.value)">${opts}</select></div>
-            </div>
-          </div>
-          <div>
-            <div class="crm-det-section-title" style="font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem">Actividad reciente</div>
-            <div class="crm-timeline">
-              ${ppts>0?`<div class="crm-tl-item"><div class="crm-tl-dot"></div><div><div class="crm-tl-title">PPT generado</div><div class="crm-tl-date">${fmtDate(d.ultimaActividad)}</div></div></div>`:''}
-              ${d.fechaCreacion?`<div class="crm-tl-item"><div class="crm-tl-dot" style="background:#22C55E"></div><div><div class="crm-tl-title">Cliente creado</div><div class="crm-tl-date">${fmtDate(d.fechaCreacion)}</div></div></div>`:''}
-              ${!ppts&&!d.fechaCreacion?'<div class="crm-empty" style="padding:.75rem 0">Sin actividad registrada.</div>':''}
-            </div>
-          </div>
-        </div>
-        ${d.edificiosEnviados?.length?`<div style="margin-top:1rem"><div class="crm-det-section-title" style="font-size:11px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem">Edificios enviados</div><div class="crm-tags">${tags(d.edificiosEnviados)}</div></div>`:''}
-      </div>
-      <div id="crm-dt-busquedas" style="display:none">
-        <div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🔍</div><div class="crm-det-placeholder-title">Búsquedas de este cliente</div><div class="crm-det-placeholder-sub">Las búsquedas de alternativas se registrarán aquí automáticamente.<br>Para iniciar una nueva búsqueda usá el <button class="crm-det-link-btn" onclick="showModule('generator')">Generador de Informes</button></div></div>
-      </div>
-      <div id="crm-dt-ppts" style="display:none">
-        <div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📄</div><div class="crm-det-placeholder-title">PPTs generados</div><div class="crm-det-placeholder-sub">${ppts>0?`Se generaron <strong>${ppts} PPT${ppts!==1?'s':''}</strong> para este cliente. Podés ver el historial completo en <button class="crm-det-link-btn" onclick="showModule(\'analytics\')">Analytics</button>`:'Aún no se generaron PPTs para este cliente.'}</div></div>
-      </div>
-      <div id="crm-dt-alt" style="display:none">
-        <div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Alternativas enviadas</div><div class="crm-det-placeholder-sub">${d.edificiosEnviados?.length?`<div class="crm-tags" style="justify-content:flex-start">${(d.edificiosEnviados||[]).map(e=>`<span class="crm-tag">${e}</span>`).join('')}</div>`:'Aún no se enviaron alternativas a este cliente.'}</div></div>
-      </div>
-      <div id="crm-dt-notas" style="display:none">
-        <textarea class="crm-new-inp" style="min-height:140px;resize:vertical;width:100%;max-width:540px" placeholder="Notas sobre este cliente..."></textarea>
-      </div>
-      <div id="crm-dt-timeline" style="display:none">
-        <div id="crm-timeline-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Cargando timeline...</div></div></div>
-      </div>
-      <div id="crm-dt-contactos" style="display:none">
-        <div id="crm-dt-contactos-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Cargando contactos...</div></div></div>
-      </div>
-      <div id="crm-dt-inventario" style="display:none">
-        <div id="crm-dt-inventario-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Cargando inventario...</div></div></div>
-      </div>
+      <div id="crm-dt-info"></div>
+      <div id="crm-dt-actividades" style="display:none"><div id="crm-dt-actividades-body"></div></div>
+      <div id="crm-dt-contactos" style="display:none"><div id="crm-dt-contactos-body"></div></div>
+      <div id="crm-dt-inventario" style="display:none"><div id="crm-dt-inventario-body"></div></div>
+      <div id="crm-dt-timeline" style="display:none"><div id="crm-timeline-body"></div></div>
     </div>
   `;
+  renderCuentaInfoTab(docId);
   const cdrEditBtn=document.getElementById('crm-edit-cuenta-btn');
-  if(cdrEditBtn)cdrEditBtn.onclick=()=>openClientDrawer_edit(docId);
+  if(cdrEditBtn){cdrEditBtn.style.display=_canEditFicha()?'':'none';cdrEditBtn.onclick=()=>cuentaFichaEdit(docId);}
   const cdrArchiveBtn=document.getElementById('crm-archive-cuenta-btn');
   if(cdrArchiveBtn)cdrArchiveBtn.onclick=()=>archiveCuenta(docId);
-  // Switch views
+  _loadCuentaQuickStats(docId);
   document.getElementById('crm-list-view').style.display='none';
   const dv=document.getElementById('crm-detail-view');
   dv.style.display='flex';
   dv.style.flexDirection='column';
+}
+
+function renderCuentaInfoTab(docId){
+  const d=_crmDocs.find(x=>x._id===docId);
+  const body=document.getElementById('crm-dt-info');
+  if(!d||!body)return;
+  const isAdmin=_nexusRole()!=='ejecutivo';
+  const gest=_gestDet(d);
+  const item=(lbl,val,tip)=>`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl" style="display:flex;align-items:center">${lbl}${tip?`<span class="nx-tip" tabindex="0" data-tip="${esc(tip)}">i</span>`:''}</div><div class="crm-det-meta-val">${val}</div></div>`;
+  const tags=arr=>arr.length?arr.map(t=>`<span class="crm-tag">${esc(t)}</span>`).join(''):'–';
+  const rubros=Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[]);
+  const subs=(Array.isArray(d.subrubros)&&d.subrubros.length?d.subrubros.map(o=>o.s||o.sub||''):(d.subRubro?[d.subRubro]:[])).filter(Boolean);
+  const bu=(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean);
+  body.innerHTML=`
+    <div class="cta-sec-title" style="margin-top:0">Información General</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
+      ${isAdmin?item('Categoría',esc(d.categoria||'–')):''}
+      ${item('Cliente Colliers',esc(d.clienteColliers||'–'),TIP_CLIENTE_COLLIERS)}
+      ${item('Tipo de cuenta',esc(d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno')))}
+      ${item('Capturado por',esc(d.capturadoPor||d.brokerCreador||'–'))}
+      ${item('Sitio web',d.sitioWeb?`<a href="${esc(d.sitioWeb)}" target="_blank" rel="noopener" style="color:#1C54F4">${esc(d.sitioWeb)}</a>`:'–')}
+    </div>
+    <div class="cta-sec-title">Segmentación</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
+      ${isAdmin?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-tags" style="margin-top:.3rem">${tags(rubros)}</div></div>
+      <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-tags" style="margin-top:.3rem">${tags(subs)}</div></div>`:''}
+      <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl" style="display:flex;align-items:center">Unidades de negocio<span class="nx-tip" tabindex="0" data-tip="${esc(TIP_BU)}">i</span></div><div class="crm-tags" style="margin-top:.3rem">${tags(bu)}</div></div>
+    </div>
+    ${isAdmin?`
+    <div class="cta-sec-title">Gestionado por <span style="font-weight:400;color:#8898C0;text-transform:none;letter-spacing:0">(hasta 3 ejecutivos · fecha de asignación automática)</span></div>
+    <div style="max-width:420px">
+      ${gest.length?gest.map(g=>`<div class="cta-gest-row"><span class="cta-gest-n">${esc(g.n)}</span><span class="cta-gest-f">${g.f?fmtDate(g.f):'–'}</span></div>`).join(''):'<div class="anc-empty">Sin ejecutivos asignados. Se completa desde Editar (Research / Marketing).</div>'}
+    </div>`:''}
+  `;
+}
+
+async function _loadCuentaQuickStats(docId){
+  const d=_crmDocs.find(x=>x._id===docId);if(!d)return;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('cta-stat-oportunidades','0');
+  const cache=_ctaQuickCache[docId]||{};
+  if(cache.contactos!=null)set('cta-stat-contactos',cache.contactos);
+  if(cache.inmuebles!=null)set('cta-stat-inmuebles',cache.inmuebles);
+  if(cache.servicios!=null)set('cta-stat-servicios',cache.servicios);
+  if(!db)return;
+  try{
+    const snap=await db.collection('contactos').where('cuentaId','==',docId).get();
+    const n=snap.docs.filter(x=>(x.data().estadoRegistro||'activo')!=='archivado').length;
+    _ctaQuickCache[docId]={..._ctaQuickCache[docId],contactos:n};set('cta-stat-contactos',n);
+  }catch(e){}
+  try{
+    const tx=await db.collection('transacciones').get();
+    const nom=(d.nombre||'').toLowerCase();
+    const n=tx.docs.filter(x=>{const t=x.data();const cli=String(t.cliente||t.clienteNombre||'').toLowerCase();return cli&&cli===nom&&String(t.estado||'').toLowerCase()==='cerrada';}).length;
+    _ctaQuickCache[docId]={..._ctaQuickCache[docId],servicios:n};set('cta-stat-servicios',n);
+  }catch(e){set('cta-stat-servicios','0');}
+}
+
+// ===== Modo edición de la ficha (un solo botón Editar; todo editable a la vez) =====
+let _fe={rubros:[],subrubros:[],bu:[],gest:[],rubroOpts:[],subOpts:[],gestOpts:[]};
+function _feUserOpts(){
+  const s=new Set(CRM_EJECUTIVOS);
+  _crmDocs.forEach(d=>{_gestDet(d).forEach(g=>g.n&&s.add(g.n));if(d.capturadoPor)s.add(d.capturadoPor);if(d.brokerCreador)s.add(d.brokerCreador);});
+  if(user?.displayName)s.add(user.displayName);
+  return[...s].sort();
+}
+window.cuentaFichaEdit=function(docId){
+  const d=_crmDocs.find(x=>x._id===docId);
+  const body=document.getElementById('crm-dt-info');
+  if(!d||!body||!_canEditFicha())return;
+  detTab(document.querySelector('.crm-det-tab'),'crm-dt-info');
+  _fe={rubros:(Array.isArray(d.rubros)&&d.rubros.length?[...d.rubros]:(d.rubro?[d.rubro]:[])),
+       subrubros:(Array.isArray(d.subrubros)?d.subrubros.map(o=>({r:o.r||'',s:o.s||''})).filter(o=>o.s):(d.subRubro?[{r:d.rubro||'',s:d.subRubro}]:[])),
+       bu:(Array.isArray(d.bu)?[...d.bu]:[]).filter(Boolean),
+       gest:_gestDet(d).map(g=>({n:g.n,f:g.f})),
+       rubroOpts:[],subOpts:[],gestOpts:[]};
+  const fld=(lbl,inner,tip)=>`<div class="cdr-field" style="margin-bottom:.7rem"><div class="cdr-lbl" style="display:flex;align-items:center">${lbl}${tip?`<span class="nx-tip" tabindex="0" data-tip="${esc(tip)}">i</span>`:''}</div>${inner}</div>`;
+  body.innerHTML=`
+    <div style="max-width:560px">
+      <div class="cta-sec-title" style="margin-top:0">Editando cuenta</div>
+      ${fld('Nombre comercial *',`<input id="fe-nombre" class="cdr-input" value="${esc(d.nombre||'')}">`)}
+      ${fld('Sitio web',`<input id="fe-sitio" class="cdr-input" type="url" placeholder="https://empresa.com" value="${esc(d.sitioWeb||'')}">`)}
+      ${fld('Logo de la empresa (URL)',`<input id="fe-logo" class="cdr-input" type="url" placeholder="https://... (.jpg .png .webp .svg)" value="${esc(d.logoUrl||'')}" oninput="feLogoPreview(this.value)"><div id="fe-logo-prev" style="margin-top:.4rem">${_logoValida(d.logoUrl)?`<img src="${esc(d.logoUrl)}" style="max-height:56px;max-width:160px;border:1px solid #E7EDF7;border-radius:8px;background:#fff;padding:4px" onerror="this.remove()">`:''}</div>`)}
+      ${fld('Categoría',`<select id="fe-categoria" class="cdr-select">${['','Top','A','B','C','No aplica'].map(c=>`<option value="${c}"${(d.categoria||'')===c?' selected':''}>${c||'— Seleccionar —'}</option>`).join('')}</select>`)}
+      ${fld('Cliente Colliers',`<div class="cdr-toggle-group">${['Sí','No'].map(v=>`<button type="button" class="cdr-toggle-btn${(d.clienteColliers||'Sí')===v?' active':''}" data-field="feCliente" data-value="${v}" onclick="cdrToggle(this)">${v}</button>`).join('')}</div>`,TIP_CLIENTE_COLLIERS)}
+      ${fld('Tipo de cuenta',`<div class="cdr-toggle-group">${['Broker','Desarrollador','Ninguno'].map(v=>`<button type="button" class="cdr-toggle-btn${(d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno'))===v?' active':''}" data-field="feTipo" data-value="${v}" onclick="cdrToggle(this)">${v}</button>`).join('')}</div>`)}
+      ${fld('Rubro',`<div id="fe-rubro-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="fe-rubro-q" class="cdr-input" placeholder="Buscar rubro..." autocomplete="off" oninput="feRubroSearch(this.value)" onfocus="feRubroSearch(this.value)" onblur="feMsBlur('rubro')"><div id="fe-rubro-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
+      ${fld('Sub rubro',`<div id="fe-subrubro-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="fe-subrubro-q" class="cdr-input" placeholder="Según rubros..." autocomplete="off" oninput="feSubSearch(this.value)" onfocus="feSubSearch(this.value)" onblur="feMsBlur('subrubro')"><div id="fe-subrubro-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
+      ${fld('Unidades de negocio',`<div class="cdr-toggle-group" id="fe-bu">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip${_fe.bu.includes(u)?' active':''}" data-bu="${u}" onclick="this.classList.toggle('active')">${u}</button>`).join('')}</div>`,TIP_BU)}
+      ${fld('Gestionado por (hasta 3, fecha automática)',`<div id="fe-gest-rows"></div><div class="cdr-ms-wrap"><input id="fe-gest-q" class="cdr-input" placeholder="Buscar ejecutivo..." autocomplete="off" oninput="feGestSearch(this.value)" onfocus="feGestSearch(this.value)" onblur="feMsBlur('gest')"><div id="fe-gest-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
+      <div style="display:flex;gap:.6rem;margin-top:1rem">
+        <button class="cdr-save" style="height:38px;padding:0 20px;border:none;border-radius:9px;background:#1C54F4;color:#fff;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer" onclick="fichaEditSave('${docId}')">Guardar</button>
+        <button style="height:38px;padding:0 16px;border:1px solid #DDE5F2;border-radius:9px;background:#fff;color:#56648F;font-weight:600;font-family:inherit;font-size:13px;cursor:pointer" onclick="renderCuentaInfoTab('${docId}')">Cancelar</button>
+      </div>
+    </div>`;
+  _feRenderRubros();_feRenderSubs();_feRenderGest();
+};
+window.feLogoPreview=function(u){const p=document.getElementById('fe-logo-prev');if(!p)return;p.innerHTML=_logoValida(u)?`<img src="${esc(u)}" style="max-height:56px;max-width:160px;border:1px solid #E7EDF7;border-radius:8px;background:#fff;padding:4px" onerror="this.remove()">`:(u?'<span style="font-size:10.5px;color:#B45309">URL de imagen no válida (jpg/jpeg/png/webp/svg)</span>':'');};
+function _feRenderRubros(){const c=document.getElementById('fe-rubro-chips');if(c)c.innerHTML=_fe.rubros.map((r,i)=>`<span class="cdr-ms-chip">${esc(r)}<span class="cdr-ms-chip-x" onclick="feRemoveRubroIdx(${i})">✕</span></span>`).join('');}
+function _feRenderSubs(){const c=document.getElementById('fe-subrubro-chips');if(c)c.innerHTML=_fe.subrubros.map((o,i)=>`<span class="cdr-ms-chip cdr-ms-chip-sub">${esc(o.s)} <small style="opacity:.6">· ${esc(o.r)}</small><span class="cdr-ms-chip-x" onclick="feRemoveSubIdx(${i})">✕</span></span>`).join('');}
+function _feRenderGest(){const c=document.getElementById('fe-gest-rows');if(c)c.innerHTML=_fe.gest.map((g,i)=>`<div class="cta-gest-row"><span class="cta-gest-n">${esc(g.n)}</span><span style="display:flex;align-items:center;gap:.5rem"><span class="cta-gest-f">${g.f?fmtDate(g.f):'nueva'}</span><span class="cdr-ms-chip-x" onclick="feGestRemoveIdx(${i})">✕</span></span></div>`).join('');}
+window.feRubroSearch=function(q){const drop=document.getElementById('fe-rubro-drop');if(!drop)return;q=(q||'').toLowerCase().trim();_fe.rubroOpts=Object.keys(RUBROS_CATALOG).filter(r=>!_fe.rubros.includes(r)&&r.toLowerCase().includes(q));drop.innerHTML=_fe.rubroOpts.length?_fe.rubroOpts.map((r,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feAddRubroIdx(${i})">${esc(r)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.feAddRubroIdx=function(i){const r=_fe.rubroOpts[i];if(r==null)return;if(!_fe.rubros.includes(r))_fe.rubros.push(r);const q=document.getElementById('fe-rubro-q');if(q)q.value='';document.getElementById('fe-rubro-drop').style.display='none';_feRenderRubros();};
+window.feRemoveRubroIdx=function(i){const r=_fe.rubros[i];if(r==null)return;_fe.rubros=_fe.rubros.filter(x=>x!==r);_fe.subrubros=_fe.subrubros.filter(o=>o.r!==r);_feRenderRubros();_feRenderSubs();};
+window.feSubSearch=function(q){const drop=document.getElementById('fe-subrubro-drop');if(!drop)return;q=(q||'').toLowerCase().trim();if(!_fe.rubros.length){drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}_fe.subOpts=[];_fe.rubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>{if(q&&!s.toLowerCase().includes(q))return;if(_fe.subrubros.some(o=>o.r===r&&o.s===s))return;_fe.subOpts.push({r,s});}));drop.innerHTML=_fe.subOpts.length?_fe.subOpts.map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feAddSubIdx(${i})">${esc(o.s)} <small>· ${esc(o.r)}</small></div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.feAddSubIdx=function(i){const o=_fe.subOpts[i];if(!o)return;if(!_fe.subrubros.some(x=>x.r===o.r&&x.s===o.s))_fe.subrubros.push(o);const q=document.getElementById('fe-subrubro-q');if(q)q.value='';document.getElementById('fe-subrubro-drop').style.display='none';_feRenderSubs();};
+window.feRemoveSubIdx=function(i){_fe.subrubros.splice(i,1);_feRenderSubs();};
+window.feGestSearch=function(q){const drop=document.getElementById('fe-gest-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=_fe.gest.map(g=>g.n);_fe.gestOpts=_feUserOpts().filter(n=>!sel.includes(n)&&n.toLowerCase().includes(q));drop.innerHTML=_fe.gestOpts.length?_fe.gestOpts.map((n,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feGestAddIdx(${i})">${esc(n)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.feGestAddIdx=function(i){const n=_fe.gestOpts[i];if(n==null)return;if(_fe.gest.length>=3)return;if(!_fe.gest.some(g=>g.n===n))_fe.gest.push({n,f:firebase.firestore.Timestamp.now()});const q=document.getElementById('fe-gest-q');if(q)q.value='';document.getElementById('fe-gest-drop').style.display='none';_feRenderGest();};
+window.feGestRemoveIdx=function(i){_fe.gest.splice(i,1);_feRenderGest();};
+window.feMsBlur=function(which){setTimeout(()=>{const d=document.getElementById('fe-'+which+'-drop');if(d)d.style.display='none';},150);};
+window.fichaEditSave=async function(docId){
+  const d=_crmDocs.find(x=>x._id===docId);if(!d||!db)return;
+  const nombre=(document.getElementById('fe-nombre').value||'').trim();
+  if(!nombre){document.getElementById('fe-nombre').style.borderColor='#ED1B34';return;}
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    const tipoCuenta=cdrToggleVal('feTipo')||'Ninguno';
+    const subrubros=_cdrValidSubrubros(_fe.rubros,_fe.subrubros);
+    const gest=_fe.gest.slice(0,3);
+    const payload={
+      nombre,
+      sitioWeb:(document.getElementById('fe-sitio').value||'').trim(),
+      logoUrl:(document.getElementById('fe-logo').value||'').trim(),
+      categoria:document.getElementById('fe-categoria').value||'',
+      clienteColliers:cdrToggleVal('feCliente')||'Sí',
+      tipoCuenta,esBroker:tipoCuenta==='Broker'?'Sí':'No',esDesarrollador:tipoCuenta==='Desarrollador'?'Sí':'No',
+      rubros:[..._fe.rubros],subrubros,rubro:_fe.rubros[0]||'',subRubro:subrubros[0]?subrubros[0].s:'',
+      bu:[...document.querySelectorAll('#fe-bu .cto-pref-chip.active')].map(c=>c.dataset.bu),
+      gestionadoPorDet:gest.map(g=>({n:g.n,f:g.f||now})),
+      gestionadoPor:gest.map(g=>g.n),
+      ejecutivoComercial:gest[0]?.n||'',
+      ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||'',
+    };
+    const labels={nombre:'Nombre',sitioWeb:'Sitio web',logoUrl:'Logo',categoria:'Categoría',clienteColliers:'Cliente Colliers',tipoCuenta:'Tipo de cuenta',rubros:'Rubro',bu:'Unidades de negocio',gestionadoPor:'Gestionado por'};
+    const diffs=_diffFields(d,payload,labels);
+    await db.collection('clientes').doc(docId).update(payload);
+    const idx=_crmDocs.findIndex(x=>x._id===docId);
+    if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],...payload};
+    if(diffs.length){
+      const desc=diffs.map(x=>`${x.field}: ${Array.isArray(x.before)?x.before.join(',')||'–':x.before||'–'} → ${Array.isArray(x.after)?x.after.join(',')||'–':x.after||'–'}`).join('\n');
+      addClientTimeline(docId,{tipo:'cuenta_actualizada',descripcion:`Cuenta actualizada\n${desc}`});
+    }
+    const oldGest=_gestDet(d).map(g=>g.n).join(', ');
+    const newGest=payload.gestionadoPor.join(', ');
+    if(oldGest!==newGest)addClientTimeline(docId,{tipo:'cambio_ejecutivo',descripcion:`Gestionado por: ${oldGest||'–'} → ${newGest||'–'}`});
+    _clientesCache.length&&(_clientesCache[0]=_clientesCache[0]);
+    openClientDetail(docId);
+    filterCRM();
+  }catch(e){alert('Error: '+e.message);}
+};
+
+// ===== Solapa Actividades (comercial + marketing & research, cronológica) =====
+const _ACT_CAT={informe_solicitado:'M',lead_calificado:'M',lead_vinculado:'M',campania:'M',publicacion:'M',cartel:'M',publicidad:'M',redes:'M',marketing:'M'};
+async function loadCuentaActividades(cuentaId){
+  const body=document.getElementById('crm-dt-actividades-body');if(!body)return;
+  body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">⏳</div><div class="crm-det-placeholder-sub">Cargando actividades...</div></div>';
+  try{
+    const items=[];
+    const push=(fecha,tipo,desc,usuario,icon)=>{const t=_tsToDate(fecha);if(!t)return;items.push({t,cat:_ACT_CAT[tipo]||'C',desc,usuario:usuario||'',icon:icon||'·'});};
+    const [tlSnap,ctoSnap,leadSnap]=await Promise.all([
+      db.collection('clientes').doc(cuentaId).collection('timeline').orderBy('fecha','desc').limit(150).get().catch(()=>({docs:[]})),
+      db.collection('contactos').where('cuentaId','==',cuentaId).get().catch(()=>({docs:[]})),
+      db.collection('leads').where('cuentaId','==',cuentaId).get().catch(()=>({docs:[]})),
+    ]);
+    const TIPO_ICON={cliente_creado:'🟢',ppt_generado:'📄',cambio_estado:'🔄',cambio_ejecutivo:'👤',cuenta_actualizada:'✏️',alternativas_enviadas:'📧',ppt_descargado:'⬇️',archivado:'📦'};
+    tlSnap.docs.forEach(doc=>{const e=doc.data();if(e.tipo==='alta_contacto'||e.tipo==='lead_vinculado')return;push(e.fecha,e.tipo,e.descripcion||e.tipo||'Evento',e.usuario,TIPO_ICON[e.tipo]);});
+    ctoSnap.docs.forEach(doc=>{const c=doc.data();if((c.estadoRegistro||'activo')==='archivado')return;push(c.fechaCreacion,'alta_contacto',`Contacto agregado: ${(c.nombre||'')+' '+(c.apellidos||'')}`.trim(),c.brokerResponsable||c.ejecutivoComercial,'👤');});
+    leadSnap.docs.forEach(doc=>{const l=doc.data();push(l.fechaCreacion,'lead_vinculado',`Lead creado: ${(l.nombre||'')+' '+(l.apellido||'')}`.trim()+(l.origen?` · ${l.origen}`:''),l.creadoPor,'🎯');if(l.estado==='Calificado'||l.estado==='Convertido')push(l.ultimaActividad,'lead_calificado',`Lead ${l.estado.toLowerCase()}: ${(l.nombre||'')+' '+(l.apellido||'')}`.trim(),l.usuarioUltimaModificacion,'✅');});
+    items.sort((a,b)=>b.t-a.t);
+    if(!items.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin actividades registradas</div><div class="crm-det-placeholder-sub">Las actividades comerciales y de Marketing & Research aparecerán acá automáticamente.</div></div>';return;}
+    body.innerHTML=items.slice(0,120).map(it=>`
+      <div class="cta-act-item">
+        <span style="font-size:14px;flex-shrink:0">${it.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;color:#1F2A4D;line-height:1.45;white-space:pre-line">${esc(it.desc)}</div>
+          <div style="font-size:10.5px;color:#8898C0;margin-top:2px">${it.t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})} ${it.t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}${it.usuario?' · '+esc(it.usuario):''}</div>
+        </div>
+        <span class="cta-act-badge ${it.cat==='M'?'m':'c'}">${it.cat==='M'?'MKT & RESEARCH':'COMERCIAL'}</span>
+      </div>`).join('');
+  }catch(e){body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;}
 }
 
 window.closeCRMDetail=()=>{
@@ -6626,21 +6797,26 @@ async function loadCuentaContactos(cuentaId){
   if(!body)return;
   body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Cargando...</div></div>';
   try{
+    const cta=_crmDocs.find(x=>x._id===cuentaId);
     const snap=await db.collection('contactos').where('cuentaId','==',cuentaId).get();
-    const docs=snap.docs.map(d=>({...d.data(),_id:d.id}));
-    if(!docs.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Sin contactos vinculados</div><div class="crm-det-placeholder-sub">Podés crear un contacto vinculado a esta cuenta desde la sección Contactos.</div></div>';return;}
-    let h=`<div style="display:flex;flex-direction:column;gap:.5rem;padding:.25rem 0">`;
+    const docs=snap.docs.map(d=>({...d.data(),_id:d.id})).filter(d=>(d.estadoRegistro||'activo')!=='archivado');
+    const canDelete=_nexusRole()!=='ejecutivo';
+    const addBtn=`<div style="display:flex;justify-content:flex-end;margin-bottom:.6rem"><button class="crm-new-btn" onclick="openContactoDrawer('${cuentaId}','${esc(cta?.nombre||'')}')">＋ Agregar contacto</button></div>`;
+    if(!docs.length){body.innerHTML=addBtn+'<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Sin contactos vinculados</div><div class="crm-det-placeholder-sub">Agregá el primer contacto de esta cuenta con el botón de arriba.</div></div>';return;}
+    let h=addBtn+`<div style="display:flex;flex-direction:column;gap:.5rem;padding:.25rem 0">`;
     docs.forEach(d=>{
       const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
       const bg=crmAvatarBg(fullname);
       const ini=crmInitials(fullname);
-      h+=`<div style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;background:#F8FAFF;border-radius:9px;cursor:pointer;transition:background .12s" onclick="switchCRMTab('contactos');setTimeout(()=>openContactoDetail('${d._id}'),50)" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background='#F8FAFF'">
-        <div class="crm-avatar" style="background:${bg};border-radius:50%;width:32px;height:32px;font-size:11px;flex-shrink:0">${ini}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:700;color:#0A1B4D">${fullname}</div>
-          <div style="font-size:10px;color:#8A9AC0">${d.cargo||''}${d.puesto?' · '+d.puesto:''}</div>
+      h+=`<div style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;background:#F8FAFF;border-radius:9px;transition:background .12s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background='#F8FAFF'">
+        <div class="crm-avatar" style="background:${bg};border-radius:50%;width:32px;height:32px;font-size:11px;flex-shrink:0;cursor:pointer" onclick="switchCRMTab('contactos');setTimeout(()=>openContactoDetail('${d._id}'),50)">${ini}</div>
+        <div style="flex:1;min-width:0;cursor:pointer" onclick="switchCRMTab('contactos');setTimeout(()=>openContactoDetail('${d._id}'),50)">
+          <div style="font-size:12px;font-weight:700;color:#0A1B4D">${esc(fullname)}</div>
+          <div style="font-size:10px;color:#8A9AC0">${esc(d.cargo||'')}${d.puesto?' · '+esc(d.puesto):''}</div>
         </div>
         ${emailBadge(d.estadoCorreo)}
+        <button class="crm-action-btn" style="padding:3px 9px;font-size:11px" onclick="event.stopPropagation();openContactoDrawer_edit('${d._id}')" title="Editar">✏️</button>
+        ${canDelete?`<button class="crm-action-btn" style="padding:3px 9px;font-size:11px;color:#DC2626;border-color:#F6C6CC" onclick="event.stopPropagation();archiveCuentaContacto('${d._id}','${cuentaId}')" title="Eliminar (archivar)">🗑</button>`:''}
       </div>`;
     });
     h+='</div>';
@@ -6649,6 +6825,18 @@ async function loadCuentaContactos(cuentaId){
     body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
   }
 }
+window.archiveCuentaContacto=async function(contactoId,cuentaId){
+  if(!confirm('¿Eliminar este contacto de la cuenta? Se archivará (no se borra definitivamente).'))return;
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    await db.collection('contactos').doc(contactoId).update({estadoRegistro:'archivado',ultimaActividad:now});
+    const c=_ctoDocs.find(x=>x._id===contactoId);
+    addClientTimeline(cuentaId,{tipo:'cuenta_actualizada',descripcion:`Contacto archivado: ${c?((c.nombre||'')+' '+(c.apellidos||'')).trim():contactoId}`});
+    delete _ctaQuickCache[cuentaId];
+    loadCuentaContactos(cuentaId);
+    _loadCuentaQuickStats(cuentaId);
+  }catch(e){alert('Error: '+e.message);}
+};
 
 /* ===== CRM → INVENTARIO ===== */
 function _renderInvTable(units,bodyId,showBldCount){
@@ -6715,7 +6903,25 @@ async function loadCuentaInventario(cuentaId){
     occ.forEach(u=>seen.add(u._bldId+'/'+u._id));
     const units=[...occ,...own.filter(u=>{const k=u._bldId+'/'+u._id;if(seen.has(k))return false;seen.add(k);return true;})];
     console.log('[INV] Total unidades a mostrar:',units.length);
-    _renderInvTable(units,'crm-dt-inventario-body',true);
+    // Quick stat: edificios distintos vinculados
+    const nBld=[...new Set(units.map(u=>u._bldId))].length;
+    _ctaQuickCache[cuentaId]={..._ctaQuickCache[cuentaId],inmuebles:nBld};
+    const stEl=document.getElementById('cta-stat-inmuebles');if(stEl)stEl.textContent=nBld;
+    if(!units.length){_renderInvTable(units,'crm-dt-inventario-body',true);return;}
+    // Agrupar por unidad de negocio del edificio
+    const classify=b=>{const a=b?.assetType||(b?._tipo==='industrial'?'industrial':b?._tipo==='retail'?'retail':'office');return a==='office'?'Oficinas':a==='retail'?'Retail':'Industria & Logística';};
+    const groups={'Oficinas':[],'Retail':[],'Industria & Logística':[]};
+    units.forEach(u=>{const b=_bldDocs.find(x=>x._id===u._bldId);groups[classify(b)].push(u);});
+    let html='';
+    Object.entries(groups).forEach(([g,us])=>{
+      if(!us.length)return;
+      html+=`<div class="cta-sec-title">${g} <span style="font-weight:400;color:#8898C0;text-transform:none;letter-spacing:0">· ${us.length} disponibilidad${us.length!==1?'es':''}</span></div><div id="crm-inv-grp-${g.replace(/[^a-z]/gi,'')}"></div>`;
+    });
+    body.innerHTML=html;
+    Object.entries(groups).forEach(([g,us])=>{
+      if(!us.length)return;
+      _renderInvTable(us,'crm-inv-grp-'+g.replace(/[^a-z]/gi,''),true);
+    });
   }catch(e){
     console.error('[INV] Error:',e);
     if(body)body.innerHTML=`<div class="crm-det-placeholder"><div class="crm-det-placeholder-title">Error: ${e.message}</div></div>`;
@@ -6935,6 +7141,7 @@ window.saveContactoDrawer=async function(){
       const createData={...newData,estadoRegistro:'activo',brokerResponsable:user?.displayName||user?.email||'',fechaCreacion:now,ultimoContacto:now,ultimaActividad:now};
       await db.collection('contactos').add(createData);
       if(newData.puesto)_puestoCatAdd(newData.puesto);
+      if(newData.cuentaId){addClientTimeline(newData.cuentaId,{tipo:'alta_contacto',descripcion:`Contacto agregado: ${(nombre+' '+apellidos).trim()}`});delete _ctaQuickCache[newData.cuentaId];}
       closeContactoDrawer();
       loadContactos();
     }
@@ -7355,6 +7562,7 @@ window.saveLeadDrawer=async function(){
       const createData={...newData,estado:'Nuevo',estadoRegistro:'activo',creadoPor:user?.displayName||user?.email||'',fechaCreacion:now,ultimaActividad:now};
       const ref=await db.collection('leads').add(createData);
       await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen}`});
+      if(newData.cuentaId)addClientTimeline(newData.cuentaId,{tipo:'lead_vinculado',descripcion:`Lead creado: ${(nombre+' '+apellido).trim()}${origen?' · '+origen:''}`});
       if(brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Ejecutivo Comercial asignado: ${brokerAsignado}`});
       _leadDocs.unshift({...createData,_id:ref.id});
       showLeadNotification({...createData,_id:ref.id});
@@ -7811,12 +8019,6 @@ window.cdrMsBlur=function(which){setTimeout(()=>{const d=document.getElementById
 function _cdrValidSubrubros(rubros,subs){
   return subs.filter(o=>rubros.includes(o.r)&&(!(o.r in RUBROS_CATALOG)||RUBROS_CATALOG[o.r].includes(o.s)));
 }
-window.cdrToggleGestion=function(btn){
-  const active=[...document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip.active')];
-  if(!btn.classList.contains('active')&&active.length>=3)return;
-  btn.classList.toggle('active');
-};
-
 window.openClientDrawer=function(callbackFn){
   _cdrEditId=null;
   _cdrCallback=callbackFn||null;
@@ -7824,7 +8026,7 @@ window.openClientDrawer=function(callbackFn){
   document.getElementById('cdr-nombre').value='';
   document.getElementById('cdr-categoria').value='';
   document.getElementById('cdr-capturadoPor').value=user?.displayName||user?.email||'';
-  document.querySelectorAll('#cdr-bu-chips .cto-pref-chip, #cdr-gestionado-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('#cdr-drawer .cdr-toggle-btn[data-default]').forEach(btn=>{
     const field=btn.dataset.field;
     document.querySelectorAll(`#cdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
@@ -7853,8 +8055,6 @@ window.openClientDrawer_edit=function(docId){
   document.getElementById('cdr-categoria').value=d.categoria||'';
   const buArr=Array.isArray(d.bu)?d.bu:[d.bu].filter(Boolean);
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',buArr.includes(c.dataset.bu));});
-  const gest=Array.isArray(d.gestionadoPor)?d.gestionadoPor:(d.ejecutivoComercial?[d.ejecutivoComercial]:[]);
-  document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',gest.includes(c.dataset.ejec));});
   const setToggle=(field,val)=>{
     document.querySelectorAll(`#cdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{
       b.classList.toggle('active',b.dataset.value===val);
@@ -7918,9 +8118,7 @@ window.saveClientDrawer=async function(){
       newData.subrubros=subrubros;
       newData.rubro=rubros[0]||'';                    // compat legacy (valor único)
       newData.subRubro=subrubros[0]?subrubros[0].s:'';// compat legacy (valor único)
-      const gestionadoPor=[...document.querySelectorAll('#cdr-gestionado-chips .cto-pref-chip.active')].map(c=>c.dataset.ejec).slice(0,3);
-      newData.gestionadoPor=gestionadoPor;
-      newData.ejecutivoComercial=gestionadoPor[0]||'';
+      // Gestionado por: NO se carga en el alta; se completa desde la ficha (Research/Marketing).
     }
     if(_cdrEditId){
       const oldD=_crmDocs.find(x=>x._id===_cdrEditId)||{};
@@ -11028,12 +11226,16 @@ async function loadClientTimeline(docId){
   body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon" style="font-size:24px">⏳</div><div class="crm-det-placeholder-sub">Cargando...</div></div>';
   try{
     const snap=await db.collection('clientes').doc(docId).collection('timeline').orderBy('fecha','desc').limit(100).get();
-    if(snap.empty){
-      body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin eventos registrados</div><div class="crm-det-placeholder-sub">Las acciones sobre este cliente aparecerán aquí automáticamente.</div></div>';
+    // Ejecutivos comerciales ven sólo el último año; Dirección/Admins ven todo.
+    const soloUltimoAnio=_nexusRole()==='ejecutivo';
+    const corte=Date.now()-365*864e5;
+    const docsTl=snap.docs.filter(doc=>!soloUltimoAnio||((_tsToDate(doc.data().fecha)?.getTime()||0)>=corte));
+    if(!docsTl.length){
+      body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin eventos registrados</div><div class="crm-det-placeholder-sub">Las acciones sobre este cliente aparecerán aquí automáticamente.'+(soloUltimoAnio?'<br>Se muestran únicamente las acciones del último año.':'')+'</div></div>';
       return;
     }
-    const TIPO_ICON={cliente_creado:'🟢',ppt_generado:'📄',cambio_estado:'🔄',cambio_zona:'📍',cambio_m2:'📐',cambio_broker:'👤',actualizacion:'✏️',alternativas_enviadas:'📧',ppt_descargado:'⬇️'};
-    body.innerHTML='<div class="clt-timeline">'+snap.docs.map(doc=>{
+    const TIPO_ICON={cliente_creado:'🟢',ppt_generado:'📄',cambio_estado:'🔄',cambio_zona:'📍',cambio_m2:'📐',cambio_broker:'👤',cambio_ejecutivo:'👤',actualizacion:'✏️',cuenta_actualizada:'✏️',alternativas_enviadas:'📧',ppt_descargado:'⬇️',alta_contacto:'👤',lead_vinculado:'🎯',archivado:'📦'};
+    body.innerHTML=(soloUltimoAnio?'<div style="font-size:10.5px;color:#8898C0;margin-bottom:.6rem">Mostrando acciones del último año.</div>':'')+'<div class="clt-timeline">'+docsTl.map(doc=>{
       const d=doc.data();
       const ts=d.fecha?.toDate?.()??new Date();
       const fecha=ts.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
