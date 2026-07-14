@@ -2926,7 +2926,14 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div class="cdr-field"><div class="cdr-lbl">Teléfono móvil</div><input id="ldr-telefono" class="cdr-input" type="tel" placeholder="+54 9 11..."></div>
         </div>
         <div class="cdr-row">
-          <div class="cdr-field"><div class="cdr-lbl">Empresa</div><input id="ldr-empresa" class="cdr-input" type="text" placeholder="Nombre de empresa" autocomplete="off"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Empresa</div>
+            <div style="position:relative">
+              <input id="ldr-empresa" class="cdr-input" type="text" placeholder="Buscar empresa en Cuentas..." autocomplete="off" oninput="ctaPickerInput('ldr',this.value)" onfocus="ctaPickerInput('ldr',this.value)" onblur="ctaPickerBlur('ldr')">
+              <div id="ldr-empresa-drop" class="cdr-ms-drop" style="display:none"></div>
+            </div>
+            <div id="ldr-empresa-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
+            <input id="ldr-cuentaId" type="hidden"><input id="ldr-cuentaNombre" type="hidden">
+          </div>
           <div class="cdr-field"><div class="cdr-lbl">Puesto</div><input id="ldr-puesto" class="cdr-input" type="text" placeholder="Ej: Gerente de RRHH"></div>
         </div>
         <div class="cdr-field">
@@ -3015,6 +3022,52 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div class="lc-footer">
         <button class="cdr-cancel" onclick="closeConvertModal()">Cancelar</button>
         <button class="cdr-save" id="lc-save-btn" onclick="executeLeadConversion()">Convertir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK CUENTA MODAL (creación rápida desde Leads u otros formularios) -->
+  <div id="qc-overlay" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(10,27,77,.5);align-items:center;justify-content:center;padding:1rem">
+    <div id="qc-modal" style="background:#fff;border-radius:16px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,7,89,.3);padding:1.4rem 1.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="font-size:16px;font-weight:800;color:#0A1B4D">Crear nueva cuenta</div>
+        <button onclick="closeQuickCuentaModal()" style="background:none;border:none;font-size:16px;color:#8898C0;cursor:pointer" title="Cerrar">✕</button>
+      </div>
+      <div id="qc-dup-warn" style="display:none;background:#FFF7EC;border:1px solid #FBE3BF;border-radius:10px;padding:.6rem .7rem;margin-bottom:.9rem"></div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Nombre comercial <span class="cdr-req">*</span></div>
+        <input id="qc-nombre" class="cdr-input" type="text" autocomplete="off" oninput="qcCheckDupes()">
+      </div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Cliente Colliers</div>
+        <div class="cdr-toggle-group">
+          <button type="button" class="cdr-toggle-btn active" data-field="qcCliente" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
+          <button type="button" class="cdr-toggle-btn" data-field="qcCliente" data-value="No" onclick="cdrToggle(this)">No</button>
+        </div>
+      </div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Rubro <span style="font-weight:400;color:#8898C0;font-size:11px">(uno o varios)</span></div>
+        <div id="qc-rubro-chips" class="cdr-ms-chips"></div>
+        <div class="cdr-ms-wrap">
+          <input id="qc-rubro-q" class="cdr-input" type="text" placeholder="Buscar rubro..." autocomplete="off" oninput="qcRubroSearch(this.value)" onfocus="qcRubroSearch(this.value)" onblur="qcMsBlur('rubro')">
+          <div id="qc-rubro-drop" class="cdr-ms-drop" style="display:none"></div>
+        </div>
+      </div>
+      <div class="cdr-field" id="qc-subrubro-field" style="display:none">
+        <div class="cdr-lbl">Sub rubro <span style="font-weight:400;color:#8898C0;font-size:11px">(según rubros)</span></div>
+        <div id="qc-subrubro-chips" class="cdr-ms-chips"></div>
+        <div class="cdr-ms-wrap">
+          <input id="qc-subrubro-q" class="cdr-input" type="text" placeholder="Buscar sub rubro..." autocomplete="off" oninput="qcSubSearch(this.value)" onfocus="qcSubSearch(this.value)" onblur="qcMsBlur('subrubro')">
+          <div id="qc-subrubro-drop" class="cdr-ms-drop" style="display:none"></div>
+        </div>
+      </div>
+      <div class="cdr-field">
+        <div class="cdr-lbl">Capturado por</div>
+        <input id="qc-capturadoPor" class="cdr-input" type="text" readonly style="opacity:.75;cursor:default;background:#F4F7FC">
+      </div>
+      <div style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.1rem">
+        <button onclick="closeQuickCuentaModal()" style="height:38px;padding:0 16px;border:1px solid #DDE5F2;border-radius:9px;background:#fff;color:#56648F;font-weight:600;font-family:inherit;font-size:13px;cursor:pointer">Cancelar</button>
+        <button id="qc-save-btn" onclick="saveQuickCuenta()" style="height:38px;padding:0 20px;border:none;border-radius:9px;background:#1C54F4;color:#fff;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer">Crear y asociar</button>
       </div>
     </div>
   </div>
@@ -7121,6 +7174,10 @@ window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBrok
   ['ldr-tipoInmueble','ldr-origen','ldr-broker'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ldr-buildingId').value='';
   document.getElementById('ldr-buildingName').value='';
+  ['ldr-cuentaId','ldr-cuentaNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const empTag=document.getElementById('ldr-empresa-tag');if(empTag)empTag.style.display='none';
+  const empDrop=document.getElementById('ldr-empresa-drop');if(empDrop)empDrop.style.display='none';
+  loadClientesParaSelector();
   if(prefillBuildingId){
     document.getElementById('ldr-buildingId').value=prefillBuildingId;
     document.getElementById('ldr-buildingName').value=prefillBuildingName||'';
@@ -7150,6 +7207,7 @@ window.openLeadDrawer_edit=function(docId){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   set('ldr-nombre',d.nombre);set('ldr-apellido',d.apellido);set('ldr-email',d.email);
   set('ldr-telefono',d.telefono);set('ldr-empresa',d.empresa);set('ldr-puesto',d.puesto);
+  if(d.cuentaId)_ctaPickerSet('ldr',d.cuentaId,d.cuentaNombre||d.empresa||'');
   set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
   set('ldr-comentarios',d.comentarios);set('ldr-link-origen',d.linkOrigen);
   if(d.buildingId){document.getElementById('ldr-buildingId').value=d.buildingId;document.getElementById('ldr-buildingName').value=d.buildingName||'';document.getElementById('ldr-bld-q').value=d.buildingName||'';}
@@ -7207,6 +7265,8 @@ window.saveLeadDrawer=async function(){
       nombre,apellido,email,origen,
       telefono:(document.getElementById('ldr-telefono').value||'').trim(),
       empresa:(document.getElementById('ldr-empresa').value||'').trim(),
+      cuentaId:document.getElementById('ldr-cuentaId').value||'',
+      cuentaNombre:document.getElementById('ldr-cuentaNombre').value||'',
       puesto:(document.getElementById('ldr-puesto').value||'').trim(),
       tipoInmueble:document.getElementById('ldr-tipoInmueble').value||'',
       buildingId:document.getElementById('ldr-buildingId').value||'',
@@ -7217,7 +7277,7 @@ window.saveLeadDrawer=async function(){
     };
     if(_ldrEditId){
       const oldD=_leadDocs.find(x=>x._id===_ldrEditId)||{};
-      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',comentarios:'Comentarios',buildingName:'Inmueble'};
+      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',cuentaNombre:'Cuenta',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',comentarios:'Comentarios',buildingName:'Inmueble'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('leads').doc(_ldrEditId).update(updatePayload);
@@ -7264,6 +7324,125 @@ function showLeadNotification(d){
   notif.style.display='block';
   setTimeout(()=>{if(notif.style.display!=='none')notif.style.display='none';},8000);
 }
+
+// ============================================================================
+//  SELECTOR DE EMPRESA/CUENTA — componente reutilizable
+//  registerCuentaPicker(key,{inputId,dropId,tagId,hidId,hidNombreId,onSelect,allowCreate})
+//  Usado en Leads ('ldr'); apto para Contactos/Oportunidades/Transacciones.
+// ============================================================================
+const _ctaPickers={};
+function _ctaAllCuentas(){
+  const a=Array.isArray(_crmDocs)?_crmDocs:[],b=Array.isArray(_clientesCache)?_clientesCache:[];
+  return a.length>=b.length?a:b;   // suelen ser la misma referencia; si no, gana el set más completo
+}
+// Normaliza para búsqueda/duplicados: minúsculas, sin acentos, sin sufijos societarios.
+function _ctaNorm(s){
+  const x=String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[.'’]/g,'')            // "s.a." -> "sa" antes de tokenizar
+    .replace(/[^a-z0-9]+/g,' ').trim();
+  const stop=new Set(['sa','srl','sas','sacif','saic','inc','llc','ltd','ltda','sl','group','grupo','holding','co','cia','company','argentina','arg']);
+  const core=x.split(' ').filter(w=>!stop.has(w)).join(' ').trim();
+  return core||x;
+}
+function _ctaSimilares(nombre,max){
+  const n=_ctaNorm(nombre);if(!n)return[];
+  const out=[];
+  _ctaAllCuentas().forEach(d=>{
+    if((d.estadoRegistro||'activo')==='archivado')return;
+    const dn=_ctaNorm(d.nombre);if(!dn)return;
+    let score=0;
+    if(dn===n)score=3;else if(dn.startsWith(n)||n.startsWith(dn))score=2;else if(dn.includes(n)||n.includes(dn))score=1;
+    if(score)out.push({d,score});
+  });
+  out.sort((a,b)=>b.score-a.score);
+  return out.slice(0,max||6).map(o=>o.d);
+}
+window.registerCuentaPicker=function(key,cfg){_ctaPickers[key]=cfg;};
+window.ctaPickerInput=function(key,val){
+  const c=_ctaPickers[key];if(!c)return;
+  document.getElementById(c.hidId).value='';document.getElementById(c.hidNombreId).value='';
+  const tag=document.getElementById(c.tagId);if(tag)tag.style.display='none';
+  const drop=document.getElementById(c.dropId);if(!drop)return;
+  const q=(val||'').trim();
+  c._opts=q?_ctaSimilares(q,8):[];
+  let h=c._opts.map((d,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctaPickerPickIdx('${key}',${i})">🏢 ${esc(d.nombre||'')}</div>`).join('');
+  if(q&&c.allowCreate!==false)h+=`<div class="cdr-ms-item" style="color:#1C54F4;font-weight:700;border-top:1px solid #EEF2FA" onmousedown="event.preventDefault();ctaPickerCreate('${key}')">➕ Crear nueva cuenta</div>`;
+  drop.innerHTML=h||'<div class="cdr-ms-empty">Escribí para buscar en Cuentas…</div>';
+  drop.style.display=q?'block':'none';
+};
+window.ctaPickerBlur=function(key){const c=_ctaPickers[key];if(!c)return;setTimeout(()=>{const d=document.getElementById(c.dropId);if(d)d.style.display='none';},150);};
+window.ctaPickerPickIdx=function(key,i){const c=_ctaPickers[key];const d=c&&c._opts&&c._opts[i];if(!d)return;_ctaPickerSet(key,d._id,d.nombre||'');};
+function _ctaPickerSet(key,id,nombre){
+  const c=_ctaPickers[key];if(!c)return;
+  document.getElementById(c.inputId).value=nombre;
+  document.getElementById(c.hidId).value=id;
+  document.getElementById(c.hidNombreId).value=nombre;
+  const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';
+  const tag=document.getElementById(c.tagId);
+  if(tag){tag.innerHTML=`✓ Vinculada a cuenta existente <span style="cursor:pointer;color:#ED1B34;font-weight:700;margin-left:.35rem" onclick="ctaPickerClear('${key}')" title="Desvincular">✕</span>`;tag.style.display='inline-flex';}
+  if(typeof c.onSelect==='function')c.onSelect(id,nombre);
+}
+window.ctaPickerClear=function(key){const c=_ctaPickers[key];if(!c)return;document.getElementById(c.hidId).value='';document.getElementById(c.hidNombreId).value='';const tag=document.getElementById(c.tagId);if(tag)tag.style.display='none';};
+window.ctaPickerCreate=function(key){const c=_ctaPickers[key];if(!c)return;const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';openQuickCuentaModal(document.getElementById(c.inputId).value.trim(),(id,nombre)=>_ctaPickerSet(key,id,nombre));};
+registerCuentaPicker('ldr',{inputId:'ldr-empresa',dropId:'ldr-empresa-drop',tagId:'ldr-empresa-tag',hidId:'ldr-cuentaId',hidNombreId:'ldr-cuentaNombre'});
+
+// --- Modal de creación rápida de Cuenta (sin abandonar el formulario actual) ---
+let _qcRubros=[],_qcSubrubros=[],_qcRubroOpts=[],_qcSubOpts=[],_qcOnDone=null,_qcDupes=[];
+window.openQuickCuentaModal=function(prefillNombre,onDone){
+  _qcOnDone=onDone||null;_qcRubros=[];_qcSubrubros=[];
+  document.getElementById('qc-nombre').value=prefillNombre||'';
+  document.querySelectorAll('#qc-modal .cdr-toggle-btn[data-field="qcCliente"]').forEach(b=>b.classList.toggle('active',b.dataset.value==='Sí'));
+  document.getElementById('qc-capturadoPor').value=user?.displayName||user?.email||'';
+  ['qc-rubro-q','qc-subrubro-q'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['qc-rubro-drop','qc-subrubro-drop'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
+  _qcRenderRubroChips();_qcRenderSubChips();_qcUpdateSubVis();
+  qcCheckDupes();
+  const btn=document.getElementById('qc-save-btn');btn.textContent='Crear y asociar';btn.disabled=false;
+  document.getElementById('qc-overlay').style.display='flex';
+  setTimeout(()=>document.getElementById('qc-nombre').focus(),60);
+};
+window.closeQuickCuentaModal=function(){document.getElementById('qc-overlay').style.display='none';_qcOnDone=null;};
+window.qcCheckDupes=function(){
+  const n=(document.getElementById('qc-nombre').value||'').trim();
+  _qcDupes=n?_ctaSimilares(n,4):[];
+  const w=document.getElementById('qc-dup-warn');if(!w)return;
+  if(!_qcDupes.length){w.style.display='none';w.innerHTML='';return;}
+  w.innerHTML=`<div style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:.35rem">⚠ Ya existen cuentas similares — evitá duplicados:</div>`+_qcDupes.map((d,i)=>`<button type="button" class="cto-pref-chip" style="margin:2px" onclick="qcUseDupeIdx(${i})">🏢 ${esc(d.nombre||'')} — usar esta</button>`).join('');
+  w.style.display='block';
+};
+window.qcUseDupeIdx=function(i){const d=_qcDupes[i];if(!d)return;const cb=_qcOnDone;closeQuickCuentaModal();if(cb)cb(d._id,d.nombre||'');};
+function _qcRenderRubroChips(){const c=document.getElementById('qc-rubro-chips');if(c)c.innerHTML=_qcRubros.map((r,i)=>`<span class="cdr-ms-chip">${esc(r)}<span class="cdr-ms-chip-x" onclick="qcRemoveRubroIdx(${i})">✕</span></span>`).join('');}
+function _qcRenderSubChips(){const c=document.getElementById('qc-subrubro-chips');if(c)c.innerHTML=_qcSubrubros.map((o,i)=>`<span class="cdr-ms-chip cdr-ms-chip-sub">${esc(o.s)} <small style="opacity:.6;font-weight:500">· ${esc(o.r)}</small><span class="cdr-ms-chip-x" onclick="qcRemoveSubIdx(${i})">✕</span></span>`).join('');}
+function _qcUpdateSubVis(){const f=document.getElementById('qc-subrubro-field');if(f)f.style.display=_qcRubros.length?'':'none';}
+window.qcRubroSearch=function(q){const drop=document.getElementById('qc-rubro-drop');if(!drop)return;q=(q||'').toLowerCase().trim();_qcRubroOpts=Object.keys(RUBROS_CATALOG).filter(r=>!_qcRubros.includes(r)&&r.toLowerCase().includes(q));drop.innerHTML=_qcRubroOpts.length?_qcRubroOpts.map((r,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();qcAddRubroIdx(${i})">${esc(r)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.qcAddRubroIdx=function(i){const r=_qcRubroOpts[i];if(r==null)return;if(!_qcRubros.includes(r))_qcRubros.push(r);const q=document.getElementById('qc-rubro-q');if(q)q.value='';document.getElementById('qc-rubro-drop').style.display='none';_qcRenderRubroChips();_qcUpdateSubVis();};
+window.qcRemoveRubroIdx=function(i){const r=_qcRubros[i];if(r==null)return;_qcRubros=_qcRubros.filter(x=>x!==r);_qcSubrubros=_qcSubrubros.filter(o=>o.r!==r);_qcRenderRubroChips();_qcRenderSubChips();_qcUpdateSubVis();};
+window.qcSubSearch=function(q){const drop=document.getElementById('qc-subrubro-drop');if(!drop)return;q=(q||'').toLowerCase().trim();_qcSubOpts=[];_qcRubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>{if(q&&!s.toLowerCase().includes(q))return;if(_qcSubrubros.some(o=>o.r===r&&o.s===s))return;_qcSubOpts.push({r,s});}));drop.innerHTML=_qcSubOpts.length?_qcSubOpts.map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();qcAddSubIdx(${i})">${esc(o.s)} <small>· ${esc(o.r)}</small></div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.qcAddSubIdx=function(i){const o=_qcSubOpts[i];if(!o)return;if(!_qcSubrubros.some(x=>x.r===o.r&&x.s===o.s))_qcSubrubros.push(o);const q=document.getElementById('qc-subrubro-q');if(q)q.value='';document.getElementById('qc-subrubro-drop').style.display='none';_qcRenderSubChips();};
+window.qcRemoveSubIdx=function(i){_qcSubrubros.splice(i,1);_qcRenderSubChips();};
+window.qcMsBlur=function(which){setTimeout(()=>{const d=document.getElementById('qc-'+which+'-drop');if(d)d.style.display='none';},150);};
+window.saveQuickCuenta=async function(){
+  const nombre=(document.getElementById('qc-nombre').value||'').trim();
+  if(!nombre){document.getElementById('qc-nombre').style.borderColor='#ED1B34';return;}
+  document.getElementById('qc-nombre').style.borderColor='';
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('qc-save-btn');btn.textContent='Creando...';btn.disabled=true;
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    const userName=user?.displayName||user?.email||'';
+    const rubros=[..._qcRubros];
+    const subrubros=_cdrValidSubrubros(rubros,_qcSubrubros);
+    const data={nombre,clienteColliers:cdrToggleVal('qcCliente')||'Sí',rubros,subrubros,rubro:rubros[0]||'',subRubro:subrubros[0]?subrubros[0].s:'',bu:[],tipoCuenta:'Ninguno',esBroker:'No',esDesarrollador:'No',capturadoPor:userName,brokerCreador:userName,pptsGenerados:0,cantidadPPTs:0,estadoRegistro:'activo',fechaCreacion:now,ultimaActividad:now};
+    const ref=await db.collection('clientes').add(data);
+    addClientTimeline(ref.id,{tipo:'cliente_creado',descripcion:'Cuenta creada desde Lead (creación rápida)'});
+    const doc={_id:ref.id,...data};
+    if(Array.isArray(_clientesCache))_clientesCache.unshift(doc);
+    if(Array.isArray(_crmDocs)&&_crmDocs!==_clientesCache&&_crmDocs.length)_crmDocs.unshift(doc);
+    const cb=_qcOnDone;
+    closeQuickCuentaModal();
+    if(cb)cb(ref.id,nombre);
+  }catch(e){alert('Error: '+e.message);btn.textContent='Crear y asociar';btn.disabled=false;}
+};
 
 // CONVERSION MODAL
 window.openConvertModal=function(){
