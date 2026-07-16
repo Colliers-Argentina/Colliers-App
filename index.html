@@ -545,6 +545,8 @@ body.dark .crm-table td{color:#C3E6FF;border-bottom:1px solid rgba(255,255,255,.
 body.dark .crm-table tbody tr:hover{background:rgba(77,147,255,.06)}
 .crm-client-cell{display:flex;align-items:center;gap:.55rem}
 .crm-avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
+.crm-avatar-logo{object-fit:contain;background:#fff;border:1px solid #E7EDF7;padding:2px;box-sizing:border-box}
+body.dark .crm-avatar-logo{background:#fff;border-color:rgba(255,255,255,.15)}
 .crm-client-name{font-size:12px;font-weight:700;color:#0A1B4D}
 body.dark .crm-client-name{color:#fff}
 .crm-client-sub{font-size:10px;color:#8A9AC0}
@@ -6325,8 +6327,12 @@ function renderCRMTable(docs){
     const bg=crmAvatarBg(nombre);
     const zonas=(d.zonasInteres||[]).slice(0,2).join(', ')+(d.zonasInteres?.length>2?'…':'');
     const supLabel=(d.rangoM2||[]).join(', ')||(d.m2?fmtM2Range(d.m2,null):'–');
+    // Logo si existe y es válido; si falta o falla la carga, cae al avatar con inicial.
+    const avatar=_logoValida(d.logoUrl)
+      ?`<img class="crm-avatar crm-avatar-logo" src="${esc(d.logoUrl)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="crm-avatar" style="background:${bg};display:none">${initials}</div>`
+      :`<div class="crm-avatar" style="background:${bg}">${initials}</div>`;
     h+=`<tr onclick="openClientDetail('${d._id}')">
-      <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${bg}">${initials}</div><div><div class="crm-client-name">${nombre}</div>${d.broker_email?`<div class="crm-client-sub">${d.broker_email}</div>`:''}</div></div></td>
+      <td><div class="crm-client-cell">${avatar}<div><div class="crm-client-name">${nombre}</div>${d.broker_email?`<div class="crm-client-sub">${d.broker_email}</div>`:''}</div></div></td>
       <td><div class="crm-broker-cell">${d.broker||'–'}</div></td>
       <td class="crm-date" style="white-space:nowrap;font-size:11px;color:#56648F">${supLabel}</td>
       <td class="crm-date">${fmtDate(d.ultimaActividad)}</td>
