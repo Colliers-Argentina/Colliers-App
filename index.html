@@ -2262,6 +2262,12 @@ body.dark .cta-act-item{border-color:rgba(255,255,255,.06)}
 .cta-act-badge.m{background:#F3EBFF;color:#7C3AED}
 .cta-sec-title{font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .55rem}
 body.dark .cta-sec-title{color:#e0eaff}
+.act-2col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
+@media(max-width:900px){.act-2col{grid-template-columns:1fr}}
+.act-btns{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.75rem}
+.act-btn{font-family:inherit;font-size:11px;font-weight:600;padding:5px 10px;border:1px solid #C7D7FF;background:#F4F8FF;color:#1C54F4;border-radius:14px;cursor:pointer;transition:all .12s;text-align:left}
+.act-btn:hover{background:#1C54F4;color:#fff}
+body.dark .act-btn{background:rgba(77,147,255,.12);border-color:rgba(77,147,255,.3);color:#8FC0FF}
 /* ===== Analytics · Cuentas (stat tiles + barras 1 serie) ===== */
 .anc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.65rem;margin-bottom:.9rem}
 .anc-tile{background:#fff;border:1px solid #E7EDF7;border-radius:12px;padding:.85rem 1rem}
@@ -6367,9 +6373,22 @@ function _canEditFicha(){const r=_nexusRole();return r==='direccion'||r==='marke
 
 // Estado automático: Activa si hubo actividad en los últimos 365 días. No editable.
 function cuentaEstadoAuto(d){
-  const t=_tsToDate(d.ultimaActividad)||_tsToDate(d.fechaCreacion);
+  // Sólo la actividad comercial / de Marketing & Research reactiva la cuenta.
+  // Los cambios administrativos (Timeline) NO actualizan este estado.
+  // Fallback legacy: cuentas previas sin ultimaActividadComercial usan ultimaActividad/fechaCreacion.
+  const t=_tsToDate(d.ultimaActividadComercial)||_tsToDate(d.ultimaActividad)||_tsToDate(d.fechaCreacion);
   const activa=!!t&&(Date.now()-t.getTime())<=365*864e5;
-  return{activa,html:`<span class="cta-estado ${activa?'on':'off'}" title="Estado automático según actividad de los últimos 365 días. No editable.">${activa?'🟢 Activa':'🔴 No Activa'}</span>`};
+  return{activa,html:`<span class="cta-estado ${activa?'on':'off'}" title="Estado automático según actividad comercial/marketing de los últimos 365 días. No editable.">${activa?'🟢 Activa':'🔴 No Activa'}</span>`};
+}
+function _cuentaCreador(d){return d.capturadoPor||d.brokerCreador||'';}
+// Ejecutivos de la cuenta: el creador SIEMPRE aparece primero (asignación automática);
+// los administradores pueden sumar hasta 2 adicionales.
+function _ejecutivosCuenta(d){
+  const det=_gestDet(d);
+  const creador=_cuentaCreador(d);
+  if(creador&&!det.some(g=>g.n===creador))det.unshift({n:creador,f:d.fechaCreacion||null});
+  else if(creador){const i=det.findIndex(g=>g.n===creador);if(i>0){const [c]=det.splice(i,1);det.unshift(c);}}
+  return det.slice(0,3);
 }
 function _logoValida(u){return /^https?:\/\/.+\.(jpg|jpeg|png|webp|svg)(\?.*)?$/i.test(String(u||'').trim());}
 function _gestDet(d){
@@ -6384,16 +6403,15 @@ const BU_OPCIONES=['Oficinas','Retail','Industria','Logística'];
 let _fichaCuentaId=null;
 const _ctaQuickCache={};
 
-function openClientDetail(docId){
+function renderCuentaLeftPanel(docId){
   const d=_crmDocs.find(x=>x._id===docId);
   if(!d)return;
-  _fichaCuentaId=docId;
   const nombre=d.nombre||d._id;
   const est=cuentaEstadoAuto(d);
-  const gest=_gestDet(d);
   const logo=_logoValida(d.logoUrl)
     ?`<img class="cta-logo" src="${esc(d.logoUrl)}" alt="" onerror="this.style.display='none';document.getElementById('cta-logo-fb').style.display='flex'"><div id="cta-logo-fb" class="crm-det-av" style="background:${crmAvatarBg(nombre)};display:none;margin:0 auto .5rem">${crmInitials(nombre)}</div>`
     :`<div class="crm-det-av" style="background:${crmAvatarBg(nombre)};margin:0 auto .5rem">${crmInitials(nombre)}</div>`;
+  const bloque=(lbl,fecha,usuario)=>`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">${lbl}</div><div class="crm-det-meta-val">${fmtDate(fecha)}</div>${usuario?`<div style="font-size:10.5px;color:#8898C0;margin-top:1px">${esc(usuario)}</div>`:''}</div>`;
   document.getElementById('crm-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       ${logo}
@@ -6404,16 +6422,19 @@ function openClientDetail(docId){
     <div class="cta-stats">
       <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-contactos">–</div><div class="cta-stat-l">Contactos</div></div>
       <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-oportunidades">–</div><div class="cta-stat-l">Oportunidades</div></div>
+      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-ganadas">–</div><div class="cta-stat-l">Oport. ganadas</div></div>
       <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-inmuebles">–</div><div class="cta-stat-l">Inmuebles</div></div>
-      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-servicios">–</div><div class="cta-stat-l">Serv. ganados</div></div>
     </div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${esc(gest[0]?.n||d.ejecutivoComercial||'–')}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Gestionado por</div><div class="crm-det-meta-val" style="font-size:12px">${gest.length?gest.map(g=>esc(g.n)).join(', '):'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${d.ultimaModificacion?fmtDate(d.ultimaModificacion)+(d.usuarioUltimaModificacion?' · '+esc(d.usuarioUltimaModificacion):''):'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">PPTs generados</div><div class="crm-det-meta-val" style="color:#1C54F4;font-size:20px">${d.cantidadPPTs||0}</div></div>
+    ${bloque('Última Actividad',d.ultimaActividadComercial||d.ultimaActividad,d.ultimaActividadComercialUsuario||'')}
+    ${bloque('Última Modificación',d.ultimaModificacion,d.usuarioUltimaModificacion||'')}
+    ${bloque('Cuenta creada',d.fechaCreacion,_cuentaCreador(d))}
   `;
+}
+function openClientDetail(docId){
+  const d=_crmDocs.find(x=>x._id===docId);
+  if(!d)return;
+  _fichaCuentaId=docId;
+  renderCuentaLeftPanel(docId);
   document.getElementById('crm-det-right').innerHTML=`
     <div class="crm-det-tabs">
       <button class="crm-det-tab active" onclick="detTab(this,'crm-dt-info')">Información</button>
@@ -6447,32 +6468,31 @@ function renderCuentaInfoTab(docId){
   const body=document.getElementById('crm-dt-info');
   if(!d||!body)return;
   const isAdmin=_nexusRole()!=='ejecutivo';
-  const gest=_gestDet(d);
   const item=(lbl,val,tip)=>`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl" style="display:flex;align-items:center">${lbl}${tip?`<span class="nx-tip" tabindex="0" data-tip="${esc(tip)}">i</span>`:''}</div><div class="crm-det-meta-val">${val}</div></div>`;
   const tags=arr=>arr.length?arr.map(t=>`<span class="crm-tag">${esc(t)}</span>`).join(''):'–';
   const rubros=Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[]);
   const subs=(Array.isArray(d.subrubros)&&d.subrubros.length?d.subrubros.map(o=>o.s||o.sub||''):(d.subRubro?[d.subRubro]:[])).filter(Boolean);
   const bu=(Array.isArray(d.bu)?d.bu:[d.bu]).filter(Boolean);
+  const ejecutivos=_ejecutivosCuenta(d);
   body.innerHTML=`
     <div class="cta-sec-title" style="margin-top:0">Información General</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
+      ${item('Sede Principal',d.sedePrincipalId?`<a href="javascript:void(0)" onclick="navToBuilding('${esc(d.sedePrincipalId)}')" style="color:#1C54F4;font-weight:600">🏢 ${esc(d.sedePrincipalNombre||'Ver edificio')}</a>`:'–')}
+      ${item('Creado por',esc(_cuentaCreador(d)||'–'))}
+    </div>
+    <div class="cta-sec-title">Segmentación</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
       ${isAdmin?item('Categoría',esc(d.categoria||'–')):''}
       ${item('Cliente Colliers',esc(d.clienteColliers||'–'),TIP_CLIENTE_COLLIERS)}
       ${item('Tipo de cuenta',esc(d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno')))}
-      ${item('Capturado por',esc(d.capturadoPor||d.brokerCreador||'–'))}
-      ${item('Sitio web',d.sitioWeb?`<a href="${esc(d.sitioWeb)}" target="_blank" rel="noopener" style="color:#1C54F4">${esc(d.sitioWeb)}</a>`:'–')}
-    </div>
-    <div class="cta-sec-title">Segmentación</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
       ${isAdmin?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Rubro</div><div class="crm-tags" style="margin-top:.3rem">${tags(rubros)}</div></div>
       <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Sub rubro</div><div class="crm-tags" style="margin-top:.3rem">${tags(subs)}</div></div>`:''}
       <div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl" style="display:flex;align-items:center">Unidades de negocio<span class="nx-tip" tabindex="0" data-tip="${esc(TIP_BU)}">i</span></div><div class="crm-tags" style="margin-top:.3rem">${tags(bu)}</div></div>
     </div>
-    ${isAdmin?`
-    <div class="cta-sec-title">Gestionado por <span style="font-weight:400;color:#8898C0;text-transform:none;letter-spacing:0">(hasta 3 ejecutivos · fecha de asignación automática)</span></div>
+    <div class="cta-sec-title">Ejecutivos Comerciales <span style="font-weight:400;color:#8898C0;text-transform:none;letter-spacing:0">(el creador es siempre el primero · hasta 2 adicionales)</span></div>
     <div style="max-width:420px">
-      ${gest.length?gest.map(g=>`<div class="cta-gest-row"><span class="cta-gest-n">${esc(g.n)}</span><span class="cta-gest-f">${g.f?fmtDate(g.f):'–'}</span></div>`).join(''):'<div class="anc-empty">Sin ejecutivos asignados. Se completa desde Editar (Research / Marketing).</div>'}
-    </div>`:''}
+      ${ejecutivos.length?ejecutivos.map((g,i)=>`<div class="cta-gest-row"><span class="cta-gest-n">${esc(g.n)}${i===0?' <span style="font-size:9px;font-weight:800;color:#8898C0">CREADOR</span>':''}</span><span class="cta-gest-f">${g.f?fmtDate(g.f):'–'}</span></div>`).join(''):'<div class="anc-empty">Sin ejecutivos asignados.</div>'}
+    </div>
   `;
 }
 
@@ -6483,7 +6503,7 @@ async function _loadCuentaQuickStats(docId){
   const cache=_ctaQuickCache[docId]||{};
   if(cache.contactos!=null)set('cta-stat-contactos',cache.contactos);
   if(cache.inmuebles!=null)set('cta-stat-inmuebles',cache.inmuebles);
-  if(cache.servicios!=null)set('cta-stat-servicios',cache.servicios);
+  if(cache.ganadas!=null)set('cta-stat-ganadas',cache.ganadas);
   if(!db)return;
   try{
     const snap=await db.collection('contactos').where('cuentaId','==',docId).get();
@@ -6491,11 +6511,15 @@ async function _loadCuentaQuickStats(docId){
     _ctaQuickCache[docId]={..._ctaQuickCache[docId],contactos:n};set('cta-stat-contactos',n);
   }catch(e){}
   try{
+    // Oportunidades ganadas: registros "Servicio Concretado" + transacciones cerradas de la cuenta
+    const acts=await db.collection('clientes').doc(docId).collection('actividades').get();
+    const nAct=acts.docs.filter(x=>/Servicio Concretado/i.test(x.data().tipo||'')).length;
     const tx=await db.collection('transacciones').get();
     const nom=(d.nombre||'').toLowerCase();
-    const n=tx.docs.filter(x=>{const t=x.data();const cli=String(t.cliente||t.clienteNombre||'').toLowerCase();return cli&&cli===nom&&String(t.estado||'').toLowerCase()==='cerrada';}).length;
-    _ctaQuickCache[docId]={..._ctaQuickCache[docId],servicios:n};set('cta-stat-servicios',n);
-  }catch(e){set('cta-stat-servicios','0');}
+    const nTx=tx.docs.filter(x=>{const t=x.data();const cli=String(t.cliente||t.clienteNombre||'').toLowerCase();return cli&&cli===nom&&String(t.estado||'').toLowerCase()==='cerrada';}).length;
+    const n=nAct+nTx;
+    _ctaQuickCache[docId]={..._ctaQuickCache[docId],ganadas:n};set('cta-stat-ganadas',n);
+  }catch(e){set('cta-stat-ganadas','0');}
 }
 
 // ===== Modo edición de la ficha (un solo botón Editar; todo editable a la vez) =====
@@ -6511,16 +6535,21 @@ window.cuentaFichaEdit=function(docId){
   const body=document.getElementById('crm-dt-info');
   if(!d||!body||!_canEditFicha())return;
   detTab(document.querySelector('.crm-det-tab'),'crm-dt-info');
+  const creador=_cuentaCreador(d);
   _fe={rubros:(Array.isArray(d.rubros)&&d.rubros.length?[...d.rubros]:(d.rubro?[d.rubro]:[])),
        subrubros:(Array.isArray(d.subrubros)?d.subrubros.map(o=>({r:o.r||'',s:o.s||''})).filter(o=>o.s):(d.subRubro?[{r:d.rubro||'',s:d.subRubro}]:[])),
        bu:(Array.isArray(d.bu)?[...d.bu]:[]).filter(Boolean),
-       gest:_gestDet(d).map(g=>({n:g.n,f:g.f})),
-       rubroOpts:[],subOpts:[],gestOpts:[]};
+       gest:_ejecutivosCuenta(d).filter(g=>g.n!==creador).map(g=>({n:g.n,f:g.f})).slice(0,2),
+       creador,
+       sede:{id:d.sedePrincipalId||'',nombre:d.sedePrincipalNombre||''},
+       rubroOpts:[],subOpts:[],gestOpts:[],sedeOpts:[]};
+  _loadBldDocsIfNeeded().catch(()=>{});
   const fld=(lbl,inner,tip)=>`<div class="cdr-field" style="margin-bottom:.7rem"><div class="cdr-lbl" style="display:flex;align-items:center">${lbl}${tip?`<span class="nx-tip" tabindex="0" data-tip="${esc(tip)}">i</span>`:''}</div>${inner}</div>`;
   body.innerHTML=`
     <div style="max-width:560px">
       <div class="cta-sec-title" style="margin-top:0">Editando cuenta</div>
       ${fld('Nombre comercial *',`<input id="fe-nombre" class="cdr-input" value="${esc(d.nombre||'')}">`)}
+      ${fld('Sede Principal',`<div id="fe-sede-tag" class="cdr-ms-chips">${_fe.sede.id?`<span class="cdr-ms-chip">🏢 ${esc(_fe.sede.nombre)}<span class="cdr-ms-chip-x" onclick="feSedeClear()">✕</span></span>`:''}</div><div class="cdr-ms-wrap"><input id="fe-sede-q" class="cdr-input" placeholder="Buscar edificio del inventario..." autocomplete="off" oninput="feSedeSearch(this.value)" onfocus="feSedeSearch(this.value)" onblur="feMsBlur('sede')"><div id="fe-sede-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
       ${fld('Sitio web',`<input id="fe-sitio" class="cdr-input" type="url" placeholder="https://empresa.com" value="${esc(d.sitioWeb||'')}">`)}
       ${fld('Logo de la empresa (URL)',`<input id="fe-logo" class="cdr-input" type="url" placeholder="https://... (.jpg .png .webp .svg)" value="${esc(d.logoUrl||'')}" oninput="feLogoPreview(this.value)"><div id="fe-logo-prev" style="margin-top:.4rem">${_logoValida(d.logoUrl)?`<img src="${esc(d.logoUrl)}" style="max-height:56px;max-width:160px;border:1px solid #E7EDF7;border-radius:8px;background:#fff;padding:4px" onerror="this.remove()">`:''}</div>`)}
       ${fld('Categoría',`<select id="fe-categoria" class="cdr-select">${['','Top','A','B','C','No aplica'].map(c=>`<option value="${c}"${(d.categoria||'')===c?' selected':''}>${c||'— Seleccionar —'}</option>`).join('')}</select>`)}
@@ -6529,7 +6558,7 @@ window.cuentaFichaEdit=function(docId){
       ${fld('Rubro',`<div id="fe-rubro-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="fe-rubro-q" class="cdr-input" placeholder="Buscar rubro..." autocomplete="off" oninput="feRubroSearch(this.value)" onfocus="feRubroSearch(this.value)" onblur="feMsBlur('rubro')"><div id="fe-rubro-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
       ${fld('Sub rubro',`<div id="fe-subrubro-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="fe-subrubro-q" class="cdr-input" placeholder="Según rubros..." autocomplete="off" oninput="feSubSearch(this.value)" onfocus="feSubSearch(this.value)" onblur="feMsBlur('subrubro')"><div id="fe-subrubro-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
       ${fld('Unidades de negocio',`<div class="cdr-toggle-group" id="fe-bu">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip${_fe.bu.includes(u)?' active':''}" data-bu="${u}" onclick="this.classList.toggle('active')">${u}</button>`).join('')}</div>`,TIP_BU)}
-      ${fld('Gestionado por (hasta 3, fecha automática)',`<div id="fe-gest-rows"></div><div class="cdr-ms-wrap"><input id="fe-gest-q" class="cdr-input" placeholder="Buscar ejecutivo..." autocomplete="off" oninput="feGestSearch(this.value)" onfocus="feGestSearch(this.value)" onblur="feMsBlur('gest')"><div id="fe-gest-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
+      ${fld('Ejecutivos Comerciales (creador fijo + hasta 2 adicionales, fecha automática)',`<div class="cta-gest-row" style="opacity:.75"><span class="cta-gest-n">${esc(_fe.creador||'–')} <span style="font-size:9px;font-weight:800;color:#8898C0">CREADOR</span></span><span class="cta-gest-f">${d.fechaCreacion?fmtDate(d.fechaCreacion):'–'}</span></div><div id="fe-gest-rows"></div><div class="cdr-ms-wrap"><input id="fe-gest-q" class="cdr-input" placeholder="Agregar ejecutivo adicional..." autocomplete="off" oninput="feGestSearch(this.value)" onfocus="feGestSearch(this.value)" onblur="feMsBlur('gest')"><div id="fe-gest-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
       <div style="display:flex;gap:.6rem;margin-top:1rem">
         <button class="cdr-save" style="height:38px;padding:0 20px;border:none;border-radius:9px;background:#1C54F4;color:#fff;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer" onclick="fichaEditSave('${docId}')">Guardar</button>
         <button style="height:38px;padding:0 16px;border:1px solid #DDE5F2;border-radius:9px;background:#fff;color:#56648F;font-weight:600;font-family:inherit;font-size:13px;cursor:pointer" onclick="renderCuentaInfoTab('${docId}')">Cancelar</button>
@@ -6547,8 +6576,11 @@ window.feRemoveRubroIdx=function(i){const r=_fe.rubros[i];if(r==null)return;_fe.
 window.feSubSearch=function(q){const drop=document.getElementById('fe-subrubro-drop');if(!drop)return;q=(q||'').toLowerCase().trim();if(!_fe.rubros.length){drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}_fe.subOpts=[];_fe.rubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>{if(q&&!s.toLowerCase().includes(q))return;if(_fe.subrubros.some(o=>o.r===r&&o.s===s))return;_fe.subOpts.push({r,s});}));drop.innerHTML=_fe.subOpts.length?_fe.subOpts.map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feAddSubIdx(${i})">${esc(o.s)} <small>· ${esc(o.r)}</small></div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
 window.feAddSubIdx=function(i){const o=_fe.subOpts[i];if(!o)return;if(!_fe.subrubros.some(x=>x.r===o.r&&x.s===o.s))_fe.subrubros.push(o);const q=document.getElementById('fe-subrubro-q');if(q)q.value='';document.getElementById('fe-subrubro-drop').style.display='none';_feRenderSubs();};
 window.feRemoveSubIdx=function(i){_fe.subrubros.splice(i,1);_feRenderSubs();};
-window.feGestSearch=function(q){const drop=document.getElementById('fe-gest-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=_fe.gest.map(g=>g.n);_fe.gestOpts=_feUserOpts().filter(n=>!sel.includes(n)&&n.toLowerCase().includes(q));drop.innerHTML=_fe.gestOpts.length?_fe.gestOpts.map((n,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feGestAddIdx(${i})">${esc(n)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
-window.feGestAddIdx=function(i){const n=_fe.gestOpts[i];if(n==null)return;if(_fe.gest.length>=3)return;if(!_fe.gest.some(g=>g.n===n))_fe.gest.push({n,f:firebase.firestore.Timestamp.now()});const q=document.getElementById('fe-gest-q');if(q)q.value='';document.getElementById('fe-gest-drop').style.display='none';_feRenderGest();};
+window.feGestSearch=function(q){const drop=document.getElementById('fe-gest-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=[..._fe.gest.map(g=>g.n),_fe.creador].filter(Boolean);_fe.gestOpts=_feUserOpts().filter(n=>!sel.includes(n)&&n.toLowerCase().includes(q));drop.innerHTML=_fe.gestOpts.length?_fe.gestOpts.map((n,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feGestAddIdx(${i})">${esc(n)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.feGestAddIdx=function(i){const n=_fe.gestOpts[i];if(n==null)return;if(_fe.gest.length>=2)return;if(!_fe.gest.some(g=>g.n===n))_fe.gest.push({n,f:firebase.firestore.Timestamp.now()});const q=document.getElementById('fe-gest-q');if(q)q.value='';document.getElementById('fe-gest-drop').style.display='none';_feRenderGest();};
+window.feSedeSearch=function(q){const drop=document.getElementById('fe-sede-drop');if(!drop)return;q=(q||'').toLowerCase().trim();_fe.sedeOpts=(_bldDocs||[]).filter(b=>(b.activo!==false)&&(b.nombre||'').toLowerCase().includes(q)).slice(0,8);drop.innerHTML=_fe.sedeOpts.length?_fe.sedeOpts.map((b,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feSedePickIdx(${i})">🏢 ${esc(b.nombre||b._id)}${b.direccion?` <small style="color:#8898C0">· ${esc(b.direccion)}</small>`:''}</div>`).join(''):(_bldDocs&&_bldDocs.length?'<div class="cdr-ms-empty">Sin resultados</div>':'<div class="cdr-ms-empty">Cargando inventario…</div>');drop.style.display='block';};
+window.feSedePickIdx=function(i){const b=_fe.sedeOpts[i];if(!b)return;_fe.sede={id:b._id,nombre:b.nombre||b._id};const q=document.getElementById('fe-sede-q');if(q)q.value='';document.getElementById('fe-sede-drop').style.display='none';const t=document.getElementById('fe-sede-tag');if(t)t.innerHTML=`<span class="cdr-ms-chip">🏢 ${esc(_fe.sede.nombre)}<span class="cdr-ms-chip-x" onclick="feSedeClear()">✕</span></span>`;};
+window.feSedeClear=function(){_fe.sede={id:'',nombre:''};const t=document.getElementById('fe-sede-tag');if(t)t.innerHTML='';};
 window.feGestRemoveIdx=function(i){_fe.gest.splice(i,1);_feRenderGest();};
 window.feMsBlur=function(which){setTimeout(()=>{const d=document.getElementById('fe-'+which+'-drop');if(d)d.style.display='none';},150);};
 window.fichaEditSave=async function(docId){
@@ -6559,11 +6591,14 @@ window.fichaEditSave=async function(docId){
     const now=firebase.firestore.Timestamp.now();
     const tipoCuenta=cdrToggleVal('feTipo')||'Ninguno';
     const subrubros=_cdrValidSubrubros(_fe.rubros,_fe.subrubros);
-    const gest=_fe.gest.slice(0,3);
+    // Creador siempre primero + hasta 2 adicionales.
+    const gest=[...(_fe.creador?[{n:_fe.creador,f:d.fechaCreacion||now}]:[]),..._fe.gest.slice(0,2)];
     const payload={
       nombre,
       sitioWeb:(document.getElementById('fe-sitio').value||'').trim(),
       logoUrl:(document.getElementById('fe-logo').value||'').trim(),
+      sedePrincipalId:_fe.sede.id||'',
+      sedePrincipalNombre:_fe.sede.nombre||'',
       categoria:document.getElementById('fe-categoria').value||'',
       clienteColliers:cdrToggleVal('feCliente')||'Sí',
       tipoCuenta,esBroker:tipoCuenta==='Broker'?'Sí':'No',esDesarrollador:tipoCuenta==='Desarrollador'?'Sí':'No',
@@ -6572,9 +6607,10 @@ window.fichaEditSave=async function(docId){
       gestionadoPorDet:gest.map(g=>({n:g.n,f:g.f||now})),
       gestionadoPor:gest.map(g=>g.n),
       ejecutivoComercial:gest[0]?.n||'',
-      ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||'',
+      // Cambios administrativos: NO tocan ultimaActividad ni el estado Activa/No Activa.
+      ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||'',
     };
-    const labels={nombre:'Nombre',sitioWeb:'Sitio web',logoUrl:'Logo',categoria:'Categoría',clienteColliers:'Cliente Colliers',tipoCuenta:'Tipo de cuenta',rubros:'Rubro',bu:'Unidades de negocio',gestionadoPor:'Gestionado por'};
+    const labels={nombre:'Nombre',sitioWeb:'Sitio web',logoUrl:'Logo',sedePrincipalNombre:'Sede Principal',categoria:'Categoría',clienteColliers:'Cliente Colliers',tipoCuenta:'Tipo de cuenta',rubros:'Rubro',bu:'Unidades de negocio',gestionadoPor:'Ejecutivos'};
     const diffs=_diffFields(d,payload,labels);
     await db.collection('clientes').doc(docId).update(payload);
     const idx=_crmDocs.findIndex(x=>x._id===docId);
@@ -6592,36 +6628,106 @@ window.fichaEditSave=async function(docId){
   }catch(e){alert('Error: '+e.message);}
 };
 
-// ===== Solapa Actividades (comercial + marketing & research, cronológica) =====
-const _ACT_CAT={informe_solicitado:'M',lead_calificado:'M',lead_vinculado:'M',campania:'M',publicacion:'M',cartel:'M',publicidad:'M',redes:'M',marketing:'M'};
+// ===== Solapa Actividades: dos columnas (Comerciales | Marketing & Research) =====
+// Registros explícitos en clientes/{id}/actividades. Cada registro reactiva la cuenta.
+const ACT_COMERCIALES=['Visita Comercial','Propuesta de Servicios enviada','Información relevante agregada a la Cuenta','Información relevante agregada a un Contacto','Oportunidad Comercial creada','Cambio de estado de una Oportunidad','Servicio Concretado (Oportunidad Ganada)','Lead Calificado','Otros'];
+const ACT_MARKETING=['Informe de alternativas solicitado','Informe de alternativas cargado en Nexus','Información relevante agregada','Ficha Comercial','Cartel','Publicación','Publicidad Ads','Redes Sociales','Otras acciones de Marketing'];
+let _actDocs=[];
 async function loadCuentaActividades(cuentaId){
   const body=document.getElementById('crm-dt-actividades-body');if(!body)return;
-  body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">⏳</div><div class="crm-det-placeholder-sub">Cargando actividades...</div></div>';
+  const isAdmin=_nexusRole()!=='ejecutivo';
+  const btns=(cat,list)=>`<div class="act-btns">${list.map((t,i)=>`<button type="button" class="act-btn" onclick="regActIdx('${cat}',${i})">＋ ${esc(t)}</button>`).join('')}</div>`;
+  body.innerHTML=`
+    <div class="act-2col">
+      <div>
+        <div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>
+        ${btns('C',ACT_COMERCIALES)}
+        <div id="act-list-C"><div class="anc-empty">Cargando…</div></div>
+      </div>
+      <div>
+        <div class="cta-sec-title" style="margin-top:0">Actividades Marketing & Research</div>
+        ${isAdmin?btns('M',ACT_MARKETING):'<div style="font-size:10.5px;color:#8898C0;margin-bottom:.6rem">Sólo los Administradores pueden registrar actividades de Marketing & Research.</div>'}
+        <div id="act-list-M"><div class="anc-empty">Cargando…</div></div>
+      </div>
+    </div>`;
   try{
-    const items=[];
-    const push=(fecha,tipo,desc,usuario,icon)=>{const t=_tsToDate(fecha);if(!t)return;items.push({t,cat:_ACT_CAT[tipo]||'C',desc,usuario:usuario||'',icon:icon||'·'});};
-    const [tlSnap,ctoSnap,leadSnap]=await Promise.all([
-      db.collection('clientes').doc(cuentaId).collection('timeline').orderBy('fecha','desc').limit(150).get().catch(()=>({docs:[]})),
-      db.collection('contactos').where('cuentaId','==',cuentaId).get().catch(()=>({docs:[]})),
-      db.collection('leads').where('cuentaId','==',cuentaId).get().catch(()=>({docs:[]})),
-    ]);
-    const TIPO_ICON={cliente_creado:'🟢',ppt_generado:'📄',cambio_estado:'🔄',cambio_ejecutivo:'👤',cuenta_actualizada:'✏️',alternativas_enviadas:'📧',ppt_descargado:'⬇️',archivado:'📦'};
-    tlSnap.docs.forEach(doc=>{const e=doc.data();if(e.tipo==='alta_contacto'||e.tipo==='lead_vinculado')return;push(e.fecha,e.tipo,e.descripcion||e.tipo||'Evento',e.usuario,TIPO_ICON[e.tipo]);});
-    ctoSnap.docs.forEach(doc=>{const c=doc.data();if((c.estadoRegistro||'activo')==='archivado')return;push(c.fechaCreacion,'alta_contacto',`Contacto agregado: ${(c.nombre||'')+' '+(c.apellidos||'')}`.trim(),c.brokerResponsable||c.ejecutivoComercial,'👤');});
-    leadSnap.docs.forEach(doc=>{const l=doc.data();push(l.fechaCreacion,'lead_vinculado',`Lead creado: ${(l.nombre||'')+' '+(l.apellido||'')}`.trim()+(l.origen?` · ${l.origen}`:''),l.creadoPor,'🎯');if(l.estado==='Calificado'||l.estado==='Convertido')push(l.ultimaActividad,'lead_calificado',`Lead ${l.estado.toLowerCase()}: ${(l.nombre||'')+' '+(l.apellido||'')}`.trim(),l.usuarioUltimaModificacion,'✅');});
-    items.sort((a,b)=>b.t-a.t);
-    if(!items.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin actividades registradas</div><div class="crm-det-placeholder-sub">Las actividades comerciales y de Marketing & Research aparecerán acá automáticamente.</div></div>';return;}
-    body.innerHTML=items.slice(0,120).map(it=>`
-      <div class="cta-act-item">
-        <span style="font-size:14px;flex-shrink:0">${it.icon}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12.5px;color:#1F2A4D;line-height:1.45;white-space:pre-line">${esc(it.desc)}</div>
-          <div style="font-size:10.5px;color:#8898C0;margin-top:2px">${it.t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})} ${it.t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}${it.usuario?' · '+esc(it.usuario):''}</div>
-        </div>
-        <span class="cta-act-badge ${it.cat==='M'?'m':'c'}">${it.cat==='M'?'MKT & RESEARCH':'COMERCIAL'}</span>
-      </div>`).join('');
-  }catch(e){body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;}
+    const snap=await db.collection('clientes').doc(cuentaId).collection('actividades').orderBy('fecha','desc').limit(200).get();
+    _actDocs=snap.docs.map(x=>({...x.data(),_id:x.id}));
+    _renderActLists(cuentaId);
+  }catch(e){
+    const c=document.getElementById('act-list-C');if(c)c.innerHTML=`<div class="anc-empty">Error: ${e.message}</div>`;
+    const m=document.getElementById('act-list-M');if(m)m.innerHTML='';
+  }
 }
+function _renderActLists(cuentaId){
+  const isAdmin=_nexusRole()!=='ejecutivo';
+  ['C','M'].forEach(cat=>{
+    const el=document.getElementById('act-list-'+cat);if(!el)return;
+    const items=_actDocs.filter(a=>(a.cat||'C')===cat);
+    if(!items.length){el.innerHTML=`<div class="anc-empty">Sin actividades ${cat==='C'?'comerciales':'de Marketing & Research'} registradas.</div>`;return;}
+    el.innerHTML=items.map(a=>{
+      const t=_tsToDate(a.fecha);
+      const idx=_actDocs.indexOf(a);
+      return`<div class="cta-act-item">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>
+          ${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}
+          <div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):''}${a.usuario?' · '+esc(a.usuario):''}</div>
+        </div>
+        ${isAdmin?`<span style="display:flex;gap:.35rem;flex-shrink:0"><span class="cdr-ms-chip-x" title="Editar" onclick="editActIdx('${cuentaId}',${idx})">✏️</span><span class="cdr-ms-chip-x" title="Eliminar" onclick="delActIdx('${cuentaId}',${idx})">🗑</span></span>`:''}
+      </div>`;
+    }).join('');
+  });
+}
+async function _registrarActividad(cuentaId,cat,tipo,descripcion){
+  if(cat==='M'&&_nexusRole()==='ejecutivo')return;   // marketing: sólo administradores
+  if(!db)return;
+  const now=firebase.firestore.Timestamp.now();
+  const userName=user?.displayName||user?.email||'';
+  const reg={cat,tipo,descripcion:descripcion||'',fecha:now,usuario:userName,userEmail:user?.email||''};
+  const ref=await db.collection('clientes').doc(cuentaId).collection('actividades').add(reg);
+  // Sólo las actividades reactivan la cuenta (estado Activa/No Activa).
+  await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:userName,ultimaActividad:now});
+  const idx=_crmDocs.findIndex(x=>x._id===cuentaId);
+  if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividadComercialUsuario:userName,ultimaActividad:now};
+  _actDocs.unshift({...reg,_id:ref.id});
+  _renderActLists(cuentaId);
+  renderCuentaLeftPanel(cuentaId);
+  _loadCuentaQuickStats(cuentaId);
+}
+window.regActIdx=function(cat,i){
+  const cuentaId=_fichaCuentaId;if(!cuentaId)return;
+  const tipo=cat==='C'?ACT_COMERCIALES[i]:ACT_MARKETING[i];
+  if(tipo==null)return;
+  let descripcion='';
+  if(/^Otr/.test(tipo)){
+    const d=prompt('Descripción de la actividad:');
+    if(!d||!d.trim())return;
+    descripcion=d.trim();
+  }
+  _registrarActividad(cuentaId,cat,tipo,descripcion).catch(e=>alert('Error: '+e.message));
+};
+window.editActIdx=async function(cuentaId,i){
+  if(_nexusRole()==='ejecutivo')return;
+  const a=_actDocs[i];if(!a)return;
+  const d=prompt('Editar descripción:',a.descripcion||'');
+  if(d==null)return;
+  try{
+    await db.collection('clientes').doc(cuentaId).collection('actividades').doc(a._id).update({descripcion:d.trim()});
+    a.descripcion=d.trim();
+    _renderActLists(cuentaId);
+  }catch(e){alert('Error: '+e.message);}
+};
+window.delActIdx=async function(cuentaId,i){
+  if(_nexusRole()==='ejecutivo')return;
+  const a=_actDocs[i];if(!a)return;
+  if(!confirm(`¿Eliminar la actividad "${a.tipo||''}"?`))return;
+  try{
+    await db.collection('clientes').doc(cuentaId).collection('actividades').doc(a._id).delete();
+    _actDocs.splice(i,1);
+    _renderActLists(cuentaId);
+  }catch(e){alert('Error: '+e.message);}
+};
 
 window.closeCRMDetail=()=>{
   document.getElementById('crm-detail-view').style.display='none';
@@ -10602,6 +10708,8 @@ async function upsertCliente(datos){
       const ex=snap.data();
       await ref.update({
         ultimaActividad:firebase.firestore.FieldValue.serverTimestamp(),
+        ultimaActividadComercial:firebase.firestore.FieldValue.serverTimestamp(),
+        ultimaActividadComercialUsuario:datos.usuario||datos.nombre||'',
         cantidadBusquedas:firebase.firestore.FieldValue.increment(1),
         cantidadPPTs:firebase.firestore.FieldValue.increment(1),
         broker:datos.usuario||datos.nombre||ex.broker||'',
@@ -10616,6 +10724,8 @@ async function upsertCliente(datos){
         broker:datos.usuario||datos.nombre||'',
         broker_email:datos.email||'',
         ultimaActividad:firebase.firestore.FieldValue.serverTimestamp(),
+        ultimaActividadComercial:firebase.firestore.FieldValue.serverTimestamp(),
+        ultimaActividadComercialUsuario:datos.usuario||datos.nombre||'',
         fechaCreacion:firebase.firestore.FieldValue.serverTimestamp(),
         cantidadBusquedas:1,
         cantidadPPTs:1,
@@ -10627,6 +10737,7 @@ async function upsertCliente(datos){
     }
     const alts=Number(datos.cantidad_alternativas)||0;
     addClientTimeline(docId,{tipo:'ppt_generado',descripcion:`PPT generado con ${alts} alternativa${alts!==1?'s':''}`});
+    ref.collection('actividades').add({cat:'M',tipo:'Informe de alternativas cargado en Nexus',descripcion:`${alts} alternativa${alts!==1?'s':''}`,fecha:firebase.firestore.Timestamp.now(),usuario:datos.usuario||datos.nombre||'',userEmail:datos.email||''}).catch(()=>{});
     console.log('Cliente upserted:',docId);
   }catch(e){console.error('upsertCliente:',e);}
 }
