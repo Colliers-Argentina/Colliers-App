@@ -26,7 +26,8 @@
   ```js
   const ANALYTICS_ALLOWED = [
     'mazaretto@gmail.com', 'matias.azaretto@colliers.com',
-    'colliers.arg@gmail.com', 'desarrollo@colliers.com.ar'
+    'colliers.arg@gmail.com', 'desarrollo@colliers.com.ar',
+    'ahbadino@gmail.com', 'alejandroh.badino@colliers.com'
   ];
   ```
 - `ANALYTICS_ALLOWED` controla: visibilidad de **Analytics**, del módulo

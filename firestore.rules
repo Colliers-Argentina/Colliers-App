@@ -74,7 +74,9 @@ service cloud.firestore {
     //     'mazaretto@gmail.com',
     //     'matias.azaretto@colliers.com',
     //     'colliers.arg@gmail.com',
-    //     'desarrollo@colliers.com.ar'
+    //     'desarrollo@colliers.com.ar',
+    //     'ahbadino@gmail.com',
+    //     'alejandroh.badino@colliers.com'
     //   ];
     // }
     // // Campos que SÓLO un admin puede crear o modificar en una Cuenta:
