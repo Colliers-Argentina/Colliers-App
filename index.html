@@ -3321,8 +3321,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           </div>
         </div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Teléfono (sin el 11 y sin espacios)</div>
-          <input id="ctdr-telefono" class="cdr-input" type="tel" inputmode="numeric" placeholder="Ej: 1551234567" oninput="this.value=_normTelContacto(this.value)">
+          <div class="cdr-lbl">Teléfono (sin el 11 y sin espacios) <span class="cdr-req">*</span></div>
+          <input id="ctdr-telefono" class="cdr-input" type="tel" inputmode="numeric" placeholder="Ej: 1551234567" oninput="this.value=_normTelContacto(this.value);this.style.borderColor=''">
         </div>
         <div class="cdr-field cdr-admin-only" id="ctdr-linkedin-field">
           <div class="cdr-lbl">LinkedIn <span class="cdr-admin-tag">ADMIN</span></div>
@@ -7398,12 +7398,14 @@ window.saveContactoDrawer=async function(){
   // Cargo efectivo: la opción estándar, o el texto libre cuando es "Otro".
   const cargo=cargoSel==='Otro'?cargoOtro:cargoSel;
   const email=(document.getElementById('ctdr-email').value||'').trim();
+  const telefono=_normTelContacto(document.getElementById('ctdr-telefono').value,true);
   let valid=true;
   if(!nombre){document.getElementById('ctdr-nombre').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-nombre').style.borderColor='';}
   if(!apellidos){document.getElementById('ctdr-apellidos').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-apellidos').style.borderColor='';}
   if(!cargoSel){document.getElementById('ctdr-cargo').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-cargo').style.borderColor='';}
   if(cargoSel==='Otro'&&!cargoOtro){document.getElementById('ctdr-cargo-otro').style.borderColor='#ED1B34';document.getElementById('ctdr-cargo-otro-err').style.display='block';valid=false;}else{document.getElementById('ctdr-cargo-otro').style.borderColor='';document.getElementById('ctdr-cargo-otro-err').style.display='none';}
   if(!email){document.getElementById('ctdr-email').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-email').style.borderColor='';}
+  if(!telefono){document.getElementById('ctdr-telefono').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-telefono').style.borderColor='';}
   if(!valid)return;
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('ctdr-save-btn');
@@ -7418,7 +7420,7 @@ window.saveContactoDrawer=async function(){
       propietario:cdrToggleVal('ctdrPropietario')||'No',
       email,
       estadoCorreo:document.getElementById('ctdr-estadoCorreo').value||'sin_comprobar',
-      telefono:_normTelContacto(document.getElementById('ctdr-telefono').value,true),
+      telefono,
       comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
     };
     // LinkedIn es exclusivo de Administradores: sólo un admin lo escribe, así un
