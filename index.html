@@ -3018,7 +3018,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
               <option>Email</option><option>Otro</option>
             </select>
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Ejecutivo Comercial asignado <span class="cdr-req">*</span></div><select id="ldr-broker" class="cdr-select"><option value="">— Seleccionar —</option><option>Matienzo</option><option>Bartra</option><option>Farola</option><option>Troncoso</option><option>Giancontieri</option><option>Zuliani</option></select></div>
+          <div class="cdr-field"><div class="cdr-lbl">Ejecutivo Comercial asignado <span class="cdr-req">*</span></div><select id="ldr-broker" class="cdr-select"><option value="">— Seleccionar —</option><option value="Bartra">Bartra Alejandro</option><option value="Farola">Farola Juan Manuel</option><option value="Giancontieri">Giancontieri Juan</option><option value="Matienzo">Matienzo Nicolas</option><option value="Troncoso">Troncoso Juan Manuel</option><option value="Zuliani">Zuliani Marcelo</option></select></div>
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Inmueble consultado</div>
@@ -3312,12 +3312,12 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div class="cdr-lbl">Ejecutivo Comercial responsable</div>
           <select id="ctdr-ejecutivo" class="cdr-select">
             <option value="">— Sin asignar —</option>
-            <option>Matienzo</option>
-            <option>Bartra</option>
-            <option>Farola</option>
-            <option>Troncoso</option>
-            <option>Giancontieri</option>
-            <option>Zuliani</option>
+            <option value="Bartra">Bartra Alejandro</option>
+            <option value="Farola">Farola Juan Manuel</option>
+            <option value="Giancontieri">Giancontieri Juan</option>
+            <option value="Matienzo">Matienzo Nicolas</option>
+            <option value="Troncoso">Troncoso Juan Manuel</option>
+            <option value="Zuliani">Zuliani Marcelo</option>
           </select>
         </div>
       </div>
@@ -4424,13 +4424,14 @@ try{
 let user=null, masterBuildings=[], filt=[], sel=new Set(), overviewData={};
 const ZONAS_DEFAULT=['Catalinas','Macrocentro','Macrocentro Sur','Microcentro','Norte CABA','Norte GBA','Plaza Roma','Puerto Madero','Retiro','Sur CABA'];
 
+// Orden alfabético por apellido. displayName con formato "Apellido Nombre".
 const BROKERS=[
-  {name:"Alejandro Bartra",displayName:"Bartra, Alejandro",email:"Alejandro.Bartra@colliers.com"},
-  {name:"Juan Manuel Farola",displayName:"Farola, Juan Manuel",email:"JuanManuel.Farola@colliers.com"},
-  {name:"Marcelo Zuliani",displayName:"Zuliani, Marcelo",email:"Marcelo.Zuliani@colliers.com"},
-  {name:"Juan Manuel Troncoso",displayName:"Troncoso, Juan Manuel",email:"JuanManuel.Troncoso@colliers.com"},
-  {name:"Nicolas Matienzo",displayName:"Matienzo, Nicolas",email:"nicolas.matienzo@colliers.com"},
-  {name:"Juan Giancontieri",displayName:"Giancontieri, Juan",email:"Juan.Giancontieri@colliers.com"}
+  {name:"Alejandro Bartra",displayName:"Bartra Alejandro",email:"Alejandro.Bartra@colliers.com"},
+  {name:"Juan Manuel Farola",displayName:"Farola Juan Manuel",email:"JuanManuel.Farola@colliers.com"},
+  {name:"Juan Giancontieri",displayName:"Giancontieri Juan",email:"Juan.Giancontieri@colliers.com"},
+  {name:"Nicolas Matienzo",displayName:"Matienzo Nicolas",email:"nicolas.matienzo@colliers.com"},
+  {name:"Juan Manuel Troncoso",displayName:"Troncoso Juan Manuel",email:"JuanManuel.Troncoso@colliers.com"},
+  {name:"Marcelo Zuliani",displayName:"Zuliani Marcelo",email:"Marcelo.Zuliani@colliers.com"}
 ];
 
 const TRANSLATIONS={
@@ -6007,7 +6008,23 @@ function createFilterEngine(defs){
   };
 }
 
-const CRM_EJECUTIVOS=['Matienzo','Bartra','Farola','Troncoso','Giancontieri','Zuliani'];
+// Catálogo oficial de Ejecutivos Comerciales, ordenado alfabéticamente por apellido.
+// La CLAVE (apellido) es el valor almacenado/relacional en Firestore — NO se modifica.
+// `display` ("Apellido Nombre") es únicamente el nombre visible en la UI.
+const EJECUTIVOS_CATALOG=[
+  {key:'Bartra',display:'Bartra Alejandro'},
+  {key:'Farola',display:'Farola Juan Manuel'},
+  {key:'Giancontieri',display:'Giancontieri Juan'},
+  {key:'Matienzo',display:'Matienzo Nicolas'},
+  {key:'Troncoso',display:'Troncoso Juan Manuel'},
+  {key:'Zuliani',display:'Zuliani Marcelo'},
+];
+const CRM_EJECUTIVOS=EJECUTIVOS_CATALOG.map(e=>e.key);
+const _EJEC_DISPLAY=Object.fromEntries(EJECUTIVOS_CATALOG.map(e=>[e.key,e.display]));
+// Devuelve el nombre visible "Apellido Nombre"; para valores fuera del catálogo
+// (nombres libres/legacy) devuelve el valor tal cual, sin romper filtros ni relaciones.
+function ejecDisplay(v){return _EJEC_DISPLAY[v]||v;}
+window.ejecDisplay=ejecDisplay;
 function _efectivoTipoCuenta(d){return d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');}
 const _normBU=x=>String(x||'').toLowerCase().replace(/s$/,'');   // 'Oficina'/'Oficinas' equivalentes (legacy)
 const _docRubros=d=>Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[]);
@@ -6022,8 +6039,8 @@ const CUENTAS_FILTER_DEFS=[
   {key:'categoria',label:'Categoría',multi:false,test:(d,v)=>(d.categoria||'')===v},
   {key:'tipoCuenta',label:'Tipo',multi:false,test:(d,v)=>_efectivoTipoCuenta(d)===v},
   {key:'bu',label:'Unidad',multi:true,test:(d,v)=>{const db=(Array.isArray(d.bu)?d.bu:(d.bu?[d.bu]:[])).map(_normBU);return v.some(u=>db.includes(_normBU(u)));}},
-  {key:'gestionadoPor',label:'Gestionado por',multi:true,test:(d,v)=>{const g=_docGestion(d);return v.some(x=>g.includes(x));}},
-  {key:'capturadoPor',label:'Creado por',multi:true,test:(d,v)=>v.includes(d.capturadoPor||d.brokerCreador||'')},
+  {key:'gestionadoPor',label:'Gestionado por',multi:true,fmt:ejecDisplay,test:(d,v)=>{const g=_docGestion(d);return v.some(x=>g.includes(x));}},
+  {key:'capturadoPor',label:'Creado por',multi:true,fmt:ejecDisplay,test:(d,v)=>v.includes(d.capturadoPor||d.brokerCreador||'')},
 ];
 const _crmFilterEngine=createFilterEngine(CUENTAS_FILTER_DEFS);
 // API pública reutilizable: otros módulos (Contactos/Leads/Oportunidades/
@@ -6060,7 +6077,7 @@ function renderCrmFilterPanel(){
 }
 function _crmFltRenderMultiChips(key){
   const el=document.getElementById('crm-flt-'+key+'-chips');if(!el)return;
-  el.innerHTML=_crmFilterEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(v)}<span class="cdr-ms-chip-x" onclick="crmFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');
+  el.innerHTML=_crmFilterEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(ejecDisplay(v))}<span class="cdr-ms-chip-x" onclick="crmFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');
 }
 function _crmSyncControls(){
   const st=_crmFilterEngine.state;
@@ -6074,8 +6091,8 @@ window.crmFltMultiSearch=function(key,q){
   q=(q||'').toLowerCase().trim();const cfg=_crmMultiCfg[key];
   if(cfg.needsRubro&&!_crmFilterEngine.state.rubros.length){_crmFltOpts[key]=[];drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}
   const sel=_crmFilterEngine.state[key];
-  _crmFltOpts[key]=cfg.opts().filter(o=>!sel.includes(o)&&o.toLowerCase().includes(q));
-  drop.innerHTML=_crmFltOpts[key].length?_crmFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();crmFltMultiAddIdx('${key}',${i})">${esc(o)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
+  _crmFltOpts[key]=cfg.opts().filter(o=>!sel.includes(o)&&(o.toLowerCase().includes(q)||ejecDisplay(o).toLowerCase().includes(q)));
+  drop.innerHTML=_crmFltOpts[key].length?_crmFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();crmFltMultiAddIdx('${key}',${i})">${esc(ejecDisplay(o))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
   drop.style.display='block';
 };
 window.crmFltMultiAddIdx=function(key,i){
@@ -6171,9 +6188,9 @@ function renderAncPanel(){
     ms('gestionadoPor','Gestionado por','Buscar ejecutivo...')+ms('capturadoPor','Creado por','Buscar usuario...');
   _ancSyncControls();
 }
-function _ancRenderMultiChips(key){const el=document.getElementById('anc-flt-'+key+'-chips');if(!el)return;el.innerHTML=_anCtaEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(v)}<span class="cdr-ms-chip-x" onclick="ancFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');}
+function _ancRenderMultiChips(key){const el=document.getElementById('anc-flt-'+key+'-chips');if(!el)return;el.innerHTML=_anCtaEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(ejecDisplay(v))}<span class="cdr-ms-chip-x" onclick="ancFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');}
 function _ancSyncControls(){const st=_anCtaEngine.state;['clienteColliers','categoria','tipoCuenta'].forEach(k=>{const el=document.getElementById('anc-flt-'+k);if(el)el.value=st[k]||'';});['rubros','subrubros','gestionadoPor','capturadoPor'].forEach(_ancRenderMultiChips);document.querySelectorAll('#anc-flt-bu .cto-pref-chip').forEach(b=>b.classList.toggle('active',st.bu.includes(b.dataset.bu)));const t=document.getElementById('anc-flt-text');if(t)t.value=st.text||'';}
-window.ancFltMultiSearch=function(key,q){const drop=document.getElementById('anc-flt-'+key+'-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const cfg=_ancMultiCfg[key];if(cfg.needsRubro&&!_anCtaEngine.state.rubros.length){_ancFltOpts[key]=[];drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}const sel=_anCtaEngine.state[key];_ancFltOpts[key]=cfg.opts().filter(o=>!sel.includes(o)&&o.toLowerCase().includes(q));drop.innerHTML=_ancFltOpts[key].length?_ancFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ancFltMultiAddIdx('${key}',${i})">${esc(o)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.ancFltMultiSearch=function(key,q){const drop=document.getElementById('anc-flt-'+key+'-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const cfg=_ancMultiCfg[key];if(cfg.needsRubro&&!_anCtaEngine.state.rubros.length){_ancFltOpts[key]=[];drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}const sel=_anCtaEngine.state[key];_ancFltOpts[key]=cfg.opts().filter(o=>!sel.includes(o)&&(o.toLowerCase().includes(q)||ejecDisplay(o).toLowerCase().includes(q)));drop.innerHTML=_ancFltOpts[key].length?_ancFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ancFltMultiAddIdx('${key}',${i})">${esc(ejecDisplay(o))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
 window.ancFltMultiAddIdx=function(key,i){const o=_ancFltOpts[key][i];if(o==null)return;const st=_anCtaEngine.state[key];if(!st.includes(o))st.push(o);const inp=document.getElementById('anc-flt-'+key+'-q');if(inp)inp.value='';document.getElementById('anc-flt-'+key+'-drop').style.display='none';_ancRenderMultiChips(key);if(key==='rubros')_ancRenderMultiChips('subrubros');applyAncFilters();};
 window.ancFltMultiRemoveIdx=function(key,i){const st=_anCtaEngine.state[key];if(i<0||i>=st.length)return;st.splice(i,1);if(key==='rubros'){const av=new Set();st.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>av.add(s)));_anCtaEngine.state.subrubros=_anCtaEngine.state.subrubros.filter(s=>av.has(s));_ancRenderMultiChips('subrubros');}_ancRenderMultiChips(key);applyAncFilters();};
 window.ancFltMultiBlur=function(key){setTimeout(()=>{const d=document.getElementById('anc-flt-'+key+'-drop');if(d)d.style.display='none';},150);};
@@ -6246,7 +6263,7 @@ const CONTACTOS_FILTER_DEFS=[
   {key:'estadoCorreo',label:'Correo',multi:false,test:(d,v)=>(d.estadoCorreo||'sin_comprobar')===v,fmt:v=>_ESTADO_CORREO_LBL[v]||v},
   {key:'propietario',label:'Propietario',multi:false,test:(d,v)=>(d.propietario||'No')===v},
   {key:'conCuenta',label:'Cuenta',multi:false,test:(d,v)=>v==='Sí'?!!d.cuentaId:!d.cuentaId,fmt:v=>v==='Sí'?'Con cuenta':'Sin cuenta'},
-  {key:'ejecutivo',label:'Ejecutivo',multi:true,test:(d,v)=>v.includes(_ctoEjecutivo(d))},
+  {key:'ejecutivo',label:'Ejecutivo',multi:true,fmt:ejecDisplay,test:(d,v)=>v.includes(_ctoEjecutivo(d))},
 ];
 let _anCtoDocs=[], _anCtoLoaded=false;
 const _anCtoEngine=createFilterEngine(CONTACTOS_FILTER_DEFS);
@@ -6285,9 +6302,9 @@ function renderAntcPanel(){
     ms('ejecutivo','Ejecutivo Comercial','Buscar ejecutivo...');
   _antcSyncControls();
 }
-function _antcRenderMultiChips(key){const el=document.getElementById('antc-flt-'+key+'-chips');if(!el)return;el.innerHTML=_anCtoEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(v)}<span class="cdr-ms-chip-x" onclick="antcFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');}
+function _antcRenderMultiChips(key){const el=document.getElementById('antc-flt-'+key+'-chips');if(!el)return;el.innerHTML=_anCtoEngine.state[key].map((v,i)=>`<span class="cdr-ms-chip">${esc(key==='ejecutivo'?ejecDisplay(v):v)}<span class="cdr-ms-chip-x" onclick="antcFltMultiRemoveIdx('${key}',${i})">✕</span></span>`).join('');}
 function _antcSyncControls(){const st=_anCtoEngine.state;['estadoCorreo','propietario','conCuenta'].forEach(k=>{const el=document.getElementById('antc-flt-'+k);if(el)el.value=st[k]||'';});['cargo','ejecutivo'].forEach(_antcRenderMultiChips);const t=document.getElementById('antc-flt-text');if(t)t.value=st.text||'';}
-window.antcFltMultiSearch=function(key,q){const drop=document.getElementById('antc-flt-'+key+'-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=_anCtoEngine.state[key];_antcFltOpts[key]=_antcMultiCfg[key].opts().filter(o=>!sel.includes(o)&&o.toLowerCase().includes(q));drop.innerHTML=_antcFltOpts[key].length?_antcFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();antcFltMultiAddIdx('${key}',${i})">${esc(o)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.antcFltMultiSearch=function(key,q){const drop=document.getElementById('antc-flt-'+key+'-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=_anCtoEngine.state[key];_antcFltOpts[key]=_antcMultiCfg[key].opts().filter(o=>!sel.includes(o)&&(o.toLowerCase().includes(q)||(key==='ejecutivo'&&ejecDisplay(o).toLowerCase().includes(q))));drop.innerHTML=_antcFltOpts[key].length?_antcFltOpts[key].map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();antcFltMultiAddIdx('${key}',${i})">${esc(key==='ejecutivo'?ejecDisplay(o):o)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
 window.antcFltMultiAddIdx=function(key,i){const o=_antcFltOpts[key][i];if(o==null)return;const st=_anCtoEngine.state[key];if(!st.includes(o))st.push(o);const inp=document.getElementById('antc-flt-'+key+'-q');if(inp)inp.value='';document.getElementById('antc-flt-'+key+'-drop').style.display='none';_antcRenderMultiChips(key);applyAntcFilters();};
 window.antcFltMultiRemoveIdx=function(key,i){const st=_anCtoEngine.state[key];if(i<0||i>=st.length)return;st.splice(i,1);_antcRenderMultiChips(key);applyAntcFilters();};
 window.antcFltMultiBlur=function(key){setTimeout(()=>{const d=document.getElementById('antc-flt-'+key+'-drop');if(d)d.style.display='none';},150);};
@@ -6313,7 +6330,7 @@ window.renderContactosAnalytics=function(docs,totalBase){
   const cargoM=_ancCountBy(docs,d=>d.cargo||'Sin cargo');
   const correoM=_ancCountBy(docs,d=>_ESTADO_CORREO_LBL[d.estadoCorreo||'sin_comprobar']);
   const propM=_ancCountBy(docs,d=>d.propietario||'No');
-  const ejeM=_ancCountBy(docs,d=>_ctoEjecutivo(d));
+  const ejeM=_ancCountBy(docs,d=>ejecDisplay(_ctoEjecutivo(d)));
   const ctaM=_ancCountBy(docs,d=>d.cuentaNombre||'');
   ch.innerHTML=
     _ancCard('Por Cargo segmentado',_ancBars([...cargoM],{max:8}))+
@@ -6529,7 +6546,7 @@ function renderCuentaInfoTab(docId){
       <div class="nx-col">
         <div class="nx-card">
           <div class="nx-card-title">Ejecutivos Comerciales</div>
-          ${ejecutivos.length?ejecutivos.map((g,i)=>`<div class="nx-row"><div class="nx-row-l">${esc(g.n)}${i===0?' <span style="font-size:9px;font-weight:800;color:#8898C0;margin-left:.35rem">CREADOR</span>':''}</div><div class="nx-row-v">${g.f?fmtDate(g.f):dash}</div></div>`).join(''):`<div class="nx-row"><div class="nx-row-v" style="width:100%;justify-content:flex-start;color:#8898C0">Sin ejecutivos asignados.</div></div>`}
+          ${ejecutivos.length?ejecutivos.map((g,i)=>`<div class="nx-row"><div class="nx-row-l">${esc(ejecDisplay(g.n))}${i===0?' <span style="font-size:9px;font-weight:800;color:#8898C0;margin-left:.35rem">CREADOR</span>':''}</div><div class="nx-row-v">${g.f?fmtDate(g.f):dash}</div></div>`).join(''):`<div class="nx-row"><div class="nx-row-v" style="width:100%;justify-content:flex-start;color:#8898C0">Sin ejecutivos asignados.</div></div>`}
         </div>
         <div class="nx-card">
           <div class="nx-card-title">Estado Comercial</div>
@@ -6627,7 +6644,7 @@ window.cuentaFichaEdit=function(docId){
       <div class="nx-col">
         <div class="nx-card">
           <div class="nx-card-title">Ejecutivos Comerciales</div>
-          <div class="nx-row"><div class="nx-row-l">${esc(_fe.creador||'–')} <span style="font-size:9px;font-weight:800;color:#8898C0;margin-left:.35rem">CREADOR</span></div><div class="nx-row-v">${d.fechaCreacion?fmtDate(d.fechaCreacion):dash}</div></div>
+          <div class="nx-row"><div class="nx-row-l">${esc(ejecDisplay(_fe.creador)||'–')} <span style="font-size:9px;font-weight:800;color:#8898C0;margin-left:.35rem">CREADOR</span></div><div class="nx-row-v">${d.fechaCreacion?fmtDate(d.fechaCreacion):dash}</div></div>
           <div id="fe-gest-rows"></div>
           <div class="cdr-ms-wrap" style="margin-top:.5rem"><input id="fe-gest-q" class="cdr-input" placeholder="Agregar ejecutivo adicional (hasta 2)..." autocomplete="off" oninput="feGestSearch(this.value)" onfocus="feGestSearch(this.value)" onblur="feMsBlur('gest')"><div id="fe-gest-drop" class="cdr-ms-drop" style="display:none"></div></div>
         </div>
@@ -6645,14 +6662,14 @@ window.cuentaFichaEdit=function(docId){
 window.feLogoPreview=function(u){const p=document.getElementById('fe-logo-prev');if(!p)return;p.innerHTML=_logoValida(u)?`<img src="${esc(u)}" style="max-height:56px;max-width:160px;border:1px solid #E7EDF7;border-radius:8px;background:#fff;padding:4px" onerror="this.remove()">`:(u?'<span style="font-size:10.5px;color:#B45309">URL de imagen no válida (jpg/jpeg/png/webp/svg)</span>':'');};
 function _feRenderRubros(){const c=document.getElementById('fe-rubro-chips');if(c)c.innerHTML=_fe.rubros.map((r,i)=>`<span class="cdr-ms-chip">${esc(r)}<span class="cdr-ms-chip-x" onclick="feRemoveRubroIdx(${i})">✕</span></span>`).join('');}
 function _feRenderSubs(){const c=document.getElementById('fe-subrubro-chips');if(c)c.innerHTML=_fe.subrubros.map((o,i)=>`<span class="cdr-ms-chip cdr-ms-chip-sub">${esc(o.s)} <small style="opacity:.6">· ${esc(o.r)}</small><span class="cdr-ms-chip-x" onclick="feRemoveSubIdx(${i})">✕</span></span>`).join('');}
-function _feRenderGest(){const c=document.getElementById('fe-gest-rows');if(c)c.innerHTML=_fe.gest.map((g,i)=>`<div class="nx-row"><div class="nx-row-l">${esc(g.n)}</div><div class="nx-row-v"><span>${g.f?fmtDate(g.f):'nueva'}</span><span class="cdr-ms-chip-x" onclick="feGestRemoveIdx(${i})">✕</span></div></div>`).join('');}
+function _feRenderGest(){const c=document.getElementById('fe-gest-rows');if(c)c.innerHTML=_fe.gest.map((g,i)=>`<div class="nx-row"><div class="nx-row-l">${esc(ejecDisplay(g.n))}</div><div class="nx-row-v"><span>${g.f?fmtDate(g.f):'nueva'}</span><span class="cdr-ms-chip-x" onclick="feGestRemoveIdx(${i})">✕</span></div></div>`).join('');}
 window.feRubroSearch=function(q){const drop=document.getElementById('fe-rubro-drop');if(!drop)return;q=(q||'').toLowerCase().trim();_fe.rubroOpts=Object.keys(RUBROS_CATALOG).filter(r=>!_fe.rubros.includes(r)&&r.toLowerCase().includes(q));drop.innerHTML=_fe.rubroOpts.length?_fe.rubroOpts.map((r,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feAddRubroIdx(${i})">${esc(r)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
 window.feAddRubroIdx=function(i){const r=_fe.rubroOpts[i];if(r==null)return;if(!_fe.rubros.includes(r))_fe.rubros.push(r);const q=document.getElementById('fe-rubro-q');if(q)q.value='';document.getElementById('fe-rubro-drop').style.display='none';_feRenderRubros();};
 window.feRemoveRubroIdx=function(i){const r=_fe.rubros[i];if(r==null)return;_fe.rubros=_fe.rubros.filter(x=>x!==r);_fe.subrubros=_fe.subrubros.filter(o=>o.r!==r);_feRenderRubros();_feRenderSubs();};
 window.feSubSearch=function(q){const drop=document.getElementById('fe-subrubro-drop');if(!drop)return;q=(q||'').toLowerCase().trim();if(!_fe.rubros.length){drop.innerHTML='<div class="cdr-ms-empty">Seleccioná un rubro primero</div>';drop.style.display='block';return;}_fe.subOpts=[];_fe.rubros.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>{if(q&&!s.toLowerCase().includes(q))return;if(_fe.subrubros.some(o=>o.r===r&&o.s===s))return;_fe.subOpts.push({r,s});}));drop.innerHTML=_fe.subOpts.length?_fe.subOpts.map((o,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feAddSubIdx(${i})">${esc(o.s)} <small>· ${esc(o.r)}</small></div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
 window.feAddSubIdx=function(i){const o=_fe.subOpts[i];if(!o)return;if(!_fe.subrubros.some(x=>x.r===o.r&&x.s===o.s))_fe.subrubros.push(o);const q=document.getElementById('fe-subrubro-q');if(q)q.value='';document.getElementById('fe-subrubro-drop').style.display='none';_feRenderSubs();};
 window.feRemoveSubIdx=function(i){_fe.subrubros.splice(i,1);_feRenderSubs();};
-window.feGestSearch=function(q){const drop=document.getElementById('fe-gest-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=[..._fe.gest.map(g=>g.n),_fe.creador].filter(Boolean);_fe.gestOpts=_feUserOpts().filter(n=>!sel.includes(n)&&n.toLowerCase().includes(q));drop.innerHTML=_fe.gestOpts.length?_fe.gestOpts.map((n,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feGestAddIdx(${i})">${esc(n)}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.feGestSearch=function(q){const drop=document.getElementById('fe-gest-drop');if(!drop)return;q=(q||'').toLowerCase().trim();const sel=[..._fe.gest.map(g=>g.n),_fe.creador].filter(Boolean);_fe.gestOpts=_feUserOpts().filter(n=>!sel.includes(n)&&(n.toLowerCase().includes(q)||ejecDisplay(n).toLowerCase().includes(q)));drop.innerHTML=_fe.gestOpts.length?_fe.gestOpts.map((n,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feGestAddIdx(${i})">${esc(ejecDisplay(n))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
 window.feGestAddIdx=function(i){const n=_fe.gestOpts[i];if(n==null)return;if(_fe.gest.length>=2)return;if(!_fe.gest.some(g=>g.n===n))_fe.gest.push({n,f:firebase.firestore.Timestamp.now()});const q=document.getElementById('fe-gest-q');if(q)q.value='';document.getElementById('fe-gest-drop').style.display='none';_feRenderGest();};
 window.feSedeSearch=function(q){const drop=document.getElementById('fe-sede-drop');if(!drop)return;q=(q||'').toLowerCase().trim();_fe.sedeOpts=(_bldDocs||[]).filter(b=>(b.activo!==false)&&(b.nombre||'').toLowerCase().includes(q)).slice(0,8);drop.innerHTML=_fe.sedeOpts.length?_fe.sedeOpts.map((b,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();feSedePickIdx(${i})">🏢 ${esc(b.nombre||b._id)}${b.direccion?` <small style="color:#8898C0">· ${esc(b.direccion)}</small>`:''}</div>`).join(''):(_bldDocs&&_bldDocs.length?'<div class="cdr-ms-empty">Sin resultados</div>':'<div class="cdr-ms-empty">Cargando inventario…</div>');drop.style.display='block';};
 window.feSedePickIdx=function(i){const b=_fe.sedeOpts[i];if(!b)return;_fe.sede={id:b._id,nombre:b.nombre||b._id};const q=document.getElementById('fe-sede-q');if(q)q.value='';document.getElementById('fe-sede-drop').style.display='none';const t=document.getElementById('fe-sede-tag');if(t)t.innerHTML=`<span class="cdr-ms-chip">🏢 ${esc(_fe.sede.nombre)}<span class="cdr-ms-chip-x" onclick="feSedeClear()">✕</span></span>`;};
@@ -6905,8 +6922,8 @@ function openContactoDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado correo</div>${emailBadge(d.estadoCorreo)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial responsable</div><div class="crm-det-meta-val">${d.brokerResponsable||'–'}</div></div>
-    ${d.ejecutivoComercial?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${d.ejecutivoComercial}</div></div>`:''}
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial responsable</div><div class="crm-det-meta-val">${esc(ejecDisplay(d.brokerResponsable))||'–'}</div></div>
+    ${d.ejecutivoComercial?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${esc(ejecDisplay(d.ejecutivoComercial))}</div></div>`:''}
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
   `;
   document.getElementById('cto-det-right').innerHTML=`
@@ -7043,7 +7060,7 @@ function _renderInvTable(units,bodyId,showBldCount){
   html+=`<div style="overflow-x:auto"><table class="crm-inv-table"><thead><tr><th>Edificio</th><th>Piso</th><th>Unidad</th><th>Rol</th><th>m²</th><th>Estado</th><th>Asking Rent</th><th>Ejecutivo Comercial</th><th></th></tr></thead><tbody>`;
   units.forEach(u=>{
     const rolCls=u._rol==='Ocupante'?'crm-inv-badge-occ':'crm-inv-badge-own';
-    html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td><span class="crm-inv-badge ${rolCls}">${u._rol}</span></td><td>${u.m2?Number(u.m2).toLocaleString('es-AR'):'–'}</td><td>${esc(u.estado||'–')}</td><td>${esc(u.askingRent||'–')}</td><td>${esc(u.brokerAsignado||u._bldEjec||'–')}</td><td><button class="crm-inv-nav-btn" onclick="navToBuilding('${u._bldId}')">Ver edificio →</button></td></tr>`;
+    html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td><span class="crm-inv-badge ${rolCls}">${u._rol}</span></td><td>${u.m2?Number(u.m2).toLocaleString('es-AR'):'–'}</td><td>${esc(u.estado||'–')}</td><td>${esc(u.askingRent||'–')}</td><td>${esc(ejecDisplay(u.brokerAsignado||u._bldEjec)||'–')}</td><td><button class="crm-inv-nav-btn" onclick="navToBuilding('${u._bldId}')">Ver edificio →</button></td></tr>`;
   });
   html+='</tbody></table></div>';
   body.innerHTML=html;
@@ -7422,7 +7439,7 @@ function renderLeadsTable(docs){
       <td>${leadOrigenBadge(d.origen)}</td>
       <td>${leadEstadoBadge(d.estado)}</td>
       <td><div class="crm-broker-cell">${d.buildingName||'–'}</div></td>
-      <td><div class="crm-broker-cell">${d.brokerAsignado||'–'}</div></td>
+      <td><div class="crm-broker-cell">${esc(ejecDisplay(d.brokerAsignado))||'–'}</div></td>
       <td class="crm-date">${fmtDate(d.fechaCreacion)}</td>
       <td><button class="crm-action-btn" onclick="event.stopPropagation();openLeadDetail('${d._id}')">Ver ficha →</button></td>
     </tr>`;
@@ -7452,7 +7469,7 @@ function openLeadDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${leadEstadoBadge(d.estado)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Origen</div>${leadOrigenBadge(d.origen)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${d.empresa||'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${d.brokerAsignado||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${esc(ejecDisplay(d.brokerAsignado))||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.buildingName||'–'}</div></div>
     ${d.linkOrigen?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Link de origen</div><div class="crm-det-meta-val" style="word-break:break-all"><a href="${d.linkOrigen}" target="_blank" rel="noopener" style="color:#1C54F4;text-decoration:none;font-size:11px">${d.linkOrigen}</a></div></div>`:''}
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
@@ -7550,7 +7567,7 @@ window._leadSendToBroker=function(docId){
   const d=_leadDocs.find(x=>x._id===docId);
   if(!d)return;
   const brokerName=d.brokerAsignado||'';
-  const brokerObj=BROKERS.find(b=>b.name.split(' ').some(p=>brokerName===p)||b.displayName.split(',').map(s=>s.trim()).some(p=>brokerName===p));
+  const brokerObj=BROKERS.find(b=>b.name.split(' ').some(p=>brokerName===p)||b.displayName.split(/[,\s]+/).map(s=>s.trim()).some(p=>brokerName===p)||b.displayName===brokerName);
   const brokerEmail=brokerObj?.email||'';
   if(!brokerEmail){showBldToast('No hay email asignado al broker');return;}
   const {subject,body}=_leadResumenText(d);
@@ -8054,7 +8071,7 @@ function renderLeadsAnalytics(leads){
   if(brokersEl){
     const bmap={};
     leads.forEach(d=>{
-      const b=d.brokerAsignado||'Sin asignar';
+      const b=ejecDisplay(d.brokerAsignado)||'Sin asignar';
       if(!bmap[b])bmap[b]={total:0,conv:0};
       bmap[b].total++;
       if(d.estado==='Convertido')bmap[b].conv++;
@@ -8105,7 +8122,7 @@ function _cdrIsAdmin(){return ANALYTICS_ALLOWED.includes(user?.email);}
 // ===== Catálogo Rubro -> Subrubros — PROVISORIO =====
 // Reemplazar por la taxonomía oficial de Colliers cuando esté disponible.
 // Es data-driven: agregar/quitar rubros o subrubros NO requiere tocar la lógica.
-const RUBROS_CATALOG={
+const _RUBROS_RAW={
   'Tecnología':['Software','Fintech','Hardware','Telecomunicaciones','E-commerce','Ciberseguridad','Datacenter'],
   'Servicios Financieros':['Banco','Seguros','Fondos de Inversión','Medios de Pago','Financiera'],
   'Salud':['Laboratorio','Farmacéutica','Clínica / Sanatorio','Equipamiento Médico','Obra Social / Prepaga'],
@@ -8122,6 +8139,12 @@ const RUBROS_CATALOG={
   'Hotelería y Turismo':['Hotel','Gastronomía','Agencia de Viajes','Entretenimiento'],
   'Medios y Entretenimiento':['Productora','Editorial / Prensa','Streaming / Contenidos','Gaming'],
 };
+// Catálogo ordenado alfabéticamente: rubros (claves) y subrubros dentro de cada rubro.
+// No modifica la taxonomía ni las relaciones Rubro→Subrubro; sólo el orden de presentación.
+const _cmpEs=(a,b)=>String(a).localeCompare(String(b),'es',{sensitivity:'base'});
+const RUBROS_CATALOG=Object.fromEntries(
+  Object.keys(_RUBROS_RAW).sort(_cmpEs).map(k=>[k,[..._RUBROS_RAW[k]].sort(_cmpEs)])
+);
 
 function _cdrRenderRubroChips(){
   const c=document.getElementById('cdr-rubro-chips');if(!c)return;
