@@ -6567,7 +6567,7 @@ function renderCuentaInfoTab(docId){
           <div class="nx-card-title">Segmentación</div>
           ${isAdmin?row('Categoría',fv(d.categoria)):''}
           ${row('Cliente Colliers',fv(d.clienteColliers),TIP_CLIENTE_COLLIERS)}
-          ${row('Tipo de Cuenta',esc(_efectivoTipoCuenta(d)))}
+          ${_efectivoTipoCuenta(d)!=='Ninguno'?row('Tipo de Cuenta',esc(_efectivoTipoCuenta(d))):''}
           ${isAdmin?row('Rubro',tags(rubros)):''}
           ${isAdmin?row('Subrubro',tags(subs)):''}
           ${row('Unidades de Negocio',tags(bu),TIP_BU)}
@@ -6576,7 +6576,7 @@ function renderCuentaInfoTab(docId){
       <div class="nx-col">
         <div class="nx-card">
           <div class="nx-card-title">Ejecutivos Comerciales</div>
-          ${ejecutivos.length?ejecutivos.map((g,i)=>`<div class="nx-row"><div class="nx-row-l">${esc(ejecDisplay(g.n))}${i===0?' <span style="font-size:9px;font-weight:800;color:#8898C0;margin-left:.35rem">CREADOR</span>':''}</div><div class="nx-row-v">${g.f?fmtDate(g.f):dash}</div></div>`).join(''):`<div class="nx-row"><div class="nx-row-v" style="width:100%;justify-content:flex-start;color:#8898C0">Sin ejecutivos asignados.</div></div>`}
+          ${ejecutivos.length?ejecutivos.map((g)=>`<div class="nx-row"><div class="nx-row-l">${esc(ejecDisplay(g.n))}</div><div class="nx-row-v">${g.f?fmtDate(g.f):dash}</div></div>`).join(''):`<div class="nx-row"><div class="nx-row-v" style="width:100%;justify-content:flex-start;color:#8898C0">Sin ejecutivos asignados.</div></div>`}
         </div>
         <div class="nx-card">
           <div class="nx-card-title">Estado Comercial</div>
