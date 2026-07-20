@@ -8546,9 +8546,43 @@ function duAcCreateNew(tipo){
   }
 }
 
+// ===== Autocomplete de Ejecutivo Comercial por COMPONENTE (catálogo, no texto libre) =====
+// Guarda la CLAVE (apellido) en brokerAsignado; muestra "Apellido Nombre". Cada unidad
+// tiene su propio ejecutivo, independiente del responsable del edificio (panel izquierdo).
+function duEjecSearch(inputEl){
+  const bld=inputEl.dataset.bld,uid=inputEl.dataset.uid;
+  const q=(inputEl.value||'').trim().toLowerCase();
+  const drop=document.getElementById('du-ac-dropdown');if(!drop)return;
+  const opts=EJECUTIVOS_CATALOG.filter(e=>!q||e.display.toLowerCase().includes(q)||e.key.toLowerCase().includes(q));
+  const r=inputEl.getBoundingClientRect();
+  drop.style.top=(r.bottom+3)+'px';drop.style.left=r.left+'px';drop.style.width=Math.max(r.width,200)+'px';
+  let html=opts.map(e=>`<div class="du-ac-item" onmousedown="event.preventDefault();_duAcBlurGuard=true;duEjecPick('${bld}','${uid}','${e.key}')">${esc(e.display)}</div>`).join('');
+  if(!opts.length)html=`<div style="padding:7px 10px;font-size:11px;color:#7B8BBD">Sin resultados</div>`;
+  if(inputEl.value.trim())html+=`<div class="du-ac-item" style="color:#8898C0" onmousedown="event.preventDefault();_duAcBlurGuard=true;duEjecPick('${bld}','${uid}','')">— Quitar asignación —</div>`;
+  drop.innerHTML=html;drop.style.display='block';
+}
+function duEjecPick(bld,uid,key){
+  setTimeout(()=>{_duAcBlurGuard=false;},150);
+  if(!db||!bld||!uid)return;
+  const el=document.querySelector(`.du-ejec-inp[data-bld="${bld}"][data-uid="${uid}"]`);
+  if(el)el.value=key?ejecDisplay(key):'';
+  const update={brokerAsignado:key,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  db.collection('buildings').doc(bld).collection('units').doc(uid).update(update)
+    .then(()=>{const u=_unitDocs.find(x=>x._id===uid);if(u)u.brokerAsignado=key;
+      if(el){el.style.borderColor='#16A34A';el.style.boxShadow='0 0 0 2px rgba(22,163,74,.12)';setTimeout(()=>{el.style.borderColor='';el.style.boxShadow='';},900);}})
+    .catch(e=>showBldToast('❌ Error: '+e.message));
+  document.getElementById('du-ac-dropdown').style.display='none';
+}
+function duEjecBlur(inputEl){
+  if(_duAcBlurGuard)return;
+  // Sin texto libre: revierte al valor guardado (clave del catálogo → display).
+  const uid=inputEl.dataset.uid;const u=_unitDocs.find(x=>x._id===uid);
+  inputEl.value=u&&u.brokerAsignado?ejecDisplay(u.brokerAsignado):'';
+}
+
 document.addEventListener('click',function(e){
   const drop=document.getElementById('du-ac-dropdown');
-  if(drop&&!drop.contains(e.target)&&!e.target.classList.contains('du-ac-inp'))drop.style.display='none';
+  if(drop&&!drop.contains(e.target)&&!e.target.classList.contains('du-ac-inp')&&!e.target.classList.contains('du-ejec-inp'))drop.style.display='none';
 });
 
 /* ===== CRM LINKS MIGRATION ===== */
@@ -9837,6 +9871,7 @@ function renderDetailUnits(buildingId,filterQ=''){
     ${th('unidad','Unidad')}
     ${th('estado','Estado')}
     ${th('ocupante','Ocupante')}
+    ${th('propietario','Propietario')}
     ${th('m2','m² Rent.')}
     ${th('tipoOferta','Tipo')}
     ${th('askingRent','Renta')}
@@ -9845,6 +9880,7 @@ function renderDetailUnits(buildingId,filterQ=''){
     ${th('cocherasUnidad','Coch.')}
     ${th('vencimientoContrato','Vcto.')}
     <th>Obs.</th>
+    <th>Ejecutivo Comercial</th>
     <th class="col-actions"></th>
   </tr></thead><tbody>`;
   filtered.forEach((u,i)=>{
@@ -9857,6 +9893,7 @@ function renderDetailUnits(buildingId,filterQ=''){
       <td><input class="du-inp" style="width:68px" value="${esc(u.unidad||'')}" onblur="saveUnitField('${buildingId}','${u._id}','unidad',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td class="du-estado-cell"><select class="du-sel" style="background:${c.bg};border:1px solid ${c.border};color:${c.text};font-weight:700;padding:4px 6px;border-radius:999px" onchange="saveUnitField('${buildingId}','${u._id}','estado',this.value,this);renderDetailUnits('${buildingId}',document.getElementById('bld-det-search')?.value||'')">${so(u.estado)}</select></td>
       <td><div style="display:flex;align-items:center;gap:2px"><input class="du-inp du-ac-inp" style="width:96px" data-bld="${buildingId}" data-uid="${u._id}" data-role="occ" value="${esc(u.occupierAccountName||u.occupierContactName||u.ocupante||'')}" oninput="duAcSearch(this)" onfocus="if(this.value.trim())duAcSearch(this)" onblur="duAcBlurSave(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()">${(u.occupierAccountId||u.occupierContactId)?`<span class="du-linked-dot" title="${u.occupierAccountId?'Cuenta vinculada':'Contacto vinculado'}"></span>`:''}</div></td>
+      <td><div style="display:flex;align-items:center;gap:2px"><input class="du-inp du-ac-inp" style="width:96px" data-bld="${buildingId}" data-uid="${u._id}" data-role="own" value="${esc(u.ownerAccountName||u.ownerContactName||u.propietario||'')}" placeholder="Vincular cuenta..." oninput="duAcSearch(this)" onfocus="if(this.value.trim())duAcSearch(this)" onblur="duAcBlurSave(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()">${(u.ownerAccountId||u.ownerContactId)?`<span class="du-linked-dot" title="${u.ownerAccountId?'Cuenta vinculada':'Contacto vinculado'}"></span>`:''}</div></td>
       <td><input class="du-inp" style="width:58px" type="number" value="${u.m2||''}" onblur="saveUnitField('${buildingId}','${u._id}','m2',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td style="min-width:110px">${toCell(u._id,u.tipoOferta)}</td>
       <td><input class="du-inp" style="width:80px" value="${esc(u.askingRent||'')}" onblur="saveUnitField('${buildingId}','${u._id}','askingRent',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
@@ -9865,6 +9902,7 @@ function renderDetailUnits(buildingId,filterQ=''){
       <td><input class="du-inp" style="width:44px" type="number" value="${u.cocherasUnidad||''}" placeholder="0" onblur="saveUnitField('${buildingId}','${u._id}','cocherasUnidad',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="width:100px" type="date" value="${esc(u.vencimientoContrato||'')}" title="${isNearVenc?'⚠ Próximo vencimiento':''}" style="width:100px;${isNearVenc?'border-color:#F59E0B;color:#F59E0B':''}" onblur="saveUnitField('${buildingId}','${u._id}','vencimientoContrato',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="min-width:100px" value="${esc(u.observaciones||'')}" onblur="saveUnitField('${buildingId}','${u._id}','observaciones',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
+      <td><input class="du-inp du-ejec-inp" style="width:130px" data-bld="${buildingId}" data-uid="${u._id}" value="${esc(ejecDisplay(u.brokerAsignado))}" placeholder="Asignar ejecutivo..." autocomplete="off" oninput="duEjecSearch(this)" onfocus="duEjecSearch(this)" onblur="duEjecBlur(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()"></td>
       <td class="col-actions"><div class="du-actions">
         <button class="du-btn dup" title="Duplicar" onclick="duplicateUnit('${buildingId}','${u._id}')">⧉</button>
         <button class="du-btn del" title="Eliminar" onclick="deleteUnit('${buildingId}','${u._id}',this.closest('tr'))">✕</button>
