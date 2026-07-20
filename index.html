@@ -3321,8 +3321,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           </div>
         </div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Teléfono</div>
-          <input id="ctdr-telefono" class="cdr-input" type="tel" placeholder="+54 11...">
+          <div class="cdr-lbl">Teléfono (sin el 11 y sin espacios)</div>
+          <input id="ctdr-telefono" class="cdr-input" type="tel" inputmode="numeric" placeholder="Ej: 1551234567" oninput="this.value=_normTelContacto(this.value)">
         </div>
         <div class="cdr-field cdr-admin-only" id="ctdr-linkedin-field">
           <div class="cdr-lbl">LinkedIn <span class="cdr-admin-tag">ADMIN</span></div>
@@ -7279,6 +7279,14 @@ window.puestoAcKey=function(key,ev){
 };
 registerPuestoAC('ctdr',{inputId:'ctdr-puesto',dropId:'ctdr-puesto-drop'});
 
+// Normaliza el teléfono del contacto: solo dígitos (quita espacios/guiones/letras).
+// Con strip11=true (al guardar) también quita el prefijo "11" inicial.
+function _normTelContacto(v,strip11){
+  let s=String(v||'').replace(/\D/g,'');
+  if(strip11&&s.startsWith('11'))s=s.slice(2);
+  return s;
+}
+window._normTelContacto=_normTelContacto;
 // Cargo estandarizado: opciones fijas + "Otro" con texto libre en "Especificar cargo".
 const CTDR_CARGO_STD=['CEO','CFO','Compras','Real Estate'];
 window.ctdrCargoChange=function(){
@@ -7404,7 +7412,7 @@ window.saveContactoDrawer=async function(){
       propietario:cdrToggleVal('ctdrPropietario')||'No',
       email,
       estadoCorreo:document.getElementById('ctdr-estadoCorreo').value||'sin_comprobar',
-      telefono:(document.getElementById('ctdr-telefono').value||'').trim(),
+      telefono:_normTelContacto(document.getElementById('ctdr-telefono').value,true),
       ejecutivoComercial:document.getElementById('ctdr-ejecutivo').value||'',
       comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
     };
