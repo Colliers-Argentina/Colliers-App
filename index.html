@@ -3198,7 +3198,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div class="cdr-field">
         <div class="cdr-lbl">Tipo de cuenta</div>
         <div class="cdr-toggle-group">
-          <button type="button" class="cdr-toggle-btn" data-field="tipoCuenta" data-value="Broker" onclick="cdrToggle(this)">Broker</button>
+          <button type="button" class="cdr-toggle-btn" data-field="tipoCuenta" data-value="Inmobiliaria" onclick="cdrToggle(this)">Inmobiliaria</button>
           <button type="button" class="cdr-toggle-btn" data-field="tipoCuenta" data-value="Desarrollador" onclick="cdrToggle(this)">Desarrollador</button>
           <button type="button" class="cdr-toggle-btn active" data-field="tipoCuenta" data-value="Ninguno" data-default onclick="cdrToggle(this)">Ninguno</button>
         </div>
@@ -5965,6 +5965,25 @@ window.toggleCRM=()=>{
   if(open){switchCRMTab('cuentas');}
 };
 
+// Migración automática Tipo de Cuenta: "Broker" -> "Inmobiliaria".
+// Corre una vez tras cargar las cuentas. La visualización ya se normaliza en
+// _efectivoTipoCuenta, así que si alguna escritura fallara, igual se ve "Inmobiliaria".
+let _brokerMigrationDone=false;
+async function _migrateTipoCuentaBroker(){
+  if(_brokerMigrationDone||!db)return;
+  _brokerMigrationDone=true;
+  const pend=_crmDocs.filter(d=>d.tipoCuenta==='Broker');
+  if(!pend.length)return;
+  for(const d of pend){
+    try{
+      await db.collection('clientes').doc(d._id).update({tipoCuenta:'Inmobiliaria',esBroker:'Sí'});
+      d.tipoCuenta='Inmobiliaria';d.esBroker='Sí';
+      const i=_clientesCache.findIndex(x=>x._id===d._id);if(i>=0){_clientesCache[i].tipoCuenta='Inmobiliaria';_clientesCache[i].esBroker='Sí';}
+    }catch(e){console.warn('[migr. tipoCuenta] no se pudo migrar',d._id,e?.message);}
+  }
+  console.log(`[migr. tipoCuenta] ${pend.length} cuenta(s) migradas de Broker a Inmobiliaria`);
+  if(typeof filterCRM==='function')filterCRM();
+}
 async function loadCRM(){
   if(!db){document.getElementById('crm-table-wrap').innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
   document.getElementById('crm-table-wrap').innerHTML='<div class="crm-empty">Cargando...</div>';
@@ -5974,6 +5993,7 @@ async function loadCRM(){
     document.getElementById('crm-subtitle').textContent=`${_crmDocs.length} cuenta${_crmDocs.length!==1?'s':''} registradas`;
     renderCrmFilterPanel();
     filterCRM();
+    _migrateTipoCuentaBroker();
   }catch(e){
     console.error('CRM load error:',e);
     document.getElementById('crm-table-wrap').innerHTML=`<div class="crm-empty">Error al cargar: ${e.message}</div>`;
@@ -6025,7 +6045,7 @@ const _EJEC_DISPLAY=Object.fromEntries(EJECUTIVOS_CATALOG.map(e=>[e.key,e.displa
 // (nombres libres/legacy) devuelve el valor tal cual, sin romper filtros ni relaciones.
 function ejecDisplay(v){return _EJEC_DISPLAY[v]||v;}
 window.ejecDisplay=ejecDisplay;
-function _efectivoTipoCuenta(d){return d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');}
+function _efectivoTipoCuenta(d){const t=d.tipoCuenta||(d.esBroker==='Sí'?'Inmobiliaria':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');return t==='Broker'?'Inmobiliaria':t;}
 const _normBU=x=>String(x||'').toLowerCase().replace(/s$/,'');   // 'Oficina'/'Oficinas' equivalentes (legacy)
 const _docRubros=d=>Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[]);
 const _docSubNames=d=>Array.isArray(d.subrubros)&&d.subrubros.length?d.subrubros.map(o=>o.s||o.sub||''):(d.subRubro?[d.subRubro]:[]);
@@ -6069,7 +6089,7 @@ function renderCrmFilterPanel(){
     ms('subrubros','Subrubro','Según rubros...')+
     sel('clienteColliers','Cliente Colliers',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
     sel('categoria','Categoría',[{v:'',t:'Todas'},{v:'Top',t:'Top'},{v:'A',t:'A'},{v:'B',t:'B'},{v:'C',t:'C'},{v:'No aplica',t:'No aplica'}])+
-    sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Broker',t:'Broker'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
+    sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Inmobiliaria',t:'Inmobiliaria'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
     `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="crm-flt-bu">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="crmFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
     ms('gestionadoPor','Gestionado por','Buscar ejecutivo...')+
     ms('capturadoPor','Creado por','Buscar usuario...');
@@ -6183,7 +6203,7 @@ function renderAncPanel(){
     ms('rubros','Rubro','Buscar rubro...')+ms('subrubros','Subrubro','Según rubros...')+
     sel('clienteColliers','Cliente Colliers',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
     sel('categoria','Categoría',[{v:'',t:'Todas'},{v:'Top',t:'Top'},{v:'A',t:'A'},{v:'B',t:'B'},{v:'C',t:'C'},{v:'No aplica',t:'No aplica'}])+
-    sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Broker',t:'Broker'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
+    sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Inmobiliaria',t:'Inmobiliaria'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
     `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="anc-flt-bu">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="ancFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
     ms('gestionadoPor','Gestionado por','Buscar ejecutivo...')+ms('capturadoPor','Creado por','Buscar usuario...');
   _ancSyncControls();
@@ -6234,7 +6254,7 @@ window.renderCuentasAnalytics=function(docs,totalBase){
   const vbars=`<div class="anc-vbars">${months.map(m=>`<div class="anc-vbar-wrap"><div class="anc-vbar-val">${m.count||''}</div><div class="anc-vbar" style="height:${Math.round(m.count/mmx*92)}px" title="${m.lbl}: ${m.count}"></div><div class="anc-vbar-lbl">${m.lbl}</div></div>`).join('')}</div>`;
   ch.innerHTML=
     _ancCard('Por Categoría',_ancBars([...catM],{order:['Top','A','B','C','No aplica','Sin categoría']}))+
-    _ancCard('Por Tipo de Cuenta',_ancBars([...tipoM],{order:['Broker','Desarrollador','Ninguno']}))+
+    _ancCard('Por Tipo de Cuenta',_ancBars([...tipoM],{order:['Inmobiliaria','Desarrollador','Ninguno']}))+
     _ancCard('Cliente Colliers',_ancBars([...cliM]))+
     _ancCard('Por Unidad de Negocio',_ancBars([...buM]))+
     _ancCard('Top Rubros',_ancBars([...rubM],{max:8}))+
@@ -6537,7 +6557,7 @@ function renderCuentaInfoTab(docId){
           <div class="nx-card-title">Segmentación</div>
           ${isAdmin?row('Categoría',fv(d.categoria)):''}
           ${row('Cliente Colliers',fv(d.clienteColliers),TIP_CLIENTE_COLLIERS)}
-          ${row('Tipo de Cuenta',esc(d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno')))}
+          ${row('Tipo de Cuenta',esc(_efectivoTipoCuenta(d)))}
           ${isAdmin?row('Rubro',tags(rubros)):''}
           ${isAdmin?row('Subrubro',tags(subs)):''}
           ${row('Unidades de Negocio',tags(bu),TIP_BU)}
@@ -6635,7 +6655,7 @@ window.cuentaFichaEdit=function(docId){
           <div class="nx-card-title">Segmentación</div>
           ${erow('Categoría',`<select id="fe-categoria" class="cdr-select">${['','Top','A','B','C','No aplica'].map(c=>`<option value="${c}"${(d.categoria||'')===c?' selected':''}>${c||'— Seleccionar —'}</option>`).join('')}</select>`)}
           ${erow('Cliente Colliers',`<div class="cdr-toggle-group">${['Sí','No'].map(v=>`<button type="button" class="cdr-toggle-btn${(d.clienteColliers||'Sí')===v?' active':''}" data-field="feCliente" data-value="${v}" onclick="cdrToggle(this)">${v}</button>`).join('')}</div>`,TIP_CLIENTE_COLLIERS)}
-          ${erow('Tipo de Cuenta',`<div class="cdr-toggle-group">${['Broker','Desarrollador','Ninguno'].map(v=>`<button type="button" class="cdr-toggle-btn${(d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno'))===v?' active':''}" data-field="feTipo" data-value="${v}" onclick="cdrToggle(this)">${v}</button>`).join('')}</div>`)}
+          ${erow('Tipo de Cuenta',`<div class="cdr-toggle-group">${['Inmobiliaria','Desarrollador','Ninguno'].map(v=>`<button type="button" class="cdr-toggle-btn${_efectivoTipoCuenta(d)===v?' active':''}" data-field="feTipo" data-value="${v}" onclick="cdrToggle(this)">${v}</button>`).join('')}</div>`)}
           ${erow('Rubro',`<div id="fe-rubro-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="fe-rubro-q" class="cdr-input" placeholder="Buscar rubro..." autocomplete="off" oninput="feRubroSearch(this.value)" onfocus="feRubroSearch(this.value)" onblur="feMsBlur('rubro')"><div id="fe-rubro-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
           ${erow('Subrubro',`<div id="fe-subrubro-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="fe-subrubro-q" class="cdr-input" placeholder="Según rubros..." autocomplete="off" oninput="feSubSearch(this.value)" onfocus="feSubSearch(this.value)" onblur="feMsBlur('subrubro')"><div id="fe-subrubro-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
           ${erow('Unidades de Negocio',`<div class="cdr-toggle-group" id="fe-bu" style="justify-content:flex-end">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip${_fe.bu.includes(u)?' active':''}" data-bu="${u}" onclick="this.classList.toggle('active')">${u}</button>`).join('')}</div>`,TIP_BU)}
@@ -6694,7 +6714,7 @@ window.fichaEditSave=async function(docId){
       sedePrincipalNombre:_fe.sede.nombre||'',
       categoria:document.getElementById('fe-categoria').value||'',
       clienteColliers:cdrToggleVal('feCliente')||'Sí',
-      tipoCuenta,esBroker:tipoCuenta==='Broker'?'Sí':'No',esDesarrollador:tipoCuenta==='Desarrollador'?'Sí':'No',
+      tipoCuenta,esBroker:tipoCuenta==='Inmobiliaria'?'Sí':'No',esDesarrollador:tipoCuenta==='Desarrollador'?'Sí':'No',
       rubros:[..._fe.rubros],subrubros,rubro:_fe.rubros[0]||'',subRubro:subrubros[0]?subrubros[0].s:'',
       bu:[...document.querySelectorAll('#fe-bu .cto-pref-chip.active')].map(c=>c.dataset.bu),
       gestionadoPorDet:gest.map(g=>({n:g.n,f:g.f||now})),
@@ -8300,7 +8320,7 @@ window.openClientDrawer_edit=function(docId){
     });
   };
   setToggle('clienteColliers',d.clienteColliers==='Sí'?'Sí':'No');
-  const tipo=d.tipoCuenta||(d.esBroker==='Sí'?'Broker':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');
+  const tipo=_efectivoTipoCuenta(d);
   setToggle('tipoCuenta',tipo);
   _cdrUpdateSubrubroVisibility();
   document.querySelector('#cdr-drawer .cdr-title').textContent='Editar Cuenta';
@@ -8343,7 +8363,7 @@ window.saveClientDrawer=async function(){
       clienteColliers:cdrToggleVal('clienteColliers')||'Sí',
       bu:[...document.querySelectorAll('#cdr-bu-chips .cto-pref-chip.active')].map(c=>c.dataset.bu),
       tipoCuenta,
-      esBroker:tipoCuenta==='Broker'?'Sí':'No',
+      esBroker:tipoCuenta==='Inmobiliaria'?'Sí':'No',
       esDesarrollador:tipoCuenta==='Desarrollador'?'Sí':'No',
     };
     // Campos restringidos a Administradores: solo se escriben si el usuario es admin,

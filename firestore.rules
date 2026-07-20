@@ -34,7 +34,7 @@ service cloud.firestore {
           && (!('categoria' in data)     || data.categoria is string)
           && (!('rubro' in data)         || data.rubro is string)
           && (!('subRubro' in data)      || data.subRubro is string)
-          && (!('tipoCuenta' in data)    || data.tipoCuenta in ['Broker','Desarrollador','Ninguno'])
+          && (!('tipoCuenta' in data)    || data.tipoCuenta in ['Inmobiliaria','Desarrollador','Ninguno','Broker'])
           && (!('nombre' in data)        || (data.nombre is string && data.nombre.size() > 0));
     }
 
