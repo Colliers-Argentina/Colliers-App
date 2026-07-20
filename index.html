@@ -6933,8 +6933,9 @@ function renderContactosTable(docs){
   renderContactosKPIs(_ctoDocs);
   const wrap=document.getElementById('cto-table-wrap');
   if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin contactos registrados.</div>';return;}
+  const fdmy=ts=>{const dt=_tsToDate(ts);return dt&&!isNaN(dt)?dt.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';};
   let h='<table class="crm-table"><thead><tr>';
-  ['Contacto','Cargo','Cuenta','Email','Estado correo',''].forEach(col=>h+=`<th>${col}</th>`);
+  ['Contacto','Cargo','Cuenta','Email','Teléfono','Creado por','Fecha de creación','Estado correo',''].forEach(col=>h+=`<th>${col}</th>`);
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
@@ -6945,6 +6946,9 @@ function renderContactosTable(docs){
       <td><div class="crm-broker-cell">${d.cargo||'–'}</div></td>
       <td><div class="crm-broker-cell">${d.cuentaNombre||'–'}</div></td>
       <td class="crm-date">${d.email||'–'}</td>
+      <td><div class="crm-broker-cell">${d.telefono?esc(d.telefono):'—'}</div></td>
+      <td><div class="crm-broker-cell">${d.brokerResponsable?esc(d.brokerResponsable):'—'}</div></td>
+      <td class="crm-date">${fdmy(d.fechaCreacion)}</td>
       <td>${emailBadge(d.estadoCorreo)}</td>
       <td><button class="crm-action-btn" onclick="event.stopPropagation();openContactoDetail('${d._id}')">Ver ficha →</button></td>
     </tr>`;
