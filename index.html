@@ -3268,11 +3268,13 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <div class="cdr-row">
           <div class="cdr-field">
             <div class="cdr-lbl">Cargo segmentado <span class="cdr-req">*</span></div>
-            <select id="ctdr-cargo" class="cdr-select">
-              <option value="">— Seleccionar —</option>
-              <option>CEO</option><option>CFO</option><option>Compras</option><option>Real Estate</option>
-              <option>Facilities</option><option>RRHH</option><option>Operaciones</option>
-              <option>IT</option><option>Administración</option><option>Marketing</option><option>Otro</option>
+            <select id="ctdr-cargo" class="cdr-select" onchange="ctdrCargoChange()">
+              <option value="">Seleccionar...</option>
+              <option value="CEO">CEO</option>
+              <option value="CFO">CFO</option>
+              <option value="Compras">Compras</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="Otro">Otro</option>
             </select>
           </div>
           <div class="cdr-field">
@@ -3282,6 +3284,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
               <div id="ctdr-puesto-drop" class="cdr-ms-drop" style="display:none"></div>
             </div>
           </div>
+        </div>
+        <div class="cdr-field" id="ctdr-cargo-otro-field" style="display:none">
+          <div class="cdr-lbl">Especificar cargo <span class="cdr-req">*</span></div>
+          <input id="ctdr-cargo-otro" class="cdr-input" type="text" placeholder="Ej: COO, Director Comercial, HR Manager..." autocomplete="off" oninput="cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err')">
+          <div class="cdr-err" id="ctdr-cargo-otro-err" style="display:none">Especificá el cargo.</div>
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Propietario</div>
@@ -7272,12 +7279,34 @@ window.puestoAcKey=function(key,ev){
 };
 registerPuestoAC('ctdr',{inputId:'ctdr-puesto',dropId:'ctdr-puesto-drop'});
 
+// Cargo estandarizado: opciones fijas + "Otro" con texto libre en "Especificar cargo".
+const CTDR_CARGO_STD=['CEO','CFO','Compras','Real Estate'];
+window.ctdrCargoChange=function(){
+  const isOtro=document.getElementById('ctdr-cargo').value==='Otro';
+  const f=document.getElementById('ctdr-cargo-otro-field');
+  if(f)f.style.display=isOtro?'':'none';
+  if(!isOtro){const i=document.getElementById('ctdr-cargo-otro');if(i)i.value='';cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err');}
+  cdrClearErr('ctdr-cargo','ctdr-cargo-err');
+};
+// Setea el desplegable a partir del valor almacenado: si es estándar lo selecciona;
+// si no coincide con ninguno, elige "Otro" y muestra el valor en "Especificar cargo".
+function _ctdrSetCargo(cargo){
+  const sel=document.getElementById('ctdr-cargo');
+  const otroInp=document.getElementById('ctdr-cargo-otro');
+  const otroField=document.getElementById('ctdr-cargo-otro-field');
+  if(!sel)return;
+  if(cargo&&CTDR_CARGO_STD.includes(cargo)){sel.value=cargo;if(otroInp)otroInp.value='';if(otroField)otroField.style.display='none';}
+  else if(cargo){sel.value='Otro';if(otroInp)otroInp.value=cargo;if(otroField)otroField.style.display='';}
+  else{sel.value='';if(otroInp)otroInp.value='';if(otroField)otroField.style.display='none';}
+}
 window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
   _puestoEnsureCat();
   _ctdrEditId=null;
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['ctdr-cargo','ctdr-estadoCorreo','ctdr-ejecutivo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
+  _ctdrSetCargo('');
+  cdrClearErr('ctdr-cargo','ctdr-cargo-err');cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err');
   document.getElementById('ctdr-cuentaId').value='';
   document.getElementById('ctdr-cuentaNombre').value='';
   document.getElementById('ctdr-comentarios').value='';
@@ -7310,7 +7339,7 @@ window.openContactoDrawer_edit=function(docId){
   set('ctdr-nombre',d.nombre);set('ctdr-apellidos',d.apellidos);set('ctdr-puesto',d.puesto);
   set('ctdr-email',d.email);set('ctdr-telefono',d.telefono);
   set('ctdr-linkedin',d.linkedin);set('ctdr-comentarios',d.comentarios);
-  document.getElementById('ctdr-cargo').value=d.cargo||'';
+  _ctdrSetCargo(d.cargo||'');
   document.getElementById('ctdr-estadoCorreo').value=d.estadoCorreo||'sin_comprobar';
   document.getElementById('ctdr-ejecutivo').value=d.ejecutivoComercial||'';
   const setToggle=(field,val)=>{
@@ -7350,12 +7379,16 @@ window.ctdrSelectCuenta=function(id,nombre){
 window.saveContactoDrawer=async function(){
   const nombre=(document.getElementById('ctdr-nombre').value||'').trim();
   const apellidos=(document.getElementById('ctdr-apellidos').value||'').trim();
-  const cargo=document.getElementById('ctdr-cargo').value||'';
+  const cargoSel=document.getElementById('ctdr-cargo').value||'';
+  const cargoOtro=(document.getElementById('ctdr-cargo-otro').value||'').trim();
+  // Cargo efectivo: la opción estándar, o el texto libre cuando es "Otro".
+  const cargo=cargoSel==='Otro'?cargoOtro:cargoSel;
   const email=(document.getElementById('ctdr-email').value||'').trim();
   let valid=true;
   if(!nombre){document.getElementById('ctdr-nombre').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-nombre').style.borderColor='';}
   if(!apellidos){document.getElementById('ctdr-apellidos').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-apellidos').style.borderColor='';}
-  if(!cargo){document.getElementById('ctdr-cargo').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-cargo').style.borderColor='';}
+  if(!cargoSel){document.getElementById('ctdr-cargo').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-cargo').style.borderColor='';}
+  if(cargoSel==='Otro'&&!cargoOtro){document.getElementById('ctdr-cargo-otro').style.borderColor='#ED1B34';document.getElementById('ctdr-cargo-otro-err').style.display='block';valid=false;}else{document.getElementById('ctdr-cargo-otro').style.borderColor='';document.getElementById('ctdr-cargo-otro-err').style.display='none';}
   if(!email){document.getElementById('ctdr-email').style.borderColor='#ED1B34';valid=false;}else{document.getElementById('ctdr-email').style.borderColor='';}
   if(!valid)return;
   if(!db){alert('Firebase no disponible.');return;}
