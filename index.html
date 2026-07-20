@@ -7697,6 +7697,7 @@ function renderLeadInfoCards(d){
   const dash='<span style="color:#8898C0">–</span>';
   const row=(lbl,val)=>`<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-v">${val||dash}</div></div>`;
   const t=v=>v?esc(v):null;
+  const link=d.linkOrigen?`<a href="${esc(d.linkOrigen)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600;word-break:break-all">${esc(d.linkOrigen)}</a>`:null;
   return `
     <div class="nx-grid">
       <div class="nx-col">
@@ -7706,18 +7707,103 @@ function renderLeadInfoCards(d){
           ${row('Apellido',t(d.apellido))}
           ${row('Email',t(d.email))}
           ${row('Teléfono',t(d.telefono))}
+          ${row('Puesto',t(d.puesto))}
+        </div>
+        <div class="nx-card">
+          <div class="nx-card-title">Origen y Asignación</div>
+          <div class="nx-row"><div class="nx-row-l">Origen</div><div class="nx-row-v">${d.origen?leadOrigenBadge(d.origen):dash}</div></div>
+          ${row('Ejecutivo Comercial asignado',d.brokerAsignado?esc(ejecDisplay(d.brokerAsignado)):null)}
+          ${row('Link de origen',link)}
         </div>
       </div>
       <div class="nx-col">
         <div class="nx-card">
-          <div class="nx-card-title">Perfil</div>
-          ${row('Puesto',t(d.puesto))}
-          ${row('Tipo inmueble',t(d.tipoInmueble))}
+          <div class="nx-card-title">Interés</div>
+          ${row('Empresa',t(d.empresa||d.cuentaNombre))}
+          ${row('Inmueble consultado',t(d.buildingName))}
+          ${row('Tipo de inmueble',t(d.tipoInmueble))}
         </div>
         ${d.comentarios?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(d.comentarios)}</div></div>`:''}
       </div>
     </div>`;
 }
+// Edición inline del Lead (mismo patrón que Cuentas/Contactos). Delegación en saveLeadDrawer.
+window.leadFichaEdit=function(docId){
+  const d=_leadDocs.find(x=>x._id===docId);
+  const body=document.getElementById('ldt-info');
+  if(!d||!body)return;
+  const origenOpts=['','Zonaprop','Argenprop','Mercado Libre','Referido','LinkedIn','Web','Llamado','Email','Otro'].map(o=>`<option value="${esc(o)}"${(d.origen||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('');
+  const tipoOpts=['','Oficina','Industria','Retail','Depósito / Logística','Terreno','Otro'].map(o=>`<option value="${esc(o)}"${(d.tipoInmueble||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('');
+  const brokerOpts=['',...CRM_EJECUTIVOS].map(k=>`<option value="${esc(k)}"${(d.brokerAsignado||'')===k?' selected':''}>${k?esc(ejecDisplay(k)):'— Seleccionar —'}</option>`).join('');
+  body.innerHTML=
+    nxEditbar('Editando lead',`openLeadDetail('${docId}')`,`leadFichaSave('${docId}')`)+`
+    <div class="nx-grid">
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Datos del Lead</div>
+          ${nxErow('Nombre',`<input id="lfe-nombre" class="cdr-input" value="${esc(d.nombre||'')}">`)}
+          ${nxErow('Apellido',`<input id="lfe-apellido" class="cdr-input" value="${esc(d.apellido||'')}">`)}
+          ${nxErow('Email',`<input id="lfe-email" class="cdr-input" type="email" value="${esc(d.email||'')}">`)}
+          ${nxErow('Teléfono',`<input id="lfe-telefono" class="cdr-input" type="tel" value="${esc(d.telefono||'')}">`)}
+          ${nxErow('Puesto',`<input id="lfe-puesto" class="cdr-input" value="${esc(d.puesto||'')}">`)}
+        </div>
+        <div class="nx-card">
+          <div class="nx-card-title">Origen y Asignación</div>
+          ${nxErow('Origen',`<select id="lfe-origen" class="cdr-select">${origenOpts}</select>`)}
+          ${nxErow('Ejecutivo Comercial asignado',`<select id="lfe-broker" class="cdr-select">${brokerOpts}</select>`)}
+          ${nxErow('Link de origen',`<input id="lfe-link" class="cdr-input" type="url" value="${esc(d.linkOrigen||'')}">`)}
+        </div>
+      </div>
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Interés</div>
+          ${nxErow('Empresa',`<input id="lfe-empresa" class="cdr-input" placeholder="Buscar empresa en Cuentas..." autocomplete="off" value="${esc(d.empresa||d.cuentaNombre||'')}" oninput="ctaPickerInput('lfe',this.value)" onblur="ctaPickerBlur('lfe')"><div id="lfe-empresa-drop" class="cdr-ms-drop" style="display:none"></div><span id="lfe-empresa-tag" style="display:none;font-size:10.5px;color:#16A34A;font-weight:700;margin-top:3px"></span><input id="lfe-cuentaId" type="hidden" value="${esc(d.cuentaId||'')}"><input id="lfe-cuentaNombre" type="hidden" value="${esc(d.cuentaNombre||'')}">`)}
+          ${nxErow('Inmueble consultado',`<input id="lfe-bld-q" class="cdr-input" placeholder="Buscar edificio..." autocomplete="off" value="${esc(d.buildingName||'')}" oninput="lfeBldSearch(this.value)" onblur="setTimeout(()=>{var l=document.getElementById('lfe-bld-list');if(l)l.style.display='none'},150)"><div id="lfe-bld-list" class="cdr-ms-drop" style="display:none"></div><input id="lfe-buildingId" type="hidden" value="${esc(d.buildingId||'')}"><input id="lfe-buildingName" type="hidden" value="${esc(d.buildingName||'')}">`)}
+          ${nxErow('Tipo de inmueble',`<select id="lfe-tipoInmueble" class="cdr-select">${tipoOpts}</select>`)}
+        </div>
+        <div class="nx-card">
+          <div class="nx-card-title">Comentarios</div>
+          <textarea id="lfe-comentarios" class="cdr-input" style="min-height:64px;resize:vertical">${esc(d.comentarios||'')}</textarea>
+        </div>
+      </div>
+    </div>`;
+  registerCuentaPicker('lfe',{inputId:'lfe-empresa',dropId:'lfe-empresa-drop',tagId:'lfe-empresa-tag',hidId:'lfe-cuentaId',hidNombreId:'lfe-cuentaNombre'});
+  _loadBldDocsIfNeeded().catch(()=>{});
+};
+window.lfeBldSearch=function(q){
+  const list=document.getElementById('lfe-bld-list');if(!list)return;
+  q=(q||'').trim().toLowerCase();
+  const src=(_bldDocs&&_bldDocs.length?_bldDocs:masterBuildings)||[];
+  const matches=q?src.filter(b=>(b.nombre||'').toLowerCase().includes(q)).slice(0,8):[];
+  list.innerHTML=matches.length?matches.map(b=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();lfeBldPick('${(b._id||b.id||'')}','${esc((b.nombre||'').replace(/'/g,''))}')">🏢 ${esc(b.nombre||'')}</div>`).join(''):(q?'<div class="cdr-ms-empty">Sin resultados</div>':'');
+  list.style.display=q?'block':'none';
+};
+window.lfeBldPick=function(id,nombre){
+  document.getElementById('lfe-buildingId').value=id;
+  document.getElementById('lfe-buildingName').value=nombre;
+  document.getElementById('lfe-bld-q').value=nombre;
+  const l=document.getElementById('lfe-bld-list');if(l)l.style.display='none';
+};
+window.leadFichaSave=async function(docId){
+  const d=_leadDocs.find(x=>x._id===docId);if(!d)return;
+  const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+  const nombre=(gv('lfe-nombre')||'').trim(),apellido=(gv('lfe-apellido')||'').trim(),email=(gv('lfe-email')||'').trim();
+  const origen=gv('lfe-origen'),broker=gv('lfe-broker'),link=(gv('lfe-link')||'').trim();
+  const mark=(id,bad)=>{const e=document.getElementById(id);if(e)e.style.borderColor=bad?'#ED1B34':'';};
+  let ok=true;
+  [['lfe-nombre',!nombre],['lfe-apellido',!apellido],['lfe-email',!email],['lfe-origen',!origen],['lfe-broker',!broker],['lfe-link',!link]].forEach(([id,bad])=>{mark(id,bad);if(bad)ok=false;});
+  if(!ok)return;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
+  set('ldr-nombre',nombre);set('ldr-apellido',apellido);set('ldr-email',email);
+  set('ldr-telefono',gv('lfe-telefono'));set('ldr-puesto',gv('lfe-puesto'));
+  set('ldr-empresa',gv('lfe-empresa'));set('ldr-cuentaId',gv('lfe-cuentaId'));set('ldr-cuentaNombre',gv('lfe-cuentaNombre'));
+  set('ldr-tipoInmueble',gv('lfe-tipoInmueble'));set('ldr-origen',origen);set('ldr-broker',broker);
+  set('ldr-buildingId',gv('lfe-buildingId'));set('ldr-buildingName',gv('lfe-buildingName'));
+  set('ldr-link-origen',link);set('ldr-comentarios',gv('lfe-comentarios'));
+  _ldrEditId=docId;
+  await saveLeadDrawer();
+  if(_currentLeadId===docId)openLeadDetail(docId);
+};
 function openLeadDetail(docId){
   const d=_leadDocs.find(x=>x._id===docId);
   if(!d)return;
@@ -7727,7 +7813,7 @@ function openLeadDetail(docId){
   const convertBtn=document.getElementById('lead-convert-btn');
   if(convertBtn)convertBtn.style.display=d.estado==='Convertido'?'none':'inline-block';
   const editBtn=document.getElementById('lead-edit-btn');
-  if(editBtn){editBtn.onclick=()=>openLeadDrawer_edit(docId);}
+  if(editBtn){editBtn.onclick=()=>leadFichaEdit(docId);}
   const archiveBtn=document.getElementById('lead-archive-btn');
   if(archiveBtn){archiveBtn.onclick=()=>archiveLead(docId);}
   document.getElementById('lead-det-left').innerHTML=`
