@@ -3329,9 +3329,17 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="ctdr-linkedin" class="cdr-input" type="url" placeholder="https://linkedin.com/in/...">
         </div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Ejecutivo Comercial responsable <span class="cdr-admin-tag" id="ctdr-brokerResp-tag" style="display:none">ADMIN</span></div>
-          <input id="ctdr-brokerResp" class="cdr-input" type="text" readonly title="Se asigna automáticamente al usuario que crea el contacto. Solo un administrador puede modificarlo." style="opacity:.85;background:#F4F7FC">
-          <div class="cdr-hint" id="ctdr-brokerResp-hint" style="font-size:10.5px;color:#8898C0;margin-top:3px">Se completa automáticamente con el usuario que crea el contacto.</div>
+          <div class="cdr-lbl">Creado por</div>
+          <input id="ctdr-brokerResp" class="cdr-input" type="text" readonly title="Se asigna automáticamente al usuario que crea el contacto. No editable." style="opacity:.85;background:#F4F7FC;cursor:default">
+          <div class="cdr-hint" style="font-size:10.5px;color:#8898C0;margin-top:3px">Se completa automáticamente con el usuario que crea el contacto. No editable.</div>
+        </div>
+        <div class="cdr-field" id="ctdr-ejec-field" style="display:none">
+          <div class="cdr-lbl">Ejecutivo(s) Comercial(es) <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(hasta 3)</span></div>
+          <div id="ctdr-ejec-chips" class="cdr-ms-chips"></div>
+          <div class="cdr-ms-wrap">
+            <input id="ctdr-ejec-q" class="cdr-input" type="text" placeholder="Buscar ejecutivo..." autocomplete="off" oninput="ctdrEjecSearch(this.value)" onfocus="ctdrEjecSearch(this.value)" onblur="ctdrEjecBlur()">
+            <div id="ctdr-ejec-drop" class="cdr-ms-drop" style="display:none"></div>
+          </div>
         </div>
       </div>
 
@@ -6960,6 +6968,12 @@ function renderContactosTable(docs,opts){
   wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
 }
 
+// Ejecutivos comerciales del contacto (auditoría vs. gestión: "Creado por" != estos).
+// Campo nuevo `ejecutivosComerciales` (array de claves); compat con el legacy `ejecutivoComercial`.
+function _ctoEjecutivos(d){
+  if(Array.isArray(d.ejecutivosComerciales)&&d.ejecutivosComerciales.length)return d.ejecutivosComerciales.filter(Boolean).slice(0,3);
+  return d.ejecutivoComercial?[d.ejecutivoComercial]:[];
+}
 // Ficha de consulta del Contacto (mismo estándar visual que Cuentas: cards + filas label/valor).
 // Sólo reorganiza la presentación de los campos existentes; no agrega ni quita datos.
 function renderContactoInfoCards(d){
@@ -6968,9 +6982,16 @@ function renderContactoInfoCards(d){
   const t=v=>v?esc(v):null;
   const linkedin=d.linkedin?`<a href="${esc(d.linkedin)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600;word-break:break-all">${esc(d.linkedin)}</a>`:null;
   const cuenta=d.cuentaNombre?`<a href="javascript:void(0)" onclick="openClientDetail('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`:null;
+  const ejs=_ctoEjecutivos(d);
+  const ejecVal=ejs.length?ejs.map(k=>esc(ejecDisplay(k))).join('<br>'):'<span style="color:#8898C0">Sin asignar</span>';
   return `
     <div class="nx-grid">
       <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Información General</div>
+          ${row('Creado por',t(d.brokerResponsable))}
+          <div class="nx-row"><div class="nx-row-l">Ejecutivo(s) Comercial(es)</div><div class="nx-row-v" style="flex-direction:column;align-items:flex-end;gap:.15rem">${ejecVal}</div></div>
+        </div>
         <div class="nx-card">
           <div class="nx-card-title">Datos de Contacto</div>
           ${row('Email',t(d.email))}
@@ -7011,8 +7032,8 @@ function openContactoDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado correo</div>${emailBadge(d.estadoCorreo)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial responsable</div><div class="crm-det-meta-val">${esc(ejecDisplay(d.brokerResponsable))||'–'}</div></div>
-    ${d.ejecutivoComercial?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial</div><div class="crm-det-meta-val">${esc(ejecDisplay(d.ejecutivoComercial))}</div></div>`:''}
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Creado por</div><div class="crm-det-meta-val">${d.brokerResponsable?esc(d.brokerResponsable):'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo(s) Comercial(es)</div><div class="crm-det-meta-val">${(()=>{const e=_ctoEjecutivos(d);return e.length?e.map(k=>esc(ejecDisplay(k))).join('<br>'):'<span style="color:#8898C0">Sin asignar</span>';})()}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
   `;
   document.getElementById('cto-det-right').innerHTML=`
@@ -7280,14 +7301,41 @@ function _normTelContacto(v,strip11){
   return s;
 }
 window._normTelContacto=_normTelContacto;
-// Ejecutivo Comercial responsable (brokerResponsable): auto=creador; editable solo por admin.
-function _ctdrSetBrokerResp(value,editable){
+// "Creado por" (brokerResponsable): auto=creador; solo lectura, no editable por nadie.
+function _ctdrSetBrokerResp(value){
   const inp=document.getElementById('ctdr-brokerResp');
-  const tag=document.getElementById('ctdr-brokerResp-tag');
-  const hint=document.getElementById('ctdr-brokerResp-hint');
-  if(inp){inp.value=value||'';inp.readOnly=!editable;inp.style.opacity=editable?'1':'.85';inp.style.background=editable?'':'#F4F7FC';inp.style.cursor=editable?'text':'default';}
-  if(tag)tag.style.display=editable?'':'none';
-  if(hint)hint.style.display=editable?'none':'';
+  if(inp){inp.value=value||'';inp.readOnly=true;}
+}
+// Ejecutivo(s) Comercial(es): hasta 3, selector predictivo (mismo criterio que Cuentas),
+// solo visible/editable por administradores y únicamente en edición.
+let _ctdrEjec=[],_ctdrEjecOpts=[];
+function _ctdrRenderEjecChips(){
+  const c=document.getElementById('ctdr-ejec-chips');if(!c)return;
+  c.innerHTML=_ctdrEjec.map((k,i)=>`<span class="cdr-ms-chip">${esc(ejecDisplay(k))}<span class="cdr-ms-chip-x" onclick="ctdrEjecRemoveIdx(${i})" title="Quitar">✕</span></span>`).join('');
+}
+window.ctdrEjecSearch=function(q){
+  const drop=document.getElementById('ctdr-ejec-drop');if(!drop)return;
+  q=(q||'').toLowerCase().trim();
+  if(_ctdrEjec.length>=3){drop.innerHTML='<div class="cdr-ms-empty">Máximo 3 ejecutivos.</div>';drop.style.display='block';return;}
+  _ctdrEjecOpts=CRM_EJECUTIVOS
+    .filter(k=>!_ctdrEjec.includes(k)&&(k.toLowerCase().includes(q)||ejecDisplay(k).toLowerCase().includes(q)))
+    .sort((a,b)=>ejecDisplay(a).localeCompare(ejecDisplay(b),'es',{sensitivity:'base'}));
+  drop.innerHTML=_ctdrEjecOpts.length?_ctdrEjecOpts.map((k,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctdrEjecAddIdx(${i})">${esc(ejecDisplay(k))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
+  drop.style.display='block';
+};
+window.ctdrEjecAddIdx=function(i){const k=_ctdrEjecOpts[i];if(k==null)return;if(_ctdrEjec.length>=3)return;if(!_ctdrEjec.includes(k))_ctdrEjec.push(k);const q=document.getElementById('ctdr-ejec-q');if(q)q.value='';document.getElementById('ctdr-ejec-drop').style.display='none';_ctdrRenderEjecChips();};
+window.ctdrEjecRemoveIdx=function(i){if(i<0||i>=_ctdrEjec.length)return;_ctdrEjec.splice(i,1);_ctdrRenderEjecChips();};
+window.ctdrEjecBlur=function(){setTimeout(()=>{const d=document.getElementById('ctdr-ejec-drop');if(d)d.style.display='none';},150);};
+function _ctdrSetupEjec(d){
+  const field=document.getElementById('ctdr-ejec-field');
+  const isAdmin=_cdrIsAdmin();
+  // Solo visible/editable por administradores y solo en edición (d != null).
+  const show=!!d&&isAdmin;
+  if(field)field.style.display=show?'':'none';
+  _ctdrEjec=d?_ctoEjecutivos(d).slice(0,3):[];
+  const q=document.getElementById('ctdr-ejec-q');if(q)q.value='';
+  const drop=document.getElementById('ctdr-ejec-drop');if(drop)drop.style.display='none';
+  _ctdrRenderEjecChips();
 }
 // Cargo estandarizado: opciones fijas + "Otro" con texto libre en "Especificar cargo".
 const CTDR_CARGO_STD=['CEO','CFO','Compras','Real Estate'];
@@ -7315,9 +7363,10 @@ window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['ctdr-cargo','ctdr-estadoCorreo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
-  // Ejecutivo Comercial responsable: se asigna automáticamente al usuario que crea el contacto.
-  // En el alta es de solo lectura para todos (asignación automática).
-  _ctdrSetBrokerResp(user?.displayName||user?.email||'',false);
+  // "Creado por": se asigna automáticamente al usuario que crea el contacto (solo lectura).
+  _ctdrSetBrokerResp(user?.displayName||user?.email||'');
+  // Ejecutivo(s) Comercial(es): NO se muestra durante la creación.
+  _ctdrSetupEjec(null);
   _ctdrSetCargo('');
   cdrClearErr('ctdr-cargo','ctdr-cargo-err');cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err');
   document.getElementById('ctdr-cuentaId').value='';
@@ -7354,8 +7403,10 @@ window.openContactoDrawer_edit=function(docId){
   set('ctdr-linkedin',d.linkedin);set('ctdr-comentarios',d.comentarios);
   _ctdrSetCargo(d.cargo||'');
   document.getElementById('ctdr-estadoCorreo').value=d.estadoCorreo||'sin_comprobar';
-  // Una vez creado, solo un administrador puede modificar el Ejecutivo Comercial responsable.
-  _ctdrSetBrokerResp(d.brokerResponsable||'',_cdrIsAdmin());
+  // "Creado por": solo lectura, no editable ni por administradores.
+  _ctdrSetBrokerResp(d.brokerResponsable||'');
+  // Ejecutivo(s) Comercial(es): editable solo por administradores, en edición.
+  _ctdrSetupEjec(d);
   const setToggle=(field,val)=>{
     document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{b.classList.toggle('active',b.dataset.value===val);});
   };
@@ -7426,12 +7477,15 @@ window.saveContactoDrawer=async function(){
     // LinkedIn es exclusivo de Administradores: sólo un admin lo escribe, así un
     // usuario estándar nunca lo pisa (ni siquiera al editar).
     if(_cdrIsAdmin())newData.linkedin=(document.getElementById('ctdr-linkedin').value||'').trim();
-    // Ejecutivo Comercial responsable: en el alta se asigna automáticamente (createData);
-    // al editar, solo un administrador puede modificarlo (no-admin no lo toca -> se preserva).
-    if(_ctdrEditId&&_cdrIsAdmin())newData.brokerResponsable=(document.getElementById('ctdr-brokerResp').value||'').trim();
+    // "Creado por" (brokerResponsable) NO se modifica al editar (auditoría, no editable).
+    // Ejecutivo(s) Comercial(es): solo un administrador los asigna, únicamente en edición.
+    if(_ctdrEditId&&_cdrIsAdmin()){
+      newData.ejecutivosComerciales=[..._ctdrEjec];
+      newData.ejecutivoComercial=_ctdrEjec[0]||'';   // compat singular (Analytics/filtros)
+    }
     if(_ctdrEditId){
       const oldD=_ctoDocs.find(x=>x._id===_ctdrEditId)||{};
-      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',cuentaNombre:'Cuenta',brokerResponsable:'Ejecutivo Comercial responsable'};
+      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',cuentaNombre:'Cuenta',ejecutivosComerciales:'Ejecutivos Comerciales'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('contactos').doc(_ctdrEditId).update(updatePayload);
