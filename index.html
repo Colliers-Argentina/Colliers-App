@@ -6500,7 +6500,6 @@ function renderCuentaInfoTab(docId){
   const ejecutivos=_ejecutivosCuenta(d);
   const est=cuentaEstadoAuto(d);
   const logo=_logoValida(d.logoUrl)?`<img src="${esc(d.logoUrl)}" style="max-height:30px;max-width:110px;border-radius:4px;background:#fff" onerror="this.replaceWith(document.createTextNode('–'))">`:dash;
-  const web=d.sitioWeb?`<a href="${esc(d.sitioWeb)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600">${esc(d.sitioWeb.replace(/^https?:\/\//,''))}</a>`:dash;
   body.innerHTML=`
     <div class="nx-grid">
       <div class="nx-col">
@@ -6508,7 +6507,6 @@ function renderCuentaInfoTab(docId){
           <div class="nx-card-title">Información General</div>
           ${row('Nombre Comercial',fv(d.nombre))}
           ${row('Sede Principal',d.sedePrincipalId?`<a href="javascript:void(0)" onclick="navToBuilding('${esc(d.sedePrincipalId)}')" style="color:#1C54F4;font-weight:600">🏢 ${esc(d.sedePrincipalNombre||'Ver edificio')}</a>`:dash)}
-          ${row('Sitio Web',web)}
           ${row('Logo',logo)}
           ${row('Creado por',fv(_cuentaCreador(d)))}
           ${row('Fecha de creación',d.fechaCreacion?fmtDate(d.fechaCreacion):dash)}
@@ -6607,7 +6605,6 @@ window.cuentaFichaEdit=function(docId){
           <div class="nx-card-title">Información General</div>
           ${erow('Nombre Comercial',`<input id="fe-nombre" class="cdr-input" value="${esc(d.nombre||'')}">`)}
           ${erow('Sede Principal',`<div id="fe-sede-tag" class="cdr-ms-chips">${_fe.sede.id?`<span class="cdr-ms-chip">🏢 ${esc(_fe.sede.nombre)}<span class="cdr-ms-chip-x" onclick="feSedeClear()">✕</span></span>`:''}</div><div class="cdr-ms-wrap"><input id="fe-sede-q" class="cdr-input" placeholder="Buscar edificio del inventario..." autocomplete="off" oninput="feSedeSearch(this.value)" onfocus="feSedeSearch(this.value)" onblur="feMsBlur('sede')"><div id="fe-sede-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
-          ${erow('Sitio Web',`<input id="fe-sitio" class="cdr-input" type="url" placeholder="https://empresa.com" value="${esc(d.sitioWeb||'')}">`)}
           ${erow('Logo',`<input id="fe-logo" class="cdr-input" type="url" placeholder="https://... (.jpg .png .webp .svg)" value="${esc(d.logoUrl||'')}" oninput="feLogoPreview(this.value)"><div id="fe-logo-prev" style="margin-top:.4rem">${_logoValida(d.logoUrl)?`<img src="${esc(d.logoUrl)}" style="max-height:48px;max-width:140px;border:1px solid #E7EDF7;border-radius:8px;background:#fff;padding:4px" onerror="this.remove()">`:''}</div>`)}
           ${rrow('Creado por',esc(_fe.creador||'–'))}
           ${rrow('Fecha de creación',d.fechaCreacion?fmtDate(d.fechaCreacion):dash)}
@@ -6669,7 +6666,7 @@ window.fichaEditSave=async function(docId){
     const gest=[...(_fe.creador?[{n:_fe.creador,f:d.fechaCreacion||now}]:[]),..._fe.gest.slice(0,2)];
     const payload={
       nombre,
-      sitioWeb:(document.getElementById('fe-sitio').value||'').trim(),
+      sitioWeb:((document.getElementById('fe-sitio')?.value)??d.sitioWeb??'').trim(),
       logoUrl:(document.getElementById('fe-logo').value||'').trim(),
       sedePrincipalId:_fe.sede.id||'',
       sedePrincipalNombre:_fe.sede.nombre||'',
