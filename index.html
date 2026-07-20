@@ -2198,6 +2198,11 @@ body.dark .cdr-select{background:#fff;color:#1F2937;border-color:rgba(255,255,25
 body.dark .cdr-input::placeholder{color:#4a6080}
 .cdr-req{color:#ED1B34}
 .cdr-err{color:#ED1B34;font-size:11px;font-weight:600;margin-top:4px}
+.cdr-signature{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.65rem 1.5rem;border-top:1px solid #EEF3FF;background:#FAFCFF}
+body.dark .cdr-signature{border-color:rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
+.cdr-signature-lbl{font-size:10px;font-weight:700;color:#8898C0;text-transform:uppercase;letter-spacing:.06em}
+.cdr-signature-val{font-size:12.5px;font-weight:700;color:#0A1B4D}
+body.dark .cdr-signature-val{color:#e0eaff}
 .cdr-admin-tag{font-size:9px;font-weight:700;color:#1C54F4;background:rgba(28,84,244,.1);border-radius:4px;padding:1px 5px;vertical-align:middle;letter-spacing:.04em}
 body.dark .cdr-admin-tag{background:rgba(77,147,255,.18);color:#8FC0FF}
 .cdr-ms-wrap{position:relative}
@@ -3321,11 +3326,6 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div class="cdr-lbl">LinkedIn <span class="cdr-admin-tag">ADMIN</span></div>
           <input id="ctdr-linkedin" class="cdr-input" type="url" placeholder="https://linkedin.com/in/...">
         </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Creado por</div>
-          <input id="ctdr-brokerResp" class="cdr-input" type="text" readonly title="Se asigna automáticamente al usuario que crea el contacto. No editable." style="opacity:.85;background:#F4F7FC;cursor:default">
-          <div class="cdr-hint" style="font-size:10.5px;color:#8898C0;margin-top:3px">Se completa automáticamente con el usuario que crea el contacto. No editable.</div>
-        </div>
         <div class="cdr-field" id="ctdr-ejec-field" style="display:none">
           <div class="cdr-lbl">Ejecutivo(s) Comercial(es) <span class="cdr-admin-tag">ADMIN</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(hasta 3)</span></div>
           <div id="ctdr-ejec-chips" class="cdr-ms-chips"></div>
@@ -3348,6 +3348,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
       </div>
 
+    </div>
+    <div class="cdr-signature">
+      <div class="cdr-signature-lbl">Creado por</div>
+      <div class="cdr-signature-val" id="ctdr-brokerResp-sig">–</div>
+      <input id="ctdr-brokerResp" type="hidden">
     </div>
     <div class="cdr-footer">
       <button class="cdr-cancel" onclick="closeContactoDrawer()">Cancelar</button>
@@ -6967,6 +6972,19 @@ function _ctoEjecutivos(d){
   if(Array.isArray(d.ejecutivosComerciales)&&d.ejecutivosComerciales.length)return d.ejecutivosComerciales.filter(Boolean).slice(0,3);
   return d.ejecutivoComercial?[d.ejecutivoComercial]:[];
 }
+// ===== Helpers reutilizables de edición inline (mismo estándar visual que Cuentas) =====
+// Barra superior de edición con Cancelar/Guardar; filas con control (erow) o de solo lectura (rrow).
+function nxEditbar(title,cancelJs,saveJs){
+  return `<div class="nx-editbar">
+    <span style="font-size:11px;font-weight:800;color:#0A1B4D;text-transform:uppercase;letter-spacing:.06em">✎ ${esc(title)}</span>
+    <span style="display:flex;gap:.5rem">
+      <button style="height:32px;padding:0 14px;border:1px solid #DDE5F2;border-radius:8px;background:#fff;color:#56648F;font-weight:600;font-family:inherit;font-size:12.5px;cursor:pointer" onclick="${cancelJs}">Cancelar</button>
+      <button style="height:32px;padding:0 18px;border:none;border-radius:8px;background:#1C54F4;color:#fff;font-weight:700;font-family:inherit;font-size:12.5px;cursor:pointer" onclick="${saveJs}">Guardar</button>
+    </span>
+  </div>`;
+}
+function nxErow(lbl,ctl){return `<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-ctl">${ctl}</div></div>`;}
+function nxRrow(lbl,val){return `<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-v">${val||'<span style="color:#8898C0">–</span>'}</div></div>`;}
 // Ficha de consulta del Contacto (mismo estándar visual que Cuentas: cards + filas label/valor).
 // Sólo reorganiza la presentación de los campos existentes; no agrega ni quita datos.
 function renderContactoInfoCards(d){
@@ -6982,6 +7000,8 @@ function renderContactoInfoCards(d){
       <div class="nx-col">
         <div class="nx-card">
           <div class="nx-card-title">Información General</div>
+          ${row('Nombre',t(d.nombre))}
+          ${row('Apellidos',t(d.apellidos))}
           ${row('Creado por',t(d.brokerResponsable))}
           <div class="nx-row"><div class="nx-row-l">Ejecutivo(s) Comercial(es)</div><div class="nx-row-v" style="flex-direction:column;align-items:flex-end;gap:.15rem">${ejecVal}</div></div>
         </div>
@@ -7005,6 +7025,83 @@ function renderContactoInfoCards(d){
       </div>
     </div>`;
 }
+// Edición inline del Contacto (mismo patrón que Cuentas). Reutiliza saveContactoDrawer
+// (volcando los controles inline a los inputs del drawer) para no duplicar la lógica.
+window.contactoFichaEdit=function(docId){
+  const d=_ctoDocs.find(x=>x._id===docId);
+  const body=document.getElementById('cto-dt-info');
+  if(!d||!body)return;
+  const isAdmin=_cdrIsAdmin();
+  const cargoStd=CTDR_CARGO_STD.includes(d.cargo||'');
+  const cargoSelV=cargoStd?d.cargo:(d.cargo?'Otro':'');
+  const cargoOtroV=cargoStd?'':(d.cargo||'');
+  const cargoOpts=['','CEO','CFO','Compras','Real Estate','Otro'].map(o=>`<option value="${esc(o)}"${cargoSelV===o?' selected':''}>${o||'Seleccionar...'}</option>`).join('');
+  const estOpts=[['sin_comprobar','🟡 Sin comprobar'],['funcional','🟢 Funcional'],['rebotado','🔴 Rebotado']].map(([v,l])=>`<option value="${v}"${(d.estadoCorreo||'sin_comprobar')===v?' selected':''}>${l}</option>`).join('');
+  const ejs=_ctoEjecutivos(d);
+  const ejecRO=ejs.length?ejs.map(k=>esc(ejecDisplay(k))).join('<br>'):'<span style="color:#8898C0">Sin asignar</span>';
+  body.innerHTML=
+    nxEditbar('Editando contacto',`openContactoDetail('${docId}')`,`contactoFichaSave('${docId}')`)+`
+    <div class="nx-grid">
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Información General</div>
+          ${nxErow('Nombre',`<input id="cfe-nombre" class="cdr-input" value="${esc(d.nombre||'')}">`)}
+          ${nxErow('Apellidos',`<input id="cfe-apellidos" class="cdr-input" value="${esc(d.apellidos||'')}">`)}
+          ${nxRrow('Creado por',esc(d.brokerResponsable||'–'))}
+          ${isAdmin
+            ?`<div class="nx-row" id="cfe-ejec-field"><div class="nx-row-l">Ejecutivo(s) Comercial(es)</div><div class="nx-row-ctl"><div id="cfe-ejec-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="cfe-ejec-q" class="cdr-input" placeholder="Buscar ejecutivo (hasta 3)..." autocomplete="off" oninput="ctdrEjecSearch(this.value)" onfocus="ctdrEjecSearch(this.value)" onblur="ctdrEjecBlur()"><div id="cfe-ejec-drop" class="cdr-ms-drop" style="display:none"></div></div></div></div>`
+            :`<div class="nx-row"><div class="nx-row-l">Ejecutivo(s) Comercial(es)</div><div class="nx-row-v" style="flex-direction:column;align-items:flex-end;gap:.15rem">${ejecRO}</div></div>`}
+        </div>
+        <div class="nx-card">
+          <div class="nx-card-title">Datos de Contacto</div>
+          ${nxErow('Email',`<input id="cfe-email" class="cdr-input" type="email" value="${esc(d.email||'')}">`)}
+          ${isAdmin?nxErow('Estado correo',`<select id="cfe-estadoCorreo" class="cdr-select">${estOpts}</select>`):`<div class="nx-row"><div class="nx-row-l">Estado correo</div><div class="nx-row-v">${emailBadge(d.estadoCorreo)}</div></div>`}
+          ${nxErow('Teléfono',`<input id="cfe-telefono" class="cdr-input" type="tel" inputmode="numeric" value="${esc(d.telefono||'')}" oninput="this.value=_normTelContacto(this.value)">`)}
+          ${d.interno?nxRrow('Interno',esc(d.interno)):''}
+          ${isAdmin?nxErow('LinkedIn',`<input id="cfe-linkedin" class="cdr-input" type="url" value="${esc(d.linkedin||'')}">`):(d.linkedin?nxRrow('LinkedIn',`<a href="${esc(d.linkedin)}" target="_blank" rel="noopener" style="color:#1C54F4">${esc(d.linkedin)}</a>`):'')}
+        </div>
+      </div>
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Datos Personales</div>
+          ${nxErow('Cargo segmentado',`<select id="cfe-cargo" class="cdr-select" onchange="var f=document.getElementById('cfe-cargo-otro-field');if(f)f.style.display=this.value==='Otro'?'':'none'">${cargoOpts}</select><div id="cfe-cargo-otro-field" style="display:${cargoSelV==='Otro'?'':'none'};margin-top:.4rem"><input id="cfe-cargo-otro" class="cdr-input" placeholder="Especificar cargo" value="${esc(cargoOtroV)}"></div>`)}
+          ${nxErow('Puesto',`<input id="cfe-puesto" class="cdr-input" value="${esc(d.puesto||'')}">`)}
+          ${nxErow('Cuenta asociada',`<input id="cfe-cuenta-q" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" value="${esc(d.cuentaNombre||'')}" oninput="ctaPickerInput('cfe',this.value)" onblur="ctaPickerBlur('cfe')"><div id="cfe-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><span id="cfe-cuenta-tag" style="display:none;font-size:10.5px;color:#16A34A;font-weight:700;margin-top:3px"></span><input id="cfe-cuentaId" type="hidden" value="${esc(d.cuentaId||'')}"><input id="cfe-cuentaNombre" type="hidden" value="${esc(d.cuentaNombre||'')}">`)}
+        </div>
+        <div class="nx-card">
+          <div class="nx-card-title">Comentarios</div>
+          <textarea id="cfe-comentarios" class="cdr-input" style="min-height:64px;resize:vertical">${esc(d.comentarios||'')}</textarea>
+        </div>
+      </div>
+    </div>`;
+  registerCuentaPicker('cfe',{inputId:'cfe-cuenta-q',dropId:'cfe-cuenta-drop',tagId:'cfe-cuenta-tag',hidId:'cfe-cuentaId',hidNombreId:'cfe-cuentaNombre'});
+  if(isAdmin)_ctdrSetupEjec(d,'cfe');
+};
+window.contactoFichaSave=async function(docId){
+  const d=_ctoDocs.find(x=>x._id===docId);if(!d)return;
+  const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+  const nombre=(gv('cfe-nombre')||'').trim(),apellidos=(gv('cfe-apellidos')||'').trim();
+  const cargoSel=gv('cfe-cargo'),cargoOtro=(gv('cfe-cargo-otro')||'').trim();
+  const email=(gv('cfe-email')||'').trim(),telefono=_normTelContacto(gv('cfe-telefono'),true);
+  const mark=(id,bad)=>{const e=document.getElementById(id);if(e)e.style.borderColor=bad?'#ED1B34':'';};
+  let ok=true;
+  [['cfe-nombre',!nombre],['cfe-apellidos',!apellidos],['cfe-cargo',!cargoSel],['cfe-email',!email],['cfe-telefono',!telefono]].forEach(([id,bad])=>{mark(id,bad);if(bad)ok=false;});
+  if(cargoSel==='Otro'&&!cargoOtro){mark('cfe-cargo-otro',true);ok=false;}else mark('cfe-cargo-otro',false);
+  if(!ok)return;
+  const isAdmin=_cdrIsAdmin();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
+  set('ctdr-nombre',nombre);set('ctdr-apellidos',apellidos);
+  set('ctdr-cargo',cargoSel);set('ctdr-cargo-otro',cargoOtro);
+  set('ctdr-puesto',gv('cfe-puesto'));set('ctdr-email',email);
+  set('ctdr-telefono',gv('cfe-telefono'));set('ctdr-comentarios',gv('cfe-comentarios'));
+  set('ctdr-cuentaId',gv('cfe-cuentaId'));set('ctdr-cuentaNombre',gv('cfe-cuentaNombre'));
+  set('ctdr-estadoCorreo',isAdmin?(gv('cfe-estadoCorreo')||'sin_comprobar'):(d.estadoCorreo||'sin_comprobar'));
+  if(isAdmin)set('ctdr-linkedin',gv('cfe-linkedin'));
+  // _ctdrEjec ya refleja la selección de la ficha (prefijo 'cfe'); saveContactoDrawer lo usa si admin.
+  _ctdrEditId=docId;
+  await saveContactoDrawer();
+  openContactoDetail(docId);
+};
 function openContactoDetail(docId){
   // Si se abre desde otra sección (p.ej. la solapa Contactos de una Cuenta),
   // mostrar el módulo Contactos para que la ficha sea visible.
@@ -7041,7 +7138,7 @@ function openContactoDetail(docId){
     </div>
   `;
   const ctoEditBtn=document.getElementById('cto-edit-contacto-btn');
-  if(ctoEditBtn)ctoEditBtn.onclick=()=>openContactoDrawer_edit(docId);
+  if(ctoEditBtn)ctoEditBtn.onclick=()=>contactoFichaEdit(docId);
   const ctoArchiveBtn=document.getElementById('cto-archive-contacto-btn');
   if(ctoArchiveBtn)ctoArchiveBtn.onclick=()=>archiveContacto(docId);
   document.getElementById('cto-list-view').style.display='none';
@@ -7293,20 +7390,22 @@ function _normTelContacto(v,strip11){
   return s;
 }
 window._normTelContacto=_normTelContacto;
-// "Creado por" (brokerResponsable): auto=creador; solo lectura, no editable por nadie.
+// "Creado por" (brokerResponsable): auto=creador; firma del registro, no editable.
 function _ctdrSetBrokerResp(value){
   const inp=document.getElementById('ctdr-brokerResp');
-  if(inp){inp.value=value||'';inp.readOnly=true;}
+  if(inp)inp.value=value||'';
+  const sig=document.getElementById('ctdr-brokerResp-sig');
+  if(sig)sig.textContent=value||'–';
 }
 // Ejecutivo(s) Comercial(es): hasta 3, selector predictivo (mismo criterio que Cuentas),
-// solo visible/editable por administradores y únicamente en edición.
-let _ctdrEjec=[],_ctdrEjecOpts=[];
+// solo editable por administradores. Reutilizable con prefijo (drawer 'ctdr' / ficha inline 'cfe').
+let _ctdrEjec=[],_ctdrEjecOpts=[],_ctdrEjecPfx='ctdr';
 function _ctdrRenderEjecChips(){
-  const c=document.getElementById('ctdr-ejec-chips');if(!c)return;
+  const c=document.getElementById(_ctdrEjecPfx+'-ejec-chips');if(!c)return;
   c.innerHTML=_ctdrEjec.map((k,i)=>`<span class="cdr-ms-chip">${esc(ejecDisplay(k))}<span class="cdr-ms-chip-x" onclick="ctdrEjecRemoveIdx(${i})" title="Quitar">✕</span></span>`).join('');
 }
 window.ctdrEjecSearch=function(q){
-  const drop=document.getElementById('ctdr-ejec-drop');if(!drop)return;
+  const drop=document.getElementById(_ctdrEjecPfx+'-ejec-drop');if(!drop)return;
   q=(q||'').toLowerCase().trim();
   if(_ctdrEjec.length>=3){drop.innerHTML='<div class="cdr-ms-empty">Máximo 3 ejecutivos.</div>';drop.style.display='block';return;}
   _ctdrEjecOpts=CRM_EJECUTIVOS
@@ -7315,18 +7414,19 @@ window.ctdrEjecSearch=function(q){
   drop.innerHTML=_ctdrEjecOpts.length?_ctdrEjecOpts.map((k,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctdrEjecAddIdx(${i})">${esc(ejecDisplay(k))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
   drop.style.display='block';
 };
-window.ctdrEjecAddIdx=function(i){const k=_ctdrEjecOpts[i];if(k==null)return;if(_ctdrEjec.length>=3)return;if(!_ctdrEjec.includes(k))_ctdrEjec.push(k);const q=document.getElementById('ctdr-ejec-q');if(q)q.value='';document.getElementById('ctdr-ejec-drop').style.display='none';_ctdrRenderEjecChips();};
+window.ctdrEjecAddIdx=function(i){const k=_ctdrEjecOpts[i];if(k==null)return;if(_ctdrEjec.length>=3)return;if(!_ctdrEjec.includes(k))_ctdrEjec.push(k);const q=document.getElementById(_ctdrEjecPfx+'-ejec-q');if(q)q.value='';const dp=document.getElementById(_ctdrEjecPfx+'-ejec-drop');if(dp)dp.style.display='none';_ctdrRenderEjecChips();};
 window.ctdrEjecRemoveIdx=function(i){if(i<0||i>=_ctdrEjec.length)return;_ctdrEjec.splice(i,1);_ctdrRenderEjecChips();};
-window.ctdrEjecBlur=function(){setTimeout(()=>{const d=document.getElementById('ctdr-ejec-drop');if(d)d.style.display='none';},150);};
-function _ctdrSetupEjec(d){
-  const field=document.getElementById('ctdr-ejec-field');
+window.ctdrEjecBlur=function(){setTimeout(()=>{const d=document.getElementById(_ctdrEjecPfx+'-ejec-drop');if(d)d.style.display='none';},150);};
+// pfx: prefijo de los ids (drawer 'ctdr' o ficha inline 'cfe'). d=null en alta (no muestra).
+function _ctdrSetupEjec(d,pfx){
+  _ctdrEjecPfx=pfx||'ctdr';
+  const field=document.getElementById(_ctdrEjecPfx+'-ejec-field');
   const isAdmin=_cdrIsAdmin();
-  // Solo visible/editable por administradores y solo en edición (d != null).
   const show=!!d&&isAdmin;
   if(field)field.style.display=show?'':'none';
   _ctdrEjec=d?_ctoEjecutivos(d).slice(0,3):[];
-  const q=document.getElementById('ctdr-ejec-q');if(q)q.value='';
-  const drop=document.getElementById('ctdr-ejec-drop');if(drop)drop.style.display='none';
+  const q=document.getElementById(_ctdrEjecPfx+'-ejec-q');if(q)q.value='';
+  const drop=document.getElementById(_ctdrEjecPfx+'-ejec-drop');if(drop)drop.style.display='none';
   _ctdrRenderEjecChips();
 }
 // Cargo estandarizado: opciones fijas + "Otro" con texto libre en "Especificar cargo".
