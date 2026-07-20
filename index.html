@@ -2197,6 +2197,7 @@ body.dark .cdr-select{background:#fff;color:#1F2937;border-color:rgba(255,255,25
 .cdr-input::placeholder{color:#B0BDDA}
 body.dark .cdr-input::placeholder{color:#4a6080}
 .cdr-req{color:#ED1B34}
+.cdr-err{color:#ED1B34;font-size:11px;font-weight:600;margin-top:4px}
 .cdr-admin-tag{font-size:9px;font-weight:700;color:#1C54F4;background:rgba(28,84,244,.1);border-radius:4px;padding:1px 5px;vertical-align:middle;letter-spacing:.04em}
 body.dark .cdr-admin-tag{background:rgba(77,147,255,.18);color:#8FC0FF}
 .cdr-ms-wrap{position:relative}
@@ -3160,11 +3161,13 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       </div>
 
       <div class="cdr-field">
-        <div class="cdr-lbl">Cliente Colliers</div>
-        <div class="cdr-toggle-group">
-          <button type="button" class="cdr-toggle-btn active" data-field="clienteColliers" data-value="Sí" data-default onclick="cdrToggle(this)">Sí</button>
-          <button type="button" class="cdr-toggle-btn" data-field="clienteColliers" data-value="No" onclick="cdrToggle(this)">No</button>
-        </div>
+        <div class="cdr-lbl">Cliente Colliers <span class="cdr-req">*</span></div>
+        <select id="cdr-clienteColliers" class="cdr-select" onchange="cdrClearErr('cdr-clienteColliers','cdr-clienteColliers-err')">
+          <option value="">Seleccionar...</option>
+          <option value="Sí">Sí</option>
+          <option value="No">No</option>
+        </select>
+        <div class="cdr-err" id="cdr-clienteColliers-err" style="display:none">Seleccioná una opción.</div>
       </div>
 
       <div class="cdr-field cdr-admin-only" id="cdr-rubro-field">
@@ -3186,22 +3189,25 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       </div>
 
       <div class="cdr-field">
-        <div class="cdr-lbl">Unidades de negocio de interés</div>
-        <div class="cdr-toggle-group" id="cdr-bu-chips">
-          <button type="button" class="cto-pref-chip" data-bu="Oficinas" onclick="this.classList.toggle('active')">Oficinas</button>
-          <button type="button" class="cto-pref-chip" data-bu="Retail" onclick="this.classList.toggle('active')">Retail</button>
-          <button type="button" class="cto-pref-chip" data-bu="Industria" onclick="this.classList.toggle('active')">Industria</button>
-          <button type="button" class="cto-pref-chip" data-bu="Logística" onclick="this.classList.toggle('active')">Logística</button>
+        <div class="cdr-lbl">Unidades de negocio de interés <span class="cdr-req">*</span></div>
+        <div class="cdr-toggle-group" id="cdr-bu-chips" style="border-radius:8px">
+          <button type="button" class="cto-pref-chip" data-bu="Oficinas" onclick="this.classList.toggle('active');cdrClearBuErr()">Oficinas</button>
+          <button type="button" class="cto-pref-chip" data-bu="Retail" onclick="this.classList.toggle('active');cdrClearBuErr()">Retail</button>
+          <button type="button" class="cto-pref-chip" data-bu="Industria" onclick="this.classList.toggle('active');cdrClearBuErr()">Industria</button>
+          <button type="button" class="cto-pref-chip" data-bu="Logística" onclick="this.classList.toggle('active');cdrClearBuErr()">Logística</button>
         </div>
+        <div class="cdr-err" id="cdr-bu-err" style="display:none">Seleccioná al menos una unidad de negocio.</div>
       </div>
 
       <div class="cdr-field">
-        <div class="cdr-lbl">Tipo de cuenta</div>
-        <div class="cdr-toggle-group">
-          <button type="button" class="cdr-toggle-btn" data-field="tipoCuenta" data-value="Inmobiliaria" onclick="cdrToggle(this)">Inmobiliaria</button>
-          <button type="button" class="cdr-toggle-btn" data-field="tipoCuenta" data-value="Desarrollador" onclick="cdrToggle(this)">Desarrollador</button>
-          <button type="button" class="cdr-toggle-btn active" data-field="tipoCuenta" data-value="Ninguno" data-default onclick="cdrToggle(this)">Ninguno</button>
-        </div>
+        <div class="cdr-lbl">Tipo de cuenta <span class="cdr-req">*</span></div>
+        <select id="cdr-tipoCuenta" class="cdr-select" onchange="cdrClearErr('cdr-tipoCuenta','cdr-tipoCuenta-err')">
+          <option value="">Seleccionar...</option>
+          <option value="Inmobiliaria">Inmobiliaria</option>
+          <option value="Desarrollador">Desarrollador</option>
+          <option value="Ninguno">Ninguno</option>
+        </select>
+        <div class="cdr-err" id="cdr-tipoCuenta-err" style="display:none">Seleccioná una opción.</div>
       </div>
 
       <div class="cdr-field">
@@ -8278,6 +8284,14 @@ window.cdrMsBlur=function(which){setTimeout(()=>{const d=document.getElementById
 function _cdrValidSubrubros(rubros,subs){
   return subs.filter(o=>rubros.includes(o.r)&&(!(o.r in RUBROS_CATALOG)||RUBROS_CATALOG[o.r].includes(o.s)));
 }
+window.cdrClearErr=function(id,errId){const el=document.getElementById(id);if(el)el.style.borderColor='';const e=document.getElementById(errId);if(e)e.style.display='none';};
+window.cdrClearBuErr=function(){const e=document.getElementById('cdr-bu-err');if(e)e.style.display='none';const g=document.getElementById('cdr-bu-chips');if(g)g.style.outline='';};
+function _cdrClearRequiredErrors(){
+  cdrClearErr('cdr-nombre',null);
+  cdrClearErr('cdr-clienteColliers','cdr-clienteColliers-err');
+  cdrClearErr('cdr-tipoCuenta','cdr-tipoCuenta-err');
+  cdrClearBuErr();
+}
 window.openClientDrawer=function(callbackFn){
   _cdrEditId=null;
   _cdrCallback=callbackFn||null;
@@ -8291,6 +8305,10 @@ window.openClientDrawer=function(callbackFn){
     document.querySelectorAll(`#cdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
+  // Cliente Colliers y Tipo de Cuenta: dropdowns obligatorios, sin valor por defecto.
+  document.getElementById('cdr-clienteColliers').value='';
+  document.getElementById('cdr-tipoCuenta').value='';
+  _cdrClearRequiredErrors();
   _cdrResetRubros();
   document.querySelectorAll('#cdr-drawer .cdr-admin-only').forEach(el=>el.style.display=isAdmin?'':'none');
   document.getElementById('cdr-subrubro-field').style.display='none';
@@ -8314,14 +8332,8 @@ window.openClientDrawer_edit=function(docId){
   document.getElementById('cdr-categoria').value=d.categoria||'';
   const buArr=Array.isArray(d.bu)?d.bu:[d.bu].filter(Boolean);
   document.querySelectorAll('#cdr-bu-chips .cto-pref-chip').forEach(c=>{c.classList.toggle('active',buArr.includes(c.dataset.bu));});
-  const setToggle=(field,val)=>{
-    document.querySelectorAll(`#cdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{
-      b.classList.toggle('active',b.dataset.value===val);
-    });
-  };
-  setToggle('clienteColliers',d.clienteColliers==='Sí'?'Sí':'No');
-  const tipo=_efectivoTipoCuenta(d);
-  setToggle('tipoCuenta',tipo);
+  document.getElementById('cdr-clienteColliers').value=d.clienteColliers==='Sí'?'Sí':(d.clienteColliers==='No'?'No':'');
+  document.getElementById('cdr-tipoCuenta').value=_efectivoTipoCuenta(d);
   _cdrUpdateSubrubroVisibility();
   document.querySelector('#cdr-drawer .cdr-title').textContent='Editar Cuenta';
   const btn=document.getElementById('cdr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
@@ -8348,8 +8360,27 @@ window.closeClientDrawer=function(){
 
 window.saveClientDrawer=async function(){
   const nombre=cdrVal('cdr-nombre');
-  if(!nombre){document.getElementById('cdr-nombre').focus();document.getElementById('cdr-nombre').style.borderColor='#ED1B34';return;}
-  document.getElementById('cdr-nombre').style.borderColor='';
+  const clienteColliersVal=document.getElementById('cdr-clienteColliers').value;
+  const tipoCuentaVal=document.getElementById('cdr-tipoCuenta').value;
+  const buSel=[...document.querySelectorAll('#cdr-bu-chips .cto-pref-chip.active')].map(c=>c.dataset.bu);
+  if(!_cdrEditId){
+    // Alta: Nombre, Cliente Colliers, Unidades de Negocio (>=1) y Tipo de Cuenta son obligatorios.
+    const badNombre=!nombre,badCC=!clienteColliersVal,badTipo=!tipoCuentaVal,badBU=buSel.length===0;
+    const mark=(id,errId,bad)=>{const el=document.getElementById(id);if(el)el.style.borderColor=bad?'#ED1B34':'';const e=errId&&document.getElementById(errId);if(e)e.style.display=bad?'block':'none';};
+    mark('cdr-nombre',null,badNombre);
+    mark('cdr-clienteColliers','cdr-clienteColliers-err',badCC);
+    mark('cdr-tipoCuenta','cdr-tipoCuenta-err',badTipo);
+    const buErr=document.getElementById('cdr-bu-err'),buGroup=document.getElementById('cdr-bu-chips');
+    if(buErr)buErr.style.display=badBU?'block':'none';if(buGroup)buGroup.style.outline=badBU?'1px solid #ED1B34':'';
+    if(badNombre||badCC||badBU||badTipo){
+      const first=badNombre?document.getElementById('cdr-nombre'):badCC?document.getElementById('cdr-clienteColliers'):badBU?buGroup:document.getElementById('cdr-tipoCuenta');
+      if(first&&first.focus)first.focus();
+      return;
+    }
+  } else {
+    if(!nombre){document.getElementById('cdr-nombre').focus();document.getElementById('cdr-nombre').style.borderColor='#ED1B34';return;}
+    document.getElementById('cdr-nombre').style.borderColor='';
+  }
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('cdr-save-btn');
   btn.textContent='Guardando...';btn.disabled=true;
@@ -8357,11 +8388,11 @@ window.saveClientDrawer=async function(){
     const now=firebase.firestore.Timestamp.now();
     const isAdmin=_cdrIsAdmin();
     const userName=user?.displayName||user?.email||'';
-    const tipoCuenta=cdrToggleVal('tipoCuenta')||'Ninguno';
+    const tipoCuenta=tipoCuentaVal||'Ninguno';
     const newData={
       nombre,
-      clienteColliers:cdrToggleVal('clienteColliers')||'Sí',
-      bu:[...document.querySelectorAll('#cdr-bu-chips .cto-pref-chip.active')].map(c=>c.dataset.bu),
+      clienteColliers:clienteColliersVal||'Sí',
+      bu:buSel,
       tipoCuenta,
       esBroker:tipoCuenta==='Inmobiliaria'?'Sí':'No',
       esDesarrollador:tipoCuenta==='Desarrollador'?'Sí':'No',
