@@ -3329,16 +3329,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="ctdr-linkedin" class="cdr-input" type="url" placeholder="https://linkedin.com/in/...">
         </div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Ejecutivo Comercial responsable</div>
-          <select id="ctdr-ejecutivo" class="cdr-select">
-            <option value="">— Sin asignar —</option>
-            <option value="Bartra">Bartra Alejandro</option>
-            <option value="Farola">Farola Juan Manuel</option>
-            <option value="Giancontieri">Giancontieri Juan</option>
-            <option value="Matienzo">Matienzo Nicolas</option>
-            <option value="Troncoso">Troncoso Juan Manuel</option>
-            <option value="Zuliani">Zuliani Marcelo</option>
-          </select>
+          <div class="cdr-lbl">Ejecutivo Comercial responsable <span class="cdr-admin-tag" id="ctdr-brokerResp-tag" style="display:none">ADMIN</span></div>
+          <input id="ctdr-brokerResp" class="cdr-input" type="text" readonly title="Se asigna automáticamente al usuario que crea el contacto. Solo un administrador puede modificarlo." style="opacity:.85;background:#F4F7FC">
+          <div class="cdr-hint" id="ctdr-brokerResp-hint" style="font-size:10.5px;color:#8898C0;margin-top:3px">Se completa automáticamente con el usuario que crea el contacto.</div>
         </div>
       </div>
 
@@ -7287,6 +7280,15 @@ function _normTelContacto(v,strip11){
   return s;
 }
 window._normTelContacto=_normTelContacto;
+// Ejecutivo Comercial responsable (brokerResponsable): auto=creador; editable solo por admin.
+function _ctdrSetBrokerResp(value,editable){
+  const inp=document.getElementById('ctdr-brokerResp');
+  const tag=document.getElementById('ctdr-brokerResp-tag');
+  const hint=document.getElementById('ctdr-brokerResp-hint');
+  if(inp){inp.value=value||'';inp.readOnly=!editable;inp.style.opacity=editable?'1':'.85';inp.style.background=editable?'':'#F4F7FC';inp.style.cursor=editable?'text':'default';}
+  if(tag)tag.style.display=editable?'':'none';
+  if(hint)hint.style.display=editable?'none':'';
+}
 // Cargo estandarizado: opciones fijas + "Otro" con texto libre en "Especificar cargo".
 const CTDR_CARGO_STD=['CEO','CFO','Compras','Real Estate'];
 window.ctdrCargoChange=function(){
@@ -7312,7 +7314,10 @@ window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
   _ctdrEditId=null;
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['ctdr-cargo','ctdr-estadoCorreo','ctdr-ejecutivo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
+  ['ctdr-cargo','ctdr-estadoCorreo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
+  // Ejecutivo Comercial responsable: se asigna automáticamente al usuario que crea el contacto.
+  // En el alta es de solo lectura para todos (asignación automática).
+  _ctdrSetBrokerResp(user?.displayName||user?.email||'',false);
   _ctdrSetCargo('');
   cdrClearErr('ctdr-cargo','ctdr-cargo-err');cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err');
   document.getElementById('ctdr-cuentaId').value='';
@@ -7349,7 +7354,8 @@ window.openContactoDrawer_edit=function(docId){
   set('ctdr-linkedin',d.linkedin);set('ctdr-comentarios',d.comentarios);
   _ctdrSetCargo(d.cargo||'');
   document.getElementById('ctdr-estadoCorreo').value=d.estadoCorreo||'sin_comprobar';
-  document.getElementById('ctdr-ejecutivo').value=d.ejecutivoComercial||'';
+  // Una vez creado, solo un administrador puede modificar el Ejecutivo Comercial responsable.
+  _ctdrSetBrokerResp(d.brokerResponsable||'',_cdrIsAdmin());
   const setToggle=(field,val)=>{
     document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{b.classList.toggle('active',b.dataset.value===val);});
   };
@@ -7413,15 +7419,17 @@ window.saveContactoDrawer=async function(){
       email,
       estadoCorreo:document.getElementById('ctdr-estadoCorreo').value||'sin_comprobar',
       telefono:_normTelContacto(document.getElementById('ctdr-telefono').value,true),
-      ejecutivoComercial:document.getElementById('ctdr-ejecutivo').value||'',
       comentarios:(document.getElementById('ctdr-comentarios').value||'').trim(),
     };
     // LinkedIn es exclusivo de Administradores: sólo un admin lo escribe, así un
     // usuario estándar nunca lo pisa (ni siquiera al editar).
     if(_cdrIsAdmin())newData.linkedin=(document.getElementById('ctdr-linkedin').value||'').trim();
+    // Ejecutivo Comercial responsable: en el alta se asigna automáticamente (createData);
+    // al editar, solo un administrador puede modificarlo (no-admin no lo toca -> se preserva).
+    if(_ctdrEditId&&_cdrIsAdmin())newData.brokerResponsable=(document.getElementById('ctdr-brokerResp').value||'').trim();
     if(_ctdrEditId){
       const oldD=_ctoDocs.find(x=>x._id===_ctdrEditId)||{};
-      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',cuentaNombre:'Cuenta',ejecutivoComercial:'Ejecutivo Comercial'};
+      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',cuentaNombre:'Cuenta',brokerResponsable:'Ejecutivo Comercial responsable'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('contactos').doc(_ctdrEditId).update(updatePayload);
