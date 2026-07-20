@@ -2255,6 +2255,13 @@ body.dark .cta-stat{background:rgba(255,255,255,.04);border-color:rgba(255,255,2
 .cta-stat-v{font-size:17px;font-weight:800;color:#0A1B4D;line-height:1.1}
 body.dark .cta-stat-v{color:#fff}
 .cta-stat-l{font-size:9px;font-weight:700;color:#56648F;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.cta-kpis{display:flex;flex-direction:column;gap:.3rem;margin:.7rem 0}
+.cta-kpi{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:#F6F9FF;border:1px solid #E7EDF7;border-radius:9px;padding:.5rem .7rem}
+body.dark .cta-kpi{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+.cta-kpi-l{font-size:11.5px;font-weight:600;color:#56648F;display:flex;align-items:center;gap:.45rem}
+body.dark .cta-kpi-l{color:#A8B3D1}
+.cta-kpi-v{font-size:15px;font-weight:800;color:#0A1B4D;line-height:1}
+body.dark .cta-kpi-v{color:#fff}
 .cta-gest-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:#F8FAFF;border:1px solid #EAF0FB;border-radius:9px;padding:.5rem .7rem;margin-bottom:.4rem}
 body.dark .cta-gest-row{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
 .cta-gest-n{font-size:12.5px;font-weight:700;color:#0A1B4D}
@@ -6480,7 +6487,6 @@ function renderCuentaLeftPanel(docId){
   const logo=_logoValida(d.logoUrl)
     ?`<img class="cta-logo" src="${esc(d.logoUrl)}" alt="" onerror="this.style.display='none';document.getElementById('cta-logo-fb').style.display='flex'"><div id="cta-logo-fb" class="crm-det-av" style="background:${crmAvatarBg(nombre)};display:none;margin:0 auto .5rem">${crmInitials(nombre)}</div>`
     :`<div class="crm-det-av" style="background:${crmAvatarBg(nombre)};margin:0 auto .5rem">${crmInitials(nombre)}</div>`;
-  const bloque=(lbl,fecha,usuario)=>`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">${lbl}</div><div class="crm-det-meta-val">${fmtDate(fecha)}</div>${usuario?`<div style="font-size:10.5px;color:#8898C0;margin-top:1px">${esc(usuario)}</div>`:''}</div>`;
   document.getElementById('crm-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       ${logo}
@@ -6488,15 +6494,13 @@ function renderCuentaLeftPanel(docId){
       ${d.sitioWeb?`<div class="crm-det-av-email"><a href="${esc(d.sitioWeb)}" target="_blank" rel="noopener" style="color:#1C54F4">${esc(d.sitioWeb.replace(/^https?:\/\//,''))}</a></div>`:''}
       <div style="margin-top:.5rem">${est.html}</div>
     </div>
-    <div class="cta-stats">
-      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-contactos">–</div><div class="cta-stat-l">Contactos</div></div>
-      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-oportunidades">–</div><div class="cta-stat-l">Oportunidades</div></div>
-      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-ganadas">–</div><div class="cta-stat-l">Oport. ganadas</div></div>
-      <div class="cta-stat"><div class="cta-stat-v" id="cta-stat-inmuebles">–</div><div class="cta-stat-l">Inmuebles</div></div>
+    <div class="cta-kpis">
+      <div class="cta-kpi"><span class="cta-kpi-l">👥 Contactos</span><span class="cta-kpi-v" id="cta-stat-contactos">–</span></div>
+      <div class="cta-kpi"><span class="cta-kpi-l">💼 Oportunidades</span><span class="cta-kpi-v" id="cta-stat-oportunidades">–</span></div>
+      <div class="cta-kpi"><span class="cta-kpi-l">🟡 Oportunidades Abiertas</span><span class="cta-kpi-v" id="cta-stat-abiertas">–</span></div>
+      <div class="cta-kpi"><span class="cta-kpi-l">🏆 Oportunidades Ganadas</span><span class="cta-kpi-v" id="cta-stat-ganadas">–</span></div>
+      <div class="cta-kpi"><span class="cta-kpi-l">🏢 Inmuebles Asociados</span><span class="cta-kpi-v" id="cta-stat-inmuebles">–</span></div>
     </div>
-    ${bloque('Última Actividad',d.ultimaActividadComercial||d.ultimaActividad,d.ultimaActividadComercialUsuario||'')}
-    ${bloque('Última Modificación',d.ultimaModificacion,d.usuarioUltimaModificacion||'')}
-    ${bloque('Cuenta creada',d.fechaCreacion,_cuentaCreador(d))}
   `;
 }
 function openClientDetail(docId){
@@ -6553,9 +6557,9 @@ function renderCuentaInfoTab(docId){
       <div class="nx-col">
         <div class="nx-card">
           <div class="nx-card-title">Información General</div>
+          ${row('Logo',logo)}
           ${row('Nombre Comercial',fv(d.nombre))}
           ${row('Sede Principal',d.sedePrincipalId?`<a href="javascript:void(0)" onclick="navToBuilding('${esc(d.sedePrincipalId)}')" style="color:#1C54F4;font-weight:600">🏢 ${esc(d.sedePrincipalNombre||'Ver edificio')}</a>`:dash)}
-          ${row('Logo',logo)}
           ${row('Creado por',fv(_cuentaCreador(d)))}
           ${row('Fecha de creación',d.fechaCreacion?fmtDate(d.fechaCreacion):dash)}
         </div>
@@ -6589,10 +6593,11 @@ function renderCuentaInfoTab(docId){
 async function _loadCuentaQuickStats(docId){
   const d=_crmDocs.find(x=>x._id===docId);if(!d)return;
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('cta-stat-oportunidades','0');
   const cache=_ctaQuickCache[docId]||{};
   if(cache.contactos!=null)set('cta-stat-contactos',cache.contactos);
   if(cache.inmuebles!=null)set('cta-stat-inmuebles',cache.inmuebles);
+  if(cache.oportunidades!=null)set('cta-stat-oportunidades',cache.oportunidades);
+  if(cache.abiertas!=null)set('cta-stat-abiertas',cache.abiertas);
   if(cache.ganadas!=null)set('cta-stat-ganadas',cache.ganadas);
   if(!db)return;
   try{
@@ -6600,16 +6605,31 @@ async function _loadCuentaQuickStats(docId){
     const n=snap.docs.filter(x=>(x.data().estadoRegistro||'activo')!=='archivado').length;
     _ctaQuickCache[docId]={..._ctaQuickCache[docId],contactos:n};set('cta-stat-contactos',n);
   }catch(e){}
+  // Inmuebles asociados: edificios distintos donde la cuenta es ocupante o propietaria.
   try{
-    // Oportunidades ganadas: registros "Servicio Concretado" + transacciones cerradas de la cuenta
+    await _loadBldDocsIfNeeded();
+    const [occ,own]=await Promise.all([_queryUnitsForId('occupierAccountId',docId),_queryUnitsForId('ownerAccountId',docId)]);
+    const nBld=new Set([...occ,...own].map(u=>u._bldId)).size;
+    _ctaQuickCache[docId]={..._ctaQuickCache[docId],inmuebles:nBld};set('cta-stat-inmuebles',nBld);
+  }catch(e){}
+  try{
+    // Oportunidades = transacciones de la cuenta + registros "Servicio Concretado".
+    //   Ganadas  = transacciones cerradas + "Servicio Concretado".
+    //   Abiertas = transacciones ni cerradas ni caídas (en negociación).
     const acts=await db.collection('clientes').doc(docId).collection('actividades').get();
-    const nAct=acts.docs.filter(x=>/Servicio Concretado/i.test(x.data().tipo||'')).length;
+    const nActGanadas=acts.docs.filter(x=>/Servicio Concretado/i.test(x.data().tipo||'')).length;
     const tx=await db.collection('transacciones').get();
     const nom=(d.nombre||'').toLowerCase();
-    const nTx=tx.docs.filter(x=>{const t=x.data();const cli=String(t.cliente||t.clienteNombre||'').toLowerCase();return cli&&cli===nom&&String(t.estado||'').toLowerCase()==='cerrada';}).length;
-    const n=nAct+nTx;
-    _ctaQuickCache[docId]={..._ctaQuickCache[docId],ganadas:n};set('cta-stat-ganadas',n);
-  }catch(e){set('cta-stat-ganadas','0');}
+    const txCuenta=tx.docs.map(x=>x.data()).filter(t=>{const cli=String(t.cliente||t.clienteNombre||'').toLowerCase();return cli&&cli===nom;});
+    const est=t=>String(t.estado||'').toLowerCase();
+    const nGanadasTx=txCuenta.filter(t=>est(t)==='cerrada').length;
+    const nCaidas=txCuenta.filter(t=>est(t)==='caída'||est(t)==='caida').length;
+    const abiertas=txCuenta.length-nGanadasTx-nCaidas;
+    const ganadas=nGanadasTx+nActGanadas;
+    const oportunidades=txCuenta.length+nActGanadas;
+    _ctaQuickCache[docId]={..._ctaQuickCache[docId],oportunidades,abiertas,ganadas};
+    set('cta-stat-oportunidades',oportunidades);set('cta-stat-abiertas',abiertas);set('cta-stat-ganadas',ganadas);
+  }catch(e){set('cta-stat-oportunidades','0');set('cta-stat-abiertas','0');set('cta-stat-ganadas','0');}
 }
 
 // ===== Modo edición de la ficha (un solo botón Editar; todo editable a la vez) =====
@@ -6651,9 +6671,9 @@ window.cuentaFichaEdit=function(docId){
       <div class="nx-col">
         <div class="nx-card">
           <div class="nx-card-title">Información General</div>
+          ${erow('Logo',`<input id="fe-logo" class="cdr-input" type="url" placeholder="https://... (.jpg .png .webp .svg)" value="${esc(d.logoUrl||'')}" oninput="feLogoPreview(this.value)"><div id="fe-logo-prev" style="margin-top:.4rem">${_logoValida(d.logoUrl)?`<img src="${esc(d.logoUrl)}" style="max-height:48px;max-width:140px;border:1px solid #E7EDF7;border-radius:8px;background:#fff;padding:4px" onerror="this.remove()">`:''}</div>`)}
           ${erow('Nombre Comercial',`<input id="fe-nombre" class="cdr-input" value="${esc(d.nombre||'')}">`)}
           ${erow('Sede Principal',`<div id="fe-sede-tag" class="cdr-ms-chips">${_fe.sede.id?`<span class="cdr-ms-chip">🏢 ${esc(_fe.sede.nombre)}<span class="cdr-ms-chip-x" onclick="feSedeClear()">✕</span></span>`:''}</div><div class="cdr-ms-wrap"><input id="fe-sede-q" class="cdr-input" placeholder="Buscar edificio del inventario..." autocomplete="off" oninput="feSedeSearch(this.value)" onfocus="feSedeSearch(this.value)" onblur="feMsBlur('sede')"><div id="fe-sede-drop" class="cdr-ms-drop" style="display:none"></div></div>`)}
-          ${erow('Logo',`<input id="fe-logo" class="cdr-input" type="url" placeholder="https://... (.jpg .png .webp .svg)" value="${esc(d.logoUrl||'')}" oninput="feLogoPreview(this.value)"><div id="fe-logo-prev" style="margin-top:.4rem">${_logoValida(d.logoUrl)?`<img src="${esc(d.logoUrl)}" style="max-height:48px;max-width:140px;border:1px solid #E7EDF7;border-radius:8px;background:#fff;padding:4px" onerror="this.remove()">`:''}</div>`)}
           ${rrow('Creado por',esc(_fe.creador||'–'))}
           ${rrow('Fecha de creación',d.fechaCreacion?fmtDate(d.fechaCreacion):dash)}
         </div>
