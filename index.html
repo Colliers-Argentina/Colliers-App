@@ -6906,6 +6906,38 @@ function renderContactosTable(docs){
   wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
 }
 
+// Ficha de consulta del Contacto (mismo estándar visual que Cuentas: cards + filas label/valor).
+// Sólo reorganiza la presentación de los campos existentes; no agrega ni quita datos.
+function renderContactoInfoCards(d){
+  const dash='<span style="color:#8898C0">–</span>';
+  const row=(lbl,val)=>`<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-v">${val||dash}</div></div>`;
+  const t=v=>v?esc(v):null;
+  const linkedin=d.linkedin?`<a href="${esc(d.linkedin)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600;word-break:break-all">${esc(d.linkedin)}</a>`:null;
+  const cuenta=d.cuentaNombre?`<a href="javascript:void(0)" onclick="openClientDetail('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`:null;
+  return `
+    <div class="nx-grid">
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Datos de Contacto</div>
+          ${row('Email',t(d.email))}
+          <div class="nx-row"><div class="nx-row-l">Estado correo</div><div class="nx-row-v">${emailBadge(d.estadoCorreo)}</div></div>
+          ${row('Teléfono',t(d.telefono))}
+          ${d.interno?row('Interno',t(d.interno)):''}
+          ${_cdrIsAdmin()?row('LinkedIn',linkedin):''}
+        </div>
+      </div>
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Datos Personales</div>
+          ${row('Cargo segmentado',t(d.cargo))}
+          ${row('Puesto',t(d.puesto))}
+          ${row('Propietario',t(d.propietario))}
+          ${row('Cuenta asociada',cuenta)}
+        </div>
+        ${d.comentarios?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.65;white-space:pre-wrap;padding-top:.2rem">${esc(d.comentarios)}</div></div>`:''}
+      </div>
+    </div>`;
+}
 function openContactoDetail(docId){
   const d=_ctoDocs.find(x=>x._id===docId);
   if(!d)return;
@@ -6932,30 +6964,7 @@ function openContactoDetail(docId){
       <button class="crm-det-tab" onclick="ctoDetTab(this,'cto-dt-inventario');loadContactoInventario('${docId}')">Inventario</button>
     </div>
     <div class="crm-det-tab-body">
-      <div id="cto-dt-info">
-        <div style="display:flex;flex-direction:column;gap:1.2rem">
-          <div>
-            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Datos de Contacto</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado correo</div>${emailBadge(d.estadoCorreo)}</div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
-              ${d.interno?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Interno</div><div class="crm-det-meta-val">${d.interno}</div></div>`:''}
-              ${_cdrIsAdmin()?`<div class="crm-det-meta-item" style="grid-column:1/-1"><div class="crm-det-meta-lbl">LinkedIn</div><div class="crm-det-meta-val">${d.linkedin?`<a href="${d.linkedin}" target="_blank" rel="noopener" style="color:#1C54F4">${d.linkedin}</a>`:'–'}</div></div>`:''}
-            </div>
-          </div>
-          <div>
-            <div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Datos Personales</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cargo segmentado</div><div class="crm-det-meta-val">${d.cargo||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Puesto</div><div class="crm-det-meta-val">${d.puesto||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario</div><div class="crm-det-meta-val">${d.propietario||'–'}</div></div>
-              <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta asociada</div><div class="crm-det-meta-val">${d.cuentaNombre||'–'}</div></div>
-            </div>
-          </div>
-          ${d.comentarios?`<div><div style="font-size:10.5px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.65rem">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.65;white-space:pre-wrap">${d.comentarios}</div></div>`:''}
-        </div>
-      </div>
+      <div id="cto-dt-info">${renderContactoInfoCards(d)}</div>
       <div id="cto-dt-inventario" style="display:none">
         <div id="cto-dt-inventario-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">🏢</div><div class="crm-det-placeholder-title">Cargando inventario...</div></div></div>
       </div>
@@ -7448,6 +7457,33 @@ function renderLeadsTable(docs){
   wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
 }
 
+// Ficha de consulta del Lead (mismo estándar visual que Cuentas). Sólo reorganiza
+// la presentación de los campos existentes del tab; no agrega ni quita datos.
+function renderLeadInfoCards(d){
+  const dash='<span style="color:#8898C0">–</span>';
+  const row=(lbl,val)=>`<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-v">${val||dash}</div></div>`;
+  const t=v=>v?esc(v):null;
+  return `
+    <div class="nx-grid">
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Datos del Lead</div>
+          ${row('Nombre',t(d.nombre))}
+          ${row('Apellido',t(d.apellido))}
+          ${row('Email',t(d.email))}
+          ${row('Teléfono',t(d.telefono))}
+        </div>
+      </div>
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Perfil</div>
+          ${row('Puesto',t(d.puesto))}
+          ${row('Tipo inmueble',t(d.tipoInmueble))}
+        </div>
+        ${d.comentarios?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(d.comentarios)}</div></div>`:''}
+      </div>
+    </div>`;
+}
 function openLeadDetail(docId){
   const d=_leadDocs.find(x=>x._id===docId);
   if(!d)return;
@@ -7490,20 +7526,12 @@ function openLeadDetail(docId){
     </div>
     <div class="crm-det-tab-body">
       <div id="ldt-info">
-        <div style="margin-bottom:1rem">
-          <div class="crm-det-meta-lbl" style="margin-bottom:.35rem">Pipeline</div>
-          <select class="crm-estado-sel" onchange="updateLeadEstado('${docId}',this.value)">${estadoOpts}</select>
+        <div class="nx-card" style="margin-bottom:.9rem">
+          <div class="nx-card-title">Pipeline</div>
+          <select class="crm-estado-sel" style="margin-top:.2rem" onchange="updateLeadEstado('${docId}',this.value)">${estadoOpts}</select>
           ${descarteRow}
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem">
-          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Nombre</div><div class="crm-det-meta-val">${d.nombre||'–'}</div></div>
-          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Apellido</div><div class="crm-det-meta-val">${d.apellido||'–'}</div></div>
-          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Email</div><div class="crm-det-meta-val">${d.email||'–'}</div></div>
-          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Teléfono</div><div class="crm-det-meta-val">${d.telefono||'–'}</div></div>
-          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Puesto</div><div class="crm-det-meta-val">${d.puesto||'–'}</div></div>
-          <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Tipo inmueble</div><div class="crm-det-meta-val">${d.tipoInmueble||'–'}</div></div>
-        </div>
-        ${d.comentarios?`<div style="margin-top:.85rem"><div class="crm-det-meta-lbl" style="margin-bottom:.35rem">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap">${d.comentarios}</div></div>`:''}
+        ${renderLeadInfoCards(d)}
       </div>
       <div id="ldt-timeline" style="display:none">
         <div id="lead-timeline-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Cargando...</div></div></div>
