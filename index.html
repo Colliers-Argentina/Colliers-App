@@ -3290,13 +3290,6 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="ctdr-cargo-otro" class="cdr-input" type="text" placeholder="Ej: COO, Director Comercial, HR Manager..." autocomplete="off" oninput="cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err')">
           <div class="cdr-err" id="ctdr-cargo-otro-err" style="display:none">Especificá el cargo.</div>
         </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Propietario</div>
-          <div class="cdr-toggle-group">
-            <button type="button" class="cdr-toggle-btn" data-field="ctdrPropietario" data-value="Sí" onclick="cdrToggle(this)">Sí</button>
-            <button type="button" class="cdr-toggle-btn active" data-field="ctdrPropietario" data-value="No" data-default onclick="cdrToggle(this)">No</button>
-          </div>
-        </div>
       </div>
 
       <!-- 2 · Datos de Contacto -->
@@ -3311,8 +3304,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <div class="cdr-lbl">Correo electrónico <span class="cdr-req">*</span></div>
             <input id="ctdr-email" class="cdr-input" type="email" placeholder="nombre@empresa.com" autocomplete="off">
           </div>
-          <div class="cdr-field">
-            <div class="cdr-lbl">Estado del correo</div>
+          <div class="cdr-field cdr-admin-only" id="ctdr-estadoCorreo-field">
+            <div class="cdr-lbl">Estado del correo <span class="cdr-admin-tag">ADMIN</span></div>
             <select id="ctdr-estadoCorreo" class="cdr-select">
               <option value="sin_comprobar">🟡 Sin comprobar</option>
               <option value="funcional">🟢 Funcional</option>
@@ -7006,7 +6999,6 @@ function renderContactoInfoCards(d){
           <div class="nx-card-title">Datos Personales</div>
           ${row('Cargo segmentado',t(d.cargo))}
           ${row('Puesto',t(d.puesto))}
-          ${row('Propietario',t(d.propietario))}
           ${row('Cuenta asociada',cuenta)}
         </div>
         ${d.comentarios?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.65;white-space:pre-wrap;padding-top:.2rem">${esc(d.comentarios)}</div></div>`:''}
@@ -7407,10 +7399,6 @@ window.openContactoDrawer_edit=function(docId){
   _ctdrSetBrokerResp(d.brokerResponsable||'');
   // Ejecutivo(s) Comercial(es): editable solo por administradores, en edición.
   _ctdrSetupEjec(d);
-  const setToggle=(field,val)=>{
-    document.querySelectorAll(`#ctdr-drawer .cdr-toggle-btn[data-field="${field}"]`).forEach(b=>{b.classList.toggle('active',b.dataset.value===val);});
-  };
-  setToggle('ctdrPropietario',d.propietario);
   document.querySelector('#ctdr-drawer .cdr-title').textContent='Editar Contacto';
   const btn=document.getElementById('ctdr-save-btn');btn.textContent='Guardar cambios';btn.disabled=false;
 };
@@ -7468,7 +7456,6 @@ window.saveContactoDrawer=async function(){
       cuentaNombre:document.getElementById('ctdr-cuentaNombre').value||'',
       nombre,apellidos,cargo,
       puesto:(document.getElementById('ctdr-puesto').value||'').trim(),
-      propietario:cdrToggleVal('ctdrPropietario')||'No',
       email,
       estadoCorreo:document.getElementById('ctdr-estadoCorreo').value||'sin_comprobar',
       telefono,
@@ -7485,7 +7472,7 @@ window.saveContactoDrawer=async function(){
     }
     if(_ctdrEditId){
       const oldD=_ctoDocs.find(x=>x._id===_ctdrEditId)||{};
-      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',propietario:'Propietario',cuentaNombre:'Cuenta',ejecutivosComerciales:'Ejecutivos Comerciales'};
+      const labels={nombre:'Nombre',apellidos:'Apellidos',cargo:'Cargo',puesto:'Puesto',email:'Email',estadoCorreo:'Estado correo',telefono:'Teléfono',cuentaNombre:'Cuenta',ejecutivosComerciales:'Ejecutivos Comerciales'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('contactos').doc(_ctdrEditId).update(updatePayload);
