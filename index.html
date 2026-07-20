@@ -6929,9 +6929,12 @@ function emailBadge(estado){
   return`<span class="email-badge ${cls}">${map[cls]||'🟡 Sin comprobar'}</span>`;
 }
 
-function renderContactosTable(docs){
-  renderContactosKPIs(_ctoDocs);
-  const wrap=document.getElementById('cto-table-wrap');
+function renderContactosTable(docs,opts){
+  opts=opts||{};
+  const targetId=opts.targetId||'cto-table-wrap';
+  if(opts.withKpis!==false)renderContactosKPIs(_ctoDocs);
+  const wrap=document.getElementById(targetId);
+  if(!wrap)return;
   if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin contactos registrados.</div>';return;}
   const fdmy=ts=>{const dt=_tsToDate(ts);return dt&&!isNaN(dt)?dt.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';};
   let h='<table class="crm-table"><thead><tr>';
@@ -6990,6 +6993,9 @@ function renderContactoInfoCards(d){
     </div>`;
 }
 function openContactoDetail(docId){
+  // Si se abre desde otra sección (p.ej. la solapa Contactos de una Cuenta),
+  // mostrar el módulo Contactos para que la ficha sea visible.
+  if(_crmActiveTab!=='contactos')switchCRMTab('contactos');
   const d=_ctoDocs.find(x=>x._id===docId);
   if(!d)return;
   const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
@@ -7065,27 +7071,12 @@ async function loadCuentaContactos(cuentaId){
     const cta=_crmDocs.find(x=>x._id===cuentaId);
     const snap=await db.collection('contactos').where('cuentaId','==',cuentaId).get();
     const docs=snap.docs.map(d=>({...d.data(),_id:d.id})).filter(d=>(d.estadoRegistro||'activo')!=='archivado');
-    const canDelete=_nexusRole()!=='ejecutivo';
+    // Upsert al cache global para que "Ver ficha" / "Editar" resuelvan el contacto.
+    docs.forEach(d=>{const i=_ctoDocs.findIndex(x=>x._id===d._id);if(i>=0)_ctoDocs[i]=d;else _ctoDocs.push(d);});
+    // Reutiliza EXACTAMENTE la misma tabla del módulo Contactos, filtrada por esta cuenta.
     const addBtn=`<div style="display:flex;justify-content:flex-end;margin-bottom:.6rem"><button class="crm-new-btn" onclick="openContactoDrawer('${cuentaId}','${esc(cta?.nombre||'')}')">＋ Agregar contacto</button></div>`;
-    if(!docs.length){body.innerHTML=addBtn+'<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">👤</div><div class="crm-det-placeholder-title">Sin contactos vinculados</div><div class="crm-det-placeholder-sub">Agregá el primer contacto de esta cuenta con el botón de arriba.</div></div>';return;}
-    let h=addBtn+`<div style="display:flex;flex-direction:column;gap:.5rem;padding:.25rem 0">`;
-    docs.forEach(d=>{
-      const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
-      const bg=crmAvatarBg(fullname);
-      const ini=crmInitials(fullname);
-      h+=`<div style="display:flex;align-items:center;gap:.65rem;padding:.6rem .75rem;background:#F8FAFF;border-radius:9px;transition:background .12s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background='#F8FAFF'">
-        <div class="crm-avatar" style="background:${bg};border-radius:50%;width:32px;height:32px;font-size:11px;flex-shrink:0;cursor:pointer" onclick="switchCRMTab('contactos');setTimeout(()=>openContactoDetail('${d._id}'),50)">${ini}</div>
-        <div style="flex:1;min-width:0;cursor:pointer" onclick="switchCRMTab('contactos');setTimeout(()=>openContactoDetail('${d._id}'),50)">
-          <div style="font-size:12px;font-weight:700;color:#0A1B4D">${esc(fullname)}</div>
-          <div style="font-size:10px;color:#8A9AC0">${esc(d.cargo||'')}${d.puesto?' · '+esc(d.puesto):''}</div>
-        </div>
-        ${emailBadge(d.estadoCorreo)}
-        <button class="crm-action-btn" style="padding:3px 9px;font-size:11px" onclick="event.stopPropagation();openContactoDrawer_edit('${d._id}')" title="Editar">✏️</button>
-        ${canDelete?`<button class="crm-action-btn" style="padding:3px 9px;font-size:11px;color:#DC2626;border-color:#F6C6CC" onclick="event.stopPropagation();archiveCuentaContacto('${d._id}','${cuentaId}')" title="Eliminar (archivar)">🗑</button>`:''}
-      </div>`;
-    });
-    h+='</div>';
-    body.innerHTML=h;
+    body.innerHTML=addBtn+`<div id="cta-cto-tablewrap"></div>`;
+    renderContactosTable(docs,{targetId:'cta-cto-tablewrap',withKpis:false});
   }catch(e){
     body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
   }
