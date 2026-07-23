@@ -7588,14 +7588,13 @@ window.closeContactoDrawer=function(){
 
 window.ctdrCuentaSearch=function(q){
   const list=document.getElementById('ctdr-cuenta-list');
-  const lq=q.toLowerCase().trim();
+  const lq=(q||'').trim();
   if(!lq){list.style.display='none';return;}
-  const matches=_crmDocs.filter(d=>(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
-  let h=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();ctdrSelectCuenta('${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')"> ${d.nombre}</div>`).join('');
-  if(!matches.length)h+='<div style="padding:10px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';
-  // "Crear nueva cuenta" solo cuando el texto no coincide exactamente con una existente.
-  const exact=matches.some(d=>_ctaNorm(d.nombre)===_ctaNorm(q));
-  if(!exact)h+=`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#1C54F4;border-top:1px solid #EEF2FA" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();ctdrCrearCuenta()">➕ Crear nueva cuenta "${esc(q.trim())}"</div>`;
+  // Reutiliza la búsqueda inteligente compartida (_ctaSimilares).
+  const matches=_ctaSimilares(lq,8);
+  let h=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();ctdrSelectCuenta('${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')"> ${esc(d.nombre||'')}</div>`).join('');
+  // "Crear nueva cuenta" solo cuando no hay coincidencias relevantes.
+  if(!matches.length)h+=`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#1C54F4;border-top:1px solid #EEF2FA" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();ctdrCrearCuenta()">➕ Crear nueva cuenta "${esc(lq)}"</div>`;
   list.innerHTML=h;
   list.style.display='block';
 };
@@ -8430,26 +8429,53 @@ function _ctaAllCuentas(){
   const a=Array.isArray(_crmDocs)?_crmDocs:[],b=Array.isArray(_clientesCache)?_clientesCache:[];
   return a.length>=b.length?a:b;   // suelen ser la misma referencia; si no, gana el set más completo
 }
-// Normaliza para búsqueda/duplicados: minúsculas, sin acentos, sin sufijos societarios.
+// ── Búsqueda inteligente de Cuentas (componente único, reutilizado por todos los selectores) ──
+// Palabras societarias/comunes que se ignoran en la comparación (no afectan la búsqueda).
+const _CTA_STOP=new Set(['sa','srl','sas','sacif','saic','inc','llc','ltd','ltda','sl',
+  'group','grupo','holding','co','cia','compania','company','empresa','argentina','arg']);
+function _ctaStripAccents(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+// Tokeniza: sin acentos, sin caracteres especiales, sin palabras societarias/comunes.
+function _ctaTokens(s){
+  const x=_ctaStripAccents(s).replace(/[.'’]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+  return x.split(' ').filter(w=>w&&!_CTA_STOP.has(w));
+}
+// Forma normalizada (para comparación de igualdad y como fallback).
 function _ctaNorm(s){
-  const x=String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
-    .replace(/[.'’]/g,'')            // "s.a." -> "sa" antes de tokenizar
-    .replace(/[^a-z0-9]+/g,' ').trim();
-  const stop=new Set(['sa','srl','sas','sacif','saic','inc','llc','ltd','ltda','sl','group','grupo','holding','co','cia','company','argentina','arg']);
-  const core=x.split(' ').filter(w=>!stop.has(w)).join(' ').trim();
-  return core||x;
+  const t=_ctaTokens(s);
+  if(t.length)return t.join(' ');
+  return _ctaStripAccents(s).replace(/[.'’]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+// Puntaje de similitud entre lo buscado (qNorm/qTokens) y un nombre candidato.
+// Mayor puntaje = más relevante. Contempla: exacta, por palabras (subconjunto y
+// solapamiento), parcial (prefijo/substring), ignorando may/min, tildes y sufijos.
+function _ctaMatchScore(qNorm,qTokens,cand){
+  const dNorm=_ctaNorm(cand);if(!dNorm||!qNorm)return 0;
+  const dTokens=_ctaTokens(cand);
+  if(dNorm===qNorm)return 100;                                   // 1) exacta (normalizada)
+  const ds=new Set(dTokens),qs=new Set(qTokens);
+  const shared=qTokens.filter(t=>ds.has(t)).length;
+  const allQinD=qTokens.length&&qTokens.every(t=>ds.has(t));     // "IRSA" ⊂ "IRSA Comercial"
+  const allDinQ=dTokens.length&&dTokens.every(t=>qs.has(t));     // "Grupo Danone" → "Danone"
+  if(allQinD||allDinQ)return 85+shared;                          // 2) por palabras (subconjunto)
+  if(dNorm.startsWith(qNorm)||qNorm.startsWith(dNorm))return 70; // 3a) parcial: prefijo
+  if(dNorm.includes(qNorm)||qNorm.includes(dNorm))return 60;     // 3b) parcial: contiene
+  if(shared)return 40+shared;                                    // 4) solapamiento de palabras
+  return 0;
 }
 function _ctaSimilares(nombre,max){
-  const n=_ctaNorm(nombre);if(!n)return[];
+  const qNorm=_ctaNorm(nombre),qTokens=_ctaTokens(nombre);
+  if(!qNorm)return[];
   const out=[];
   _ctaAllCuentas().forEach(d=>{
     if((d.estadoRegistro||'activo')==='archivado')return;
-    const dn=_ctaNorm(d.nombre);if(!dn)return;
-    let score=0;
-    if(dn===n)score=3;else if(dn.startsWith(n)||n.startsWith(dn))score=2;else if(dn.includes(n)||n.includes(dn))score=1;
-    if(score)out.push({d,score});
+    let score=_ctaMatchScore(qNorm,qTokens,d.nombre);
+    // Alias (preparado para etapa futura): si la cuenta tiene alias, también se comparan.
+    const aliases=Array.isArray(d.aliases)?d.aliases:(d.alias?[d.alias]:[]);
+    aliases.forEach(a=>{const s=_ctaMatchScore(qNorm,qTokens,a);if(s>score)score=s;});
+    if(score>0)out.push({d,score});
   });
-  out.sort((a,b)=>b.score-a.score);
+  // Orden: exactas → parciales → similares; a igualdad, el nombre más corto (más canónico) primero.
+  out.sort((a,b)=>b.score-a.score||(a.d.nombre||'').length-(b.d.nombre||'').length);
   return out.slice(0,max||6).map(o=>o.d);
 }
 window.registerCuentaPicker=function(key,cfg){_ctaPickers[key]=cfg;};
@@ -8461,10 +8487,9 @@ window.ctaPickerInput=function(key,val){
   const q=(val||'').trim();
   c._opts=q?_ctaSimilares(q,8):[];
   let h=c._opts.map((d,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctaPickerPickIdx('${key}',${i})">🏢 ${esc(d.nombre||'')}</div>`).join('');
-  // La opción "Crear nueva cuenta" solo aparece cuando el texto no coincide
-  // exactamente con ninguna cuenta existente (permite crear aunque haya parciales).
-  const exact=q&&c._opts.some(d=>_ctaNorm(d.nombre)===_ctaNorm(q));
-  if(q&&!exact&&c.allowCreate!==false)h+=`<div class="cdr-ms-item" style="color:#1C54F4;font-weight:700;border-top:1px solid #EEF2FA" onmousedown="event.preventDefault();ctaPickerCreate('${key}')">➕ Crear nueva cuenta "${esc(q)}"</div>`;
+  // "Crear nueva cuenta" solo aparece cuando no hay coincidencias relevantes.
+  // Si hay cuentas similares, se muestran primero para evitar duplicados.
+  if(q&&!c._opts.length&&c.allowCreate!==false)h+=`<div class="cdr-ms-item" style="color:#1C54F4;font-weight:700;border-top:1px solid #EEF2FA" onmousedown="event.preventDefault();ctaPickerCreate('${key}')">➕ Crear nueva cuenta "${esc(q)}"</div>`;
   drop.innerHTML=h||'<div class="cdr-ms-empty">Escribí para buscar en Cuentas…</div>';
   drop.style.display=q?'block':'none';
 };
