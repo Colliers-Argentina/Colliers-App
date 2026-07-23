@@ -1,52 +1,58 @@
-# Manuales de Usuario — Colliers Nexus
+# Documentación de Usuario — Colliers Nexus
 
-Carpeta compartida con los manuales de usuario de Nexus. Cada manual se entrega
-en **DOCX** y **PDF**, listos para guardar y enviar a los usuarios finales.
+Carpeta compartida con la documentación de usuario de Nexus. Los documentos se
+entregan en **DOCX** y **PDF**, listos para guardar y enviar a los usuarios finales.
 
-## Regla del proyecto
+## Política del proyecto
 
-Cada vez que se implementa **un formulario nuevo** o **una modificación relevante**
-en Nexus, además del desarrollo se genera/actualiza su Manual de Usuario. Si el
-manual ya existe, se **actualiza** (nueva fila en el Historial de cambios y nueva
-versión) — nunca se duplica. La documentación se mantiene sincronizada con la
-versión actual de Nexus.
+**Todos los formularios del sistema** tienen su guía rápida de uso, no solo los que
+se desarrollan o modifican. Cuando un formulario cambia, se **actualiza** su documento
+(se sube la versión/fecha), no se crea uno nuevo. La documentación se mantiene siempre
+sincronizada con la versión actual de Nexus.
 
-## Estructura de cada manual (10 secciones)
+## Formato: Guía Rápida (vigente)
 
-1. Portada (logo, módulo, versión y fecha)
-2. Objetivo del formulario
-3. Paso a paso de uso
-4. Capturas de pantalla numeradas del flujo
-5. Explicación de todos los campos
-6. Validaciones y reglas de negocio
-7. Buenas prácticas
-8. Resultado esperado al guardar
-9. Preguntas frecuentes
-10. Historial de cambios
+Guía breve y sencilla para el usuario final. Cada guía contiene:
+
+- **Título**: `Manual de Usuario - <Formulario>`
+- **Versión** y **Fecha**
+- **Objetivo** (2-3 líneas)
+- **Campos**: cada campo con "Qué ingresar:" explicado en lenguaje de usuario
+- **Al finalizar**: qué sucede al presionar Guardar / Crear
+
+No incluye capturas, diagramas, arquitectura, código ni reglas técnicas.
+
+### Guías disponibles
+
+| Formulario | Archivos |
+|------------|----------|
+| Cuentas | `Guia_Cuentas.docx` / `.pdf` |
+| Contactos | `Guia_Contactos.docx` / `.pdf` |
+| Leads | `Guia_Leads.docx` / `.pdf` |
+| Visitas | `Guia_Visitas.docx` / `.pdf` |
+| Oficinas | `Guia_Oficinas.docx` / `.pdf` |
+| Retail | `Guia_Retail.docx` / `.pdf` |
+| Industria & Logística | `Guia_Industria_Logistica.docx` / `.pdf` |
+| Componentes | `Guia_Componentes.docx` / `.pdf` |
+| Oportunidades | *Pendiente — el formulario aún no está implementado ("Pronto").* |
 
 ## Cómo se generan
 
-Los manuales se generan por código para que DOCX y PDF salgan siempre del mismo
-contenido y no se desincronicen:
-
-- `manual_base.py` — motor común (estilo Colliers + render DOCX y PDF).
-- `gen_manual_<modulo>.py` — contenido de cada manual.
-
 ```bash
 cd docs/manuales
-pip install python-docx reportlab   # dependencias
-python3 gen_manual_visitas.py       # genera Manual_Visitas.docx + .pdf
+pip install python-docx reportlab
+python3 gen_guias.py     # regenera todas las guías (DOCX + PDF)
 ```
 
-### Nota sobre las capturas (sección 4)
+- `guia_base.py` — motor común (estilo Colliers + render DOCX y PDF).
+- `gen_guias.py` — contenido de todas las guías (un bloque `Guia(...)` por formulario).
 
-Las capturas se insertan como **marcadores numerados** (`[ CAPTURA n ]`) con la
-descripción de qué debe mostrar cada una, porque no se pueden tomar screenshots
-automáticos de la app en vivo (requiere login Google + Firebase). Para la versión
-final, reemplazar cada marcador por la imagen real del flujo.
+**Para actualizar** una guía tras un cambio en su formulario: editar su bloque en
+`gen_guias.py`, subir la versión/fecha y volver a ejecutar.
+**Para un formulario nuevo**: agregar su bloque `Guia(...)` y regenerar.
 
-## Manuales disponibles
+## Formato extendido (opcional)
 
-| Módulo | Archivos | Versión |
-|--------|----------|---------|
-| Visitas | `Manual_Visitas.docx` / `.pdf` | 1.0 |
+Si en algún caso se necesita un manual más completo (10 secciones, con marcadores de
+captura), están `manual_base.py` + `gen_manual_<modulo>.py`. Ejemplo: `Manual_Visitas`.
+El formato por defecto es la Guía Rápida.

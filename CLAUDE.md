@@ -125,17 +125,27 @@ sed -n "$((SCRIPT_START+1)),$((SCRIPT_END-1))p" index.html > /tmp/check.mjs && n
 - CSS inline en JS para elementos generados dinámicamente (template literals)
 - Timestamps de Firestore: siempre usar `_tsToDate(ts)` para convertir, `firebase.firestore.Timestamp.now()` para crear
 
-## Manuales de Usuario (regla permanente)
+## Documentación de formularios (regla permanente)
 
-Cada vez que se implemente **un formulario nuevo** o **una modificación relevante**,
-además del desarrollo hay que **generar/actualizar su Manual de Usuario** en `docs/manuales/`.
+**TODOS los formularios del sistema** tienen su documentación de usuario en `docs/manuales/`,
+no solo los que se desarrollan/modifican. Cuando un formulario cambia, se **actualiza** su
+documento (subir versión/fecha), no se crea uno nuevo. Siempre sincronizado con la versión
+actual de Nexus.
 
-- Formato: **DOCX + PDF** (ambos, generados por código desde el mismo contenido).
-- Estructura de 10 secciones: 1) Portada (logo, módulo, versión, fecha) · 2) Objetivo ·
-  3) Paso a paso · 4) Capturas numeradas · 5) Campos · 6) Validaciones y reglas de negocio ·
-  7) Buenas prácticas · 8) Resultado esperado · 9) FAQ · 10) Historial de cambios.
-- Si el manual **ya existe, se actualiza** (nueva versión + fila en Historial), no se duplica.
-- Motor: `docs/manuales/manual_base.py`; contenido por manual: `gen_manual_<modulo>.py`.
-- Deps: `pip install python-docx reportlab`. PDF vía reportlab (LibreOffice headless no
-  funciona en este entorno). Las capturas van como marcadores `[ CAPTURA n ]` a completar
-  con la imagen real (no hay screenshots automáticos: la app requiere login Google + Firebase).
+### Formato principal: Guía Rápida (política vigente)
+Guía breve para el usuario final. **DOCX + PDF**, generados desde el mismo contenido.
+- Estructura: Título (`Manual de Usuario - <Form>`) · Versión · Fecha · **Objetivo** (2-3 líneas)
+  · **Campos** (cada uno con "Qué ingresar:" en lenguaje de usuario) · **Al finalizar** (qué pasa al Guardar).
+- **No incluir**: capturas, diagramas, arquitectura, código, reglas técnicas ni info para devs.
+- Motor: `docs/manuales/guia_base.py`; contenido de todas las guías: `gen_guias.py`.
+- Formularios cubiertos: Cuentas, Contactos, Leads, Visitas, Oficinas, Retail,
+  Industria & Logística, Componentes. (Oportunidades: pendiente, aún es placeholder "Pronto".)
+- Al agregar un formulario nuevo: sumar su bloque `Guia(...)` en `gen_guias.py` y regenerar.
+
+### Formato extendido (manual largo, opcional)
+`manual_base.py` + `gen_manual_<modulo>.py` generan un manual de 10 secciones (con capturas
+como marcadores) si en algún caso se necesita documentación más completa. Existe `Manual_Visitas`
+como ejemplo. El formato por defecto es la Guía Rápida.
+
+Deps: `pip install python-docx reportlab`. PDF vía reportlab (LibreOffice headless no funciona
+en este entorno). No hay screenshots automáticos (la app requiere login Google + Firebase).
