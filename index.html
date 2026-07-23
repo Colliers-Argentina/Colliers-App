@@ -988,12 +988,12 @@ body.dark .gen-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(
 /* KPI row */
 .bld-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;flex-shrink:0}
 @media(max-width:960px){.bld-kpi-row{grid-template-columns:repeat(2,1fr)}}
-.bld-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:12px;padding:.62rem 1.1rem;display:flex;flex-direction:column;gap:.15rem;transition:all .25s}
+.bld-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:12px;padding:.42rem 1.1rem;display:flex;flex-direction:column;gap:.08rem;transition:all .25s}
 body.dark .bld-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)}
 .bld-kpi.filtered{border-color:rgba(28,84,244,.35);box-shadow:0 0 0 1px rgba(28,84,244,.15),0 4px 16px rgba(28,84,244,.1)}
 body.dark .bld-kpi.filtered{border-color:rgba(77,147,255,.4);box-shadow:0 0 0 1px rgba(77,147,255,.15),0 4px 20px rgba(28,84,244,.2)}
-.bld-kpi-icon{font-size:15px;line-height:1}
-.bld-kpi-v{font-size:24px;font-weight:700;color:#0A1B4D;line-height:1;transition:color .2s}
+.bld-kpi-icon{font-size:14px;line-height:1}
+.bld-kpi-v{font-size:22px;font-weight:700;color:#0A1B4D;line-height:1;transition:color .2s}
 body.dark .bld-kpi-v{color:#fff}
 .bld-kpi.filtered .bld-kpi-v{color:#1C54F4}
 body.dark .bld-kpi.filtered .bld-kpi-v{color:#4D93FF}
@@ -1474,14 +1474,20 @@ select.bwiz-inp:focus{border-color:#4D93FF}
 .bld-det-ckpi-l{display:none}
 
 /* ===== BUILDINGS MODULE v3 — filter bar + list view ===== */
-.bld-filter-bar{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.1rem 0 .3rem;flex-wrap:wrap}
-.bld-filter-bar-l{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex:1}
-.bld-filter-bar-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
-.bld-filter-inp{padding:.34rem .7rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:13px;color:#000759;background:#fff;font-family:inherit;outline:none;transition:border-color .15s;width:200px}
+/* Toolbar de filtros en una sola fila (estilo CRM). Los selects viven dentro de
+   #bld-filter-dyn; con display:contents se vuelven ítems flex de la barra. */
+.bld-filter-bar{display:flex;align-items:center;gap:.4rem;padding:0 0 .35rem;flex-wrap:wrap}
+.bld-filter-bar-l{display:contents}
+#bld-filter-dyn{display:contents}
+.bld-filter-bar-r{display:flex;align-items:center;gap:.4rem;flex-shrink:0;margin-left:auto}
+.bld-filter-inp{height:30px;padding:0 .6rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:13px;color:#000759;background:#fff;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box}
+#bld-search{flex:1 1 220px;min-width:160px;max-width:420px}
 .bld-filter-inp:focus{border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
-.bld-filter-sel{padding:.34rem .6rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:12.5px;color:#000759;background:#fff;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
+.bld-filter-sel{height:30px;padding:0 .5rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:12.5px;color:#000759;background:#fff;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s;box-sizing:border-box;flex:0 0 132px;width:132px}
+.bld-filter-bar .mz-dd{flex:0 0 132px}
+.bld-filter-bar .mz-dd .bld-filter-sel{width:100%;flex:1 1 auto;display:flex;align-items:center;justify-content:space-between}
 .bld-filter-sel:focus{border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
-.bld-filter-clear{display:inline-flex;align-items:center;gap:4px;padding:.4rem .75rem;border:1.5px solid rgba(239,51,64,.25);border-radius:8px;background:rgba(239,51,64,.06);color:#EF3340;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.bld-filter-clear{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 .7rem;border:1.5px solid rgba(239,51,64,.25);border-radius:8px;background:rgba(239,51,64,.06);color:#EF3340;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;box-sizing:border-box;flex:0 0 auto}
 .bld-filter-clear:hover{background:rgba(239,51,64,.1);border-color:rgba(239,51,64,.4)}
 body.dark .bld-filter-inp,.bld-filter-inp{background:#fff;color:#000759}
 body.dark .bld-filter-bar{border-color:rgba(255,255,255,.06)}
@@ -1530,7 +1536,7 @@ body.dark .bld-lt-btn{border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.
 body.dark .bld-lt-btn:hover{background:rgba(77,147,255,.12);border-color:rgba(77,147,255,.3);color:#4D93FF}
 body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 
-@media(max-width:900px){.bld-filter-bar{flex-direction:column;align-items:stretch}.bld-filter-bar-l{flex-wrap:wrap}.bld-filter-inp{width:100%}}
+@media(max-width:760px){#bld-search{flex-basis:100%;max-width:none}.bld-filter-sel,.bld-filter-bar .mz-dd{flex:1 1 46%}.bld-filter-bar-r{margin-left:0}}
 
 /* ===== HOME HUB ===== */
 #home-hub{display:none;background:url('home-bg.jpg') center/cover no-repeat;background-attachment:local;overflow-y:auto;min-width:0;flex:1;height:100%;position:relative}
