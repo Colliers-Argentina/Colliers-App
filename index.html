@@ -8021,19 +8021,18 @@ window.leadFichaEdit=function(docId){
           ${nxErow('Cargo segmentado',`<select id="lfe-cargo" class="cdr-select">${['','CEO','CFO','Compras','Real Estate','Otro'].map(o=>`<option value="${esc(o)}"${(d.cargo||'')===o?' selected':''}>${o||'Seleccionar...'}</option>`).join('')}</select>`)}
           ${nxErow('Puesto',`<input id="lfe-puesto" class="cdr-input" value="${esc(d.puesto||'')}">`)}
         </div>
-        <div class="nx-card">
-          <div class="nx-card-title">Origen y Asignación</div>
-          ${nxErow('Origen',`<select id="lfe-origen" class="cdr-select">${origenOpts}</select>`)}
-          ${nxErow('Ejecutivo Comercial asignado',`<select id="lfe-broker" class="cdr-select">${brokerOpts}</select>`)}
-          ${nxErow('Link de origen',`<input id="lfe-link" class="cdr-input" type="url" value="${esc(d.linkOrigen||'')}">`)}
-        </div>
       </div>
       <div class="nx-col">
         <div class="nx-card">
-          <div class="nx-card-title">Interés</div>
+          <div class="nx-card-title">Información Comercial</div>
           ${nxErow('Empresa',`<input id="lfe-empresa" class="cdr-input" placeholder="Buscar empresa en Cuentas..." autocomplete="off" value="${esc(d.empresa||d.cuentaNombre||'')}" oninput="ctaPickerInput('lfe',this.value)" onblur="ctaPickerBlur('lfe')"><div id="lfe-empresa-drop" class="cdr-ms-drop" style="display:none"></div><span id="lfe-empresa-tag" style="display:none;font-size:10.5px;color:#16A34A;font-weight:700;margin-top:3px"></span><input id="lfe-cuentaId" type="hidden" value="${esc(d.cuentaId||'')}"><input id="lfe-cuentaNombre" type="hidden" value="${esc(d.cuentaNombre||'')}">`)}
-          ${nxErow('Inmueble consultado',`<input id="lfe-bld-q" class="cdr-input" placeholder="Buscar edificio..." autocomplete="off" value="${esc(d.buildingName||'')}" oninput="lfeBldSearch(this.value)" onblur="setTimeout(()=>{var l=document.getElementById('lfe-bld-list');if(l)l.style.display='none'},150)"><div id="lfe-bld-list" class="cdr-ms-drop" style="display:none"></div><input id="lfe-buildingId" type="hidden" value="${esc(d.buildingId||'')}"><input id="lfe-buildingName" type="hidden" value="${esc(d.buildingName||'')}">`)}
-          ${nxErow('Tipo de consulta',`<select id="lfe-tipoInmueble" class="cdr-select" onchange="var f=document.getElementById('lfe-tipoConsultaOtro-field');if(f)f.style.display=this.value==='Otros'?'':'none'">${tipoOpts}</select><div id="lfe-tipoConsultaOtro-field" style="display:${d.tipoInmueble==='Otros'?'':'none'};margin-top:.4rem"><input id="lfe-tipoConsultaOtro" class="cdr-input" placeholder="Especificar tipo de consulta" value="${esc(d.tipoConsultaOtro||'')}"></div>`)}
+          ${nxErow('Tipo de consulta',`<select id="lfe-tipoInmueble" class="cdr-select" onchange="lfeTipoConsultaChange()">${tipoOpts}</select><div id="lfe-tipoConsultaOtro-field" style="display:${d.tipoInmueble==='Otros'?'':'none'};margin-top:.4rem"><input id="lfe-tipoConsultaOtro" class="cdr-input" placeholder="Especificar tipo de consulta" value="${esc(d.tipoConsultaOtro||'')}"></div>`)}
+          <div id="lfe-inmueble-field" style="display:${['Oficina','Retail','Industria','Depósito','Terreno'].includes(d.tipoInmueble||'')?'':'none'}">
+            ${nxErow('Inmueble',`<input id="lfe-bld-q" class="cdr-input" placeholder="Buscar edificio..." autocomplete="off" value="${esc(d.buildingName||'')}" oninput="lfeBldSearch(this.value)" onblur="setTimeout(()=>{var l=document.getElementById('lfe-bld-list');if(l)l.style.display='none'},150)"><div id="lfe-bld-list" class="cdr-ms-drop" style="display:none"></div><input id="lfe-buildingId" type="hidden" value="${esc(d.buildingId||'')}"><input id="lfe-buildingName" type="hidden" value="${esc(d.buildingName||'')}">`)}
+          </div>
+          ${nxErow('Ejecutivo Comercial asignado',`<select id="lfe-broker" class="cdr-select">${brokerOpts}</select>`)}
+          ${nxErow('Origen',`<select id="lfe-origen" class="cdr-select">${origenOpts}</select>`)}
+          ${nxErow('Link de origen',`<input id="lfe-link" class="cdr-input" type="url" value="${esc(d.linkOrigen||'')}">`)}
           ${nxErow('Clasificación',`<select id="lfe-clasificacion" class="cdr-select">${['','Estándar','Calificado'].map(o=>`<option value="${esc(o)}"${(d.clasificacion||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('')}</select>`)}
         </div>
         <div class="nx-card">
@@ -8044,6 +8043,13 @@ window.leadFichaEdit=function(docId){
     </div>`;
   registerCuentaPicker('lfe',{inputId:'lfe-empresa',dropId:'lfe-empresa-drop',tagId:'lfe-empresa-tag',hidId:'lfe-cuentaId',hidNombreId:'lfe-cuentaNombre'});
   _loadBldDocsIfNeeded().catch(()=>{});
+};
+// En la edición del Lead: al cambiar el Tipo de consulta, mostrar/ocultar el texto
+// libre "Otros" y el campo Inmueble (solo para consultas de inmuebles).
+window.lfeTipoConsultaChange=function(){
+  const v=document.getElementById('lfe-tipoInmueble')?.value||'';
+  const otro=document.getElementById('lfe-tipoConsultaOtro-field');if(otro)otro.style.display=v==='Otros'?'':'none';
+  const inm=document.getElementById('lfe-inmueble-field');if(inm)inm.style.display=['Oficina','Retail','Industria','Depósito','Terreno'].includes(v)?'':'none';
 };
 window.lfeBldSearch=function(q){
   const list=document.getElementById('lfe-bld-list');if(!list)return;
