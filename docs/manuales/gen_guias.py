@@ -38,11 +38,11 @@ GUIAS["Guia_Cuentas"] = Guia(
 
 # ─────────────────────────── CONTACTOS ───────────────────────────
 GUIAS["Guia_Contactos"] = Guia(
-    "Contactos", "1.0", FECHA,
+    "Contactos", "1.1", FECHA,
     "Permite registrar personas (contactos) y vincularlas a una cuenta. Sirve para tener "
     "la información de las personas con las que se gestiona cada empresa.",
     [
-        ("Cuenta asociada", "Buscar y seleccionar la empresa a la que pertenece el contacto."),
+        ("Cuenta asociada", "Buscar y seleccionar la empresa a la que pertenece el contacto. Si la empresa no existe todavía, al final de la lista aparece la opción \"➕ Crear nueva cuenta\": se crea en el momento, sin salir del formulario, y queda seleccionada."),
         ("Nombre", "Nombre de pila de la persona."),
         ("Apellidos", "Apellido de la persona."),
         ("Cargo segmentado", "Seleccionar el tipo de cargo: CEO, CFO, Compras, Real Estate u Otro."),
@@ -64,7 +64,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "1.0", FECHA,
+    "Leads", "1.1", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) para "
     "hacerles seguimiento y, si corresponde, convertirlas en contactos y operaciones.",
     [
@@ -72,7 +72,7 @@ GUIAS["Guia_Leads"] = Guia(
         ("Apellido", "Apellido de la persona."),
         ("Email", "Correo electrónico de contacto."),
         ("Teléfono móvil", "Número de celular de la persona."),
-        ("Empresa", "Empresa del interesado. Se puede buscar entre las cuentas existentes."),
+        ("Empresa", "Empresa del interesado. Se puede buscar entre las cuentas existentes. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin perder los datos del lead."),
         ("Puesto", "Puesto o rol de la persona (opcional)."),
         ("Tipo de inmueble", "Tipo de propiedad que busca (oficina, local, depósito, etc.)."),
         ("Origen", "Cómo llegó la consulta: Zonaprop, Argenprop, Mercado Libre, Referido, LinkedIn, Web, Llamado, Email u Otro."),
@@ -90,11 +90,11 @@ GUIAS["Guia_Leads"] = Guia(
 
 # ─────────────────────────── VISITAS ───────────────────────────
 GUIAS["Guia_Visitas"] = Guia(
-    "Visitas", "1.0", FECHA,
+    "Visitas", "1.1", FECHA,
     "Permite registrar de forma rápida las visitas comerciales realizadas a un inmueble en "
     "el marco de una cuenta. Cada visita queda asociada a la cuenta y al inmueble.",
     [
-        ("Cuenta", "Buscar y seleccionar la empresa sobre la que se hizo la visita."),
+        ("Cuenta", "Buscar y seleccionar la empresa sobre la que se hizo la visita. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin salir del formulario."),
         ("Inmueble", "Buscar y seleccionar el inmueble visitado."),
         ("Contacto", "Buscar y seleccionar la persona con la que se realizó la visita (opcional)."),
         ("Comentarios", "Observaciones de la visita: qué se habló, próximos pasos (opcional)."),

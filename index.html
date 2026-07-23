@@ -7586,9 +7586,19 @@ window.ctdrCuentaSearch=function(q){
   const lq=q.toLowerCase().trim();
   if(!lq){list.style.display='none';return;}
   const matches=_crmDocs.filter(d=>(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
-  if(!matches.length){list.innerHTML='<div style="padding:10px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
-  list.innerHTML=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onclick="ctdrSelectCuenta('${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')"> ${d.nombre}</div>`).join('');
+  let h=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF;transition:background .1s" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();ctdrSelectCuenta('${d._id}','${(d.nombre||'').replace(/'/g,"\\'")}')"> ${d.nombre}</div>`).join('');
+  if(!matches.length)h+='<div style="padding:10px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';
+  // "Crear nueva cuenta" solo cuando el texto no coincide exactamente con una existente.
+  const exact=matches.some(d=>_ctaNorm(d.nombre)===_ctaNorm(q));
+  if(!exact)h+=`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#1C54F4;border-top:1px solid #EEF2FA" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();ctdrCrearCuenta()">➕ Crear nueva cuenta "${esc(q.trim())}"</div>`;
+  list.innerHTML=h;
   list.style.display='block';
+};
+// Reutiliza el mismo modal de creación rápida de Cuenta; al guardar, selecciona la cuenta en el contacto.
+window.ctdrCrearCuenta=function(){
+  const list=document.getElementById('ctdr-cuenta-list');if(list)list.style.display='none';
+  const typed=(document.getElementById('ctdr-cuenta-q').value||'').trim();
+  openQuickCuentaModal(typed,(id,nombre)=>ctdrSelectCuenta(id,nombre));
 };
 
 window.ctdrSelectCuenta=function(id,nombre){
@@ -8446,7 +8456,10 @@ window.ctaPickerInput=function(key,val){
   const q=(val||'').trim();
   c._opts=q?_ctaSimilares(q,8):[];
   let h=c._opts.map((d,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctaPickerPickIdx('${key}',${i})">🏢 ${esc(d.nombre||'')}</div>`).join('');
-  if(q&&c.allowCreate!==false)h+=`<div class="cdr-ms-item" style="color:#1C54F4;font-weight:700;border-top:1px solid #EEF2FA" onmousedown="event.preventDefault();ctaPickerCreate('${key}')">➕ Crear nueva cuenta</div>`;
+  // La opción "Crear nueva cuenta" solo aparece cuando el texto no coincide
+  // exactamente con ninguna cuenta existente (permite crear aunque haya parciales).
+  const exact=q&&c._opts.some(d=>_ctaNorm(d.nombre)===_ctaNorm(q));
+  if(q&&!exact&&c.allowCreate!==false)h+=`<div class="cdr-ms-item" style="color:#1C54F4;font-weight:700;border-top:1px solid #EEF2FA" onmousedown="event.preventDefault();ctaPickerCreate('${key}')">➕ Crear nueva cuenta "${esc(q)}"</div>`;
   drop.innerHTML=h||'<div class="cdr-ms-empty">Escribí para buscar en Cuentas…</div>';
   drop.style.display=q?'block':'none';
 };
@@ -8465,7 +8478,7 @@ function _ctaPickerSet(key,id,nombre){
 window.ctaPickerClear=function(key){const c=_ctaPickers[key];if(!c)return;document.getElementById(c.hidId).value='';document.getElementById(c.hidNombreId).value='';const tag=document.getElementById(c.tagId);if(tag)tag.style.display='none';};
 window.ctaPickerCreate=function(key){const c=_ctaPickers[key];if(!c)return;const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';openQuickCuentaModal(document.getElementById(c.inputId).value.trim(),(id,nombre)=>_ctaPickerSet(key,id,nombre));};
 registerCuentaPicker('ldr',{inputId:'ldr-empresa',dropId:'ldr-empresa-drop',tagId:'ldr-empresa-tag',hidId:'ldr-cuentaId',hidNombreId:'ldr-cuentaNombre'});
-registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre',allowCreate:false,onSelect:function(){ _visClearCto(); }});
+registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre',onSelect:function(){ _visClearCto(); }});
 
 // --- Modal de creación rápida de Cuenta (sin abandonar el formulario actual) ---
 let _qcRubros=[],_qcSubrubros=[],_qcRubroOpts=[],_qcSubOpts=[],_qcOnDone=null,_qcDupes=[];
