@@ -7966,20 +7966,27 @@ function renderLeadInfoCards(d){
           ${row('Cargo segmentado',t(d.cargo))}
           ${row('Puesto',t(d.puesto))}
         </div>
-        <div class="nx-card">
-          <div class="nx-card-title">Origen y Asignación</div>
-          <div class="nx-row"><div class="nx-row-l">Origen</div><div class="nx-row-v">${d.origen?leadOrigenBadge(d.origen):dash}</div></div>
-          ${row('Ejecutivo Comercial asignado',d.brokerAsignado?esc(ejecDisplay(d.brokerAsignado)):null)}
-          ${row('Link de origen',link)}
-        </div>
       </div>
       <div class="nx-col">
-        <div class="nx-card">
-          <div class="nx-card-title">Interés</div>
-          ${row('Empresa',t(d.empresa||d.cuentaNombre))}
-          ${row('Inmueble consultado',t(d.buildingName))}
-          ${row('Tipo de consulta',t(d.tipoInmueble==='Otros'&&d.tipoConsultaOtro?`Otros — ${d.tipoConsultaOtro}`:d.tipoInmueble))}
-        </div>
+        ${(()=>{
+          // Empresa: Cuenta asociada si existe; si no, "Sin cuenta asociada".
+          const empresaVal=d.cuentaNombre
+            ?`<a href="javascript:void(0)" onclick="openClientDetail('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`
+            :'<span style="color:#8898C0">Sin cuenta asociada</span>';
+          // Inmueble: solo para consultas de inmuebles; oculto para SPS/Valuaciones/Otros.
+          const TIPOS_CON_INMUEBLE=['Oficina','Retail','Industria','Depósito','Terreno'];
+          const mostrarInmueble=TIPOS_CON_INMUEBLE.includes(d.tipoInmueble||'');
+          const tipoVal=d.tipoInmueble==='Otros'&&d.tipoConsultaOtro?`Otros — ${d.tipoConsultaOtro}`:d.tipoInmueble;
+          return `<div class="nx-card">
+            <div class="nx-card-title">Información Comercial</div>
+            ${row('Empresa',empresaVal)}
+            ${row('Tipo de consulta',t(tipoVal))}
+            ${mostrarInmueble?row('Inmueble',t(d.buildingName)):''}
+            ${row('Ejecutivo Comercial asignado',d.brokerAsignado?esc(ejecDisplay(d.brokerAsignado)):null)}
+            <div class="nx-row"><div class="nx-row-l">Origen</div><div class="nx-row-v">${d.origen?leadOrigenBadge(d.origen):dash}</div></div>
+            ${row('Link de origen',link)}
+          </div>`;
+        })()}
         ${d.comentarios?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(d.comentarios)}</div></div>`:''}
       </div>
     </div>`;
