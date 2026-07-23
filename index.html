@@ -942,12 +942,12 @@ body.dark #buildings-panel{background:#030B1E}
 .bld-layout.editor-open{grid-template-columns:1fr 420px}
 @media(max-width:1100px){.bld-layout.editor-open{grid-template-columns:1fr 360px}}
 .bld-main{display:flex;flex-direction:column;height:100%;overflow:hidden}
-.bld-wrap{max-width:none;padding:2rem 2.5rem;display:flex;flex-direction:column;gap:1.5rem;height:100%;box-sizing:border-box}
+.bld-wrap{max-width:none;padding:1.1rem 2.5rem 1.3rem;display:flex;flex-direction:column;gap:.8rem;height:100%;box-sizing:border-box}
 
 /* Header */
 .bld-hz{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;flex-shrink:0}
 .bld-hz-l{display:flex;flex-direction:column;gap:4px}
-.bld-title{color:#0A1B4D;font-size:28px;font-weight:700;letter-spacing:-.5px}
+.bld-title{color:#0A1B4D;font-size:23px;font-weight:700;letter-spacing:-.5px}
 .bld-subtitle{color:#7B8BBD;font-size:13px}
 body.dark .bld-title{color:#fff}
 body.dark .bld-subtitle{color:#A8B3D1}
@@ -986,14 +986,14 @@ body.dark .gen-close-btn{background:rgba(255,255,255,.06);border-color:rgba(255,
 body.dark .gen-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(239,51,64,.35);color:#EF3340}
 
 /* KPI row */
-.bld-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;flex-shrink:0}
+.bld-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;flex-shrink:0}
 @media(max-width:960px){.bld-kpi-row{grid-template-columns:repeat(2,1fr)}}
-.bld-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:1.1rem 1.4rem;display:flex;flex-direction:column;gap:.3rem;transition:all .25s}
+.bld-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:12px;padding:.62rem 1.1rem;display:flex;flex-direction:column;gap:.15rem;transition:all .25s}
 body.dark .bld-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)}
 .bld-kpi.filtered{border-color:rgba(28,84,244,.35);box-shadow:0 0 0 1px rgba(28,84,244,.15),0 4px 16px rgba(28,84,244,.1)}
 body.dark .bld-kpi.filtered{border-color:rgba(77,147,255,.4);box-shadow:0 0 0 1px rgba(77,147,255,.15),0 4px 20px rgba(28,84,244,.2)}
-.bld-kpi-icon{font-size:18px;line-height:1}
-.bld-kpi-v{font-size:30px;font-weight:700;color:#0A1B4D;line-height:1;transition:color .2s}
+.bld-kpi-icon{font-size:15px;line-height:1}
+.bld-kpi-v{font-size:24px;font-weight:700;color:#0A1B4D;line-height:1;transition:color .2s}
 body.dark .bld-kpi-v{color:#fff}
 .bld-kpi.filtered .bld-kpi-v{color:#1C54F4}
 body.dark .bld-kpi.filtered .bld-kpi-v{color:#4D93FF}
@@ -1474,12 +1474,12 @@ select.bwiz-inp:focus{border-color:#4D93FF}
 .bld-det-ckpi-l{display:none}
 
 /* ===== BUILDINGS MODULE v3 — filter bar + list view ===== */
-.bld-filter-bar{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.6rem 0 .8rem;flex-wrap:wrap}
+.bld-filter-bar{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.1rem 0 .3rem;flex-wrap:wrap}
 .bld-filter-bar-l{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;flex:1}
 .bld-filter-bar-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
-.bld-filter-inp{padding:.45rem .75rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:13px;color:#000759;background:#fff;font-family:inherit;outline:none;transition:border-color .15s;width:230px}
+.bld-filter-inp{padding:.34rem .7rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:13px;color:#000759;background:#fff;font-family:inherit;outline:none;transition:border-color .15s;width:200px}
 .bld-filter-inp:focus{border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
-.bld-filter-sel{padding:.45rem .65rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:12.5px;color:#000759;background:#fff;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
+.bld-filter-sel{padding:.34rem .6rem;border:1.5px solid #E2EAF4;border-radius:8px;font-size:12.5px;color:#000759;background:#fff;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
 .bld-filter-sel:focus{border-color:#1C54F4;box-shadow:0 0 0 3px rgba(28,84,244,.08)}
 .bld-filter-clear{display:inline-flex;align-items:center;gap:4px;padding:.4rem .75rem;border:1.5px solid rgba(239,51,64,.25);border-radius:8px;background:rgba(239,51,64,.06);color:#EF3340;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
 .bld-filter-clear:hover{background:rgba(239,51,64,.1);border-color:rgba(239,51,64,.4)}
