@@ -16,9 +16,12 @@ GUIAS = {}
 
 # ─────────────────────────── CUENTAS ───────────────────────────
 GUIAS["Guia_Cuentas"] = Guia(
-    "Cuentas", "1.0", FECHA,
+    "Cuentas", "1.1", FECHA,
     "Permite dar de alta y mantener las cuentas (empresas) con las que trabaja Colliers. "
-    "Es la base del CRM: sobre las cuentas se cargan contactos, visitas y actividad comercial.",
+    "Es la base del CRM: sobre las cuentas se cargan contactos, visitas y actividad comercial. "
+    "Los usuarios comerciales ven un formulario reducido (Nombre comercial, Cliente Colliers, "
+    "Unidades de negocio y Tipo de cuenta) para un alta rápida; los administradores ven el "
+    "formulario completo. Es el mismo formulario que aparece al crear una cuenta desde otros módulos.",
     [
         ("Nombre comercial", "Nombre de la empresa."),
         ("Categoría", "Clasificación interna de la cuenta (Top, A, B, C o No aplica). Disponible solo para administradores."),
