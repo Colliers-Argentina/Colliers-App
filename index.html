@@ -3047,12 +3047,17 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <div class="cdr-field"><div class="cdr-lbl">Puesto <span id="ldr-puesto-hint" style="font-weight:400;color:#8898C0;font-size:11px"></span></div><input id="ldr-puesto" class="cdr-input" type="text" placeholder="Ej: Gerente de RRHH"></div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Tipo de inmueble</div>
-          <select id="ldr-tipoInmueble" class="cdr-select">
+          <div class="cdr-lbl">Tipo de consulta</div>
+          <select id="ldr-tipoInmueble" class="cdr-select" onchange="ldrTipoConsultaChange()">
             <option value="">— Seleccionar —</option>
-            <option>Oficina</option><option>Industria</option><option>Retail</option>
-            <option>Depósito / Logística</option><option>Terreno</option><option>Otro</option>
+            <option>Oficina</option><option>Industria</option><option>Depósito</option>
+            <option>Terreno</option><option>Retail</option><option>SPS</option>
+            <option>Valuaciones</option><option>Otros</option>
           </select>
+        </div>
+        <div class="cdr-field" id="ldr-tipoConsultaOtro-field" style="display:none">
+          <div class="cdr-lbl">Especificar tipo de consulta</div>
+          <input id="ldr-tipoConsultaOtro" class="cdr-input" type="text" placeholder="Detallar la consulta...">
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Clasificación <span class="cdr-req">*</span></div>
@@ -7973,7 +7978,7 @@ function renderLeadInfoCards(d){
           <div class="nx-card-title">Interés</div>
           ${row('Empresa',t(d.empresa||d.cuentaNombre))}
           ${row('Inmueble consultado',t(d.buildingName))}
-          ${row('Tipo de inmueble',t(d.tipoInmueble))}
+          ${row('Tipo de consulta',t(d.tipoInmueble==='Otros'&&d.tipoConsultaOtro?`Otros — ${d.tipoConsultaOtro}`:d.tipoInmueble))}
         </div>
         ${d.comentarios?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(d.comentarios)}</div></div>`:''}
       </div>
@@ -7985,7 +7990,7 @@ window.leadFichaEdit=function(docId){
   const body=document.getElementById('ldt-info');
   if(!d||!body)return;
   const origenOpts=['','Zonaprop','Argenprop','Mercado Libre','Referido','LinkedIn','Web','Llamado','Email','Otro'].map(o=>`<option value="${esc(o)}"${(d.origen||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('');
-  const tipoOpts=['','Oficina','Industria','Retail','Depósito / Logística','Terreno','Otro'].map(o=>`<option value="${esc(o)}"${(d.tipoInmueble||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('');
+  const tipoOpts=['',...LEAD_TIPO_CONSULTA].map(o=>`<option value="${esc(o)}"${(d.tipoInmueble||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('');
   const brokerOpts=['',...CRM_EJECUTIVOS].map(k=>`<option value="${esc(k)}"${(d.brokerAsignado||'')===k?' selected':''}>${k?esc(ejecDisplay(k)):'— Seleccionar —'}</option>`).join('');
   body.innerHTML=
     nxEditbar('Editando lead',`openLeadDetail('${docId}')`,`leadFichaSave('${docId}')`)+`
@@ -8012,7 +8017,7 @@ window.leadFichaEdit=function(docId){
           <div class="nx-card-title">Interés</div>
           ${nxErow('Empresa',`<input id="lfe-empresa" class="cdr-input" placeholder="Buscar empresa en Cuentas..." autocomplete="off" value="${esc(d.empresa||d.cuentaNombre||'')}" oninput="ctaPickerInput('lfe',this.value)" onblur="ctaPickerBlur('lfe')"><div id="lfe-empresa-drop" class="cdr-ms-drop" style="display:none"></div><span id="lfe-empresa-tag" style="display:none;font-size:10.5px;color:#16A34A;font-weight:700;margin-top:3px"></span><input id="lfe-cuentaId" type="hidden" value="${esc(d.cuentaId||'')}"><input id="lfe-cuentaNombre" type="hidden" value="${esc(d.cuentaNombre||'')}">`)}
           ${nxErow('Inmueble consultado',`<input id="lfe-bld-q" class="cdr-input" placeholder="Buscar edificio..." autocomplete="off" value="${esc(d.buildingName||'')}" oninput="lfeBldSearch(this.value)" onblur="setTimeout(()=>{var l=document.getElementById('lfe-bld-list');if(l)l.style.display='none'},150)"><div id="lfe-bld-list" class="cdr-ms-drop" style="display:none"></div><input id="lfe-buildingId" type="hidden" value="${esc(d.buildingId||'')}"><input id="lfe-buildingName" type="hidden" value="${esc(d.buildingName||'')}">`)}
-          ${nxErow('Tipo de inmueble',`<select id="lfe-tipoInmueble" class="cdr-select">${tipoOpts}</select>`)}
+          ${nxErow('Tipo de consulta',`<select id="lfe-tipoInmueble" class="cdr-select" onchange="var f=document.getElementById('lfe-tipoConsultaOtro-field');if(f)f.style.display=this.value==='Otros'?'':'none'">${tipoOpts}</select><div id="lfe-tipoConsultaOtro-field" style="display:${d.tipoInmueble==='Otros'?'':'none'};margin-top:.4rem"><input id="lfe-tipoConsultaOtro" class="cdr-input" placeholder="Especificar tipo de consulta" value="${esc(d.tipoConsultaOtro||'')}"></div>`)}
           ${nxErow('Clasificación',`<select id="lfe-clasificacion" class="cdr-select">${['','Estándar','Calificado'].map(o=>`<option value="${esc(o)}"${(d.clasificacion||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('')}</select>`)}
         </div>
         <div class="nx-card">
@@ -8054,7 +8059,7 @@ window.leadFichaSave=async function(docId){
   set('ldr-nombre',nombre);set('ldr-apellido',apellido);set('ldr-email',email);
   set('ldr-telefono',gv('lfe-telefono'));set('ldr-puesto',gv('lfe-puesto'));set('ldr-cargo',gv('lfe-cargo'));
   set('ldr-empresa',gv('lfe-empresa'));set('ldr-cuentaId',gv('lfe-cuentaId'));set('ldr-cuentaNombre',gv('lfe-cuentaNombre'));
-  set('ldr-tipoInmueble',gv('lfe-tipoInmueble'));set('ldr-origen',origen);set('ldr-broker',broker);
+  set('ldr-tipoInmueble',gv('lfe-tipoInmueble'));set('ldr-tipoConsultaOtro',gv('lfe-tipoConsultaOtro'));set('ldr-origen',origen);set('ldr-broker',broker);
   set('ldr-buildingId',gv('lfe-buildingId'));set('ldr-buildingName',gv('lfe-buildingName'));
   set('ldr-link-origen',link);set('ldr-comentarios',gv('lfe-comentarios'));
   set('ldr-clasificacion',gv('lfe-clasificacion'));
@@ -8328,12 +8333,19 @@ window.ldrCargoChange=function(){
   const sel=document.getElementById('ldr-cargo');const hint=document.getElementById('ldr-puesto-hint');
   if(hint)hint.textContent=(sel&&sel.value==='Otro')?'(especificá el cargo)':'';
 };
+// Tipo de consulta del Lead. "Otros" → aparece un texto libre para especificar.
+const LEAD_TIPO_CONSULTA=['Oficina','Industria','Depósito','Terreno','Retail','SPS','Valuaciones','Otros'];
+window.ldrTipoConsultaChange=function(){
+  const sel=document.getElementById('ldr-tipoInmueble');const f=document.getElementById('ldr-tipoConsultaOtro-field');
+  if(f)f.style.display=(sel&&sel.value==='Otros')?'':'none';
+};
 // LEAD DRAWER
 window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
   _ldrEditId=null;
   ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-cargo','ldr-bld-q','ldr-comentarios','ldr-link-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ldrCargoChange();
-  ['ldr-tipoInmueble','ldr-origen','ldr-broker','ldr-clasificacion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ldr-tipoInmueble','ldr-origen','ldr-broker','ldr-clasificacion','ldr-tipoConsultaOtro'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ldrTipoConsultaChange();
   document.getElementById('ldr-buildingId').value='';
   document.getElementById('ldr-buildingName').value='';
   ['ldr-cuentaId','ldr-cuentaNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -8371,7 +8383,8 @@ window.openLeadDrawer_edit=function(docId){
   set('ldr-telefono',d.telefono);set('ldr-empresa',d.empresa);set('ldr-puesto',d.puesto);
   set('ldr-cargo',d.cargo);ldrCargoChange();
   if(d.cuentaId)_ctaPickerSet('ldr',d.cuentaId,d.cuentaNombre||d.empresa||'');
-  set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
+  set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-tipoConsultaOtro',d.tipoConsultaOtro);ldrTipoConsultaChange();
+  set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
   set('ldr-clasificacion',d.clasificacion);
   set('ldr-comentarios',d.comentarios);set('ldr-link-origen',d.linkOrigen);
   if(d.buildingId){document.getElementById('ldr-buildingId').value=d.buildingId;document.getElementById('ldr-buildingName').value=d.buildingName||'';document.getElementById('ldr-bld-q').value=d.buildingName||'';}
@@ -8629,6 +8642,7 @@ window.saveLeadDrawer=async function(){
       puesto:(document.getElementById('ldr-puesto').value||'').trim(),
       cargo:document.getElementById('ldr-cargo')?.value||'',
       tipoInmueble:document.getElementById('ldr-tipoInmueble').value||'',
+      tipoConsultaOtro:(document.getElementById('ldr-tipoInmueble').value==='Otros'?(document.getElementById('ldr-tipoConsultaOtro')?.value||'').trim():''),
       buildingId:document.getElementById('ldr-buildingId').value||'',
       buildingName:document.getElementById('ldr-buildingName').value||'',
       brokerAsignado,
@@ -8638,7 +8652,7 @@ window.saveLeadDrawer=async function(){
     };
     if(_ldrEditId){
       const oldD=_leadDocs.find(x=>x._id===_ldrEditId)||{};
-      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',cuentaNombre:'Cuenta',cargo:'Cargo',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',clasificacion:'Clasificación',comentarios:'Comentarios',buildingName:'Inmueble'};
+      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',cuentaNombre:'Cuenta',cargo:'Cargo',puesto:'Puesto',tipoInmueble:'Tipo de consulta',tipoConsultaOtro:'Detalle de consulta',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',clasificacion:'Clasificación',comentarios:'Comentarios',buildingName:'Inmueble'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('leads').doc(_ldrEditId).update(updatePayload);
