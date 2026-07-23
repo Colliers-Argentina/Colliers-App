@@ -70,7 +70,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "2.1", FECHA,
+    "Leads", "2.2", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
     "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
     "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
@@ -81,7 +81,8 @@ GUIAS["Guia_Leads"] = Guia(
         ("Email", "Correo electrónico de contacto (opcional). Si se completa, debe tener formato válido."),
         ("Teléfono móvil", "Número de celular de la persona (opcional). Se puede completar más adelante."),
         ("Empresa", "Empresa del interesado. Se puede buscar entre las cuentas existentes. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin perder los datos del lead."),
-        ("Puesto", "Puesto o rol de la persona (opcional)."),
+        ("Cargo segmentado", "Seleccionar el tipo de cargo (CEO, CFO, Compras, Real Estate u Otro), igual que en Contactos. Si se elige \"Otro\", especificar el cargo en el campo Puesto."),
+        ("Puesto", "Puesto o rol de la persona (opcional). Sirve para ampliar o especificar el cargo."),
         ("Tipo de inmueble", "Tipo de propiedad que busca (oficina, local, depósito, etc.)."),
         ("Clasificación", "Obligatorio. Indicar la calidad del lead al ingresar: Estándar o Calificado. No tiene valor por defecto."),
         ("Origen", "Cómo llegó la consulta: Zonaprop, Argenprop, Mercado Libre, Referido, LinkedIn, Web, Llamado, Email u Otro."),

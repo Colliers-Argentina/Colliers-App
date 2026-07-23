@@ -3035,8 +3035,17 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <div id="ldr-empresa-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
             <input id="ldr-cuentaId" type="hidden"><input id="ldr-cuentaNombre" type="hidden">
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Puesto</div><input id="ldr-puesto" class="cdr-input" type="text" placeholder="Ej: Gerente de RRHH"></div>
+          <div class="cdr-field">
+            <div class="cdr-lbl">Cargo segmentado</div>
+            <select id="ldr-cargo" class="cdr-select" onchange="ldrCargoChange()">
+              <option value="">Seleccionar...</option>
+              <option value="CEO">CEO</option><option value="CFO">CFO</option>
+              <option value="Compras">Compras</option><option value="Real Estate">Real Estate</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
         </div>
+        <div class="cdr-field"><div class="cdr-lbl">Puesto <span id="ldr-puesto-hint" style="font-weight:400;color:#8898C0;font-size:11px"></span></div><input id="ldr-puesto" class="cdr-input" type="text" placeholder="Ej: Gerente de RRHH"></div>
         <div class="cdr-field">
           <div class="cdr-lbl">Tipo de inmueble</div>
           <select id="ldr-tipoInmueble" class="cdr-select">
@@ -7949,6 +7958,7 @@ function renderLeadInfoCards(d){
           ${row('Apellido',t(d.apellido))}
           ${row('Email',t(d.email))}
           ${row('Teléfono',t(d.telefono))}
+          ${row('Cargo segmentado',t(d.cargo))}
           ${row('Puesto',t(d.puesto))}
         </div>
         <div class="nx-card">
@@ -7987,6 +7997,7 @@ window.leadFichaEdit=function(docId){
           ${nxErow('Apellido',`<input id="lfe-apellido" class="cdr-input" value="${esc(d.apellido||'')}">`)}
           ${nxErow('Email',`<input id="lfe-email" class="cdr-input" type="email" value="${esc(d.email||'')}">`)}
           ${nxErow('Teléfono',`<input id="lfe-telefono" class="cdr-input" type="tel" value="${esc(d.telefono||'')}">`)}
+          ${nxErow('Cargo segmentado',`<select id="lfe-cargo" class="cdr-select">${['','CEO','CFO','Compras','Real Estate','Otro'].map(o=>`<option value="${esc(o)}"${(d.cargo||'')===o?' selected':''}>${o||'Seleccionar...'}</option>`).join('')}</select>`)}
           ${nxErow('Puesto',`<input id="lfe-puesto" class="cdr-input" value="${esc(d.puesto||'')}">`)}
         </div>
         <div class="nx-card">
@@ -8041,7 +8052,7 @@ window.leadFichaSave=async function(docId){
   if(!ok)return;
   const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
   set('ldr-nombre',nombre);set('ldr-apellido',apellido);set('ldr-email',email);
-  set('ldr-telefono',gv('lfe-telefono'));set('ldr-puesto',gv('lfe-puesto'));
+  set('ldr-telefono',gv('lfe-telefono'));set('ldr-puesto',gv('lfe-puesto'));set('ldr-cargo',gv('lfe-cargo'));
   set('ldr-empresa',gv('lfe-empresa'));set('ldr-cuentaId',gv('lfe-cuentaId'));set('ldr-cuentaNombre',gv('lfe-cuentaNombre'));
   set('ldr-tipoInmueble',gv('lfe-tipoInmueble'));set('ldr-origen',origen);set('ldr-broker',broker);
   set('ldr-buildingId',gv('lfe-buildingId'));set('ldr-buildingName',gv('lfe-buildingName'));
@@ -8312,10 +8323,16 @@ async function loadLeadTimeline(docId){
   }catch(e){body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;}
 }
 
+// Cargo segmentado del Lead (mismo criterio que Contactos). "Otro" → especificar en Puesto.
+window.ldrCargoChange=function(){
+  const sel=document.getElementById('ldr-cargo');const hint=document.getElementById('ldr-puesto-hint');
+  if(hint)hint.textContent=(sel&&sel.value==='Otro')?'(especificá el cargo)':'';
+};
 // LEAD DRAWER
 window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
   _ldrEditId=null;
-  ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-bld-q','ldr-comentarios','ldr-link-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-cargo','ldr-bld-q','ldr-comentarios','ldr-link-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ldrCargoChange();
   ['ldr-tipoInmueble','ldr-origen','ldr-broker','ldr-clasificacion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ldr-buildingId').value='';
   document.getElementById('ldr-buildingName').value='';
@@ -8352,6 +8369,7 @@ window.openLeadDrawer_edit=function(docId){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   set('ldr-nombre',d.nombre);set('ldr-apellido',d.apellido);set('ldr-email',d.email);
   set('ldr-telefono',d.telefono);set('ldr-empresa',d.empresa);set('ldr-puesto',d.puesto);
+  set('ldr-cargo',d.cargo);ldrCargoChange();
   if(d.cuentaId)_ctaPickerSet('ldr',d.cuentaId,d.cuentaNombre||d.empresa||'');
   set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
   set('ldr-clasificacion',d.clasificacion);
@@ -8609,6 +8627,7 @@ window.saveLeadDrawer=async function(){
       cuentaId:document.getElementById('ldr-cuentaId').value||'',
       cuentaNombre:document.getElementById('ldr-cuentaNombre').value||'',
       puesto:(document.getElementById('ldr-puesto').value||'').trim(),
+      cargo:document.getElementById('ldr-cargo')?.value||'',
       tipoInmueble:document.getElementById('ldr-tipoInmueble').value||'',
       buildingId:document.getElementById('ldr-buildingId').value||'',
       buildingName:document.getElementById('ldr-buildingName').value||'',
@@ -8619,7 +8638,7 @@ window.saveLeadDrawer=async function(){
     };
     if(_ldrEditId){
       const oldD=_leadDocs.find(x=>x._id===_ldrEditId)||{};
-      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',cuentaNombre:'Cuenta',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',clasificacion:'Clasificación',comentarios:'Comentarios',buildingName:'Inmueble'};
+      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',cuentaNombre:'Cuenta',cargo:'Cargo',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',clasificacion:'Clasificación',comentarios:'Comentarios',buildingName:'Inmueble'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('leads').doc(_ldrEditId).update(updatePayload);
@@ -8894,7 +8913,7 @@ window.executeLeadConversion=async function(){
     const contactRef=await db.collection('contactos').add({
       cuentaId,cuentaNombre,
       nombre:lead.nombre||'',apellidos:lead.apellido||'',
-      cargo:'Otro',puesto:lead.puesto||'',
+      cargo:lead.cargo||'Otro',puesto:lead.puesto||'',
       email:lead.email||'',estadoCorreo:'sin_comprobar',
       telefono:lead.telefono||'',
       comentarios:lead.comentarios||'',
