@@ -6615,6 +6615,15 @@ function renderCuentaLeftPanel(docId){
     <div class="crm-det-meta-item" style="margin-top:.2rem"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${d.fechaCreacion?fmtDate(d.fechaCreacion):'–'}</div></div>
   `;
 }
+// Abre la ficha de una Cuenta desde otra sección (Leads/Contactos): cambia a la
+// solapa Cuentas, asegura que estén cargadas y recién ahí abre el detalle.
+window.crmOpenCuenta=async function(cuentaId){
+  if(!cuentaId)return;
+  switchCRMTab('cuentas');
+  if(!_crmDocs.length){try{await loadCRM();}catch(e){}}
+  if(_crmDocs.find(x=>x._id===cuentaId))openClientDetail(cuentaId);
+  else alert('No se encontró la cuenta asociada.');
+};
 function openClientDetail(docId){
   const d=_crmDocs.find(x=>x._id===docId);
   if(!d)return;
@@ -7099,7 +7108,7 @@ function renderContactoInfoCards(d){
   const row=(lbl,val)=>`<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-v">${val||dash}</div></div>`;
   const t=v=>v?esc(v):null;
   const linkedin=d.linkedin?`<a href="${esc(d.linkedin)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600;word-break:break-all">${esc(d.linkedin)}</a>`:null;
-  const cuenta=d.cuentaNombre?`<a href="javascript:void(0)" onclick="openClientDetail('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`:null;
+  const cuenta=d.cuentaNombre?`<a href="javascript:void(0)" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`:null;
   const ejs=_ctoEjecutivos(d);
   const ejecVal=ejs.length?ejs.map(k=>esc(ejecDisplay(k))).join('<br>'):'<span style="color:#8898C0">Sin asignar</span>';
   return `
@@ -7221,7 +7230,7 @@ function openContactoDetail(docId){
   const ini=crmInitials(fullname);
   // Panel izquierdo (mismo diseño que Cuentas): solo resumen esencial.
   const cuentaVal=d.cuentaNombre
-    ?`<div class="crm-det-meta-val" style="color:#1C54F4;cursor:pointer" onclick="openClientDetail('${esc(d.cuentaId||'')}')">${esc(d.cuentaNombre)}</div>`
+    ?`<div class="crm-det-meta-val" style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')">${esc(d.cuentaNombre)}</div>`
     :'<div class="crm-det-meta-val" style="color:#8898C0">Sin cuenta asociada</div>';
   document.getElementById('cto-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
@@ -7971,7 +7980,7 @@ function renderLeadInfoCards(d){
         ${(()=>{
           // Empresa: Cuenta asociada si existe; si no, "Sin cuenta asociada".
           const empresaVal=d.cuentaNombre
-            ?`<a href="javascript:void(0)" onclick="openClientDetail('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`
+            ?`<a href="javascript:void(0)" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`
             :'<span style="color:#8898C0">Sin cuenta asociada</span>';
           // Inmueble: solo para consultas de inmuebles; oculto para SPS/Valuaciones/Otros.
           const TIPOS_CON_INMUEBLE=['Oficina','Retail','Industria','Depósito','Terreno'];
