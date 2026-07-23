@@ -1497,6 +1497,9 @@ body.dark .bld-filter-bar{border-color:rgba(255,255,255,.06)}
 .bld-lt-name{min-width:200px}
 .bld-lt-name-inner{display:flex;align-items:center;gap:10px}
 .bld-lt-avatar{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#1C54F4,#25408F);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bld-lt-avatar.bld-lt-thumb{padding:0;overflow:hidden;background:#EEF3FF;border:1px solid #E2EAF4}
+.bld-lt-avatar.bld-lt-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+body.dark .bld-lt-avatar.bld-lt-thumb{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
 .bld-lt-nm{font-weight:600;color:#000759;font-size:13px}
 .bld-lt-addr{font-size:11px;color:#7B8BBD;margin-top:1px}
 .bld-lt-num{font-size:12.5px;color:#344563;white-space:nowrap;font-variant-numeric:tabular-nums;padding:10px 12px}
@@ -10178,6 +10181,16 @@ function renderBuildingsTable(){
   _bldPaginationHTML(total,start);
 }
 
+// Miniatura del edificio para la vista Lista: usa la imagen principal (foto/imagenes[0]);
+// si no hay imagen válida (o falla al cargar), muestra el ícono/letra por defecto.
+function _bldListThumb(d,fallback){
+  const img=(d.foto||(d.imagenes&&d.imagenes[0])||'').trim();
+  const fb=String(fallback).replace(/['"<>]/g,'');
+  if(img&&/^https?:\/\//i.test(img)){
+    return `<div class="bld-lt-avatar bld-lt-thumb"><img src="${esc(img)}" alt="" loading="lazy" onerror="this.parentElement.classList.remove('bld-lt-thumb');this.parentElement.textContent='${fb}'"></div>`;
+  }
+  return `<div class="bld-lt-avatar">${fb}</div>`;
+}
 function renderBuildingsListView(){
   const wrap=document.getElementById('bld-table-wrap');
   const total=_bldFiltered.length;
@@ -10201,7 +10214,7 @@ function renderBuildingsListView(){
       <th class="bld-lt-actions"></th></tr></thead><tbody>`;
     page.forEach(d=>{
       h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
-        <td class="bld-lt-name"><div class="bld-lt-name-inner"><div class="bld-lt-avatar">🏭</div><div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
+        <td class="bld-lt-name"><div class="bld-lt-name-inner">${_bldListThumb(d,'🏭')}<div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
         <td>${esc(d.localidad||'–')}</td>
         <td>${esc(d.provincia||'–')}</td>
         <td>${esc(d.corredor||d.zona||'–')}</td>
@@ -10225,7 +10238,7 @@ function renderBuildingsListView(){
       const supTotal=d.superficieTotal||(Number(d.superficiePB||0)+Number(d.superficieSS||0)+Number(d.superficiePA||0));
       const alq=Number(d.precioAlquiler||d.alquiler||0);
       h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
-        <td class="bld-lt-name"><div class="bld-lt-name-inner"><div class="bld-lt-avatar">🏪</div><div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
+        <td class="bld-lt-name"><div class="bld-lt-name-inner">${_bldListThumb(d,'🏪')}<div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
         <td>${esc(d.corredor||d.zona||'–')}</td>
         <td>${esc(d.ciudad||'–')}</td>
         <td class="bld-lt-num">${d.frente?d.frente+' m':'–'}</td>
@@ -10256,7 +10269,7 @@ function renderBuildingsListView(){
       const pisos=d.cantidadPisos||d.pisos||'–';
       const upd=fmtDate(d.updatedAt||d.createdAt);
       h+=`<tr class="bld-list-row${_bldEditId===d._id?' selected':''}" onclick="openBuildingEditor('${d._id}')">
-        <td class="bld-lt-name"><div class="bld-lt-name-inner"><div class="bld-lt-avatar">${(d.nombre||'O').charAt(0).toUpperCase()}</div><div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
+        <td class="bld-lt-name"><div class="bld-lt-name-inner">${_bldListThumb(d,(d.nombre||'O').charAt(0).toUpperCase())}<div><div class="bld-lt-nm">${esc(d.nombre||d._id)}</div><div class="bld-lt-addr">${esc(d.direccion||'')}</div></div></div></td>
         <td>${esc(corredor)}</td>
         <td><span class="bld-cat-badge cat-${(cat||'').replace('+','p')}">${esc(cat)}</span></td>
         <td><span class="bld-etapa-badge">${esc(d.etapa||'–')}</span></td>
