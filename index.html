@@ -2967,6 +2967,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       </div>
       <div class="crm-list-body">
         <div class="crm-kpi-row" id="lead-kpi-row"></div>
+        <div id="lead-alert-banner" style="display:none"></div>
         <div class="crm-tbl-wrap"><div id="lead-table-wrap">Cargando...</div></div>
       </div>
     </div>
@@ -3042,6 +3043,13 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <option value="">— Seleccionar —</option>
             <option>Oficina</option><option>Industria</option><option>Retail</option>
             <option>Depósito / Logística</option><option>Terreno</option><option>Otro</option>
+          </select>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Clasificación <span class="cdr-req">*</span></div>
+          <select id="ldr-clasificacion" class="cdr-select">
+            <option value="">— Seleccionar —</option>
+            <option>Estándar</option><option>Calificado</option>
           </select>
         </div>
       </div>
@@ -7838,6 +7846,16 @@ let _cdrSubOpts=[];       // opciones actuales del dropdown de subrubro (para ha
 const LEAD_ESTADOS=['Nuevo','Intento de contacto','Contactado','Calificado','Visita coordinada','Visita realizada','Propuesta enviada','Descartado','Convertido'];
 const LEAD_ESTADO_CLS={'Nuevo':'nuevo','Intento de contacto':'intento','Contactado':'contactado','Calificado':'calificado','Visita coordinada':'visita-c','Visita realizada':'visita-r','Propuesta enviada':'propuesta','Descartado':'descartado','Convertido':'convertido'};
 const LEAD_DESCARTE=['No responde','No interesado','Ya cerró operación','Fuera de presupuesto','Datos inválidos','Otro'];
+// Ciclo de vida del Lead (independiente del pipeline `estado`):
+const LEAD_CLASIF=['Estándar','Calificado'];
+const LEAD_RESULTADOS=['Pendiente','Próspero','No Próspero'];
+const LEAD_INACT_DIAS=14;          // días en Pendiente hasta pasar a Inactivo
+const LEAD_ALERTA_DIAS=[10,13];    // recordatorios previos
+function leadClasifBadge(c){const s={'Calificado':'background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)','Estándar':'background:rgba(123,139,189,.12);color:#56648F;border:1px solid rgba(123,139,189,.3)'}[c]||'background:rgba(123,139,189,.12);color:#56648F;border:1px solid rgba(123,139,189,.3)';return c?`<span class="estado-badge" style="${s}">${esc(c)}</span>`:'<span style="color:#8898C0">–</span>';}
+function leadResultadoBadge(r){r=r||'Pendiente';const s={'Próspero':'background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)','No Próspero':'background:rgba(239,51,64,.1);color:#EF3340;border:1px solid rgba(239,51,64,.3)','Pendiente':'background:rgba(245,158,11,.12);color:#B45309;border:1px solid rgba(245,158,11,.3)'}[r];return `<span class="estado-badge" style="${s}">${esc(r)}</span>`;}
+function leadActividadBadge(e){e=e||'Activo';const on=e==='Activo';return `<span class="estado-badge" style="${on?'background:rgba(28,84,244,.1);color:#1C54F4;border:1px solid rgba(28,84,244,.3)':'background:rgba(123,139,189,.12);color:#8898C0;border:1px solid rgba(123,139,189,.3)'}">${on?'🟢 Activo':'⚪ Inactivo'}</span>`;}
+// Días que un lead lleva con resultado Pendiente (base: resultadoDesde o fechaCreacion).
+function _leadDiasPendiente(d){const base=_tsToDate(d.resultadoDesde)||_tsToDate(d.fechaCreacion);if(!base)return 0;return Math.floor((Date.now()-base.getTime())/864e5);}
 
 function leadEstadoBadge(e){const cls=LEAD_ESTADO_CLS[e]||'nuevo';return`<span class="lead-estado ${cls}">${e||'Nuevo'}</span>`;}
 function leadOrigenBadge(o){return o?`<span class="lead-origen">${o}</span>`:'–';}
@@ -7850,6 +7868,7 @@ async function loadLeads(){
     _leadDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
     document.getElementById('lead-subtitle').textContent=`${_leadDocs.length} lead${_leadDocs.length!==1?'s':''} registrados`;
     filterLeads();
+    _leadSweepInactividad();   // marca Inactivos y dispara recordatorios (día 10/13/14)
   }catch(e){
     document.getElementById('lead-table-wrap').innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
     document.getElementById('lead-subtitle').textContent='Error al cargar';
@@ -7979,6 +7998,7 @@ window.leadFichaEdit=function(docId){
           ${nxErow('Empresa',`<input id="lfe-empresa" class="cdr-input" placeholder="Buscar empresa en Cuentas..." autocomplete="off" value="${esc(d.empresa||d.cuentaNombre||'')}" oninput="ctaPickerInput('lfe',this.value)" onblur="ctaPickerBlur('lfe')"><div id="lfe-empresa-drop" class="cdr-ms-drop" style="display:none"></div><span id="lfe-empresa-tag" style="display:none;font-size:10.5px;color:#16A34A;font-weight:700;margin-top:3px"></span><input id="lfe-cuentaId" type="hidden" value="${esc(d.cuentaId||'')}"><input id="lfe-cuentaNombre" type="hidden" value="${esc(d.cuentaNombre||'')}">`)}
           ${nxErow('Inmueble consultado',`<input id="lfe-bld-q" class="cdr-input" placeholder="Buscar edificio..." autocomplete="off" value="${esc(d.buildingName||'')}" oninput="lfeBldSearch(this.value)" onblur="setTimeout(()=>{var l=document.getElementById('lfe-bld-list');if(l)l.style.display='none'},150)"><div id="lfe-bld-list" class="cdr-ms-drop" style="display:none"></div><input id="lfe-buildingId" type="hidden" value="${esc(d.buildingId||'')}"><input id="lfe-buildingName" type="hidden" value="${esc(d.buildingName||'')}">`)}
           ${nxErow('Tipo de inmueble',`<select id="lfe-tipoInmueble" class="cdr-select">${tipoOpts}</select>`)}
+          ${nxErow('Clasificación',`<select id="lfe-clasificacion" class="cdr-select">${['','Estándar','Calificado'].map(o=>`<option value="${esc(o)}"${(d.clasificacion||'')===o?' selected':''}>${o||'— Seleccionar —'}</option>`).join('')}</select>`)}
         </div>
         <div class="nx-card">
           <div class="nx-card-title">Comentarios</div>
@@ -8010,7 +8030,7 @@ window.leadFichaSave=async function(docId){
   const origen=gv('lfe-origen'),broker=gv('lfe-broker'),link=(gv('lfe-link')||'').trim();
   const mark=(id,bad)=>{const e=document.getElementById(id);if(e)e.style.borderColor=bad?'#ED1B34':'';};
   let ok=true;
-  [['lfe-nombre',!nombre],['lfe-apellido',!apellido],['lfe-email',!email],['lfe-origen',!origen],['lfe-broker',!broker],['lfe-link',!link]].forEach(([id,bad])=>{mark(id,bad);if(bad)ok=false;});
+  [['lfe-nombre',!nombre],['lfe-apellido',!apellido],['lfe-email',!email],['lfe-origen',!origen],['lfe-broker',!broker],['lfe-link',!link],['lfe-clasificacion',!gv('lfe-clasificacion')]].forEach(([id,bad])=>{mark(id,bad);if(bad)ok=false;});
   if(!ok)return;
   const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
   set('ldr-nombre',nombre);set('ldr-apellido',apellido);set('ldr-email',email);
@@ -8019,6 +8039,7 @@ window.leadFichaSave=async function(docId){
   set('ldr-tipoInmueble',gv('lfe-tipoInmueble'));set('ldr-origen',origen);set('ldr-broker',broker);
   set('ldr-buildingId',gv('lfe-buildingId'));set('ldr-buildingName',gv('lfe-buildingName'));
   set('ldr-link-origen',link);set('ldr-comentarios',gv('lfe-comentarios'));
+  set('ldr-clasificacion',gv('lfe-clasificacion'));
   _ldrEditId=docId;
   await saveLeadDrawer();
   if(_currentLeadId===docId)openLeadDetail(docId);
@@ -8030,7 +8051,8 @@ function openLeadDetail(docId){
   const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
   const bg=crmAvatarBg(fullname);const ini=crmInitials(fullname);
   const convertBtn=document.getElementById('lead-convert-btn');
-  if(convertBtn)convertBtn.style.display=d.estado==='Convertido'?'none':'inline-block';
+  // "Convertir a Contacto" solo cuando el Resultado es Próspero y aún no fue convertido.
+  if(convertBtn)convertBtn.style.display=(d.resultado==='Próspero'&&d.estado!=='Convertido')?'inline-block':'none';
   const editBtn=document.getElementById('lead-edit-btn');
   if(editBtn){editBtn.onclick=()=>leadFichaEdit(docId);}
   const archiveBtn=document.getElementById('lead-archive-btn');
@@ -8041,7 +8063,10 @@ function openLeadDetail(docId){
       <div class="crm-det-av-name">${fullname}</div>
       <div class="crm-det-av-email">${d.email||''}</div>
     </div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div>${leadEstadoBadge(d.estado)}</div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Clasificación</div>${leadClasifBadge(d.clasificacion)}</div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Resultado</div><span id="lead-resultado-badge">${leadResultadoBadge(d.resultado)}</span></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><span id="lead-actividad-badge">${leadActividadBadge(d.estadoActividad)}</span></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Pipeline</div>${leadEstadoBadge(d.estado)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Origen</div>${leadOrigenBadge(d.origen)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${d.empresa||'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${esc(ejecDisplay(d.brokerAsignado))||'–'}</div></div>
@@ -8065,6 +8090,16 @@ function openLeadDetail(docId){
     </div>
     <div class="crm-det-tab-body">
       <div id="ldt-info">
+        <div class="nx-card" style="margin-bottom:.9rem">
+          <div class="nx-card-title">Ciclo comercial</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.35rem 0 .6rem">
+            <span>${leadClasifBadge(d.clasificacion)}</span>
+            <span id="lead-resultado-badge2">${leadResultadoBadge(d.resultado)}</span>
+            <span id="lead-actividad-badge2">${leadActividadBadge(d.estadoActividad)}</span>
+          </div>
+          <div class="crm-det-meta-lbl" style="margin-bottom:.3rem">Resultado</div>
+          <select class="crm-estado-sel" onchange="updateLeadResultado('${docId}',this.value)">${LEAD_RESULTADOS.map(r=>`<option${(d.resultado||'Pendiente')===r?' selected':''}>${r}</option>`).join('')}</select>
+        </div>
         <div class="nx-card" style="margin-bottom:.9rem">
           <div class="nx-card-title">Pipeline</div>
           <select class="crm-estado-sel" style="margin-top:.2rem" onchange="updateLeadEstado('${docId}',this.value)">${estadoOpts}</select>
@@ -8159,21 +8194,90 @@ function leadDetTab(el,tabId){
 
 async function updateLeadEstado(docId,nuevoEstado){
   try{
-    await db.collection('leads').doc(docId).update({estado:nuevoEstado,ultimaActividad:firebase.firestore.Timestamp.now()});
-    await addLeadTimeline(docId,{tipo:'cambio_estado',descripcion:`Estado → ${nuevoEstado}`});
+    const now=firebase.firestore.Timestamp.now();
     const idx=_leadDocs.findIndex(d=>d._id===docId);
-    if(idx>=0)_leadDocs[idx].estado=nuevoEstado;
+    const d=idx>=0?_leadDocs[idx]:null;
+    const upd={estado:nuevoEstado,ultimaActividad:now};
+    // Reactivación: un cambio de pipeline es una acción comercial relevante.
+    let reactivado=false;
+    if(d&&d.estadoActividad==='Inactivo'){upd.estadoActividad='Activo';reactivado=true;}
+    await db.collection('leads').doc(docId).update(upd);
+    await addLeadTimeline(docId,{tipo:'cambio_estado',descripcion:`Estado → ${nuevoEstado}`});
+    if(reactivado){await addLeadTimeline(docId,{tipo:'reactivado',descripcion:'Lead reactivado (Activo) por actividad de pipeline'});const b=document.getElementById('lead-actividad-badge'),b2=document.getElementById('lead-actividad-badge2');if(b)b.innerHTML=leadActividadBadge('Activo');if(b2)b2.innerHTML=leadActividadBadge('Activo');}
+    if(idx>=0)_leadDocs[idx]={..._leadDocs[idx],...upd};
     const row=document.getElementById('lead-descarte-row');
     if(row)row.style.display=nuevoEstado==='Descartado'?'block':'none';
+    // El botón Convertir depende del Resultado (Próspero), no del pipeline.
     const convertBtn=document.getElementById('lead-convert-btn');
-    if(convertBtn)convertBtn.style.display=nuevoEstado==='Convertido'?'none':'inline-block';
+    if(convertBtn)convertBtn.style.display=((idx>=0?_leadDocs[idx].resultado:d?.resultado)==='Próspero'&&nuevoEstado!=='Convertido')?'inline-block':'none';
     const leftPanel=document.getElementById('lead-det-left');
     if(leftPanel){const badge=leftPanel.querySelector('.lead-estado');if(badge)badge.outerHTML=leadEstadoBadge(nuevoEstado);}
   }catch(e){alert('Error: '+e.message);}
 }
 
+// Actualiza el Resultado del Lead (Pendiente/Próspero/No Próspero). Reactiva si estaba Inactivo.
+async function updateLeadResultado(docId,valor){
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    const idx=_leadDocs.findIndex(d=>d._id===docId);
+    const d=idx>=0?_leadDocs[idx]:null;const prev=d?.resultado||'Pendiente';
+    const upd={resultado:valor,ultimaActividad:now};
+    if(valor==='Pendiente')upd.resultadoDesde=now;           // reinicia el conteo de inactividad
+    let reactivado=false;
+    if(d&&d.estadoActividad==='Inactivo'){upd.estadoActividad='Activo';reactivado=true;}
+    await db.collection('leads').doc(docId).update(upd);
+    if(idx>=0)_leadDocs[idx]={..._leadDocs[idx],...upd};
+    await addLeadTimeline(docId,{tipo:'cambio_resultado',descripcion:`Resultado: ${prev} → ${valor}`});
+    if(reactivado)await addLeadTimeline(docId,{tipo:'reactivado',descripcion:'Lead reactivado (Activo) por actualización de Resultado'});
+    if(valor==='No Próspero')await addLeadTimeline(docId,{tipo:'no_prospero',descripcion:'Lead marcado No Próspero — se conserva como registro histórico'});
+    // Actualizar badges visibles.
+    const estAct=(idx>=0?_leadDocs[idx].estadoActividad:'Activo')||'Activo';
+    ['lead-resultado-badge','lead-resultado-badge2'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=leadResultadoBadge(valor);});
+    ['lead-actividad-badge','lead-actividad-badge2'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=leadActividadBadge(estAct);});
+    const convertBtn=document.getElementById('lead-convert-btn');
+    if(convertBtn)convertBtn.style.display=(valor==='Próspero'&&d?.estado!=='Convertido')?'inline-block':'none';
+    if(typeof filterLeads==='function')filterLeads();
+  }catch(e){alert('Error: '+e.message);}
+}
+
 async function updateLeadMotivo(docId,motivo){
   try{await db.collection('leads').doc(docId).update({motivoDescarte:motivo});}catch(e){console.error(e);}
+}
+
+// Barrido de inactividad: marca Inactivo tras 14 días en Pendiente y dispara recordatorios (día 10 y 13).
+// Arquitectura lista para notificaciones por correo (ver _notifyLeadAlert).
+async function _leadSweepInactividad(){
+  if(!db||!Array.isArray(_leadDocs))return;
+  for(const d of _leadDocs){
+    if((d.estadoRegistro||'activo')==='archivado')continue;
+    if(d.estado==='Convertido')continue;
+    if((d.resultado||'Pendiente')!=='Pendiente')continue;
+    const dias=_leadDiasPendiente(d);
+    if(dias>=LEAD_INACT_DIAS){
+      if(d.estadoActividad!=='Inactivo'){
+        try{await db.collection('leads').doc(d._id).update({estadoActividad:'Inactivo'});d.estadoActividad='Inactivo';await addLeadTimeline(d._id,{tipo:'inactivo',descripcion:`Lead marcado Inactivo tras ${dias} días sin resolución`});}catch(e){}
+      }
+    }else{
+      const marks=Object.assign({},d.alertasSeguimiento||{});let changed=false;
+      for(const dd of LEAD_ALERTA_DIAS){if(dias>=dd&&!marks['d'+dd]){marks['d'+dd]=true;changed=true;_notifyLeadAlert(d,dd);}}
+      if(changed){try{await db.collection('leads').doc(d._id).update({alertasSeguimiento:marks});d.alertasSeguimiento=marks;}catch(e){}}
+    }
+  }
+  _renderLeadAlertBanner();
+}
+function _notifyLeadAlert(d,dia){
+  // TODO (futuro): enviar correo al ejecutivo responsable (d.brokerAsignado) vía EmailJS.
+  // Por ahora la alerta se muestra dentro de Nexus (banner en la lista de Leads).
+  console.log(`[lead-alerta] Día ${dia}: seguimiento pendiente de "${((d.nombre||'')+' '+(d.apellido||'')).trim()}" · ejecutivo ${d.brokerAsignado||'—'}`);
+}
+function _renderLeadAlertBanner(){
+  const el=document.getElementById('lead-alert-banner');if(!el)return;
+  const activos=_leadDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado');
+  const seguimiento=activos.filter(d=>(d.resultado||'Pendiente')==='Pendiente'&&d.estado!=='Convertido'&&d.estadoActividad!=='Inactivo'&&_leadDiasPendiente(d)>=LEAD_ALERTA_DIAS[0]);
+  const inactivos=activos.filter(d=>d.estadoActividad==='Inactivo');
+  if(!seguimiento.length&&!inactivos.length){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  el.innerHTML=`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.7rem .9rem;margin-bottom:.6rem;font-size:12.5px;color:#B45309">⚠ ${seguimiento.length} lead(s) pendientes requieren seguimiento${inactivos.length?` · ${inactivos.length} inactivo(s)`:''}. Actualizá el Resultado para reactivarlos.</div>`;
 }
 
 async function addLeadTimeline(docId,evento){
@@ -8192,7 +8296,7 @@ async function loadLeadTimeline(docId){
     const snap=await db.collection('leadTimeline').where('leadId','==',docId).get();
     const events=snap.docs.map(d=>d.data()).sort((a,b)=>_tsToDate(b.fecha)-_tsToDate(a.fecha));
     if(!events.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin eventos aún</div></div>';return;}
-    const iconMap={lead_creado:'🎯',broker_asignado:'👤',cambio_estado:'↗️',convertido:'✅',actualizado:'✏️',archivado:'📦'};
+    const iconMap={lead_creado:'🎯',broker_asignado:'👤',cambio_estado:'↗️',cambio_resultado:'🎚️',reactivado:'🔄',inactivo:'💤',no_prospero:'🚫',convertido:'✅',actualizado:'✏️',archivado:'📦'};
     body.innerHTML=`<div class="clt-timeline">${events.map(ev=>`
       <div class="clt-event">
         <div class="clt-event-dot" style="background:#1C54F4"></div>
@@ -8211,7 +8315,7 @@ async function loadLeadTimeline(docId){
 window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
   _ldrEditId=null;
   ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-bld-q','ldr-comentarios','ldr-link-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['ldr-tipoInmueble','ldr-origen','ldr-broker'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ldr-tipoInmueble','ldr-origen','ldr-broker','ldr-clasificacion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ldr-buildingId').value='';
   document.getElementById('ldr-buildingName').value='';
   ['ldr-cuentaId','ldr-cuentaNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -8249,6 +8353,7 @@ window.openLeadDrawer_edit=function(docId){
   set('ldr-telefono',d.telefono);set('ldr-empresa',d.empresa);set('ldr-puesto',d.puesto);
   if(d.cuentaId)_ctaPickerSet('ldr',d.cuentaId,d.cuentaNombre||d.empresa||'');
   set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
+  set('ldr-clasificacion',d.clasificacion);
   set('ldr-comentarios',d.comentarios);set('ldr-link-origen',d.linkOrigen);
   if(d.buildingId){document.getElementById('ldr-buildingId').value=d.buildingId;document.getElementById('ldr-buildingName').value=d.buildingName||'';document.getElementById('ldr-bld-q').value=d.buildingName||'';}
   document.querySelector('#ldr-drawer .cdr-title').textContent='Editar Lead';
@@ -8478,8 +8583,9 @@ window.saveLeadDrawer=async function(){
   const origen=document.getElementById('ldr-origen').value||'';
   const brokerAsignado=document.getElementById('ldr-broker').value||'';
   const linkOrigen=(document.getElementById('ldr-link-origen').value||'').trim();
+  const clasificacion=document.getElementById('ldr-clasificacion')?.value||'';
   let ok=true;
-  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-telefono',v:telefono},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-link-origen',v:linkOrigen}].forEach(({id,v})=>{
+  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-telefono',v:telefono},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-link-origen',v:linkOrigen},{id:'ldr-clasificacion',v:clasificacion}].forEach(({id,v})=>{
     const el=document.getElementById(id);if(!el)return;
     if(!v){el.style.borderColor='#ED1B34';ok=false;}else{el.style.borderColor='';}
   });
@@ -8500,11 +8606,12 @@ window.saveLeadDrawer=async function(){
       buildingName:document.getElementById('ldr-buildingName').value||'',
       brokerAsignado,
       linkOrigen,
+      clasificacion,
       comentarios:(document.getElementById('ldr-comentarios').value||'').trim(),
     };
     if(_ldrEditId){
       const oldD=_leadDocs.find(x=>x._id===_ldrEditId)||{};
-      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',cuentaNombre:'Cuenta',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',comentarios:'Comentarios',buildingName:'Inmueble'};
+      const labels={nombre:'Nombre',apellido:'Apellido',email:'Email',telefono:'Teléfono',empresa:'Empresa',cuentaNombre:'Cuenta',puesto:'Puesto',tipoInmueble:'Tipo inmueble',origen:'Origen',brokerAsignado:'Ejecutivo Comercial',linkOrigen:'Link de origen',clasificacion:'Clasificación',comentarios:'Comentarios',buildingName:'Inmueble'};
       const diffs=_diffFields(oldD,newData,labels);
       const updatePayload={...newData,ultimaActividad:now,ultimaModificacion:now,usuarioUltimaModificacion:user?.displayName||user?.email||''};
       await db.collection('leads').doc(_ldrEditId).update(updatePayload);
@@ -8518,9 +8625,9 @@ window.saveLeadDrawer=async function(){
       if(_currentLeadId===_ldrEditId)openLeadDetail(_ldrEditId);
       filterLeads();
     } else {
-      const createData={...newData,estado:'Nuevo',estadoRegistro:'activo',creadoPor:user?.displayName||user?.email||'',fechaCreacion:now,ultimaActividad:now};
+      const createData={...newData,estado:'Nuevo',resultado:'Pendiente',estadoActividad:'Activo',resultadoDesde:now,estadoRegistro:'activo',creadoPor:user?.displayName||user?.email||'',fechaCreacion:now,ultimaActividad:now};
       const ref=await db.collection('leads').add(createData);
-      await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen}`});
+      await addLeadTimeline(ref.id,{tipo:'lead_creado',descripcion:`Lead creado desde ${origen} · Clasificación: ${clasificacion} · Resultado: Pendiente`});
       if(newData.cuentaId)addClientTimeline(newData.cuentaId,{tipo:'lead_vinculado',descripcion:`Lead creado: ${(nombre+' '+apellido).trim()}${origen?' · '+origen:''}`});
       if(brokerAsignado)await addLeadTimeline(ref.id,{tipo:'broker_asignado',descripcion:`Ejecutivo Comercial asignado: ${brokerAsignado}`});
       _leadDocs.unshift({...createData,_id:ref.id});
@@ -8708,10 +8815,19 @@ window.openConvertModal=function(){
   document.getElementById('lc-opt-existente').classList.add('sel');
   document.getElementById('lc-opt-nueva').classList.remove('sel');
   document.getElementById('lc-search-wrap').style.display='block';
-  document.getElementById('lc-cuenta-q').value='';
-  document.getElementById('lc-cuentaId').value='';
-  document.getElementById('lc-cuentaNombre').value='';
   document.getElementById('lc-cuenta-list').style.display='none';
+  // Si el Lead ya tiene una Cuenta asociada (incluida la creada desde el propio Lead),
+  // se reutiliza automáticamente para no duplicar.
+  const lead=_leadDocs.find(d=>d._id===_currentLeadId);
+  if(lead&&lead.cuentaId){
+    document.getElementById('lc-cuentaId').value=lead.cuentaId;
+    document.getElementById('lc-cuentaNombre').value=lead.cuentaNombre||lead.empresa||'';
+    document.getElementById('lc-cuenta-q').value=lead.cuentaNombre||lead.empresa||'';
+  }else{
+    document.getElementById('lc-cuenta-q').value='';
+    document.getElementById('lc-cuentaId').value='';
+    document.getElementById('lc-cuentaNombre').value='';
+  }
   const btn=document.getElementById('lc-save-btn');btn.textContent='Convertir';btn.disabled=false;
   document.getElementById('lead-convert-overlay').classList.add('open');
 };

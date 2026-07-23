@@ -70,9 +70,11 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "1.1", FECHA,
-    "Permite registrar oportunidades entrantes (consultas de posibles interesados) para "
-    "hacerles seguimiento y, si corresponde, convertirlas en contactos y operaciones.",
+    "Leads", "2.0", FECHA,
+    "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
+    "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
+    "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
+    "(Pendiente/Próspero/No Próspero) y Estado (Activo/Inactivo).",
     [
         ("Nombre", "Nombre de la persona que hizo la consulta."),
         ("Apellido", "Apellido de la persona."),
@@ -81,16 +83,19 @@ GUIAS["Guia_Leads"] = Guia(
         ("Empresa", "Empresa del interesado. Se puede buscar entre las cuentas existentes. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin perder los datos del lead."),
         ("Puesto", "Puesto o rol de la persona (opcional)."),
         ("Tipo de inmueble", "Tipo de propiedad que busca (oficina, local, depósito, etc.)."),
+        ("Clasificación", "Obligatorio. Indicar la calidad del lead al ingresar: Estándar o Calificado. No tiene valor por defecto."),
         ("Origen", "Cómo llegó la consulta: Zonaprop, Argenprop, Mercado Libre, Referido, LinkedIn, Web, Llamado, Email u Otro."),
         ("Ejecutivo Comercial asignado", "Ejecutivo que se hará cargo del seguimiento del lead."),
         ("Inmueble de interés", "Buscar y seleccionar el edificio/inmueble por el que consulta (opcional)."),
         ("Link de origen", "Pegar el enlace del aviso o publicación de donde surgió la consulta."),
         ("Comentarios", "Observaciones: superficie buscada, urgencia, detalles de la consulta."),
+        ("Resultado (en la ficha)", "Se crea como Pendiente. Luego se actualiza a Próspero o No Próspero. Cuando es Próspero aparece la acción \"Convertir a Contacto\"; No Próspero conserva el lead como registro histórico."),
     ],
     [
-        "Se crea el Lead y queda asignado al ejecutivo indicado.",
-        "Aparece en el listado de Leads para hacerle seguimiento.",
-        "Puede editarse o convertirse en contacto más adelante.",
+        "Se crea el Lead con Resultado Pendiente y Estado Activo, asignado al ejecutivo indicado.",
+        "Si pasa 14 días en Pendiente sin resolución, el lead pasa automáticamente a Inactivo (con recordatorios previos en los días 10 y 13). No se elimina.",
+        "Al actualizar el Resultado (u otra acción comercial), un lead Inactivo vuelve a Activo.",
+        "Con Resultado Próspero se puede convertir en Contacto reutilizando la cuenta asociada, sin duplicar información; el lead queda como registro histórico.",
     ],
 )
 
