@@ -16,7 +16,7 @@ GUIAS = {}
 
 # ─────────────────────────── CUENTAS ───────────────────────────
 GUIAS["Guia_Cuentas"] = Guia(
-    "Cuentas", "1.1", FECHA,
+    "Cuentas", "1.2", FECHA,
     "Permite dar de alta y mantener las cuentas (empresas) con las que trabaja Colliers. "
     "Es la base del CRM: sobre las cuentas se cargan contactos, visitas y actividad comercial. "
     "Los usuarios comerciales ven un formulario reducido (Nombre comercial, Cliente Colliers, "
@@ -36,14 +36,16 @@ GUIAS["Guia_Cuentas"] = Guia(
         "Se crea la Cuenta.",
         "Queda disponible para todos los usuarios autorizados.",
         "Puede editarse posteriormente según permisos.",
+        "La ficha de la cuenta incluye una solapa Comentarios con historial cronológico.",
     ],
 )
 
 # ─────────────────────────── CONTACTOS ───────────────────────────
 GUIAS["Guia_Contactos"] = Guia(
-    "Contactos", "1.1", FECHA,
-    "Permite registrar personas (contactos) y vincularlas a una cuenta. Sirve para tener "
-    "la información de las personas con las que se gestiona cada empresa.",
+    "Contactos", "2.0", FECHA,
+    "Permite registrar personas (contactos) y vincularlas a una cuenta. La ficha del contacto "
+    "usa el mismo estilo que Cuentas, con solapas de Información General, Comentarios, "
+    "Actividades, Inventario y Timeline.",
     [
         ("Cuenta asociada", "Buscar y seleccionar la empresa a la que pertenece el contacto. Si la empresa no existe todavía, al final de la lista aparece la opción \"➕ Crear nueva cuenta\": se crea en el momento, sin salir del formulario, y queda seleccionada."),
         ("Nombre", "Nombre de pila de la persona."),
@@ -51,17 +53,18 @@ GUIAS["Guia_Contactos"] = Guia(
         ("Cargo segmentado", "Seleccionar el tipo de cargo: CEO, CFO, Compras, Real Estate u Otro."),
         ("Puesto", "Escribir el puesto tal cual figura (por ejemplo: Director Comercial). Campo libre."),
         ("Especificar cargo", "Solo si en Cargo se eligió \"Otro\": escribir el cargo concreto."),
+        ("Inversor", "Indicar si la persona es inversor (Sí/No). Disponible solo para administradores."),
         ("Correo electrónico", "Email de la persona."),
-        ("Estado del correo", "Indicar si el correo está Sin comprobar, Funcional o Rebotado. Disponible solo para administradores."),
-        ("Teléfono", "Número de celular, sin el 11 y sin espacios (por ejemplo: 1551234567)."),
+        ("Estado del correo", "Indica si el correo es Funcional, Rebotado o Sin comprobar. Los ejecutivos comerciales no lo editan: se actualiza mediante importaciones masivas y los administradores pueden ajustarlo."),
+        ("Teléfono", "Número de celular, sin el 11 y sin espacios (por ejemplo: 1551234567). Por privacidad, el teléfono solo lo ven el creador del contacto, los ejecutivos asignados y los administradores."),
         ("LinkedIn", "Dirección del perfil de LinkedIn. Disponible solo para administradores."),
         ("Ejecutivo(s) Comercial(es)", "Asignar hasta 3 ejecutivos responsables del contacto. Disponible solo para administradores."),
-        ("Comentarios", "Observaciones o contexto comercial de la persona."),
+        ("Comentarios", "Observaciones sobre el contacto. La ficha tiene además una solapa Comentarios con historial cronológico, donde cualquier usuario puede sumar comentarios."),
     ],
     [
         "Se crea el Contacto y queda vinculado a la cuenta elegida.",
         "Aparece en la ficha de la cuenta, dentro de la solapa Contactos.",
-        "Puede editarse posteriormente según permisos.",
+        "Los ejecutivos comerciales pueden crear contactos, ver todos, registrar actividades y agregar comentarios; la edición y la administración quedan a cargo de los administradores.",
     ],
 )
 
