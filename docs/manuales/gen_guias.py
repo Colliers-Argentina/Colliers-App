@@ -70,7 +70,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "2.0", FECHA,
+    "Leads", "2.1", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
     "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
     "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
@@ -78,8 +78,8 @@ GUIAS["Guia_Leads"] = Guia(
     [
         ("Nombre", "Nombre de la persona que hizo la consulta."),
         ("Apellido", "Apellido de la persona."),
-        ("Email", "Correo electrónico de contacto."),
-        ("Teléfono móvil", "Número de celular de la persona."),
+        ("Email", "Correo electrónico de contacto (opcional). Si se completa, debe tener formato válido."),
+        ("Teléfono móvil", "Número de celular de la persona (opcional). Se puede completar más adelante."),
         ("Empresa", "Empresa del interesado. Se puede buscar entre las cuentas existentes. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin perder los datos del lead."),
         ("Puesto", "Puesto o rol de la persona (opcional)."),
         ("Tipo de inmueble", "Tipo de propiedad que busca (oficina, local, depósito, etc.)."),
@@ -87,7 +87,7 @@ GUIAS["Guia_Leads"] = Guia(
         ("Origen", "Cómo llegó la consulta: Zonaprop, Argenprop, Mercado Libre, Referido, LinkedIn, Web, Llamado, Email u Otro."),
         ("Ejecutivo Comercial asignado", "Ejecutivo que se hará cargo del seguimiento del lead."),
         ("Inmueble de interés", "Buscar y seleccionar el edificio/inmueble por el que consulta (opcional)."),
-        ("Link de origen", "Pegar el enlace del aviso o publicación de donde surgió la consulta."),
+        ("Link de origen", "Pegar el enlace del aviso o publicación de donde surgió la consulta (opcional). Si se completa, debe ser una URL válida."),
         ("Comentarios", "Observaciones: superficie buscada, urgencia, detalles de la consulta."),
         ("Resultado (en la ficha)", "Se crea como Pendiente. Luego se actualiza a Próspero o No Próspero. Cuando es Próspero aparece la acción \"Convertir a Contacto\"; No Próspero conserva el lead como registro histórico."),
     ],

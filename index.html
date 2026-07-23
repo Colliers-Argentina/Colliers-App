@@ -3023,8 +3023,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div class="cdr-field"><div class="cdr-lbl">Apellido <span class="cdr-req">*</span></div><input id="ldr-apellido" class="cdr-input" type="text" placeholder="Apellido" autocomplete="off"></div>
         </div>
         <div class="cdr-row">
-          <div class="cdr-field"><div class="cdr-lbl">Email <span class="cdr-req">*</span></div><input id="ldr-email" class="cdr-input" type="email" placeholder="nombre@empresa.com" autocomplete="off"></div>
-          <div class="cdr-field"><div class="cdr-lbl">Teléfono móvil <span class="cdr-req">*</span></div><input id="ldr-telefono" class="cdr-input" type="tel" placeholder="+54 9 11..."></div>
+          <div class="cdr-field"><div class="cdr-lbl">Email</div><input id="ldr-email" class="cdr-input" type="email" placeholder="nombre@empresa.com" autocomplete="off"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Teléfono móvil</div><input id="ldr-telefono" class="cdr-input" type="tel" placeholder="+54 9 11..."></div>
         </div>
         <div class="cdr-row">
           <div class="cdr-field"><div class="cdr-lbl">Empresa</div>
@@ -3076,7 +3076,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="ldr-buildingId" type="hidden"><input id="ldr-buildingName" type="hidden">
         </div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Link de origen <span class="cdr-req">*</span></div>
+          <div class="cdr-lbl">Link de origen</div>
           <input id="ldr-link-origen" class="cdr-input" type="url" placeholder="https://www.zonaprop.com.ar/..." autocomplete="off">
         </div>
       </div>
@@ -8034,7 +8034,10 @@ window.leadFichaSave=async function(docId){
   const origen=gv('lfe-origen'),broker=gv('lfe-broker'),link=(gv('lfe-link')||'').trim();
   const mark=(id,bad)=>{const e=document.getElementById(id);if(e)e.style.borderColor=bad?'#ED1B34':'';};
   let ok=true;
-  [['lfe-nombre',!nombre],['lfe-apellido',!apellido],['lfe-email',!email],['lfe-origen',!origen],['lfe-broker',!broker],['lfe-link',!link],['lfe-clasificacion',!gv('lfe-clasificacion')]].forEach(([id,bad])=>{mark(id,bad);if(bad)ok=false;});
+  // Email y Link de origen son opcionales; se validan solo por formato si se completan.
+  [['lfe-nombre',!nombre],['lfe-apellido',!apellido],['lfe-origen',!origen],['lfe-broker',!broker],['lfe-clasificacion',!gv('lfe-clasificacion')]].forEach(([id,bad])=>{mark(id,bad);if(bad)ok=false;});
+  const tel=(gv('lfe-telefono')||'').trim();
+  [['lfe-email',!!email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)],['lfe-telefono',!!tel&&!/^[\d\s()+-]{6,}$/.test(tel)],['lfe-link',!!link&&!/^https?:\/\/.+/i.test(link)]].forEach(([id,bad])=>{mark(id,bad);if(bad)ok=false;});
   if(!ok)return;
   const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
   set('ldr-nombre',nombre);set('ldr-apellido',apellido);set('ldr-email',email);
@@ -8583,10 +8586,17 @@ window.saveLeadDrawer=async function(){
   const linkOrigen=(document.getElementById('ldr-link-origen').value||'').trim();
   const clasificacion=document.getElementById('ldr-clasificacion')?.value||'';
   let ok=true;
-  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-telefono',v:telefono},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-link-origen',v:linkOrigen},{id:'ldr-clasificacion',v:clasificacion}].forEach(({id,v})=>{
+  // Obligatorios: Nombre, Apellido, Origen, Ejecutivo y Clasificación.
+  // Teléfono, Email y Link de origen son opcionales (se completan durante la gestión).
+  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-clasificacion',v:clasificacion}].forEach(({id,v})=>{
     const el=document.getElementById(id);if(!el)return;
     if(!v){el.style.borderColor='#ED1B34';ok=false;}else{el.style.borderColor='';}
   });
+  // Validación de formato SOLO si el campo opcional fue completado.
+  const markFmt=(id,bad)=>{const el=document.getElementById(id);if(el)el.style.borderColor=bad?'#ED1B34':'';if(bad)ok=false;};
+  markFmt('ldr-email',!!email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  markFmt('ldr-telefono',!!telefono&&!/^[\d\s()+-]{6,}$/.test(telefono));
+  markFmt('ldr-link-origen',!!linkOrigen&&!/^https?:\/\/.+/i.test(linkOrigen));
   if(!ok)return;
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('ldr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
