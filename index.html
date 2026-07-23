@@ -2997,7 +2997,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <div class="cdr-row">
           <div class="cdr-field"><div class="cdr-lbl">Email <span class="cdr-req">*</span></div><input id="ldr-email" class="cdr-input" type="email" placeholder="nombre@empresa.com" autocomplete="off"></div>
-          <div class="cdr-field"><div class="cdr-lbl">Teléfono móvil</div><input id="ldr-telefono" class="cdr-input" type="tel" placeholder="+54 9 11..."></div>
+          <div class="cdr-field"><div class="cdr-lbl">Teléfono móvil <span class="cdr-req">*</span></div><input id="ldr-telefono" class="cdr-input" type="tel" placeholder="+54 9 11..."></div>
         </div>
         <div class="cdr-row">
           <div class="cdr-field"><div class="cdr-lbl">Empresa</div>
@@ -8069,11 +8069,12 @@ window.saveLeadDrawer=async function(){
   const nombre=(document.getElementById('ldr-nombre').value||'').trim();
   const apellido=(document.getElementById('ldr-apellido').value||'').trim();
   const email=(document.getElementById('ldr-email').value||'').trim();
+  const telefono=(document.getElementById('ldr-telefono').value||'').trim();
   const origen=document.getElementById('ldr-origen').value||'';
   const brokerAsignado=document.getElementById('ldr-broker').value||'';
   const linkOrigen=(document.getElementById('ldr-link-origen').value||'').trim();
   let ok=true;
-  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-link-origen',v:linkOrigen}].forEach(({id,v})=>{
+  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-email',v:email},{id:'ldr-telefono',v:telefono},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-link-origen',v:linkOrigen}].forEach(({id,v})=>{
     const el=document.getElementById(id);if(!el)return;
     if(!v){el.style.borderColor='#ED1B34';ok=false;}else{el.style.borderColor='';}
   });
@@ -8084,7 +8085,7 @@ window.saveLeadDrawer=async function(){
     const now=firebase.firestore.Timestamp.now();
     const newData={
       nombre,apellido,email,origen,
-      telefono:(document.getElementById('ldr-telefono').value||'').trim(),
+      telefono,
       empresa:(document.getElementById('ldr-empresa').value||'').trim(),
       cuentaId:document.getElementById('ldr-cuentaId').value||'',
       cuentaNombre:document.getElementById('ldr-cuentaNombre').value||'',
