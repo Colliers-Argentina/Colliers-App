@@ -992,7 +992,10 @@ body.dark .gen-close-btn:hover{background:rgba(239,51,64,.12);border-color:rgba(
 body.dark .bld-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)}
 .bld-kpi.filtered{border-color:rgba(28,84,244,.35);box-shadow:0 0 0 1px rgba(28,84,244,.15),0 4px 16px rgba(28,84,244,.1)}
 body.dark .bld-kpi.filtered{border-color:rgba(77,147,255,.4);box-shadow:0 0 0 1px rgba(77,147,255,.15),0 4px 20px rgba(28,84,244,.2)}
-.bld-kpi-icon{font-size:14px;line-height:1}
+.bld-kpi-icon{font-size:14px;line-height:1;color:#1C54F4;display:flex;align-items:center}
+.bld-kpi-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.dark .bld-kpi-icon{color:#4D93FF}
+.bld-btn svg,#bld-map-recalc-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2.5px;margin-right:5px}
 .bld-kpi-v{font-size:22px;font-weight:700;color:#0A1B4D;line-height:1;transition:color .2s}
 body.dark .bld-kpi-v{color:#fff}
 .bld-kpi.filtered .bld-kpi-v{color:#1C54F4}
@@ -3486,9 +3489,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <div class="bld-subtitle" id="bld-subtitle">Cargando...</div>
           </div>
           <div class="bld-hz-r">
-            <button class="bld-btn bld-btn-primary" onclick="_bldNewAction()" id="bld-new-btn">＋ Nuevo Edificio</button>
-            <button class="bld-btn" onclick="syncSheetToFirestore()" id="bld-import-btn">⬇ Importar Sheets</button>
-            <button id="bld-crm-links-btn" class="bld-btn" style="display:none" onclick="openCrmLinksModal()">🔗 CRM Links</button>
+            <button class="bld-btn bld-btn-primary" onclick="_bldNewAction()" id="bld-new-btn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo Edificio</button>
+            <button class="bld-btn" onclick="syncSheetToFirestore()" id="bld-import-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importar Sheets</button>
+            <button id="bld-crm-links-btn" class="bld-btn" style="display:none" onclick="openCrmLinksModal()"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>CRM Links</button>
             <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
             <button onclick="showModule('home')" class="bld-close-btn">✕ Cerrar</button>
           </div>
@@ -3516,7 +3519,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <div class="bld-map-stat"><span class="bld-map-stat-val" id="bld-map-stat-ok" style="color:#22C55E">—</span><span class="bld-map-stat-lbl">con coords</span></div>
             <div class="bld-map-vsep"></div>
             <div class="bld-map-stat"><span class="bld-map-stat-val" id="bld-map-stat-nok" style="color:#F59E0B">—</span><span class="bld-map-stat-lbl">sin coords</span></div>
-            <button id="bld-map-recalc-btn" onclick="recalcAllCoords()">⟳ Recalcular coordenadas</button>
+            <button id="bld-map-recalc-btn" onclick="recalcAllCoords()"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Recalcular coordenadas</button>
           </div>
           <div id="bld-map-el"></div>
         </div>
@@ -9950,10 +9953,10 @@ function renderBldKPIs(docs){
     const totalCubiertos=src.reduce((s,d)=>s+(Number(d.superficieCubierta)||Number(d.superficieTotal)||0),0);
     const corredores=new Set(src.map(d=>d.corredor||d.zona).filter(Boolean)).size;
     row.innerHTML=`
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏭</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Activos${isFiltered?' en vista':' totales'}</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v pop">${totalCubiertos.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² cubiertos</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${corredores}</div><div class="bld-kpi-l">Corredor${corredores!==1?'es':''}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('industrial')}</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Activos${isFiltered?' en vista':' totales'}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('check')}</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('area')}</div><div class="bld-kpi-v pop">${totalCubiertos.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² cubiertos</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('mapa')}</div><div class="bld-kpi-v pop">${corredores}</div><div class="bld-kpi-l">Corredor${corredores!==1?'es':''}</div></div>
     `;
   } else if(_bldAssetType==='retail'){
     const disponibles=src.filter(d=>d.disponible!==false&&(!d.estado||d.estado==='Disponible')).length;
@@ -9961,20 +9964,20 @@ function renderBldKPIs(docs){
     const alqProm=alqValues.length?Math.round(alqValues.reduce((a,b)=>a+b,0)/alqValues.length):0;
     const corredores=new Set(src.map(d=>d.corredor||d.zona).filter(Boolean)).size;
     row.innerHTML=`
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏪</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Locales${isFiltered?' en vista':' totales'}</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">💵</div><div class="bld-kpi-v pop">${alqProm?'USD '+alqProm.toLocaleString('es-AR'):'–'}</div><div class="bld-kpi-l">Alq. promedio/mes</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${corredores}</div><div class="bld-kpi-l">Corredor${corredores!==1?'es':''}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('retail')}</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Locales${isFiltered?' en vista':' totales'}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('check')}</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('money')}</div><div class="bld-kpi-v pop">${alqProm?'USD '+alqProm.toLocaleString('es-AR'):'–'}</div><div class="bld-kpi-l">Alq. promedio/mes</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('mapa')}</div><div class="bld-kpi-v pop">${corredores}</div><div class="bld-kpi-l">Corredor${corredores!==1?'es':''}</div></div>
     `;
   } else {
     const disponibles=src.filter(d=>!d.estado||d.estado==='Disponible').length;
     const totalM2=src.reduce((s,d)=>s+(Number(d.superficieDisponible)||0),0);
     const zonas=new Set(src.map(d=>d.zona||d.submercado).filter(Boolean)).size;
     row.innerHTML=`
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🏢</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Edificios${isFiltered?' en vista':' totales'}</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">✅</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">📐</div><div class="bld-kpi-v pop">${totalM2.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² disp.${isFiltered?' (vista)':''}</div></div>
-      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">🗺</div><div class="bld-kpi-v pop">${zonas}</div><div class="bld-kpi-l">Zona${zonas!==1?'s':''} activa${zonas!==1?'s':''}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('oficinas')}</div><div class="bld-kpi-v pop">${total}</div><div class="bld-kpi-l">Edificios${isFiltered?' en vista':' totales'}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('check')}</div><div class="bld-kpi-v pop">${disponibles}</div><div class="bld-kpi-l">Disponibles</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('area')}</div><div class="bld-kpi-v pop">${totalM2.toLocaleString('es-AR')}</div><div class="bld-kpi-l">m² disp.${isFiltered?' (vista)':''}</div></div>
+      <div class="bld-kpi${fc}"><div class="bld-kpi-icon">${nxIcon('mapa')}</div><div class="bld-kpi-v pop">${zonas}</div><div class="bld-kpi-l">Zona${zonas!==1?'s':''} activa${zonas!==1?'s':''}</div></div>
     `;
   }
 }
@@ -11160,9 +11163,9 @@ function _bldNewAction(){
 }
 function _bldAdaptUI(){
   const cfg={
-    office:   {title:'Oficinas',     btn:'＋ Nuevo Edificio',          back:'← Oficinas'},
-    industrial:{title:'Industrial',  btn:'＋ Nuevo Activo Industrial',  back:'← Industrial'},
-    retail:   {title:'Retail',       btn:'＋ Nuevo Local',              back:'← Retail'},
+    office:   {title:'Oficinas',     btn:'Nuevo Edificio',          back:'← Oficinas'},
+    industrial:{title:'Industrial',  btn:'Nuevo Activo Industrial',  back:'← Industrial'},
+    retail:   {title:'Retail',       btn:'Nuevo Local',              back:'← Retail'},
   };
   const c=cfg[_bldAssetType]||cfg.office;
   const t=document.getElementById('bld-title');
@@ -11170,7 +11173,7 @@ function _bldAdaptUI(){
   const bk=document.getElementById('bld-det-back-btn');
   const imp=document.getElementById('bld-import-btn');
   if(t)t.textContent=c.title;
-  if(b)b.textContent=c.btn;
+  if(b)b.innerHTML='<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'+esc(c.btn);
   if(bk)bk.textContent=c.back;
   if(imp)imp.style.display=_bldAssetType==='office'?'':'none';
   _bldRenderFilterBar();
@@ -13117,6 +13120,10 @@ const NX_ICON={
   nuevaVisita:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0110.5-7.6"/><circle cx="11" cy="10" r="2.5"/><line x1="19" y1="2.5" x2="19" y2="8.5"/><line x1="16" y1="5.5" x2="22" y2="5.5"/>',
   ppts:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
   analytics:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>',
+  check:'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  area:'<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>',
+  mapa:'<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>',
+  money:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
 };
 function nxIcon(key){return NX_ICON[key]?`<svg viewBox="0 0 24 24">${NX_ICON[key]}</svg>`:'';}
 function _hubCardHTML(c){
