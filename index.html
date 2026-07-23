@@ -7206,11 +7206,15 @@ function openContactoDetail(docId){
   const bg=crmAvatarBg(fullname);
   const ini=crmInitials(fullname);
   // Panel izquierdo (mismo diseño que Cuentas): solo resumen esencial.
+  const cuentaVal=d.cuentaNombre
+    ?`<div class="crm-det-meta-val" style="color:#1C54F4;cursor:pointer" onclick="openClientDetail('${esc(d.cuentaId||'')}')">${esc(d.cuentaNombre)}</div>`
+    :'<div class="crm-det-meta-val" style="color:#8898C0">Sin cuenta asociada</div>';
   document.getElementById('cto-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       <div class="crm-det-av" style="background:${bg};border-radius:50%">${ini}</div>
       <div class="crm-det-av-name">${fullname}</div>
     </div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta asociada</div>${cuentaVal}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado del correo</div>${emailBadge(d.estadoCorreo)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
@@ -8057,23 +8061,17 @@ function openLeadDetail(docId){
   if(editBtn){editBtn.onclick=()=>leadFichaEdit(docId);}
   const archiveBtn=document.getElementById('lead-archive-btn');
   if(archiveBtn){archiveBtn.onclick=()=>archiveLead(docId);}
+  // Panel izquierdo (mismo diseño que Cuentas/Contactos): solo resumen esencial.
   document.getElementById('lead-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       <div class="crm-det-av" style="background:${bg}">${ini}</div>
       <div class="crm-det-av-name">${fullname}</div>
-      <div class="crm-det-av-email">${d.email||''}</div>
     </div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><span id="lead-actividad-badge">${leadActividadBadge(d.estadoActividad)}</span></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Clasificación</div>${leadClasifBadge(d.clasificacion)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Resultado</div><span id="lead-resultado-badge">${leadResultadoBadge(d.resultado)}</span></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><span id="lead-actividad-badge">${leadActividadBadge(d.estadoActividad)}</span></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Pipeline</div>${leadEstadoBadge(d.estado)}</div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Origen</div>${leadOrigenBadge(d.origen)}</div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${d.empresa||'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo Comercial asignado</div><div class="crm-det-meta-val">${esc(ejecDisplay(d.brokerAsignado))||'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.buildingName||'–'}</div></div>
-    ${d.linkOrigen?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Link de origen</div><div class="crm-det-meta-val" style="word-break:break-all"><a href="${d.linkOrigen}" target="_blank" rel="noopener" style="color:#1C54F4;text-decoration:none;font-size:11px">${d.linkOrigen}</a></div></div>`:''}
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
-    ${d.ultimaModificacion?`<div class="crm-det-meta-item" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF3FF"><div class="crm-det-meta-lbl">Última modificación</div><div class="crm-det-meta-val" style="font-size:10.5px">${fmtDate(d.ultimaModificacion)}${d.usuarioUltimaModificacion?' · '+d.usuarioUltimaModificacion:''}</div></div>`:''}
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
   `;
   const estadoOpts=LEAD_ESTADOS.map(e=>`<option${d.estado===e?' selected':''}>${e}</option>`).join('');
   const descarteRow=`<div id="lead-descarte-row" style="display:${d.estado==='Descartado'?'block':'none'};margin-top:.75rem">
