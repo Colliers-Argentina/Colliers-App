@@ -13095,6 +13095,7 @@ const NX_ICON={
   cuentas:'<path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/><line x1="8" y1="16" x2="11" y2="16"/>',
   contactos:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   visitas:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
+  nuevaVisita:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0110.5-7.6"/><circle cx="11" cy="10" r="2.5"/><line x1="19" y1="2.5" x2="19" y2="8.5"/><line x1="16" y1="5.5" x2="22" y2="5.5"/>',
   ppts:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
   analytics:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>',
 };
@@ -13129,7 +13130,7 @@ function renderHubCards(){
     {iconKey:'leads',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
     {iconKey:'cuentas',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'activas'}]},
     {iconKey:'contactos',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
-    {iconKey:'visitas',title:'Nueva Visita',action:'openVisitaDrawer()',btn:'Registrar'},
+    {iconKey:'nuevaVisita',title:'Nueva Visita',action:'openVisitaDrawer()',btn:'Registrar'},
     {iconKey:'ppts',title:'PPTs',mod:'generator',btn:'Crear PPT',stats:[{id:'hc-ppt-30d',lbl:'últimos 30d'}]},
   ];
   if(isAdmin)cards.push({iconKey:'analytics',title:'Analytics',mod:'analytics',btn:'Abrir',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
