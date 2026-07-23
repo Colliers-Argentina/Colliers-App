@@ -124,3 +124,18 @@ sed -n "$((SCRIPT_START+1)),$((SCRIPT_END-1))p" index.html > /tmp/check.mjs && n
 - Sin manejo de errores para escenarios imposibles
 - CSS inline en JS para elementos generados dinámicamente (template literals)
 - Timestamps de Firestore: siempre usar `_tsToDate(ts)` para convertir, `firebase.firestore.Timestamp.now()` para crear
+
+## Manuales de Usuario (regla permanente)
+
+Cada vez que se implemente **un formulario nuevo** o **una modificación relevante**,
+además del desarrollo hay que **generar/actualizar su Manual de Usuario** en `docs/manuales/`.
+
+- Formato: **DOCX + PDF** (ambos, generados por código desde el mismo contenido).
+- Estructura de 10 secciones: 1) Portada (logo, módulo, versión, fecha) · 2) Objetivo ·
+  3) Paso a paso · 4) Capturas numeradas · 5) Campos · 6) Validaciones y reglas de negocio ·
+  7) Buenas prácticas · 8) Resultado esperado · 9) FAQ · 10) Historial de cambios.
+- Si el manual **ya existe, se actualiza** (nueva versión + fila en Historial), no se duplica.
+- Motor: `docs/manuales/manual_base.py`; contenido por manual: `gen_manual_<modulo>.py`.
+- Deps: `pip install python-docx reportlab`. PDF vía reportlab (LibreOffice headless no
+  funciona en este entorno). Las capturas van como marcadores `[ CAPTURA n ]` a completar
+  con la imagen real (no hay screenshots automáticos: la app requiere login Google + Firebase).
