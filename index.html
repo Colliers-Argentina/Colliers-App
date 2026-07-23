@@ -4001,6 +4001,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div class="bld-det-main-tabs">
         <button class="bld-det-main-tab active" id="bld-main-tab-info" onclick="switchBldMainTab('info')">Información</button>
         <button class="bld-det-main-tab" id="bld-main-tab-units" onclick="switchBldMainTab('units')">Componentes <span class="bld-det-main-cnt" id="bld-det-unit-count">0</span></button>
+        <button class="bld-det-main-tab" id="bld-main-tab-actividades" onclick="switchBldMainTab('actividades')">Actividades <span class="bld-det-main-cnt" id="bld-det-act-count">0</span></button>
         <button class="bld-det-main-tab" id="bld-main-tab-timeline" onclick="switchBldMainTab('timeline')">Timeline</button>
         <button class="bld-det-main-tab" id="bld-main-tab-docs" onclick="switchBldMainTab('docs')">Documentos</button>
         <button class="bld-det-main-tab" id="bld-main-tab-ficha" onclick="switchBldMainTab('ficha')" style="color:#1C54F4;font-weight:700">Ficha ✦</button>
@@ -4020,6 +4021,10 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <div class="bld-det-tbl-wrap" id="bld-det-tbl-wrap">
           <div class="det-unit-empty">Cargando...</div>
         </div>
+      </div>
+      <!-- ACTIVIDADES PANEL (Visitas vinculadas al inmueble) -->
+      <div id="bld-det-panel-actividades" style="display:none;flex:1;overflow-y:auto;padding:1.25rem 1.5rem">
+        <div id="bld-actividades-body"><div class="det-unit-empty">Cargando actividades...</div></div>
       </div>
       <!-- PHASE 1: TIMELINE PANEL -->
       <div id="bld-det-panel-timeline" style="display:none;flex:1;overflow-y:auto;padding:1.25rem 1.5rem">
@@ -10061,6 +10066,13 @@ function openBuildingEditor(docId){
   _applyBldSidebarState();
   switchBldMainTab('info');
   loadUnits(docId);
+  _loadBldActCount(docId);
+}
+// Precarga el contador de la solapa Actividades (visitas) sin abrir la solapa.
+async function _loadBldActCount(buildingId){
+  const cnt=document.getElementById('bld-det-act-count');if(!cnt||!db)return;
+  try{const snap=await db.collection('visitas').where('buildingId','==',buildingId).get();cnt.textContent=snap.size;}
+  catch(e){}
 }
 
 function bldEdTab(el,tabId){
@@ -12170,13 +12182,14 @@ async function loadBuildingHistory(buildingId){
 }
 
 function switchBldMainTab(panel){
-  ['info','units','timeline','docs','ficha'].forEach(p=>{
+  ['info','units','actividades','timeline','docs','ficha'].forEach(p=>{
     const btn=document.getElementById('bld-main-tab-'+p);
     const pnl=document.getElementById('bld-det-panel-'+p);
     if(btn)btn.classList.toggle('active',p===panel);
     if(pnl)pnl.style.display=p===panel?(p==='units'?'flex':'block'):'none';
   });
   if(panel==='info')renderBldInfoTab(window._bldEditId);
+  if(panel==='actividades')loadBldActividades(window._bldEditId);
   if(panel==='timeline')loadBldTimeline(window._bldEditId);
   if(panel==='docs')loadBldDocs(window._bldEditId);
   if(panel==='ficha')loadBldFicha(window._bldEditId);
@@ -13342,6 +13355,35 @@ async function addBldTimelineEvent(buildingId,tipo,descripcion,detalle){
       fecha:firebase.firestore.Timestamp.now()
     });
   }catch(e){console.error('[bldTimeline]',e);}
+}
+
+// Solapa Actividades del Inmueble: lista las Visitas vinculadas por buildingId.
+async function loadBldActividades(buildingId){
+  const body=document.getElementById('bld-actividades-body');
+  if(!body||!db)return;
+  body.innerHTML='<div class="det-unit-empty">Cargando actividades...</div>';
+  try{
+    const snap=await db.collection('visitas').where('buildingId','==',buildingId).get();
+    const docs=snap.docs.map(d=>({_id:d.id,...d.data()}))
+      .sort((a,b)=>{const ta=_tsToDate(a.fecha),tb=_tsToDate(b.fecha);return (tb?tb.getTime():0)-(ta?ta.getTime():0);});
+    const cnt=document.getElementById('bld-det-act-count');if(cnt)cnt.textContent=docs.length;
+    if(!docs.length){body.innerHTML='<div class="det-unit-empty">Sin visitas registradas sobre este inmueble.</div>';return;}
+    body.innerHTML=docs.map(d=>{
+      const dt=_tsToDate(d.fecha);
+      const fecha=dt&&!isNaN(dt)?dt.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})+' · '+dt.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'';
+      const meta=[];
+      if(d.ejecutivo)meta.push('Ejecutivo: '+esc(ejecDisplay(d.ejecutivo)));
+      if(d.usuario)meta.push('Registró: '+esc(d.usuario));
+      return `<div class="cta-act-item" style="margin-bottom:.6rem">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;font-weight:700;color:#1F2A4D">📍 Visita Comercial${d.cuentaNombre?' · '+esc(d.cuentaNombre):''}</div>
+          ${d.contactoNombre?`<div style="font-size:12px;color:#56648F">Contacto: ${esc(d.contactoNombre)}</div>`:''}
+          ${d.comentarios?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line;margin-top:2px">${esc(d.comentarios)}</div>`:''}
+          <div style="font-size:10.5px;color:#8898C0;margin-top:3px">${fecha}${meta.length?' · '+meta.join(' · '):''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){body.innerHTML='<div class="det-unit-empty">Error: '+esc(e.message)+'</div>';}
 }
 
 async function loadBldTimeline(buildingId){
