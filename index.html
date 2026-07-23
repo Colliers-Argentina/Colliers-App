@@ -2496,6 +2496,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')">Leads</button>
         <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')">Contactos</button>
         <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')">Cuentas</button>
+        <button class="sb-item" data-mod="crm" data-submod="visitas" onclick="_sbItemClick('crm','visitas')">Visitas</button>
         <button class="sb-item" disabled><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
         <button class="sb-item" data-mod="transacciones" onclick="_sbItemClick('transacciones',null)">Transacciones</button>
       </div>
@@ -2842,6 +2843,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
     <button class="crm-subnav-tab active" id="crm-snav-cuentas" onclick="switchCRMTab('cuentas')">🏢 Cuentas</button>
     <button class="crm-subnav-tab" id="crm-snav-contactos" onclick="switchCRMTab('contactos')">👤 Contactos</button>
     <button class="crm-subnav-tab" id="crm-snav-leads" onclick="switchCRMTab('leads')">🎯 Leads</button>
+    <button class="crm-subnav-tab" id="crm-snav-visitas" onclick="switchCRMTab('visitas')">📍 Visitas</button>
     <div style="flex:1"></div>
     <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
   </div>
@@ -2977,6 +2979,25 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div class="crm-det-layout">
         <div class="crm-det-left" id="lead-det-left"></div>
         <div class="crm-det-right" id="lead-det-right"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISITAS SECTION -->
+  <div id="crm-visitas-section" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="crm-topbar">
+        <div class="crm-topbar-l">
+          <div class="crm-page-title">Visitas</div>
+          <div class="crm-page-sub" id="vis-subtitle">Cargando...</div>
+        </div>
+        <div class="crm-topbar-r">
+          <input id="vis-search" type="text" placeholder="🔍 Buscar visita..." class="crm-search-inp" oninput="filterVisitas()">
+          <button class="crm-new-btn" onclick="openVisitaDrawer()">+ Nueva Visita</button>
+        </div>
+      </div>
+      <div class="crm-list-body">
+        <div class="crm-tbl-wrap"><div id="vis-table-wrap">Cargando...</div></div>
       </div>
     </div>
   </div>
@@ -3361,6 +3382,50 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
   </div>
 
 </div>
+
+<!-- VISITA DRAWER (fuera de crm-panel: se abre también desde el Home) -->
+  <div id="visdr-overlay" class="cdr-overlay" onclick="closeVisitaDrawer()"></div>
+  <div id="visdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nueva Visita">
+    <div class="cdr-hd">
+      <div class="cdr-title">Nueva Visita</div>
+      <button class="cdr-close" onclick="closeVisitaDrawer()" title="Cerrar">✕</button>
+    </div>
+    <div class="cdr-body">
+      <div class="cdr-section">
+        <div class="cdr-section-hd"><div class="cdr-section-num">1</div><div class="cdr-section-name">Datos de la Visita</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-field" style="position:relative">
+          <div class="cdr-lbl">Cuenta <span class="cdr-req">*</span></div>
+          <input id="visdr-cuenta" class="cdr-input" type="text" placeholder="Buscar cuenta en Cuentas..." autocomplete="off" oninput="ctaPickerInput('visdr',this.value)" onfocus="ctaPickerInput('visdr',this.value)" onblur="ctaPickerBlur('visdr')">
+          <div id="visdr-cuenta-drop" class="cdr-ms-drop" style="display:none"></div>
+          <div id="visdr-cuenta-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
+          <input id="visdr-cuentaId" type="hidden"><input id="visdr-cuentaNombre" type="hidden">
+        </div>
+        <div class="cdr-field" style="position:relative">
+          <div class="cdr-lbl">Inmueble <span class="cdr-req">*</span></div>
+          <input id="visdr-bld-q" class="cdr-input" type="text" placeholder="Buscar inmueble..." autocomplete="off" oninput="visBldSearch(this.value)">
+          <div id="visdr-bld-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+          <input id="visdr-buildingId" type="hidden"><input id="visdr-buildingName" type="hidden">
+        </div>
+      </div>
+      <div class="cdr-section">
+        <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Opcional</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-field" style="position:relative">
+          <div class="cdr-lbl">Contacto</div>
+          <input id="visdr-cto-q" class="cdr-input" type="text" placeholder="Buscar contacto..." autocomplete="off" oninput="visCtoSearch(this.value)">
+          <div id="visdr-cto-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+          <input id="visdr-contactoId" type="hidden"><input id="visdr-contactoNombre" type="hidden">
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Comentarios</div>
+          <textarea id="visdr-comentarios" class="cdr-input" rows="3" placeholder="Observaciones de la visita..." style="resize:vertical;min-height:72px;line-height:1.5"></textarea>
+        </div>
+        <div id="visdr-auto-hint" style="font-size:10.5px;color:#8898C0;line-height:1.6;margin-top:.2rem"></div>
+      </div>
+    </div>
+    <div class="cdr-footer">
+      <button class="cdr-save" id="visdr-save-btn" onclick="saveVisitaDrawer()">Registrar visita</button>
+    </div>
+  </div>
 
 <!-- BUILDINGS ADMIN -->
 <div id="buildings-panel" style="display:none">
@@ -5952,7 +6017,7 @@ let _crmDocs=[], _crmActiveTab='cuentas';
 
 function switchCRMTab(tab){
   _crmActiveTab=tab;
-  ['cuentas','contactos','leads'].forEach(t=>{
+  ['cuentas','contactos','leads','visitas'].forEach(t=>{
     const btn=document.getElementById('crm-snav-'+t);
     if(btn)btn.classList.toggle('active',t===tab);
     const sec=document.getElementById('crm-'+t+'-section');
@@ -5961,6 +6026,7 @@ function switchCRMTab(tab){
   if(tab==='cuentas'&&!_crmDocs.length)loadCRM();
   if(tab==='contactos')loadContactos();
   if(tab==='leads')loadLeads();
+  if(tab==='visitas')loadVisitas();
 }
 
 const ESTADO_COLORS={
@@ -8043,6 +8109,192 @@ window.closeLeadDrawer=function(){
   document.getElementById('ldr-bld-list').style.display='none';
 };
 
+// ═══════════════════ VISITAS ═══════════════════
+// Entidad propia (colección Firestore `visitas`). Al guardar, cada visita genera
+// automáticamente una Actividad Comercial "Visita Comercial" en la Cuenta,
+// reutilizando el mismo modelo de datos que la solapa Actividades
+// (clientes/{id}/actividades) y reactivando la cuenta (estado Activa).
+// La relación Visita↔Inmueble (buildingId/buildingName) queda persistida para la
+// futura solapa Actividades del módulo Inmuebles (aún no implementada).
+let _visDocs=[];
+async function loadVisitas(){
+  const wrap=document.getElementById('vis-table-wrap');
+  if(!db){if(wrap)wrap.innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
+  if(wrap)wrap.innerHTML='<div class="crm-empty">Cargando...</div>';
+  try{
+    const snap=await db.collection('visitas').orderBy('fecha','desc').get();
+    _visDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    _visSetSubtitle();
+    filterVisitas();
+  }catch(e){
+    console.error('Visitas load error:',e);
+    if(wrap)wrap.innerHTML=`<div class="crm-empty">Error al cargar: ${e.message}</div>`;
+    const st=document.getElementById('vis-subtitle');if(st)st.textContent='Error al cargar datos';
+  }
+}
+function _visSetSubtitle(){
+  const st=document.getElementById('vis-subtitle');
+  if(st)st.textContent=`${_visDocs.length} visita${_visDocs.length!==1?'s':''} registrada${_visDocs.length!==1?'s':''}`;
+}
+function filterVisitas(){
+  const q=(document.getElementById('vis-search')?.value||'').trim().toLowerCase();
+  const docs=!q?_visDocs:_visDocs.filter(d=>[d.cuentaNombre,d.buildingName,d.contactoNombre,d.ejecutivo,d.usuario].some(v=>(v||'').toLowerCase().includes(q)));
+  renderVisitasTable(docs);
+}
+function renderVisitasTable(docs){
+  const wrap=document.getElementById('vis-table-wrap');if(!wrap)return;
+  if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin visitas registradas.</div>';return;}
+  let h='<table class="crm-table"><thead><tr>';
+  ['Fecha','Cuenta','Inmueble','Contacto','Ejecutivo Comercial','Registró'].forEach(c=>h+=`<th>${c}</th>`);
+  h+='</tr></thead><tbody>';
+  docs.forEach(d=>{
+    const dt=_tsToDate(d.fecha);
+    const fecha=dt&&!isNaN(dt)?dt.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})+' '+dt.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'–';
+    h+=`<tr>
+      <td class="crm-date">${fecha}</td>
+      <td><div class="crm-client-name">${esc(d.cuentaNombre||'–')}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.buildingName||'–')}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.contactoNombre||'–')}</div></td>
+      <td><div class="crm-broker-cell">${esc(ejecDisplay(d.ejecutivo)||'–')}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.usuario||'–')}</div></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
+}
+function _visClearCto(){
+  ['visdr-contactoId','visdr-contactoNombre','visdr-cto-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const l=document.getElementById('visdr-cto-list');if(l)l.style.display='none';
+}
+window.openVisitaDrawer=function(prefillBuildingId,prefillBuildingName){
+  ['visdr-cuenta','visdr-bld-q','visdr-cto-q','visdr-comentarios'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['visdr-cuentaId','visdr-cuentaNombre','visdr-buildingId','visdr-buildingName','visdr-contactoId','visdr-contactoNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const ctag=document.getElementById('visdr-cuenta-tag');if(ctag)ctag.style.display='none';
+  ['visdr-cuenta-drop','visdr-bld-list','visdr-cto-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  ['visdr-cuenta','visdr-bld-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
+  loadClientesParaSelector();
+  _loadBldDocsIfNeeded().catch(()=>{});
+  if(prefillBuildingId){
+    document.getElementById('visdr-buildingId').value=prefillBuildingId;
+    document.getElementById('visdr-buildingName').value=prefillBuildingName||'';
+    document.getElementById('visdr-bld-q').value=prefillBuildingName||'';
+  }
+  const now=new Date();
+  const uname=user?.displayName||user?.email||'—';
+  const hint=document.getElementById('visdr-auto-hint');
+  if(hint)hint.innerHTML=`Se registran automáticamente: <b>${esc(uname)}</b> · ${now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})} ${now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}. Al guardar se genera la Actividad Comercial "Visita Comercial" en la Cuenta.`;
+  const btn=document.getElementById('visdr-save-btn');if(btn){btn.textContent='Registrar visita';btn.disabled=false;}
+  document.getElementById('visdr-overlay').classList.add('open');
+  document.getElementById('visdr-drawer').classList.add('open');
+  setTimeout(()=>document.getElementById('visdr-cuenta')?.focus(),60);
+};
+window.closeVisitaDrawer=function(){
+  document.getElementById('visdr-overlay').classList.remove('open');
+  document.getElementById('visdr-drawer').classList.remove('open');
+  ['visdr-bld-list','visdr-cto-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+};
+window.visBldSearch=function(q){
+  const list=document.getElementById('visdr-bld-list');if(!list)return;
+  document.getElementById('visdr-buildingId').value='';document.getElementById('visdr-buildingName').value='';
+  if(!q.trim()){list.style.display='none';return;}
+  const lq=q.toLowerCase();
+  const src=_bldDocs.length?_bldDocs:masterBuildings;
+  const matches=src.filter(d=>(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
+  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
+  list.innerHTML=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();visSelectBld('${(d._id||d.id||'')}','${(d.nombre||'').replace(/'/g,"\\'")}')">${esc(d.nombre||'')}</div>`).join('');
+  list.style.display='block';
+};
+window.visSelectBld=function(id,nombre){
+  document.getElementById('visdr-buildingId').value=id;
+  document.getElementById('visdr-buildingName').value=nombre;
+  document.getElementById('visdr-bld-q').value=nombre;
+  document.getElementById('visdr-bld-list').style.display='none';
+};
+window.visCtoSearch=function(q){
+  const list=document.getElementById('visdr-cto-list');if(!list)return;
+  document.getElementById('visdr-contactoId').value='';document.getElementById('visdr-contactoNombre').value='';
+  if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){
+    db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));if((document.getElementById('visdr-cto-q').value||'').trim())visCtoSearch(document.getElementById('visdr-cto-q').value);}).catch(()=>{});
+  }
+  if(!q.trim()){list.style.display='none';return;}
+  const lq=q.toLowerCase();
+  const cuentaId=document.getElementById('visdr-cuentaId').value||'';
+  let src=Array.isArray(_ctoDocs)?_ctoDocs:[];
+  if(cuentaId)src=src.filter(c=>c.cuentaId===cuentaId);
+  const matches=src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')).toLowerCase().includes(lq)).slice(0,8);
+  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
+  list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();visSelectCto('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}</div>`;}).join('');
+  list.style.display='block';
+};
+window.visSelectCto=function(id,nombre){
+  document.getElementById('visdr-contactoId').value=id;
+  document.getElementById('visdr-contactoNombre').value=nombre;
+  document.getElementById('visdr-cto-q').value=nombre;
+  document.getElementById('visdr-cto-list').style.display='none';
+};
+window.saveVisitaDrawer=async function(){
+  const cuentaId=document.getElementById('visdr-cuentaId').value||'';
+  const cuentaNombre=document.getElementById('visdr-cuentaNombre').value||'';
+  const buildingId=document.getElementById('visdr-buildingId').value||'';
+  const buildingName=document.getElementById('visdr-buildingName').value||'';
+  let ok=true;
+  const mark=(inputId,cond)=>{const el=document.getElementById(inputId);if(el)el.style.borderColor=cond?'':'#ED1B34';if(!cond)ok=false;};
+  mark('visdr-cuenta',!!cuentaId);
+  mark('visdr-bld-q',!!buildingId);
+  if(!ok)return;
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('visdr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    const usuario=user?.displayName||user?.email||'';
+    const userEmail=user?.email||'';
+    const comentarios=(document.getElementById('visdr-comentarios').value||'').trim();
+    const contactoId=document.getElementById('visdr-contactoId').value||'';
+    const contactoNombre=(document.getElementById('visdr-contactoNombre').value||'').trim();
+    // Ejecutivo Comercial (automático): broker del inmueble → gestionadoPor de la cuenta → usuario.
+    const bld=(_bldDocs.length?_bldDocs:masterBuildings).find(x=>(x._id||x.id)===buildingId);
+    const cuenta=_ctaAllCuentas().find(x=>x._id===cuentaId);
+    const validBrokers=['Matienzo','Bartra','Farola','Troncoso','Giancontieri','Zuliani'];
+    let ejecutivo='';
+    if(bld?.brokerAsignado&&validBrokers.includes(bld.brokerAsignado))ejecutivo=bld.brokerAsignado;
+    else if(Array.isArray(cuenta?.gestionadoPor)&&cuenta.gestionadoPor.length)ejecutivo=cuenta.gestionadoPor[0];
+    else if(cuenta?.gestionadoPor)ejecutivo=cuenta.gestionadoPor;
+    else ejecutivo=usuario;
+    const visita={
+      cuentaId,cuentaNombre,buildingId,buildingName,
+      contactoId,contactoNombre,comentarios,
+      ejecutivo,usuario,userEmail,
+      fecha:now,fechaCreacion:now,
+    };
+    const ref=await db.collection('visitas').add(visita);
+    // Actividad Comercial automática en la Cuenta (mismo modelo que la solapa Actividades).
+    const descParts=[];
+    if(buildingName)descParts.push('Inmueble: '+buildingName);
+    if(contactoNombre)descParts.push('Contacto: '+contactoNombre);
+    if(comentarios)descParts.push(comentarios);
+    const reg={cat:'C',tipo:'Visita Comercial',descripcion:descParts.join('\n'),fecha:now,usuario,userEmail,origen:'visita',visitaId:ref.id};
+    await db.collection('clientes').doc(cuentaId).collection('actividades').add(reg);
+    // Reactivar la cuenta (estado Activa) — idéntico a _registrarActividad.
+    await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now});
+    const idx=_crmDocs.findIndex(x=>x._id===cuentaId);
+    if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now};
+    // Si la ficha de esa cuenta está abierta, refrescar Actividades + estado (sin regresiones).
+    if(typeof _fichaCuentaId!=='undefined'&&_fichaCuentaId===cuentaId){
+      if(typeof loadCuentaActividades==='function')loadCuentaActividades(cuentaId);
+      if(typeof renderCuentaLeftPanel==='function')renderCuentaLeftPanel(cuentaId);
+      if(typeof _loadCuentaQuickStats==='function')_loadCuentaQuickStats(cuentaId);
+    }
+    _visDocs.unshift({...visita,_id:ref.id});
+    closeVisitaDrawer();
+    if(_crmActiveTab==='visitas'){_visSetSubtitle();filterVisitas();}
+    console.log('[visitas] Visita registrada',ref.id,'+ actividad en cuenta',cuentaId);
+  }catch(e){
+    console.error('saveVisitaDrawer error:',e);
+    alert('Error al registrar la visita: '+e.message);
+    const b=document.getElementById('visdr-save-btn');b.textContent='Registrar visita';b.disabled=false;
+  }
+};
+
 window.ldrBldSearch=function(q){
   const list=document.getElementById('ldr-bld-list');
   if(!q.trim()){list.style.display='none';return;}
@@ -8208,6 +8460,7 @@ function _ctaPickerSet(key,id,nombre){
 window.ctaPickerClear=function(key){const c=_ctaPickers[key];if(!c)return;document.getElementById(c.hidId).value='';document.getElementById(c.hidNombreId).value='';const tag=document.getElementById(c.tagId);if(tag)tag.style.display='none';};
 window.ctaPickerCreate=function(key){const c=_ctaPickers[key];if(!c)return;const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';openQuickCuentaModal(document.getElementById(c.inputId).value.trim(),(id,nombre)=>_ctaPickerSet(key,id,nombre));};
 registerCuentaPicker('ldr',{inputId:'ldr-empresa',dropId:'ldr-empresa-drop',tagId:'ldr-empresa-tag',hidId:'ldr-cuentaId',hidNombreId:'ldr-cuentaNombre'});
+registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre',allowCreate:false,onSelect:function(){ _visClearCto(); }});
 
 // --- Modal de creación rápida de Cuenta (sin abandonar el formulario actual) ---
 let _qcRubros=[],_qcSubrubros=[],_qcRubroOpts=[],_qcSubOpts=[],_qcOnDone=null,_qcDupes=[];
@@ -12426,11 +12679,12 @@ function showModule(mod){
     _bldAssetType=mod==='buildings'?'office':mod;
     show('buildings-panel');
     loadBuildings();
-  } else if(mod==='crm'||mod==='crm-cuentas'||mod==='crm-contactos'||mod==='crm-leads'){
+  } else if(mod==='crm'||mod==='crm-cuentas'||mod==='crm-contactos'||mod==='crm-leads'||mod==='crm-visitas'){
     show('crm-panel');
     loadCRM();
     if(mod==='crm-contactos')setTimeout(()=>switchCRMTab('contactos'),300);
     else if(mod==='crm-leads')setTimeout(()=>switchCRMTab('leads'),300);
+    else if(mod==='crm-visitas')setTimeout(()=>switchCRMTab('visitas'),300);
     else setTimeout(()=>switchCRMTab('cuentas'),300);
   } else if(mod==='analytics'){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
@@ -12457,7 +12711,8 @@ function _updateHubGreeting(){
 
 function _hubCardHTML(c){
   const statHTML=c.stats?`<div class="hub-card-stat-row">${c.stats.map(s=>`<span class="hub-card-stat-val" id="${s.id}">—</span><span class="hub-card-stat-lbl">${s.lbl}</span>`).join('<span style="color:rgba(255,255,255,.12);margin:0 .25rem">·</span>')}</div>`:'';
-  return `<div class="hub-card" onclick="showModule('${c.mod}')">
+  const click=c.action?c.action:`showModule('${c.mod}')`;
+  return `<div class="hub-card" onclick="${click}">
     <div class="hub-card-hd">
       <div class="hub-card-icon">${c.icon}</div>
       ${c.badge?`<span class="hub-card-badge">${c.badge}</span>`:''}
@@ -12467,7 +12722,7 @@ function _hubCardHTML(c){
       ${statHTML}
     </div>
     <div class="hub-card-footer">
-      <button class="hub-card-btn" onclick="event.stopPropagation();showModule('${c.mod}')">${c.btn} →</button>
+      <button class="hub-card-btn" onclick="event.stopPropagation();${click}">${c.btn} →</button>
     </div>
   </div>`;
 }
@@ -12484,6 +12739,7 @@ function renderHubCards(){
     {icon:'🎯',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
     {icon:'🏛️',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'activas'}]},
     {icon:'👤',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
+    {icon:'📍',title:'Nueva Visita',action:'openVisitaDrawer()',btn:'Registrar'},
     {icon:'📄',title:'PPTs',mod:'generator',btn:'Crear PPT',stats:[{id:'hc-ppt-30d',lbl:'últimos 30d'}]},
   ];
   if(isAdmin)cards.push({icon:'📊',title:'Analytics',mod:'analytics',btn:'Abrir',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
