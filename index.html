@@ -1547,6 +1547,9 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 .hub-card:hover{background:rgba(28,84,244,.13);backdrop-filter:blur(22px);border-color:rgba(77,147,255,.35);transform:translateY(-5px);box-shadow:0 22px 60px rgba(0,0,0,.42),0 0 0 1px rgba(77,147,255,.2)}
 .hub-card:hover::before{opacity:1}
 .hub-card-icon{font-size:24px;line-height:1;width:46px;height:46px;background:rgba(28,84,244,.18);border:1px solid rgba(77,147,255,.22);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Iconos outline reutilizables: blancos sobre fondo oscuro (hub) / azul Colliers sobre claro (subnav). */
+.hub-card-icon svg{width:24px;height:24px;stroke:#DCEBFF;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.crm-subnav-tab svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2.5px;margin-right:5px}
 .hub-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:.6rem}
 .hub-card-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.15px;margin-bottom:.2rem}
 .hub-card-desc{font-size:13px;color:rgba(163,193,255,.6);line-height:1.6}
@@ -2847,10 +2850,10 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 <div id="crm-panel" style="display:none">
   <!-- SUBNAV -->
   <div class="crm-subnav">
-    <button class="crm-subnav-tab active" id="crm-snav-cuentas" onclick="switchCRMTab('cuentas')">🏢 Cuentas</button>
-    <button class="crm-subnav-tab" id="crm-snav-contactos" onclick="switchCRMTab('contactos')">👤 Contactos</button>
-    <button class="crm-subnav-tab" id="crm-snav-leads" onclick="switchCRMTab('leads')">🎯 Leads</button>
-    <button class="crm-subnav-tab" id="crm-snav-visitas" onclick="switchCRMTab('visitas')">📍 Visitas</button>
+    <button class="crm-subnav-tab active" id="crm-snav-cuentas" onclick="switchCRMTab('cuentas')"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/><line x1="8" y1="16" x2="11" y2="16"/></svg>Cuentas</button>
+    <button class="crm-subnav-tab" id="crm-snav-contactos" onclick="switchCRMTab('contactos')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Contactos</button>
+    <button class="crm-subnav-tab" id="crm-snav-leads" onclick="switchCRMTab('leads')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Leads</button>
+    <button class="crm-subnav-tab" id="crm-snav-visitas" onclick="switchCRMTab('visitas')"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Visitas</button>
     <div style="flex:1"></div>
     <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
   </div>
@@ -13082,12 +13085,26 @@ function _updateHubGreeting(){
   if(el)el.textContent=`${saludo}${nombre?', '+nombre:''}!`;
 }
 
+// Librería de iconos outline (mismo estilo que la barra lateral). Se reutiliza vía nxIcon().
+// El color lo define el contexto (currentColor / stroke por CSS): claro→azul Colliers, oscuro→blanco.
+const NX_ICON={
+  oficinas:'<rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9" y2="6"/><line x1="15" y1="6" x2="15" y2="6"/><line x1="9" y1="10" x2="9" y2="10"/><line x1="15" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="9" y2="14"/><line x1="15" y1="14" x2="15" y2="14"/><path d="M10 22v-4h4v4"/>',
+  industrial:'<path d="M2 20h20"/><path d="M4 20V9l6 4V9l6 4V6l4 2.5V20"/>',
+  retail:'<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>',
+  leads:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  cuentas:'<path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/><line x1="8" y1="16" x2="11" y2="16"/>',
+  contactos:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  visitas:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
+  ppts:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  analytics:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>',
+};
+function nxIcon(key){return NX_ICON[key]?`<svg viewBox="0 0 24 24">${NX_ICON[key]}</svg>`:'';}
 function _hubCardHTML(c){
   const statHTML=c.stats?`<div class="hub-card-stat-row">${c.stats.map(s=>`<span class="hub-card-stat-val" id="${s.id}">—</span><span class="hub-card-stat-lbl">${s.lbl}</span>`).join('<span style="color:rgba(255,255,255,.12);margin:0 .25rem">·</span>')}</div>`:'';
   const click=c.action?c.action:`showModule('${c.mod}')`;
   return `<div class="hub-card" onclick="${click}">
     <div class="hub-card-hd">
-      <div class="hub-card-icon">${c.icon}</div>
+      <div class="hub-card-icon">${c.iconKey?nxIcon(c.iconKey):(c.icon||'')}</div>
       ${c.badge?`<span class="hub-card-badge">${c.badge}</span>`:''}
     </div>
     <div style="flex:1;min-width:0">
@@ -13106,16 +13123,16 @@ function renderHubCards(){
   if(!container)return;
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
   const cards=[
-    {icon:'🏢',title:'Oficinas',mod:'office',btn:'Ver inventario',stats:[{id:'hc-off-total',lbl:'edif.'},{id:'hc-off-disp',lbl:'disp.'}]},
-    {icon:'🏭',title:'Industrial',mod:'industrial',btn:'Ver inventario',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disp.'}]},
-    {icon:'🛍️',title:'Retail',mod:'retail',btn:'Ver inventario',stats:[{id:'hc-ret-total',lbl:'locales'},{id:'hc-ret-disp',lbl:'disp.'}]},
-    {icon:'🎯',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
-    {icon:'🏛️',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'activas'}]},
-    {icon:'👤',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
-    {icon:'📍',title:'Nueva Visita',action:'openVisitaDrawer()',btn:'Registrar'},
-    {icon:'📄',title:'PPTs',mod:'generator',btn:'Crear PPT',stats:[{id:'hc-ppt-30d',lbl:'últimos 30d'}]},
+    {iconKey:'oficinas',title:'Oficinas',mod:'office',btn:'Ver inventario',stats:[{id:'hc-off-total',lbl:'edif.'},{id:'hc-off-disp',lbl:'disp.'}]},
+    {iconKey:'industrial',title:'Industrial',mod:'industrial',btn:'Ver inventario',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disp.'}]},
+    {iconKey:'retail',title:'Retail',mod:'retail',btn:'Ver inventario',stats:[{id:'hc-ret-total',lbl:'locales'},{id:'hc-ret-disp',lbl:'disp.'}]},
+    {iconKey:'leads',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
+    {iconKey:'cuentas',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'activas'}]},
+    {iconKey:'contactos',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
+    {iconKey:'visitas',title:'Nueva Visita',action:'openVisitaDrawer()',btn:'Registrar'},
+    {iconKey:'ppts',title:'PPTs',mod:'generator',btn:'Crear PPT',stats:[{id:'hc-ppt-30d',lbl:'últimos 30d'}]},
   ];
-  if(isAdmin)cards.push({icon:'📊',title:'Analytics',mod:'analytics',btn:'Abrir',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
+  if(isAdmin)cards.push({iconKey:'analytics',title:'Analytics',mod:'analytics',btn:'Abrir',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
   container.innerHTML=cards.map(c=>_hubCardHTML(c)).join('');
   _loadHubDashboardData();
 }
