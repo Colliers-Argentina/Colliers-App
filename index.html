@@ -3147,7 +3147,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           </div>
           <div class="lc-opt" id="lc-opt-nueva" onclick="lcSelectOpt('nueva')">
             <div class="lc-opt-icon">✨</div>
-            <div class="lc-opt-text"><div class="lc-opt-title">Crear nueva Cuenta</div><div class="lc-opt-sub">Se crea automáticamente con los datos del lead</div></div>
+            <div class="lc-opt-text"><div class="lc-opt-title">Crear nueva Cuenta</div><div class="lc-opt-sub">Abre el formulario de Cuenta según tu perfil y la vincula automáticamente</div></div>
+          </div>
+          <div class="lc-opt" id="lc-opt-particular" onclick="lcSelectOpt('particular')">
+            <div class="lc-opt-icon">👤</div>
+            <div class="lc-opt-text"><div class="lc-opt-title">Particular</div><div class="lc-opt-sub">Contacto sin Cuenta asociada (podés vincularlo más adelante)</div></div>
           </div>
         </div>
         <div id="lc-search-wrap">
@@ -7248,7 +7252,7 @@ function openContactoDetail(docId){
   // Panel izquierdo (mismo diseño que Cuentas): solo resumen esencial.
   const cuentaVal=d.cuentaNombre
     ?`<div class="crm-det-meta-val" style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')">${esc(d.cuentaNombre)}</div>`
-    :'<div class="crm-det-meta-val" style="color:#8898C0">Sin cuenta asociada</div>';
+    :(d.esParticular?'<div class="crm-det-meta-val" style="color:#8898C0">👤 Particular</div>':'<div class="crm-det-meta-val" style="color:#8898C0">Sin cuenta asociada</div>');
   document.getElementById('cto-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       <div class="crm-det-av" style="background:${bg};border-radius:50%">${ini}</div>
@@ -8892,10 +8896,10 @@ window.saveQuickCuenta=async function(){
 // CONVERSION MODAL
 window.openConvertModal=function(){
   _ldrConvertOpt='existente';
-  document.getElementById('lc-opt-existente').classList.add('sel');
-  document.getElementById('lc-opt-nueva').classList.remove('sel');
+  ['existente','nueva','particular'].forEach(o=>{const el=document.getElementById('lc-opt-'+o);if(el)el.classList.toggle('sel',o==='existente');});
   document.getElementById('lc-search-wrap').style.display='block';
   document.getElementById('lc-cuenta-list').style.display='none';
+  document.getElementById('lc-cuenta-q').style.borderColor='';
   // Si el Lead ya tiene una Cuenta asociada (incluida la creada desde el propio Lead),
   // se reutiliza automáticamente para no duplicar.
   const lead=_leadDocs.find(d=>d._id===_currentLeadId);
@@ -8918,9 +8922,10 @@ window.closeConvertModal=function(){
 
 window.lcSelectOpt=function(opt){
   _ldrConvertOpt=opt;
-  document.getElementById('lc-opt-existente').classList.toggle('sel',opt==='existente');
-  document.getElementById('lc-opt-nueva').classList.toggle('sel',opt==='nueva');
+  ['existente','nueva','particular'].forEach(o=>{const el=document.getElementById('lc-opt-'+o);if(el)el.classList.toggle('sel',o===opt);});
   document.getElementById('lc-search-wrap').style.display=opt==='existente'?'block':'none';
+  const btn=document.getElementById('lc-save-btn');
+  if(btn)btn.textContent=opt==='nueva'?'Continuar':'Convertir';
 };
 
 window.lcCuentaSearch=function(q){
@@ -8937,6 +8942,7 @@ window.lcSelectCuenta=function(id,nombre){
   document.getElementById('lc-cuentaId').value=id;
   document.getElementById('lc-cuentaNombre').value=nombre;
   document.getElementById('lc-cuenta-q').value=nombre;
+  document.getElementById('lc-cuenta-q').style.borderColor='';
   document.getElementById('lc-cuenta-list').style.display='none';
 };
 
@@ -8944,44 +8950,65 @@ window.executeLeadConversion=async function(){
   if(!_currentLeadId){closeConvertModal();return;}
   const lead=_leadDocs.find(d=>d._id===_currentLeadId);
   if(!lead)return;
-  const btn=document.getElementById('lc-save-btn');btn.textContent='Convirtiendo...';btn.disabled=true;
-  try{
-    let cuentaId='',cuentaNombre='';
-    if(_ldrConvertOpt==='existente'){
-      cuentaId=document.getElementById('lc-cuentaId').value;
-      cuentaNombre=document.getElementById('lc-cuentaNombre').value;
-    }else{
-      const ref=await db.collection('clientes').add({
-        nombre:lead.empresa||((lead.nombre||'')+' '+(lead.apellido||'')).trim(),
-        fechaCreacion:firebase.firestore.Timestamp.now(),
-        ultimaActividad:firebase.firestore.Timestamp.now(),
-        brokerCreador:user?.displayName||user?.email||'',
-        pptsGenerados:0,cantidadPPTs:0
-      });
-      cuentaId=ref.id;
-      cuentaNombre=lead.empresa||((lead.nombre||'')+' '+(lead.apellido||'')).trim();
-      _crmDocs=[];_clientesCache=[];
-    }
-    const now=firebase.firestore.Timestamp.now();
-    const contactRef=await db.collection('contactos').add({
-      cuentaId,cuentaNombre,
-      nombre:lead.nombre||'',apellidos:lead.apellido||'',
-      cargo:lead.cargo||'Otro',puesto:lead.puesto||'',
-      email:lead.email||'',estadoCorreo:'sin_comprobar',
-      telefono:lead.telefono||'',
-      comentarios:lead.comentarios||'',
-      brokerResponsable:lead.brokerAsignado||user?.displayName||'',
-      fechaCreacion:now,ultimoContacto:now,ultimaActividad:now,
-    });
-    await db.collection('leads').doc(_currentLeadId).update({estado:'Convertido',contactoId:contactRef.id,cuentaId,ultimaActividad:now});
-    await addLeadTimeline(_currentLeadId,{tipo:'convertido',descripcion:`Convertido → Contacto${cuentaNombre?' en '+cuentaNombre:''}`});
-    const idx=_leadDocs.findIndex(d=>d._id===_currentLeadId);
-    if(idx>=0){_leadDocs[idx].estado='Convertido';_leadDocs[idx].contactoId=contactRef.id;}
-    _ctoDocs=[];
+  // Opción "Crear nueva Cuenta": abrir el formulario de Cuenta (respeta permisos por perfil).
+  // Al guardar, se vincula el contacto a la nueva cuenta y se completa la conversión.
+  if(_ldrConvertOpt==='nueva'){
     closeConvertModal();
-    openLeadDetail(_currentLeadId);
-  }catch(e){alert('Error al convertir: '+e.message);btn.textContent='Convertir';btn.disabled=false;}
+    const prefill=lead.empresa||lead.cuentaNombre||((lead.nombre||'')+' '+(lead.apellido||'')).trim();
+    openClientDrawer((nombre,newId)=>_finishLeadConversion(newId,nombre,{}),prefill);
+    return;
+  }
+  const btn=document.getElementById('lc-save-btn');
+  let cuentaId='',cuentaNombre='',particular=false;
+  if(_ldrConvertOpt==='particular'){
+    particular=true;
+  }else{ // existente
+    cuentaId=document.getElementById('lc-cuentaId').value||'';
+    cuentaNombre=document.getElementById('lc-cuentaNombre').value||'';
+    if(!cuentaId){document.getElementById('lc-cuenta-q').style.borderColor='#ED1B34';return;}
+  }
+  btn.textContent='Convirtiendo...';btn.disabled=true;
+  try{ await _finishLeadConversion(cuentaId,cuentaNombre,{particular}); }
+  catch(e){alert('Error al convertir: '+e.message);btn.textContent='Convertir';btn.disabled=false;}
 };
+
+// Crea el Contacto desde el Lead, lo vincula (o lo deja Particular), completa la conversión,
+// registra Timeline y navega a la ficha del Contacto. Reutilizado por las 3 opciones.
+async function _finishLeadConversion(cuentaId,cuentaNombre,opts){
+  opts=opts||{};
+  const lead=_leadDocs.find(d=>d._id===_currentLeadId);if(!lead)return;
+  const now=firebase.firestore.Timestamp.now();
+  const contacto={
+    cuentaId:cuentaId||'',cuentaNombre:cuentaNombre||'',
+    nombre:lead.nombre||'',apellidos:lead.apellido||'',
+    cargo:lead.cargo||'Otro',puesto:lead.puesto||'',
+    email:lead.email||'',estadoCorreo:'sin_comprobar',
+    telefono:lead.telefono||'',
+    comentarios:lead.comentarios||'',
+    brokerResponsable:lead.brokerAsignado||user?.displayName||'',
+    userEmail:user?.email||'',
+    fechaCreacion:now,ultimoContacto:now,ultimaActividad:now,
+  };
+  if(opts.particular&&!cuentaId)contacto.esParticular=true;
+  const contactRef=await db.collection('contactos').add(contacto);
+  await db.collection('leads').doc(_currentLeadId).update({estado:'Convertido',contactoId:contactRef.id,cuentaId:cuentaId||'',ultimaActividad:now});
+  const destino=opts.particular?'Particular (sin cuenta)':(cuentaNombre?('en '+cuentaNombre):'sin cuenta');
+  await addLeadTimeline(_currentLeadId,{tipo:'convertido',descripcion:`Convertido → Contacto (${destino})`});
+  if(cuentaId&&typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'alta_contacto',descripcion:`Contacto desde conversión de Lead: ${((lead.nombre||'')+' '+(lead.apellido||'')).trim()}`});
+  const idx=_leadDocs.findIndex(d=>d._id===_currentLeadId);
+  if(idx>=0){_leadDocs[idx].estado='Convertido';_leadDocs[idx].contactoId=contactRef.id;_leadDocs[idx].cuentaId=cuentaId||'';}
+  _ctoDocs=[];_crmDocs=[];_clientesCache=[];
+  closeConvertModal();
+  _gotoContacto(contactRef.id);
+}
+// Navega a la ficha del Contacto recién creado (cambia a la solapa Contactos y la abre).
+async function _gotoContacto(contactoId){
+  try{
+    switchCRMTab('contactos');
+    if(typeof loadContactos==='function')await loadContactos();
+    if(_ctoDocs.find(x=>x._id===contactoId))openContactoDetail(contactoId);
+  }catch(e){console.warn('gotoContacto',e);}
+}
 
 // LEADS ANALYTICS
 async function loadLeadsAnalytics(){

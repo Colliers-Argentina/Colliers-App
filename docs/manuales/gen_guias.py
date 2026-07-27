@@ -70,7 +70,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "2.3", FECHA,
+    "Leads", "2.4", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
     "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
     "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
@@ -96,7 +96,7 @@ GUIAS["Guia_Leads"] = Guia(
         "Se crea el Lead con Resultado Pendiente y Estado Activo, asignado al ejecutivo indicado.",
         "Si pasa 14 días en Pendiente sin resolución, el lead pasa automáticamente a Inactivo (con recordatorios previos en los días 10 y 13). No se elimina.",
         "Al actualizar el Resultado (u otra acción comercial), un lead Inactivo vuelve a Activo.",
-        "Con Resultado Próspero se puede convertir en Contacto reutilizando la cuenta asociada, sin duplicar información; el lead queda como registro histórico.",
+        "Con Resultado Próspero se puede convertir en Contacto. Al convertir se puede: vincular a una cuenta existente, crear una nueva cuenta (se abre el formulario según tu perfil y se vincula sola), o marcar el contacto como Particular (sin cuenta). Al finalizar se abre la ficha del contacto creado; el lead queda como registro histórico.",
     ],
 )
 
