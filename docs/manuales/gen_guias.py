@@ -42,7 +42,7 @@ GUIAS["Guia_Cuentas"] = Guia(
 
 # ─────────────────────────── CONTACTOS ───────────────────────────
 GUIAS["Guia_Contactos"] = Guia(
-    "Contactos", "2.1", FECHA,
+    "Contactos", "2.2", FECHA,
     "Permite registrar personas (contactos) y vincularlas a una cuenta. La ficha del contacto "
     "usa el mismo estilo que Cuentas, con solapas de Información General, Comentarios, "
     "Actividades, Inventario y Timeline.",
@@ -53,8 +53,8 @@ GUIAS["Guia_Contactos"] = Guia(
         ("Cargo", "Seleccionar el tipo de cargo: CEO, CFO, Compras, Real Estate u Otro."),
         ("Puesto", "Escribir el puesto tal cual figura (por ejemplo: Director Comercial). Campo libre."),
         ("Especificar cargo", "Solo si en Cargo se eligió \"Otro\": escribir el cargo concreto."),
-        ("Inversor", "Indicar si la persona es inversor (Sí/No). Aparece debajo de Puesto."),
-        ("Unidad de negocio de interés", "Solo si Inversor = Sí: seleccionar las unidades que le interesan (Oficinas, Retail, Industria & Logística)."),
+        ("¿Es inversor?", "En la tarjeta 'Perfil Comercial': indicar Sí o No. Es obligatorio elegir una opción (no viene seleccionada por defecto)."),
+        ("Unidad de negocio de interés", "Aparece solo si '¿Es inversor?' = Sí: seleccionar las unidades que le interesan (Oficinas, Retail, Industria & Logística)."),
         ("Correo electrónico", "Email de la persona."),
         ("Estado del correo", "Indica si el correo es Funcional, Rebotado o Sin comprobar. Los ejecutivos comerciales no lo editan: se actualiza mediante importaciones masivas y los administradores pueden ajustarlo."),
         ("Teléfono", "Número de celular, sin el 11 y sin espacios (por ejemplo: 1551234567). Por privacidad, el teléfono solo lo ven el creador del contacto, los ejecutivos asignados y los administradores."),
@@ -71,7 +71,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "2.5", FECHA,
+    "Leads", "2.6", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
     "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
     "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
@@ -83,7 +83,7 @@ GUIAS["Guia_Leads"] = Guia(
         ("Teléfono móvil", "Número de celular de la persona (opcional). Se puede completar más adelante."),
         ("Empresa", "Empresa del interesado. Se puede buscar entre las cuentas existentes. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin perder los datos del lead."),
         ("Cargo", "Seleccionar el tipo de cargo (CEO, CFO, Compras, Real Estate u Otro), igual que en Contactos. Si se elige \"Otro\", especificar el cargo en el campo Puesto."),
-        ("Puesto", "Puesto o rol de la persona (opcional). Sirve para ampliar o especificar el cargo."),
+        ("Puesto", "Aparece solo cuando en Cargo se elige \"Otro\": campo de texto para especificar el cargo (igual que en Contactos)."),
         ("Tipo de consulta", "Tipo de consulta realizada: Oficina, Industria, Depósito, Terreno, Retail, SPS, Valuaciones u Otros. Si se elige \"Otros\", aparece un campo para especificar la consulta."),
         ("Clasificación", "Obligatorio. Indicar la calidad del lead al ingresar: Estándar o Calificado. No tiene valor por defecto."),
         ("Origen", "Cómo llegó la consulta: Zonaprop, Argenprop, Mercado Libre, Referido, LinkedIn, Web, Llamado, Email u Otro."),
