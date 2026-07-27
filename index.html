@@ -8964,7 +8964,6 @@ window.saveOportunidadDrawer=async function(){
     console.log('[oportunidades] creada',ref.id,'cuenta',cuentaId);
   }catch(e){console.error('saveOportunidadDrawer',e);alert('Error al crear la oportunidad: '+e.message);const b=document.getElementById('opdr-save-btn');b.textContent='Crear oportunidad';b.disabled=false;}
 };
-registerCuentaPicker('opdr',{inputId:'opdr-cuenta',dropId:'opdr-cuenta-drop',tagId:'opdr-cuenta-tag',hidId:'opdr-cuentaId',hidNombreId:'opdr-cuentaNombre',allowCreate:false});
 
 window.ldrBldSearch=function(q){
   const list=document.getElementById('ldr-bld-list');
@@ -9172,6 +9171,7 @@ window.ctaPickerClear=function(key){const c=_ctaPickers[key];if(!c)return;docume
 window.ctaPickerCreate=function(key){const c=_ctaPickers[key];if(!c)return;const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';openClientDrawer((nombre,newId)=>_ctaPickerSet(key,newId,nombre),document.getElementById(c.inputId).value.trim());};
 registerCuentaPicker('ldr',{inputId:'ldr-empresa',dropId:'ldr-empresa-drop',tagId:'ldr-empresa-tag',hidId:'ldr-cuentaId',hidNombreId:'ldr-cuentaNombre'});
 registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre',onSelect:function(){ _visClearCto(); }});
+registerCuentaPicker('opdr',{inputId:'opdr-cuenta',dropId:'opdr-cuenta-drop',tagId:'opdr-cuenta-tag',hidId:'opdr-cuentaId',hidNombreId:'opdr-cuentaNombre',allowCreate:false});
 
 // --- Modal de creación rápida de Cuenta (sin abandonar el formulario actual) ---
 let _qcRubros=[],_qcSubrubros=[],_qcRubroOpts=[],_qcSubOpts=[],_qcOnDone=null,_qcDupes=[];
