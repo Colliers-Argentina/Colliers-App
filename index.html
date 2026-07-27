@@ -3038,6 +3038,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="opp-search" type="text" placeholder="🔍 Buscar cuenta..." class="crm-search-inp" oninput="filterOportunidades()">
           <select id="opp-filter-ejecutivo" class="crm-sel" onchange="filterOportunidades()"><option value="">Ejecutivo</option></select>
           <select id="opp-filter-estado" class="crm-sel" onchange="filterOportunidades()"><option value="">Estado</option></select>
+          <select id="opp-filter-actividad" class="crm-sel" onchange="filterOportunidades()"><option value="">Actividad comercial</option><option>Visita comercial</option><option>Informe de alternativas</option><option>Propuesta de servicios</option></select>
           <select id="opp-filter-conversion" class="crm-sel" onchange="filterOportunidades()"><option value="">% Conversión</option><option value="0-50">0–50%</option><option value="50-80">50–80%</option><option value="80-100">80–100%</option></select>
           <select id="opp-filter-un" class="crm-sel" onchange="filterOportunidades()"><option value="">Unidad de negocio</option><option>Oficinas</option><option>Retail</option><option>Industria &amp; Logística</option></select>
           <button class="crm-new-btn" onclick="openOportunidadDrawer()">+ Nueva Oportunidad</button>
@@ -3100,6 +3101,14 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio</div>
             <select id="opdr-un" class="cdr-select"><option value="">— Seleccionar —</option><option>Oficinas</option><option>Retail</option><option>Industria &amp; Logística</option></select>
           </div>
+        </div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Actividad Comercial</div>
+          <select id="opdr-actividad" class="cdr-select">
+            <option value="">— Seleccionar —</option>
+            <option>Visita comercial</option><option>Informe de alternativas</option><option>Propuesta de servicios</option>
+          </select>
+          <div style="font-size:10.5px;color:#8898C0;margin-top:.25rem">Al seleccionar, se registra la actividad en la Cuenta y el Contacto.</div>
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Título / Nota</div>
@@ -8783,11 +8792,22 @@ window.saveVisitaDrawer=async function(){
 // el picker de cuentas, la búsqueda de contactos/inmuebles y el modelo de actividades:
 // cada oportunidad y sus cambios alimentan las Actividades de la Cuenta (y del Contacto).
 const OPP_ESTADOS=['Prospectando','Calificando','En negociación','Ganada','Perdida'];
+const OPP_ACTIVIDADES=['Visita comercial','Informe de alternativas','Propuesta de servicios'];
 const OPP_CONV_LBL={'0-50':'🟠 0–50%','50-80':'🟡 50–80%','80-100':'🟢 80–100%'};
 let _oppDocs=[],_oppWidget='',_opdrBlds=[],_oppFiltersReady=false;
 function oppEstadoBadge(e){const m={'Prospectando':'#1C54F4','Calificando':'#0090C7','En negociación':'#7C3AED','Ganada':'#16A34A','Perdida':'#EF3340'};const c=m[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'–')}</span>`;}
 function oppConvBadge(v){const m={'0-50':'#F59E0B','50-80':'#CA8A04','80-100':'#16A34A'};const c=m[v];return c?`<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${OPP_CONV_LBL[v]}</span>`:'<span style="color:#8898C0">–</span>';}
-function _oppMatchWidget(o,w){switch(w){case 'activas':return !['Ganada','Perdida'].includes(o.estado);case 'ganadas':return o.estado==='Ganada';case 'perdidas':return o.estado==='Perdida';case 'negociacion':return o.estado==='En negociación';case 'visitas':return /visita/i.test(o.tipoActividad||'');case 'propuestas':return /propuesta/i.test(o.tipoActividad||'');default:return true;}}
+function _oppMatchWidget(o,w){
+  switch(w){
+    case 'activas':return !['Ganada','Perdida'].includes(o.estado);
+    case 'ganadas':return o.estado==='Ganada';
+    case 'perdidas':return o.estado==='Perdida';
+    case 'act:Visita comercial':return o.actividadComercial==='Visita comercial';
+    case 'act:Informe de alternativas':return o.actividadComercial==='Informe de alternativas';
+    case 'act:Propuesta de servicios':return o.actividadComercial==='Propuesta de servicios';
+    default:return true;
+  }
+}
 async function loadOportunidades(){
   const wrap=document.getElementById('opp-table-wrap');
   if(!db){if(wrap)wrap.innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
@@ -8813,11 +8833,12 @@ function _oppByCuenta(opps){
 function filterOportunidades(){
   const gv=id=>document.getElementById(id)?.value||'';
   const q=gv('opp-search').toLowerCase().trim();
-  const fEje=gv('opp-filter-ejecutivo'),fEst=gv('opp-filter-estado'),fConv=gv('opp-filter-conversion'),fUn=gv('opp-filter-un');
+  const fEje=gv('opp-filter-ejecutivo'),fEst=gv('opp-filter-estado'),fConv=gv('opp-filter-conversion'),fUn=gv('opp-filter-un'),fAct=gv('opp-filter-actividad');
   const opps=_oppDocs.filter(o=>{
     if(q&&!((o.cuentaNombre||'').toLowerCase().includes(q)))return false;
     if(fEje&&o.ejecutivo!==fEje)return false;
     if(fEst&&o.estado!==fEst)return false;
+    if(fAct&&o.actividadComercial!==fAct)return false;
     if(fConv&&o.conversion!==fConv)return false;
     if(fUn&&o.unidadNegocio!==fUn)return false;
     if(_oppWidget&&!_oppMatchWidget(o,_oppWidget))return false;
@@ -8831,7 +8852,7 @@ function filterOportunidades(){
 function _renderOppWidgets(){
   const el=document.getElementById('opp-widgets');if(!el)return;
   const c=k=>_oppDocs.filter(o=>_oppMatchWidget(o,k)).length;
-  const W=[['activas','Activas','#1C54F4'],['ganadas','Ganadas','#16A34A'],['perdidas','Perdidas','#EF3340'],['visitas','Visitas comerciales','#0090C7'],['propuestas','Propuestas enviadas','#B45309'],['negociacion','En negociación','#7C3AED']];
+  const W=[['activas','Activas','#1C54F4'],['ganadas','Ganadas','#16A34A'],['perdidas','Perdidas','#EF3340'],['act:Visita comercial','Visitas comerciales','#0090C7'],['act:Informe de alternativas','Informes de alternativas','#7C3AED'],['act:Propuesta de servicios','Propuestas de servicios','#B45309']];
   el.innerHTML=W.map(([k,lbl,col])=>`<div class="crm-kpi" style="cursor:pointer;${_oppWidget===k?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="oppToggleWidget('${k}')"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${c(k)}</div><div class="crm-kpi-l">${lbl}</div></div></div>`).join('');
 }
 window.oppToggleWidget=function(k){_oppWidget=_oppWidget===k?'':k;filterOportunidades();};
@@ -8839,19 +8860,20 @@ function renderOportunidadesTable(rows){
   const wrap=document.getElementById('opp-table-wrap');if(!wrap)return;
   if(!rows.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin oportunidades. Creá una con "+ Nueva Oportunidad".</div>';return;}
   let h='<table class="crm-table"><thead><tr>';
-  ['','Cuenta','Última actividad','Tipo de actividad','Estado','% Conversión','Ejecutivo','Últ. actualización',''].forEach(c=>h+=`<th>${c}</th>`);
+  ['','Cuenta','Última actividad','Actividad Comercial','Estado','% Conversión','Ejecutivo','Últ. actualización',''].forEach(c=>h+=`<th>${c}</th>`);
   h+='</tr></thead><tbody>';
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
     const nombre=o.cuentaNombre||cuenta?.nombre||o.cuentaId;
     const logo=(cuenta&&_logoValida(cuenta.logoUrl))?`<img src="${esc(cuenta.logoUrl)}" style="width:30px;height:30px;border-radius:7px;object-fit:cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'crm-avatar',style:'background:${crmAvatarBg(nombre)}',innerText:'${crmInitials(nombre)}'}))">`:`<div class="crm-avatar" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>`;
+    const actSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateActividad('${o._id}','${o.cuentaId}','${o.contactoId||''}',this.value)"><option value="">–</option>${OPP_ACTIVIDADES.map(s=>`<option${o.actividadComercial===s?' selected':''}>${s}</option>`).join('')}</select>`;
     const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${o.estado===s?' selected':''}>${s}</option>`).join('')}</select>`;
     const convSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateConv('${o._id}','${o.cuentaId}',this.value)"><option value="">–</option>${Object.keys(OPP_CONV_LBL).map(v=>`<option value="${v}"${o.conversion===v?' selected':''}>${OPP_CONV_LBL[v]}</option>`).join('')}</select>`;
     h+=`<tr onclick="crmOpenCuenta('${o.cuentaId}')">
       <td>${logo}</td>
       <td><div class="crm-client-name">${esc(nombre)}</div>${o.contactoNombre?`<div class="crm-client-sub">👤 ${esc(o.contactoNombre)}</div>`:''}</td>
       <td class="crm-date">${fmtDate(o.ultimaActividad)}</td>
-      <td><div class="crm-broker-cell">${esc(o.tipoActividad||'–')}</div></td>
+      <td>${actSel}</td>
       <td>${estSel}</td>
       <td>${convSel}</td>
       <td><div class="crm-broker-cell">${esc(ejecDisplay(o.ejecutivo))||'–'}</div></td>
@@ -8885,6 +8907,31 @@ window.oppUpdateConv=async function(oppId,cuentaId,val){
     filterOportunidades();
   }catch(e){alert('Error: '+e.message);}
 };
+// Registra la Actividad Comercial de la oportunidad en Actividades de la Cuenta y del
+// Contacto (si existe) y en el Timeline, reutilizando el modelo de actividades existente.
+async function _oppRegistrarActividadComercial(cuentaId,contactoId,tipo,nombreCuenta){
+  if(!db||!tipo)return;
+  const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
+  const reg={cat:'C',tipo,descripcion:'Registrada desde Oportunidad',fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad'};
+  await db.collection('clientes').doc(cuentaId).collection('actividades').add(reg);
+  await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now});
+  const idx=_crmDocs.findIndex(x=>x._id===cuentaId);if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividad:now};
+  if(typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'cuenta_actualizada',descripcion:`Actividad Comercial (Oportunidad): ${tipo}`});
+  if(contactoId){
+    db.collection('contactos').doc(contactoId).collection('actividades').add(reg).catch(()=>{});
+    db.collection('contactos').doc(contactoId).update({ultimaActividad:now}).catch(()=>{});
+    db.collection('contactoTimeline').add({contactoId,tipo:'actividad',descripcion:`Actividad Comercial (Oportunidad): ${tipo}`,fecha:now,usuario}).catch(()=>{});
+  }
+}
+window.oppUpdateActividad=async function(oppId,cuentaId,contactoId,val){
+  const now=firebase.firestore.Timestamp.now();
+  try{
+    await db.collection('oportunidades').doc(oppId).update({actividadComercial:val,ultimaActividad:now,ultimaActualizacion:now,tipoActividad:val||''});
+    const o=_oppDocs.find(x=>x._id===oppId);if(o){o.actividadComercial=val;o.tipoActividad=val||'';o.ultimaActividad=now;o.ultimaActualizacion=now;}
+    if(val)await _oppRegistrarActividadComercial(cuentaId,contactoId||'',val);
+    filterOportunidades();
+  }catch(e){alert('Error: '+e.message);}
+};
 // ── Drawer de Oportunidad ──
 window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
   ['opdr-cuenta','opdr-cto-q','opdr-bld-q','opdr-nota'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -8896,6 +8943,7 @@ window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
   const est=document.getElementById('opdr-estado');if(est)est.innerHTML=OPP_ESTADOS.map((s,i)=>`<option${i===0?' selected':''}>${s}</option>`).join('');
   const eje=document.getElementById('opdr-ejecutivo');if(eje)eje.innerHTML='<option value="">— Seleccionar —</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
   document.getElementById('opdr-conversion').value='';document.getElementById('opdr-un').value='';
+  {const a=document.getElementById('opdr-actividad');if(a)a.value='';}
   loadClientesParaSelector();_loadBldDocsIfNeeded().catch(()=>{});
   if(prefillCuentaId){document.getElementById('opdr-cuentaId').value=prefillCuentaId;document.getElementById('opdr-cuentaNombre').value=prefillCuentaNombre||'';document.getElementById('opdr-cuenta').value=prefillCuentaNombre||'';}
   const btn=document.getElementById('opdr-save-btn');if(btn){btn.textContent='Crear oportunidad';btn.disabled=false;}
@@ -8949,7 +8997,8 @@ window.saveOportunidadDrawer=async function(){
     const contactoId=document.getElementById('opdr-contactoId').value||'';
     const contactoNombre=(document.getElementById('opdr-contactoNombre').value||'').trim();
     const un=document.getElementById('opdr-un').value||'';const nota=(document.getElementById('opdr-nota').value||'').trim();
-    const opp={cuentaId,cuentaNombre,contactoId,contactoNombre,buildingIds:_opdrBlds.map(b=>b.id),buildingNames:_opdrBlds.map(b=>b.nombre),estado,conversion,ejecutivo,unidadNegocio:un,nota,tipoActividad:'Oportunidad Comercial creada',usuario,userEmail:user?.email||'',fechaCreacion:now,ultimaActividad:now,ultimaActualizacion:now};
+    const actividadComercial=document.getElementById('opdr-actividad')?.value||'';
+    const opp={cuentaId,cuentaNombre,contactoId,contactoNombre,buildingIds:_opdrBlds.map(b=>b.id),buildingNames:_opdrBlds.map(b=>b.nombre),estado,conversion,ejecutivo,unidadNegocio:un,nota,actividadComercial,tipoActividad:actividadComercial||'Oportunidad Comercial creada',usuario,userEmail:user?.email||'',fechaCreacion:now,ultimaActividad:now,ultimaActualizacion:now};
     const ref=await db.collection('oportunidades').add(opp);
     const desc=`Oportunidad creada — Estado: ${estado} · Conversión: ${OPP_CONV_LBL[conversion]||conversion}`+(contactoNombre?`\nContacto: ${contactoNombre}`:'')+(nota?`\n${nota}`:'');
     // Actividad Comercial automática en la Cuenta (mismo modelo que la solapa Actividades).
@@ -8958,6 +9007,8 @@ window.saveOportunidadDrawer=async function(){
     const idx=_crmDocs.findIndex(x=>x._id===cuentaId);if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividad:now};
     // Actividad en el Contacto principal (si corresponde).
     if(contactoId){db.collection('contactos').doc(contactoId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id}).catch(()=>{});db.collection('contactos').doc(contactoId).update({ultimaActividad:now}).catch(()=>{});}
+    // Si se eligió una Actividad Comercial, se registra también como actividad (Cuenta + Contacto + Timeline).
+    if(actividadComercial)await _oppRegistrarActividadComercial(cuentaId,contactoId,actividadComercial);
     _oppDocs.unshift({...opp,_id:ref.id});
     closeOportunidadDrawer();
     if(_crmActiveTab==='oportunidades')filterOportunidades();
