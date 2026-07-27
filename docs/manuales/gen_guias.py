@@ -42,7 +42,7 @@ GUIAS["Guia_Cuentas"] = Guia(
 
 # ─────────────────────────── CONTACTOS ───────────────────────────
 GUIAS["Guia_Contactos"] = Guia(
-    "Contactos", "2.0", FECHA,
+    "Contactos", "2.1", FECHA,
     "Permite registrar personas (contactos) y vincularlas a una cuenta. La ficha del contacto "
     "usa el mismo estilo que Cuentas, con solapas de Información General, Comentarios, "
     "Actividades, Inventario y Timeline.",
@@ -50,10 +50,11 @@ GUIAS["Guia_Contactos"] = Guia(
         ("Cuenta asociada", "Buscar y seleccionar la empresa a la que pertenece el contacto. Si la empresa no existe todavía, al final de la lista aparece la opción \"➕ Crear nueva cuenta\": se crea en el momento, sin salir del formulario, y queda seleccionada."),
         ("Nombre", "Nombre de pila de la persona."),
         ("Apellidos", "Apellido de la persona."),
-        ("Cargo segmentado", "Seleccionar el tipo de cargo: CEO, CFO, Compras, Real Estate u Otro."),
+        ("Cargo", "Seleccionar el tipo de cargo: CEO, CFO, Compras, Real Estate u Otro."),
         ("Puesto", "Escribir el puesto tal cual figura (por ejemplo: Director Comercial). Campo libre."),
         ("Especificar cargo", "Solo si en Cargo se eligió \"Otro\": escribir el cargo concreto."),
-        ("Inversor", "Indicar si la persona es inversor (Sí/No). Disponible solo para administradores."),
+        ("Inversor", "Indicar si la persona es inversor (Sí/No). Aparece debajo de Puesto."),
+        ("Unidad de negocio de interés", "Solo si Inversor = Sí: seleccionar las unidades que le interesan (Oficinas, Retail, Industria & Logística)."),
         ("Correo electrónico", "Email de la persona."),
         ("Estado del correo", "Indica si el correo es Funcional, Rebotado o Sin comprobar. Los ejecutivos comerciales no lo editan: se actualiza mediante importaciones masivas y los administradores pueden ajustarlo."),
         ("Teléfono", "Número de celular, sin el 11 y sin espacios (por ejemplo: 1551234567). Por privacidad, el teléfono solo lo ven el creador del contacto, los ejecutivos asignados y los administradores."),
@@ -70,7 +71,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "2.4", FECHA,
+    "Leads", "2.5", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
     "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
     "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
@@ -81,7 +82,7 @@ GUIAS["Guia_Leads"] = Guia(
         ("Email", "Correo electrónico de contacto (opcional). Si se completa, debe tener formato válido."),
         ("Teléfono móvil", "Número de celular de la persona (opcional). Se puede completar más adelante."),
         ("Empresa", "Empresa del interesado. Se puede buscar entre las cuentas existentes. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin perder los datos del lead."),
-        ("Cargo segmentado", "Seleccionar el tipo de cargo (CEO, CFO, Compras, Real Estate u Otro), igual que en Contactos. Si se elige \"Otro\", especificar el cargo en el campo Puesto."),
+        ("Cargo", "Seleccionar el tipo de cargo (CEO, CFO, Compras, Real Estate u Otro), igual que en Contactos. Si se elige \"Otro\", especificar el cargo en el campo Puesto."),
         ("Puesto", "Puesto o rol de la persona (opcional). Sirve para ampliar o especificar el cargo."),
         ("Tipo de consulta", "Tipo de consulta realizada: Oficina, Industria, Depósito, Terreno, Retail, SPS, Valuaciones u Otros. Si se elige \"Otros\", aparece un campo para especificar la consulta."),
         ("Clasificación", "Obligatorio. Indicar la calidad del lead al ingresar: Estándar o Calificado. No tiene valor por defecto."),
@@ -96,7 +97,7 @@ GUIAS["Guia_Leads"] = Guia(
         "Se crea el Lead con Resultado Pendiente y Estado Activo, asignado al ejecutivo indicado.",
         "Si pasa 14 días en Pendiente sin resolución, el lead pasa automáticamente a Inactivo (con recordatorios previos en los días 10 y 13). No se elimina.",
         "Al actualizar el Resultado (u otra acción comercial), un lead Inactivo vuelve a Activo.",
-        "Con Resultado Próspero se puede convertir en Contacto. Al convertir se puede: vincular a una cuenta existente, crear una nueva cuenta (se abre el formulario según tu perfil y se vincula sola), o marcar el contacto como Particular (sin cuenta). Al finalizar se abre la ficha del contacto creado; el lead queda como registro histórico.",
+        "Con Resultado Próspero, 'Convertir a Contacto' abre el formulario completo de Contacto precargado con los datos del Lead; se completa lo que falte y recién al presionar 'Crear Contacto' se genera. Dentro del formulario se elige la cuenta: existente, nueva o vacío (Particular). Antes de crear, avisa si ya existe un contacto con el mismo nombre y apellido. El lead queda como registro histórico.",
     ],
 )
 

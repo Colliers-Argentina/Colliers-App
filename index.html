@@ -2515,9 +2515,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-comercial">
-        <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Leads</span></button>
-        <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contactos</span></button>
         <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/><line x1="8" y1="16" x2="11" y2="16"/></svg></span><span>Cuentas</span></button>
+        <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contactos</span></button>
+        <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Leads</span></button>
         <button class="sb-item" data-mod="crm" data-submod="visitas" onclick="_sbItemClick('crm','visitas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>Visitas</span></button>
         <button class="sb-item" disabled><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span><span>Oportunidades</span><span class="sb-soon-badge">Pronto</span></button>
         <button class="sb-item" data-mod="transacciones" onclick="_sbItemClick('transacciones',null)"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></span><span>Transacciones</span></button>
@@ -2969,9 +2969,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="lead-search" type="text" placeholder="🔍 Buscar lead..." class="crm-search-inp" oninput="filterLeads()">
           <select id="lead-filter-estado" class="crm-sel" onchange="filterLeads()">
             <option value="">Todos los estados</option>
-            <option>Nuevo</option><option>Intento de contacto</option><option>Contactado</option>
-            <option>Calificado</option><option>Visita coordinada</option><option>Visita realizada</option>
-            <option>Propuesta enviada</option><option>Descartado</option><option>Convertido</option>
+            <option>Pendiente</option><option>Próspero</option><option>No Próspero</option>
+            <option>Inactivo</option><option>Convertido</option>
           </select>
           <select id="lead-filter-origen" class="crm-sel" onchange="filterLeads()">
             <option value="">Todos los orígenes</option>
@@ -2993,7 +2992,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div class="crm-det-topbar">
         <button class="crm-det-back-btn" onclick="closeLeadDetail()">← Volver a leads</button>
         <div style="flex:1"></div>
-        <button id="lead-convert-btn" onclick="openConvertModal()" style="display:none;background:#16A34A;color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer">🔄 Convertir a contacto</button>
+        <button id="lead-convert-btn" onclick="startLeadConversion()" style="display:none;background:#16A34A;color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer">🔄 Convertir a contacto</button>
         <button id="lead-send-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="_leadSendToBroker(_currentLeadId)">📧 Enviar al Broker</button>
         <button id="lead-copy-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="_leadCopyResumen(_currentLeadId)">📋 Copiar Resumen</button>
         <button id="lead-edit-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF">✏️ Editar</button>
@@ -3053,7 +3052,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <input id="ldr-cuentaId" type="hidden"><input id="ldr-cuentaNombre" type="hidden">
           </div>
           <div class="cdr-field">
-            <div class="cdr-lbl">Cargo segmentado</div>
+            <div class="cdr-lbl">Cargo</div>
             <select id="ldr-cargo" class="cdr-select" onchange="ldrCargoChange()">
               <option value="">Seleccionar...</option>
               <option value="CEO">CEO</option><option value="CFO">CFO</option>
@@ -3341,7 +3340,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <div class="cdr-row">
           <div class="cdr-field">
-            <div class="cdr-lbl">Cargo segmentado <span class="cdr-req">*</span></div>
+            <div class="cdr-lbl">Cargo <span class="cdr-req">*</span></div>
             <select id="ctdr-cargo" class="cdr-select" onchange="ctdrCargoChange()">
               <option value="">Seleccionar...</option>
               <option value="CEO">CEO</option>
@@ -3364,12 +3363,20 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="ctdr-cargo-otro" class="cdr-input" type="text" placeholder="Ej: COO, Director Comercial, HR Manager..." autocomplete="off" oninput="cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err')">
           <div class="cdr-err" id="ctdr-cargo-otro-err" style="display:none">Especificá el cargo.</div>
         </div>
-        <div class="cdr-field cdr-admin-only">
-          <div class="cdr-lbl">Inversor <span class="cdr-admin-tag">ADMIN</span></div>
-          <select id="ctdr-inversor" class="cdr-select">
+        <div class="cdr-field">
+          <div class="cdr-lbl">Inversor</div>
+          <select id="ctdr-inversor" class="cdr-select" onchange="ctdrInversorChange()">
             <option value="No">No</option>
             <option value="Sí">Sí</option>
           </select>
+        </div>
+        <div class="cdr-field" id="ctdr-un-field" style="display:none">
+          <div class="cdr-lbl">Unidad de negocio de interés</div>
+          <div class="cdr-toggle-group" id="ctdr-bu-chips" style="border-radius:8px">
+            <button type="button" class="cto-pref-chip" data-bu="Oficinas" onclick="this.classList.toggle('active')">Oficinas</button>
+            <button type="button" class="cto-pref-chip" data-bu="Retail" onclick="this.classList.toggle('active')">Retail</button>
+            <button type="button" class="cto-pref-chip" data-bu="Industria & Logística" onclick="this.classList.toggle('active')">Industria & Logística</button>
+          </div>
         </div>
       </div>
 
@@ -6460,7 +6467,7 @@ function renderAntcPanel(){
   const sel=(key,label,opts)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div><select id="antc-flt-${key}" class="crm-flt-sel" onchange="antcFltSelect('${key}',this.value)">${opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join('')}</select></div>`;
   p.innerHTML=
     `<div class="crm-flt-field"><div class="crm-flt-lbl">Buscar</div><input id="antc-flt-text" class="crm-flt-sel" type="text" placeholder="Nombre, apellido o cuenta..." autocomplete="off" oninput="antcFltText(this.value)"></div>`+
-    ms('cargo','Cargo segmentado','Buscar cargo...')+
+    ms('cargo','Cargo','Buscar cargo...')+
     sel('estadoCorreo','Estado del correo',[{v:'',t:'Todos'},{v:'funcional',t:'🟢 Funcional'},{v:'sin_comprobar',t:'🟡 Sin comprobar'},{v:'rebotado',t:'🔴 Rebotado'}])+
     sel('propietario','Propietario',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
     sel('conCuenta','Cuenta asociada',[{v:'',t:'Todos'},{v:'Sí',t:'Con cuenta'},{v:'No',t:'Sin cuenta'}])+
@@ -6498,7 +6505,7 @@ window.renderContactosAnalytics=function(docs,totalBase){
   const ejeM=_ancCountBy(docs,d=>ejecDisplay(_ctoEjecutivo(d)));
   const ctaM=_ancCountBy(docs,d=>d.cuentaNombre||'');
   ch.innerHTML=
-    _ancCard('Por Cargo segmentado',_ancBars([...cargoM],{max:8}))+
+    _ancCard('Por Cargo',_ancBars([...cargoM],{max:8}))+
     _ancCard('Estado del correo',_ancBars([...correoM],{order:[_ESTADO_CORREO_LBL.funcional,_ESTADO_CORREO_LBL.sin_comprobar,_ESTADO_CORREO_LBL.rebotado]}))+
     _ancCard('Propietario de inmueble',_ancBars([...propM],{order:['Sí','No']}))+
     _ancCard('Por Ejecutivo Comercial',_ancBars([...ejeM],{max:8}))+
@@ -6633,7 +6640,8 @@ function renderCuentaLeftPanel(docId){
       <div class="cta-kpi"><span class="cta-kpi-l">🏆 Oportunidades Ganadas</span><span class="cta-kpi-v" id="cta-stat-ganadas">–</span></div>
       <div class="cta-kpi"><span class="cta-kpi-l">🏢 Inmuebles Asociados</span><span class="cta-kpi-v" id="cta-stat-inmuebles">–</span></div>
     </div>
-    <div class="crm-det-meta-item" style="margin-top:.2rem"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${d.fechaCreacion?fmtDate(d.fechaCreacion):'–'}</div></div>
+    <div class="crm-det-meta-item" style="margin-top:.2rem"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividadComercial||d.ultimaActividad)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${d.fechaCreacion?fmtDate(d.fechaCreacion):'–'}</div></div>
   `;
 }
 // Abre la ficha de una Cuenta desde otra sección (Leads/Contactos): cambia a la
@@ -7158,6 +7166,7 @@ function renderContactoInfoCards(d){
           ${row('Creado por',t(d.brokerResponsable))}
           <div class="nx-row"><div class="nx-row-l">Ejecutivo(s) Comercial(es)</div><div class="nx-row-v" style="flex-direction:column;align-items:flex-end;gap:.15rem">${ejecVal}</div></div>
           ${row('Inversor',t(d.inversor||'No'))}
+          ${d.inversor==='Sí'?row('Unidad de negocio de interés',(Array.isArray(d.unidadesNegocio)&&d.unidadesNegocio.length)?d.unidadesNegocio.map(b=>`<span class="crm-tag">${esc(b)}</span>`).join(''):null):''}
         </div>
       </div>
     </div>`;
@@ -7201,10 +7210,10 @@ window.contactoFichaEdit=function(docId){
       <div class="nx-col">
         <div class="nx-card">
           <div class="nx-card-title">Datos Personales</div>
-          ${nxErow('Cargo segmentado',`<select id="cfe-cargo" class="cdr-select" onchange="var f=document.getElementById('cfe-cargo-otro-field');if(f)f.style.display=this.value==='Otro'?'':'none'">${cargoOpts}</select><div id="cfe-cargo-otro-field" style="display:${cargoSelV==='Otro'?'':'none'};margin-top:.4rem"><input id="cfe-cargo-otro" class="cdr-input" placeholder="Especificar cargo" value="${esc(cargoOtroV)}"></div>`)}
+          ${nxErow('Cargo',`<select id="cfe-cargo" class="cdr-select" onchange="var f=document.getElementById('cfe-cargo-otro-field');if(f)f.style.display=this.value==='Otro'?'':'none'">${cargoOpts}</select><div id="cfe-cargo-otro-field" style="display:${cargoSelV==='Otro'?'':'none'};margin-top:.4rem"><input id="cfe-cargo-otro" class="cdr-input" placeholder="Especificar cargo" value="${esc(cargoOtroV)}"></div>`)}
           ${nxErow('Puesto',`<input id="cfe-puesto" class="cdr-input" value="${esc(d.puesto||'')}">`)}
           ${nxErow('Cuenta asociada',`<input id="cfe-cuenta-q" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" value="${esc(d.cuentaNombre||'')}" oninput="ctaPickerInput('cfe',this.value)" onblur="ctaPickerBlur('cfe')"><div id="cfe-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><span id="cfe-cuenta-tag" style="display:none;font-size:10.5px;color:#16A34A;font-weight:700;margin-top:3px"></span><input id="cfe-cuentaId" type="hidden" value="${esc(d.cuentaId||'')}"><input id="cfe-cuentaNombre" type="hidden" value="${esc(d.cuentaNombre||'')}">`)}
-          ${isAdmin?nxErow('Inversor',`<select id="cfe-inversor" class="cdr-select"><option value="No"${(d.inversor||'No')==='No'?' selected':''}>No</option><option value="Sí"${d.inversor==='Sí'?' selected':''}>Sí</option></select>`):''}
+          ${isAdmin?nxErow('Inversor',`<select id="cfe-inversor" class="cdr-select" onchange="var f=document.getElementById('cfe-un-field');if(f)f.style.display=this.value==='Sí'?'':'none'"><option value="No"${(d.inversor||'No')==='No'?' selected':''}>No</option><option value="Sí"${d.inversor==='Sí'?' selected':''}>Sí</option></select><div id="cfe-un-field" style="display:${d.inversor==='Sí'?'':'none'};margin-top:.4rem"><div class="cdr-toggle-group" id="cfe-bu-chips" style="border-radius:8px">${['Oficinas','Retail','Industria & Logística'].map(b=>`<button type="button" class="cto-pref-chip${(Array.isArray(d.unidadesNegocio)&&d.unidadesNegocio.includes(b))?' active':''}" data-bu="${esc(b)}" onclick="this.classList.toggle('active')">${b}</button>`).join('')}</div></div>`):''}
         </div>
         <div class="nx-card">
           <div class="nx-card-title">Comentarios</div>
@@ -7234,7 +7243,8 @@ window.contactoFichaSave=async function(docId){
   set('ctdr-telefono',gv('cfe-telefono'));set('ctdr-comentarios',gv('cfe-comentarios'));
   set('ctdr-cuentaId',gv('cfe-cuentaId'));set('ctdr-cuentaNombre',gv('cfe-cuentaNombre'));
   set('ctdr-estadoCorreo',isAdmin?(gv('cfe-estadoCorreo')||'sin_comprobar'):(d.estadoCorreo||'sin_comprobar'));
-  if(isAdmin){set('ctdr-linkedin',gv('cfe-linkedin'));set('ctdr-inversor',gv('cfe-inversor')||d.inversor||'No');}
+  if(isAdmin){set('ctdr-linkedin',gv('cfe-linkedin'));set('ctdr-inversor',gv('cfe-inversor')||d.inversor||'No');
+    const cfeBU=[...document.querySelectorAll('#cfe-bu-chips .cto-pref-chip.active')].map(b=>b.dataset.bu);_ctdrBUset(cfeBU);}
   // _ctdrEjec ya refleja la selección de la ficha (prefijo 'cfe'); saveContactoDrawer lo usa si admin.
   _ctdrEditId=docId;
   await saveContactoDrawer();
@@ -7260,8 +7270,8 @@ function openContactoDetail(docId){
     </div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta asociada</div>${cuentaVal}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado del correo</div>${emailBadge(d.estadoCorreo)}</div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
   `;
   document.getElementById('cto-det-right').innerHTML=`
     <div class="crm-det-tabs">
@@ -7381,34 +7391,65 @@ window.addComentario=async function(col,parentId,inputId,bodyId){
 };
 
 // ═══ Actividades del Contacto (mismo patrón que Cuentas; orden cronológico descendente) ═══
+// Actividades del Contacto: dos columnas (Comerciales | Marketing & Research), misma
+// lógica y permisos que en Cuentas. Ejecutivos: solo visualizan Marketing & Research.
+let _ctoActDocs=[];
 async function loadContactoActividades(contactoId){
   const body=document.getElementById('cto-dt-actividades-body');if(!body)return;
   if(!db){body.innerHTML='<div class="anc-empty">Firebase no disponible.</div>';return;}
-  const btns=`<div class="act-btns">${ACT_COMERCIALES.map((t,i)=>`<button type="button" class="act-btn" onclick="regActContactoIdx('${contactoId}',${i})">＋ ${esc(t)}</button>`).join('')}</div>`;
-  body.innerHTML=`<div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>${btns}<div id="cto-act-list"><div class="anc-empty">Cargando…</div></div>`;
-  _renderContactoActList(contactoId);
-}
-async function _renderContactoActList(contactoId){
-  const el=document.getElementById('cto-act-list');if(!el)return;
+  const isAdmin=_nexusRole()!=='ejecutivo';
+  const btns=(cat,list)=>`<div class="act-btns">${list.map((t,i)=>`<button type="button" class="act-btn" onclick="regActContactoIdx('${contactoId}','${cat}',${i})">＋ ${esc(t)}</button>`).join('')}</div>`;
+  body.innerHTML=`
+    <div class="act-2col">
+      <div>
+        <div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>
+        ${btns('C',ACT_COMERCIALES)}
+        <div id="cto-act-list-C"><div class="anc-empty">Cargando…</div></div>
+      </div>
+      <div>
+        <div class="cta-sec-title" style="margin-top:0">Actividades Marketing & Research</div>
+        ${isAdmin?btns('M',ACT_MARKETING):'<div style="font-size:10.5px;color:#8898C0;margin-bottom:.6rem">Sólo los Administradores pueden registrar actividades de Marketing & Research.</div>'}
+        <div id="cto-act-list-M"><div class="anc-empty">Cargando…</div></div>
+      </div>
+    </div>`;
   try{
     const snap=await db.collection('contactos').doc(contactoId).collection('actividades').orderBy('fecha','desc').limit(200).get();
-    if(snap.empty){el.innerHTML='<div class="anc-empty">Sin actividades registradas.</div>';return;}
-    el.innerHTML=snap.docs.map(doc=>{const a=doc.data();const t=_tsToDate(a.fecha);
-      return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div></div>`;
-    }).join('');
-  }catch(e){el.innerHTML='<div class="anc-empty">Error: '+esc(e.message)+'</div>';}
+    _ctoActDocs=snap.docs.map(x=>({...x.data(),_id:x.id}));
+    _renderContactoActLists(contactoId);
+  }catch(e){const c=document.getElementById('cto-act-list-C');if(c)c.innerHTML=`<div class="anc-empty">Error: ${e.message}</div>`;}
 }
-window.regActContactoIdx=async function(contactoId,i){
-  const tipo=ACT_COMERCIALES[i];if(!tipo||!db)return;
+function _renderContactoActLists(contactoId){
+  const isAdmin=_nexusRole()!=='ejecutivo';
+  ['C','M'].forEach(cat=>{
+    const el=document.getElementById('cto-act-list-'+cat);if(!el)return;
+    const items=_ctoActDocs.filter(a=>(a.cat||'C')===cat);
+    if(!items.length){el.innerHTML=`<div class="anc-empty">Sin actividades ${cat==='C'?'comerciales':'de Marketing & Research'} registradas.</div>`;return;}
+    el.innerHTML=items.map(a=>{const t=_tsToDate(a.fecha);const idx=_ctoActDocs.indexOf(a);
+      return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div>${isAdmin?`<span style="display:flex;gap:.35rem;flex-shrink:0"><span class="cdr-ms-chip-x" title="Eliminar" onclick="delActContactoIdx('${contactoId}',${idx})">🗑</span></span>`:''}</div>`;
+    }).join('');
+  });
+}
+window.regActContactoIdx=async function(contactoId,cat,i){
+  const tipo=cat==='M'?ACT_MARKETING[i]:ACT_COMERCIALES[i];if(!tipo||!db)return;
+  if(cat==='M'&&_nexusRole()==='ejecutivo')return;   // Marketing & Research: solo admins
   let descripcion='';
-  if(tipo==='Otros'){descripcion=(prompt('Descripción de la actividad:')||'').trim();if(!descripcion)return;}
+  if(/^Otr/.test(tipo)){descripcion=(prompt('Descripción de la actividad:')||'').trim();if(!descripcion)return;}
   const now=firebase.firestore.Timestamp.now();
-  const reg={cat:'C',tipo,descripcion,fecha:now,usuario:user?.displayName||user?.email||'',userEmail:user?.email||''};
+  const reg={cat,tipo,descripcion,fecha:now,usuario:user?.displayName||user?.email||'',userEmail:user?.email||''};
   try{
-    await db.collection('contactos').doc(contactoId).collection('actividades').add(reg);
+    const ref=await db.collection('contactos').doc(contactoId).collection('actividades').add(reg);
     await db.collection('contactos').doc(contactoId).update({ultimaActividad:now}).catch(()=>{});
     const idx=_ctoDocs.findIndex(x=>x._id===contactoId);if(idx>=0)_ctoDocs[idx].ultimaActividad=now;
-    _renderContactoActList(contactoId);
+    _ctoActDocs.unshift({...reg,_id:ref.id});
+    _renderContactoActLists(contactoId);
+  }catch(e){alert('Error: '+e.message);}
+};
+window.delActContactoIdx=async function(contactoId,i){
+  if(_nexusRole()==='ejecutivo')return;
+  const a=_ctoActDocs[i];if(!a)return;
+  if(!confirm(`¿Eliminar la actividad "${a.tipo||''}"?`))return;
+  try{await db.collection('contactos').doc(contactoId).collection('actividades').doc(a._id).delete();
+    _ctoActDocs.splice(i,1);_renderContactoActLists(contactoId);
   }catch(e){alert('Error: '+e.message);}
 };
 
@@ -7700,6 +7741,14 @@ window.ctdrCargoChange=function(){
   if(!isOtro){const i=document.getElementById('ctdr-cargo-otro');if(i)i.value='';cdrClearErr('ctdr-cargo-otro','ctdr-cargo-otro-err');}
   cdrClearErr('ctdr-cargo','ctdr-cargo-err');
 };
+// Inversor = Sí muestra "Unidad de negocio de interés" (misma lógica que Cuentas).
+window.ctdrInversorChange=function(){
+  const inv=document.getElementById('ctdr-inversor');
+  const f=document.getElementById('ctdr-un-field');
+  if(f)f.style.display=(inv&&inv.value==='Sí')?'':'none';
+};
+function _ctdrBUget(){return [...document.querySelectorAll('#ctdr-bu-chips .cto-pref-chip.active')].map(b=>b.dataset.bu);}
+function _ctdrBUset(arr){arr=Array.isArray(arr)?arr:[];document.querySelectorAll('#ctdr-bu-chips .cto-pref-chip').forEach(b=>b.classList.toggle('active',arr.includes(b.dataset.bu)));}
 // Setea el desplegable a partir del valor almacenado: si es estándar lo selecciona;
 // si no coincide con ninguno, elige "Otro" y muestra el valor en "Especificar cargo".
 function _ctdrSetCargo(cargo){
@@ -7713,11 +7762,12 @@ function _ctdrSetCargo(cargo){
 }
 window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
   _puestoEnsureCat();
-  _ctdrEditId=null;
+  _ctdrEditId=null;_ctdrLeadConv=null;
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['ctdr-cargo','ctdr-estadoCorreo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
   {const inv=document.getElementById('ctdr-inversor');if(inv)inv.value='No';}
+  _ctdrBUset([]);ctdrInversorChange();
   // "Creado por": se asigna automáticamente al usuario que crea el contacto (solo lectura).
   _ctdrSetBrokerResp(user?.displayName||user?.email||'');
   // Ejecutivo(s) Comercial(es): NO se muestra durante la creación.
@@ -7757,6 +7807,7 @@ window.openContactoDrawer_edit=function(docId){
   set('ctdr-email',d.email);set('ctdr-telefono',d.telefono);
   set('ctdr-linkedin',d.linkedin);set('ctdr-comentarios',d.comentarios);
   set('ctdr-inversor',d.inversor||'No');
+  _ctdrBUset(d.unidadesNegocio||[]);ctdrInversorChange();
   _ctdrSetCargo(d.cargo||'');
   document.getElementById('ctdr-estadoCorreo').value=d.estadoCorreo||'sin_comprobar';
   // "Creado por": solo lectura, no editable ni por administradores.
@@ -7768,7 +7819,7 @@ window.openContactoDrawer_edit=function(docId){
 };
 
 window.closeContactoDrawer=function(){
-  _ctdrEditId=null;
+  _ctdrEditId=null;_ctdrLeadConv=null;
   document.getElementById('ctdr-overlay').classList.remove('open');
   document.getElementById('ctdr-drawer').classList.remove('open');
   document.getElementById('ctdr-cuenta-list').style.display='none';
@@ -7838,7 +7889,8 @@ window.saveContactoDrawer=async function(){
     // usuario estándar nunca lo pisa (ni siquiera al editar).
     if(_cdrIsAdmin())newData.linkedin=(document.getElementById('ctdr-linkedin').value||'').trim();
     // Inversor (Sí/No): campo administrativo. Sólo lo escribe un admin.
-    if(_cdrIsAdmin()){const inv=document.getElementById('ctdr-inversor');newData.inversor=inv?(inv.value||'No'):'No';}
+    {const inv=document.getElementById('ctdr-inversor');newData.inversor=inv?(inv.value||'No'):'No';
+     newData.unidadesNegocio=newData.inversor==='Sí'?_ctdrBUget():[];}
     // "Creado por" (brokerResponsable) NO se modifica al editar (auditoría, no editable).
     // Ejecutivo(s) Comercial(es): solo un administrador los asigna, únicamente en edición.
     if(_ctdrEditId&&_cdrIsAdmin()){
@@ -7861,12 +7913,21 @@ window.saveContactoDrawer=async function(){
       closeContactoDrawer();
       loadContactos();
     } else {
+      // Validación de duplicados: mismo nombre + apellido. Advertir antes de crear.
+      try{if(!Array.isArray(_ctoDocs)||!_ctoDocs.length){const s=await db.collection('contactos').get();_ctoDocs=s.docs.map(x=>({...x.data(),_id:x.id}));}}catch(e){}
+      const nn=nombre.trim().toLowerCase(),aa=apellidos.trim().toLowerCase();
+      const dupe=(_ctoDocs||[]).find(c=>(c.estadoRegistro||'activo')!=='archivado'&&(c.nombre||'').trim().toLowerCase()===nn&&(c.apellidos||'').trim().toLowerCase()===aa);
+      if(dupe&&!confirm(`Ya existe un contacto con un nombre similar: "${((dupe.nombre||'')+' '+(dupe.apellidos||'')).trim()}". ¿Desea crearlo igualmente?`)){
+        btn.textContent='Crear contacto';btn.disabled=false;return;
+      }
       const createData={...newData,inversor:newData.inversor||'No',estadoRegistro:'activo',brokerResponsable:user?.displayName||user?.email||'',userEmail:user?.email||'',fechaCreacion:now,ultimoContacto:now,ultimaActividad:now};
-      await db.collection('contactos').add(createData);
+      if(_ctdrLeadConv&&!createData.cuentaId)createData.esParticular=true;
+      const ref=await db.collection('contactos').add(createData);
       if(newData.puesto)_puestoCatAdd(newData.puesto);
       if(newData.cuentaId){addClientTimeline(newData.cuentaId,{tipo:'alta_contacto',descripcion:`Contacto agregado: ${(nombre+' '+apellidos).trim()}`});delete _ctaQuickCache[newData.cuentaId];}
       closeContactoDrawer();
-      loadContactos();
+      if(_ctdrLeadConv){await _completeLeadConversionFromContact(ref.id,createData.cuentaId,createData.cuentaNombre);}
+      else loadContactos();
     }
   }catch(e){
     alert('Error: '+e.message);
@@ -7885,7 +7946,7 @@ function _diffFields(oldD,newD,labels){
 
 // ===== LEADS =====
 let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente';
-let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null;
+let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null,_ctdrLeadConv=null;
 let _cdrRubros=[];        // rubros seleccionados (many-to-many) -> string[]
 let _cdrSubrubros=[];     // subrubros seleccionados -> [{r:rubro, s:subrubro}]
 let _cdrRubroOpts=[];     // opciones actuales del dropdown de rubro (para handlers por índice)
@@ -7902,6 +7963,12 @@ const LEAD_ALERTA_DIAS=[10,13];    // recordatorios previos
 function leadClasifBadge(c){const s={'Calificado':'background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)','Estándar':'background:rgba(123,139,189,.12);color:#56648F;border:1px solid rgba(123,139,189,.3)'}[c]||'background:rgba(123,139,189,.12);color:#56648F;border:1px solid rgba(123,139,189,.3)';return c?`<span class="estado-badge" style="${s}">${esc(c)}</span>`:'<span style="color:#8898C0">–</span>';}
 function leadResultadoBadge(r){r=r||'Pendiente';const s={'Próspero':'background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)','No Próspero':'background:rgba(239,51,64,.1);color:#EF3340;border:1px solid rgba(239,51,64,.3)','Pendiente':'background:rgba(245,158,11,.12);color:#B45309;border:1px solid rgba(245,158,11,.3)'}[r];return `<span class="estado-badge" style="${s}">${esc(r)}</span>`;}
 function leadActividadBadge(e){e=e||'Activo';const on=e==='Activo';return `<span class="estado-badge" style="${on?'background:rgba(28,84,244,.1);color:#1C54F4;border:1px solid rgba(28,84,244,.3)':'background:rgba(123,139,189,.12);color:#8898C0;border:1px solid rgba(123,139,189,.3)'}">${on?'🟢 Activo':'⚪ Inactivo'}</span>`;}
+// "Estado" unificado del Lead (texto): Convertido → Inactivo → Resultado (Pendiente inicial).
+function _leadEstadoText(d){return d.estado==='Convertido'?'Convertido':((d.estadoActividad||'Activo')==='Inactivo'?'Inactivo':(d.resultado||'Pendiente'));}
+function _leadEstadoDisplay(d){
+  if(d.estado==='Convertido')return `<span class="estado-badge" style="background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)">Convertido</span>`;
+  return (d.estadoActividad||'Activo')==='Inactivo'?leadActividadBadge('Inactivo'):leadResultadoBadge(d.resultado||'Pendiente');
+}
 // Días que un lead lleva con resultado Pendiente (base: resultadoDesde o fechaCreacion).
 function _leadDiasPendiente(d){const base=_tsToDate(d.resultadoDesde)||_tsToDate(d.fechaCreacion);if(!base)return 0;return Math.floor((Date.now()-base.getTime())/864e5);}
 
@@ -7931,7 +7998,7 @@ function filterLeads(){
     if((d.estadoRegistro||'activo')==='archivado')return false;
     const full=((d.nombre||'')+' '+(d.apellido||'')+' '+(d.empresa||'')+' '+(d.email||'')).toLowerCase();
     if(q&&!full.includes(q))return false;
-    if(estado&&d.estado!==estado)return false;
+    if(estado&&_leadEstadoText(d)!==estado)return false;
     if(origen&&d.origen!==origen)return false;
     return true;
   });
@@ -7941,14 +8008,14 @@ function filterLeads(){
 function renderLeadsKPIs(docs){
   const row=document.getElementById('lead-kpi-row');if(!row)return;
   const total=docs.length;
-  const nuevos=docs.filter(d=>d.estado==='Nuevo').length;
+  const pendientes=docs.filter(d=>_leadEstadoText(d)==='Pendiente').length;
   const convertidos=docs.filter(d=>d.estado==='Convertido').length;
-  const descartados=docs.filter(d=>d.estado==='Descartado').length;
+  const inactivos=docs.filter(d=>_leadEstadoText(d)==='Inactivo').length;
   row.innerHTML=`
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🎯</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Total leads</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🆕</div><div class="crm-kpi-data"><div class="crm-kpi-v">${nuevos}</div><div class="crm-kpi-l">Nuevos</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FEF6E7">⏳</div><div class="crm-kpi-data"><div class="crm-kpi-v">${pendientes}</div><div class="crm-kpi-l">Pendientes</div></div></div>
     <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${convertidos}</div><div class="crm-kpi-l">Convertidos</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FEF2F2">🗑️</div><div class="crm-kpi-data"><div class="crm-kpi-v">${descartados}</div><div class="crm-kpi-l">Descartados</div></div></div>
+    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#F3F4F6">⚪</div><div class="crm-kpi-data"><div class="crm-kpi-v">${inactivos}</div><div class="crm-kpi-l">Inactivos</div></div></div>
   `;
 }
 
@@ -7966,7 +8033,7 @@ function renderLeadsTable(docs){
       <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${bg}">${ini}</div><div><div class="crm-client-name">${fullname}</div><div class="crm-client-sub">${d.email||''}</div></div></div></td>
       <td><div class="crm-broker-cell">${d.empresa||'–'}</div></td>
       <td>${leadOrigenBadge(d.origen)}</td>
-      <td>${leadEstadoBadge(d.estado)}</td>
+      <td>${_leadEstadoDisplay(d)}</td>
       <td><div class="crm-broker-cell">${d.buildingName||'–'}</div></td>
       <td><div class="crm-broker-cell">${esc(ejecDisplay(d.brokerAsignado))||'–'}</div></td>
       <td class="crm-date">${fmtDate(d.fechaCreacion)}</td>
@@ -7993,7 +8060,7 @@ function renderLeadInfoCards(d){
           ${row('Apellido',t(d.apellido))}
           ${row('Email',t(d.email))}
           ${row('Teléfono',t(d.telefono))}
-          ${row('Cargo segmentado',t(d.cargo))}
+          ${row('Cargo',t(d.cargo))}
           ${row('Puesto',t(d.puesto))}
         </div>
       </div>
@@ -8039,7 +8106,7 @@ window.leadFichaEdit=function(docId){
           ${nxErow('Apellido',`<input id="lfe-apellido" class="cdr-input" value="${esc(d.apellido||'')}">`)}
           ${nxErow('Email',`<input id="lfe-email" class="cdr-input" type="email" value="${esc(d.email||'')}">`)}
           ${nxErow('Teléfono',`<input id="lfe-telefono" class="cdr-input" type="tel" value="${esc(d.telefono||'')}">`)}
-          ${nxErow('Cargo segmentado',`<select id="lfe-cargo" class="cdr-select">${['','CEO','CFO','Compras','Real Estate','Otro'].map(o=>`<option value="${esc(o)}"${(d.cargo||'')===o?' selected':''}>${o||'Seleccionar...'}</option>`).join('')}</select>`)}
+          ${nxErow('Cargo',`<select id="lfe-cargo" class="cdr-select">${['','CEO','CFO','Compras','Real Estate','Otro'].map(o=>`<option value="${esc(o)}"${(d.cargo||'')===o?' selected':''}>${o||'Seleccionar...'}</option>`).join('')}</select>`)}
           ${nxErow('Puesto',`<input id="lfe-puesto" class="cdr-input" value="${esc(d.puesto||'')}">`)}
         </div>
       </div>
@@ -8123,26 +8190,17 @@ function openLeadDetail(docId){
   if(editBtn){editBtn.onclick=()=>leadFichaEdit(docId);}
   const archiveBtn=document.getElementById('lead-archive-btn');
   if(archiveBtn){archiveBtn.onclick=()=>archiveLead(docId);}
-  // Panel izquierdo (mismo diseño que Cuentas/Contactos): solo resumen esencial.
+  // Panel izquierdo: Estado (Resultado; Inactivo si corresponde), Clasificación y fechas.
   document.getElementById('lead-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       <div class="crm-det-av" style="background:${bg}">${ini}</div>
       <div class="crm-det-av-name">${fullname}</div>
     </div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><span id="lead-actividad-badge">${leadActividadBadge(d.estadoActividad)}</span></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><span id="lead-estado-badge">${_leadEstadoDisplay(d)}</span></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Clasificación</div>${leadClasifBadge(d.clasificacion)}</div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Resultado</div><span id="lead-resultado-badge">${leadResultadoBadge(d.resultado)}</span></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
   `;
-  const estadoOpts=LEAD_ESTADOS.map(e=>`<option${d.estado===e?' selected':''}>${e}</option>`).join('');
-  const descarteRow=`<div id="lead-descarte-row" style="display:${d.estado==='Descartado'?'block':'none'};margin-top:.75rem">
-    <div class="crm-det-meta-lbl" style="margin-bottom:.35rem">Motivo de descarte</div>
-    <select class="crm-estado-sel" onchange="updateLeadMotivo('${docId}',this.value)">
-      <option value="">— Seleccionar —</option>
-      ${LEAD_DESCARTE.map(m=>`<option${d.motivoDescarte===m?' selected':''}>${m}</option>`).join('')}
-    </select>
-  </div>`;
   document.getElementById('lead-det-right').innerHTML=`
     <div class="crm-det-tabs">
       <button class="crm-det-tab active" onclick="leadDetTab(this,'ldt-info')">Información</button>
@@ -8151,19 +8209,9 @@ function openLeadDetail(docId){
     <div class="crm-det-tab-body">
       <div id="ldt-info">
         <div class="nx-card" style="margin-bottom:.9rem">
-          <div class="nx-card-title">Ciclo comercial</div>
-          <div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.35rem 0 .6rem">
-            <span>${leadClasifBadge(d.clasificacion)}</span>
-            <span id="lead-resultado-badge2">${leadResultadoBadge(d.resultado)}</span>
-            <span id="lead-actividad-badge2">${leadActividadBadge(d.estadoActividad)}</span>
-          </div>
-          <div class="crm-det-meta-lbl" style="margin-bottom:.3rem">Resultado</div>
+          <div class="nx-card-title">Estado</div>
+          <div class="crm-det-meta-lbl" style="margin:.2rem 0 .3rem">Resultado</div>
           <select class="crm-estado-sel" onchange="updateLeadResultado('${docId}',this.value)">${LEAD_RESULTADOS.map(r=>`<option${(d.resultado||'Pendiente')===r?' selected':''}>${r}</option>`).join('')}</select>
-        </div>
-        <div class="nx-card" style="margin-bottom:.9rem">
-          <div class="nx-card-title">Pipeline</div>
-          <select class="crm-estado-sel" style="margin-top:.2rem" onchange="updateLeadEstado('${docId}',this.value)">${estadoOpts}</select>
-          ${descarteRow}
         </div>
         ${renderLeadInfoCards(d)}
       </div>
@@ -8290,10 +8338,8 @@ async function updateLeadResultado(docId,valor){
     await addLeadTimeline(docId,{tipo:'cambio_resultado',descripcion:`Resultado: ${prev} → ${valor}`});
     if(reactivado)await addLeadTimeline(docId,{tipo:'reactivado',descripcion:'Lead reactivado (Activo) por actualización de Resultado'});
     if(valor==='No Próspero')await addLeadTimeline(docId,{tipo:'no_prospero',descripcion:'Lead marcado No Próspero — se conserva como registro histórico'});
-    // Actualizar badges visibles.
-    const estAct=(idx>=0?_leadDocs[idx].estadoActividad:'Activo')||'Activo';
-    ['lead-resultado-badge','lead-resultado-badge2'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=leadResultadoBadge(valor);});
-    ['lead-actividad-badge','lead-actividad-badge2'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=leadActividadBadge(estAct);});
+    // Actualizar el badge "Estado" del panel izquierdo.
+    const eb=document.getElementById('lead-estado-badge');if(eb&&idx>=0)eb.innerHTML=_leadEstadoDisplay(_leadDocs[idx]);
     const convertBtn=document.getElementById('lead-convert-btn');
     if(convertBtn)convertBtn.style.display=(valor==='Próspero'&&d?.estado!=='Convertido')?'inline-block':'none';
     if(typeof filterLeads==='function')filterLeads();
@@ -8371,7 +8417,7 @@ async function loadLeadTimeline(docId){
   }catch(e){body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;}
 }
 
-// Cargo segmentado del Lead (mismo criterio que Contactos). "Otro" → especificar en Puesto.
+// Cargo del Lead (mismo criterio que Contactos). "Otro" → especificar en Puesto.
 window.ldrCargoChange=function(){
   const sel=document.getElementById('ldr-cargo');const hint=document.getElementById('ldr-puesto-hint');
   if(hint)hint.textContent=(sel&&sel.value==='Otro')?'(especificá el cargo)':'';
@@ -9008,6 +9054,39 @@ async function _gotoContacto(contactoId){
     if(typeof loadContactos==='function')await loadContactos();
     if(_ctoDocs.find(x=>x._id===contactoId))openContactoDetail(contactoId);
   }catch(e){console.warn('gotoContacto',e);}
+}
+
+// Conversión de Lead → Contacto: abre el formulario COMPLETO de Contacto precargado con
+// los datos del Lead. El Contacto se crea recién al presionar "Crear Contacto"
+// (la cuenta se elige dentro del formulario: existente, nueva o vacío = Particular).
+window.startLeadConversion=function(){
+  const lead=_leadDocs.find(d=>d._id===_currentLeadId);if(!lead)return;
+  openContactoDrawer(lead.cuentaId||'',lead.cuentaNombre||lead.empresa||'');
+  _ctdrLeadConv={leadId:lead._id};
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+  set('ctdr-nombre',lead.nombre);set('ctdr-apellidos',lead.apellido);
+  set('ctdr-email',lead.email);set('ctdr-telefono',lead.telefono);
+  set('ctdr-puesto',lead.puesto);set('ctdr-comentarios',lead.comentarios);
+  if(typeof _ctdrSetCargo==='function')_ctdrSetCargo(lead.cargo||'');
+  const title=document.querySelector('#ctdr-drawer .cdr-title');if(title)title.textContent='Convertir Lead a Contacto';
+  const btn=document.getElementById('ctdr-save-btn');if(btn)btn.textContent='Crear Contacto';
+};
+// Al guardar el Contacto en contexto de conversión: marca el Lead como Convertido,
+// registra Timeline y navega a la ficha del Contacto recién creado.
+async function _completeLeadConversionFromContact(contactId,cuentaId,cuentaNombre){
+  const ctx=_ctdrLeadConv;_ctdrLeadConv=null;
+  if(!ctx||!ctx.leadId){_gotoContacto(contactId);return;}
+  const now=firebase.firestore.Timestamp.now();
+  try{
+    if(!cuentaId)await db.collection('contactos').doc(contactId).update({esParticular:true}).catch(()=>{});
+    await db.collection('leads').doc(ctx.leadId).update({estado:'Convertido',contactoId:contactId,cuentaId:cuentaId||'',ultimaActividad:now});
+    const destino=cuentaNombre?('en '+cuentaNombre):'Particular (sin cuenta)';
+    await addLeadTimeline(ctx.leadId,{tipo:'convertido',descripcion:`Convertido → Contacto (${destino})`});
+    if(cuentaId&&typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'alta_contacto',descripcion:'Contacto desde conversión de Lead'});
+    const idx=_leadDocs.findIndex(d=>d._id===ctx.leadId);
+    if(idx>=0){_leadDocs[idx].estado='Convertido';_leadDocs[idx].contactoId=contactId;_leadDocs[idx].cuentaId=cuentaId||'';}
+  }catch(e){console.warn('completeLeadConversion',e);}
+  _gotoContacto(contactId);
 }
 
 // LEADS ANALYTICS
