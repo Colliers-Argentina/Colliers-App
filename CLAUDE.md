@@ -139,7 +139,7 @@ Guía breve para el usuario final. **DOCX + PDF**, generados desde el mismo cont
 - **No incluir**: capturas, diagramas, arquitectura, código, reglas técnicas ni info para devs.
 - Motor: `docs/manuales/guia_base.py`; contenido de todas las guías: `gen_guias.py`.
 - Formularios cubiertos: Cuentas, Contactos, Leads, Visitas, Oficinas, Retail,
-  Industria & Logística, Componentes. (Oportunidades: pendiente, aún es placeholder "Pronto".)
+  Industria & Logística, Componentes, Oportunidades.
 - Al agregar un formulario nuevo: sumar su bloque `Guia(...)` en `gen_guias.py` y regenerar.
 
 ### Formato extendido (manual largo, opcional)

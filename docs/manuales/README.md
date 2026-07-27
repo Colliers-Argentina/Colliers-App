@@ -34,7 +34,7 @@ No incluye capturas, diagramas, arquitectura, código ni reglas técnicas.
 | Retail | `Guia_Retail.docx` / `.pdf` |
 | Industria & Logística | `Guia_Industria_Logistica.docx` / `.pdf` |
 | Componentes | `Guia_Componentes.docx` / `.pdf` |
-| Oportunidades | *Pendiente — el formulario aún no está implementado ("Pronto").* |
+| Oportunidades | `Guia_Oportunidades.docx` / `.pdf` |
 
 ## Cómo se generan
 

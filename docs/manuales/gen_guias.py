@@ -242,6 +242,32 @@ GUIAS["Guia_Componentes"] = Guia(
     ],
 )
 
+# ─────────────────────────── OPORTUNIDADES ───────────────────────────
+GUIAS["Guia_Oportunidades"] = Guia(
+    "Oportunidades", "1.0", FECHA,
+    "Centro de seguimiento de la gestión comercial. Cada oportunidad es una gestión entre una "
+    "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
+    "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
+    "automáticamente una actividad en la Cuenta (y en el Contacto asociado).",
+    [
+        ("Cuenta", "Buscar y seleccionar la empresa de la oportunidad (obligatorio)."),
+        ("Contacto principal", "Buscar y seleccionar el contacto de la cuenta (opcional). Si no hay, se continúa solo con la Cuenta."),
+        ("Inmueble(s) asociado(s)", "Buscar y agregar uno o varios inmuebles relacionados (opcional)."),
+        ("Estado", "Etapa de la gestión: Prospectando, Calificando, En negociación, Ganada o Perdida."),
+        ("% Conversión", "Elegir una categoría: 0–50% (naranja), 50–80% (amarillo) o 80–100% (verde). Es obligatorio."),
+        ("Ejecutivo Comercial", "Ejecutivo responsable de la oportunidad (obligatorio)."),
+        ("Unidad de negocio", "Oficinas, Retail o Industria & Logística (opcional)."),
+        ("Título / Nota", "Breve descripción de la oportunidad (opcional)."),
+    ],
+    [
+        "Se crea la Oportunidad asociada a la Cuenta.",
+        "Se registra automáticamente una actividad en la Cuenta y, si hay contacto, también en el Contacto.",
+        "La Cuenta aparece en la grilla de Oportunidades, ordenada por la actividad más reciente.",
+        "Desde la grilla se puede cambiar el Estado y el % de Conversión, y esos cambios también quedan registrados.",
+        "También se puede crear una oportunidad desde la ficha de la Cuenta (botón '+ Nueva oportunidad').",
+    ],
+)
+
 
 def build_all():
     for basename, guia in GUIAS.items():
