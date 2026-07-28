@@ -14481,16 +14481,20 @@ window.srPrintPDF=function(id){
 };
 function _srBuildHTML(d){
   const svc=_srService(d.servicio);const data=d.data||{};
-  const row=(l,v)=>`<tr><td class="l">${l}</td><td class="v">${v||'–'}</td></tr>`;
+  const e=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const row=(l,v)=>`<tr><td class="l">${e(l)}</td><td class="v">${v||'–'}</td></tr>`;
+  // cell() devuelve HTML ya escapado (listas con viñetas para equipamiento/documentación/selecciones múltiples).
   const cell=(f)=>{const v=data[f.k];
-    if(f.type==='cuenta')return d.cuentaNombre||'';if(f.type==='contacto')return d.propietarioNombre||'';
-    if(f.type==='inmueble')return d.inmuebleNombre||'';
-    if(f.type==='ejecutivos')return Array.isArray(v)?v.join(', '):'';
-    if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`${k}: ${v[k]}`).join('<br>'):'';
-    if(f.type==='checks'||f.type==='multi')return Array.isArray(v)?v.join(', '):'';
-    if(f.type==='docs')return Array.isArray(v)?v.map(x=>`${x.tipo}: ${x.url}`).join('<br>'):'';
-    return v||'';};
-  const secciones=(svc?svc.form:[]).map(card=>`<h3>${card.title}</h3><table>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>row(f.label||card.title,String(cell(f)).replace(/</g,'&lt;'))).join('')}</table>`).join('');
+    if(f.type==='cuenta')return e(d.cuentaNombre||'');if(f.type==='contacto')return e(d.propietarioNombre||'');
+    if(f.type==='inmueble')return e(d.inmuebleNombre||'');
+    if(f.type==='sino'){if(!v||!Object.keys(v).length)return '';return `<ul class="pdf-list">${Object.keys(v).map(k=>`<li>${e(k)}: <b>${e(v[k])}</b></li>`).join('')}</ul>`;}
+    if(f.type==='ejecutivos')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:'';
+    if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:'';
+    if(f.type==='docs'){if(!Array.isArray(v)||!v.length)return '';
+      const groups=[];v.forEach(x=>{let g=groups.find(y=>y.tipo===x.tipo);if(!g){g={tipo:x.tipo,urls:[]};groups.push(g);}g.urls.push(x.url);});
+      return `<ul class="pdf-list">${groups.map(g=>`<li>${e(g.tipo)}${g.urls.map(u=>`<div class="pdf-url">${e(u)}</div>`).join('')}</li>`).join('')}</ul>`;}
+    return e(v||'');};
+  const secciones=(svc?svc.form:[]).map(card=>`<h3>${e(card.title)}</h3><table>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>row(f.label||card.title,cell(f))).join('')}</table>`).join('');
   const fecha=(_tsToDate(d.fechaCreacion)||new Date()).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
   return `<!doctype html><html><head><meta charset="utf-8"><title>${d.ticket}</title><style>
     *{font-family:'Segoe UI',Arial,sans-serif;box-sizing:border-box}body{margin:0;color:#222A40}
@@ -14501,6 +14505,8 @@ function _srBuildHTML(d){
     .body{padding:20px 40px 40px}h3{color:#00285A;font-size:14px;border-bottom:2px solid #E2EAF4;padding-bottom:5px;margin:22px 0 8px}
     table{width:100%;border-collapse:collapse;margin-bottom:6px}td{padding:6px 8px;font-size:12.5px;vertical-align:top;border-bottom:1px solid #F1F5FE}
     td.l{width:230px;color:#56648F;font-weight:600}td.v{color:#1F2A4D}
+    ul.pdf-list{margin:2px 0;padding-left:18px}ul.pdf-list li{font-size:12.5px;margin-bottom:5px;line-height:1.4}
+    .pdf-url{font-size:11.5px;color:#1C54F4;word-break:break-all;margin:2px 0 1px}
     .ft{padding:16px 40px;font-size:10px;color:#8898C0;border-top:1px solid #E8EFF8}
   </style></head><body>
     <div class="hd"><div><div class="brand">COLLIERS</div><div class="sub">Centro de Solicitudes · Nexus</div></div><div class="tk">${esc(d.servicioLabel||'')}<b>${esc(d.ticket)}</b>${esc(d.estado||'')}</div></div>
