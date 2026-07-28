@@ -272,7 +272,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────────────── CENTRO DE SOLICITUDES ───────────────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Centro de Solicitudes", "1.4", FECHA,
+    "Centro de Solicitudes", "1.5", FECHA,
     "Centraliza las solicitudes internas de todas las áreas de Colliers. Cada servicio tiene su "
     "propio formulario; el primero disponible es 'Ficha y Publicaciones – Oficinas'. Al enviar se "
     "genera un Ticket, se puede descargar un PDF corporativo y se notifica al responsable.",
@@ -285,6 +285,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Inmueble asociado", "Buscar el inmueble con el buscador inteligente. Si no existe, usar '+ Crear nuevo inmueble' (solo pide Dirección y Tipo). Al enviar la solicitud, el sistema ofrece continuar completando la ficha del inmueble."),
         ("Tipo de transacción", "Alquiler, Venta o Ambas. Según lo elegido, en Condiciones Comerciales aparecen solo los precios que correspondan (alquiler y/o venta)."),
         ("Equipamiento y Servicios", "Para cada servicio (aire acondicionado, ascensor, seguridad, etc.) marcar Sí o No, indicando si el edificio cuenta con él."),
+        ("Especificaciones de los equipos", "Campo de texto libre y opcional, debajo de Equipamiento y Servicios. Detallar características técnicas que no se representan con Sí/No (tipo de aire, capacidad del grupo electrógeno, cantidad de ascensores, certificaciones, etc.). Admite varias líneas y se incluye en el PDF."),
         ("Ejecutivo(s) Comercial(es) a cargo", "El usuario que crea la solicitud queda asignado automáticamente como primer ejecutivo. Se pueden agregar hasta 2 ejecutivos adicionales con el selector predictivo."),
         ("Superficies", "La Superficie Total debe ser mayor o igual a la Superficie Cubierta (pueden ser iguales). No se permiten valores negativos ni una superficie total en cero. Si no se cumple, el sistema resalta los campos y no deja enviar."),
         ("Fecha de requerimiento / entrega", "La fecha comprometida que se ingresa en el formulario se muestra luego como 'Fecha de entrega' en el panel lateral de la solicitud."),

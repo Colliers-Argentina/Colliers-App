@@ -14086,6 +14086,9 @@ const SR_SERVICES=[
      {title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
+     {title:'Especificaciones de los Equipos',fields:[
+       {k:'especificaciones',label:'Especificaciones de los equipos',type:'textarea',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+     ]},
      {title:'Descripción General',fields:[
        {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
      ]},
@@ -14210,7 +14213,7 @@ function _srFieldHTML(f){
   const lbl=f.label?`<div class="cdr-lbl">${esc(f.label)}${req}</div>`:'';
   const w=(inner,extra)=>`<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}${extra||''}>${lbl}${inner}</div>`;
   if(f.type==='text'||f.type==='number')return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}">`);
-  if(f.type==='textarea')return w(`<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"></textarea>`);
+  if(f.type==='textarea')return w(`<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"${f.ph?` placeholder="${esc(f.ph)}"`:''}></textarea>`);
   if(f.type==='date')return w(`<input id="${id}" class="cdr-input" type="date">`);
   if(f.type==='select')return w(`<select id="${id}" class="cdr-select" onchange="_srApplyConditionals()"><option value="">— Seleccionar —</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`);
   if(f.type==='cuenta')return w(`<input id="srf-cuenta" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('sr',this.value)" onfocus="ctaPickerInput('sr',this.value)" onblur="ctaPickerBlur('sr')"><div id="srf-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><div id="srf-cuenta-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-cuentaId" type="hidden"><input id="srf-cuentaNombre" type="hidden">`,' style="position:relative"');
@@ -14490,6 +14493,7 @@ function _srRenderData(d){
     if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`<div style="font-size:12px"><b>${esc(k)}:</b> ${esc(v[k])}</div>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='docs')return (Array.isArray(v)&&v.length)?v.map(x=>`<div style="font-size:12px"><b>${esc(x.tipo)}:</b> <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(x.url)}</a></div>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='textarea')return v?`<div style="white-space:pre-wrap">${esc(v)}</div>`:'<span style="color:#8898C0">–</span>';
     return v?esc(v):'<span style="color:#8898C0">–</span>';};
   return `<div class="nx-grid"><div class="nx-col" style="grid-column:1/-1">${svc.form.map(card=>`<div class="nx-card"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>`<div class="nx-row"><div class="nx-row-l">${esc(f.label||card.title)}</div><div class="nx-row-v">${val(f)}</div></div>`).join('')}</div>`).join('')}</div></div>`;
 }
@@ -14547,6 +14551,7 @@ function _srBuildHTML(d){
       return `<ul class="pdf-list">${groups.map(g=>`<li>${e(g.tipo)}${g.urls.map(u=>`<div class="pdf-url">${e(u)}</div>`).join('')}</li>`).join('')}</ul>`;}
     if(f.type==='number'){if(v===''||v==null)return '';const m=miles(v);return m!=null?e(m+(esSuperficie(f)?' m²':'')):e(v);}
     if(f.type==='text'){const m=miles(v);return m!=null?e(m):e(v||'');}
+    if(f.type==='textarea')return v?`<div style="white-space:pre-wrap">${e(v).replace(/\n/g,'<br>')}</div>`:'';
     return e(v||'');};
   const secciones=(svc?svc.form:[]).map(card=>`<h3>${e(card.title)}</h3><table>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>row(f.label||card.title,cell(f))).join('')}</table>`).join('');
   const fecha=(_tsToDate(d.fechaCreacion)||new Date()).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
