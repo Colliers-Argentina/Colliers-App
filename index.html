@@ -14032,6 +14032,19 @@ if(localStorage.getItem('colliers-theme')==='dark'){
 // Motor reutilizable: catálogo de servicios + formularios dinámicos (schema) + tickets +
 // estados + timeline + PDF (vista imprimible) + email (EmailJS). Agregar un servicio nuevo
 // = sumar una entrada a SR_SERVICES con su schema; el motor no cambia.
+// Validación reutilizable de superficies (Solicitudes, Inmuebles, Pisos, Locales, Depósitos, etc.).
+// Regla: Superficie Total >= Superficie Cubierta; sin negativos; Total > 0 si es obligatoria.
+function validarSuperficieTotalCubierta(total,cubierta,opts){
+  opts=opts||{};
+  const t=parseFloat(total),c=parseFloat(cubierta);
+  const hasT=total!==''&&total!=null&&!isNaN(t);
+  const hasC=cubierta!==''&&cubierta!=null&&!isNaN(c);
+  if(hasT&&t<0)return {ok:false,msg:'La superficie no puede ser negativa.'};
+  if(hasC&&c<0)return {ok:false,msg:'La superficie no puede ser negativa.'};
+  if(opts.totalReq&&hasT&&t===0)return {ok:false,msg:'La Superficie Total debe ser mayor a cero.'};
+  if(hasT&&hasC&&t<c)return {ok:false,msg:'La Superficie Total debe ser mayor o igual a la Superficie Cubierta.'};
+  return {ok:true,msg:''};
+}
 const SR_ESTADOS=['Pendiente','En proceso','Finalizada'];
 const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada':'#16A34A'};
 const SR_SERVICES=[
@@ -14181,6 +14194,7 @@ function openSolicitudForm(key){
   loadClientesParaSelector();
   _srRenderEjecChips();
   _srApplyConditionals();
+  ['srf-supTotal','srf-supCubierta'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',_srValidateSuperficies);});
   const btn=document.getElementById('sr-form-save');if(btn){btn.textContent='Enviar solicitud';btn.disabled=false;}
   document.getElementById('sr-list-view').style.display='none';
   document.getElementById('sr-detail-view').style.display='none';
@@ -14217,6 +14231,16 @@ function _srApplyConditionals(){
 function _srFieldVisible(f,data){
   if(!f.showIf)return true;
   return f.showIf.vals.includes(data[f.showIf.k]||'');
+}
+// Validación de superficies del formulario de solicitud (en vivo y al enviar).
+function _srValidateSuperficies(){
+  const tEl=document.getElementById('srf-supTotal');if(!tEl)return true;
+  const cEl=document.getElementById('srf-supCubierta');
+  const r=validarSuperficieTotalCubierta(tEl.value,cEl?cEl.value:'',{totalReq:true});
+  let msg=document.getElementById('srf-sup-err');
+  if(!msg){const host=tEl.closest('.cdr-field')||tEl.parentElement;msg=document.createElement('div');msg.id='srf-sup-err';msg.style.cssText='font-size:11px;font-weight:700;color:#ED1B34;margin-top:.3rem;display:none';if(host&&host.parentElement)host.parentElement.insertBefore(msg,host.nextSibling);}
+  if(!r.ok){tEl.style.borderColor='#ED1B34';if(cEl)cEl.style.borderColor='#ED1B34';msg.textContent=r.msg;msg.style.display='block';return false;}
+  tEl.style.borderColor='';if(cEl)cEl.style.borderColor='';msg.style.display='none';return true;
 }
 // ── Inmueble asociado: buscador inteligente + creación rápida (dirección + tipo) ──
 window.srInmSearch=function(q){
@@ -14337,6 +14361,7 @@ window.submitSolicitud=async function(){
     if(empty){ok=false;if(!first)first=el;}
   }));
   if(!ok){if(first&&first.scrollIntoView)first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  if(!_srValidateSuperficies()){const el=document.getElementById('srf-supTotal');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});return;}
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('sr-form-save');btn.textContent='Enviando...';btn.disabled=true;
   try{
@@ -14374,16 +14399,27 @@ window.srCloseDetail=function(){document.getElementById('sr-detail-view').style.
 window.srOpenDetail=function(id){
   const d=_srDocs.find(x=>x._id===id);if(!d)return;_srCurrentId=id;
   const canEdit=_canEditFicha()||(d.solicitanteEmail||'').toLowerCase()===(user?.email||'').toLowerCase();
+  const data=d.data||{};
+  const PRIO_COLOR={'Baja':'#16A34A','Media':'#1C54F4','Alta':'#B45309','Urgente':'#ED1B34'};
+  const prioridad=data.prioridad||'';
+  const prioBadge=prioridad?(pc=>`<span class="estado-badge" style="background:${pc}1a;color:${pc};border:1px solid ${pc}55">${esc(prioridad)}</span>`)(PRIO_COLOR[prioridad]||'#8898C0'):'<span style="color:#8898C0">–</span>';
+  const entrega=data.fechaRequerimiento||'';
+  const entregaFmt=entrega?new Date(entrega+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}):'–';
+  const ejec=Array.isArray(data.ejecutivos)&&data.ejecutivos.length?data.ejecutivos:(data.ejecutivosCreador?[data.ejecutivosCreador]:[]);
+  const ejecHTML=ejec.length?ejec.map(e=>`<span class="crm-tag">${esc(e)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
   document.getElementById('sr-det-left').innerHTML=`
     <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name">${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoBadge(d.estado)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem">${canEdit?`<select class="crm-estado-sel" onchange="srUpdateEstado('${id}',this.value)">${SR_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('')}</select>`:srEstadoBadge(d.estado)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Prioridad</div><div style="margin-top:.3rem">${prioBadge}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de entrega</div><div class="crm-det-meta-val">${esc(entregaFmt)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Solicitante</div><div class="crm-det-meta-val">${esc(d.solicitante||'–')}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo(s) Comercial(es) a cargo</div><div class="crm-det-meta-val" style="flex-wrap:wrap;gap:.3rem">${ejecHTML}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Responsable</div><div class="crm-det-meta-val">${esc(d.responsable||'–')}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Servicio</div><div class="crm-det-meta-val">${esc(d.servicioLabel||d.servicio)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta</div><div class="crm-det-meta-val">${d.cuentaNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')">${esc(d.cuentaNombre)}</span>`:'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.inmuebleNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="showModule('buildings');setTimeout(()=>{try{openBuildingEditor('${esc(d.inmuebleId||'')}')}catch(e){}},400)">${esc(d.inmuebleNombre)}</span>`:'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario</div><div class="crm-det-meta-val">${esc(d.propietarioNombre||'–')}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Solicitante</div><div class="crm-det-meta-val">${esc(d.solicitante||'–')}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Responsable</div><div class="crm-det-meta-val">${esc(d.responsable||'–')}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem">${canEdit?`<select class="crm-estado-sel" onchange="srUpdateEstado('${id}',this.value)">${SR_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('')}</select>`:srEstadoBadge(d.estado)}</div></div>`;
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario</div><div class="crm-det-meta-val">${esc(d.propietarioNombre||'–')}</div></div>`;
   document.getElementById('sr-det-right').innerHTML=`
     <div class="crm-det-tabs"><button class="crm-det-tab active" onclick="srDetTab(this,'srd-info')">Información</button><button class="crm-det-tab" onclick="srDetTab(this,'srd-timeline')">Timeline</button></div>
     <div class="crm-det-tab-body">

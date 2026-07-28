@@ -272,7 +272,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────────────── CENTRO DE SOLICITUDES ───────────────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Centro de Solicitudes", "1.2", FECHA,
+    "Centro de Solicitudes", "1.3", FECHA,
     "Centraliza las solicitudes internas de todas las áreas de Colliers. Cada servicio tiene su "
     "propio formulario; el primero disponible es 'Ficha y Publicaciones – Oficinas'. Al enviar se "
     "genera un Ticket, se puede descargar un PDF corporativo y se notifica al responsable.",
@@ -286,6 +286,8 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Tipo de transacción", "Alquiler, Venta o Ambas. Según lo elegido, en Condiciones Comerciales aparecen solo los precios que correspondan (alquiler y/o venta)."),
         ("Equipamiento y Servicios", "Para cada servicio (aire acondicionado, ascensor, seguridad, etc.) marcar Sí o No, indicando si el edificio cuenta con él."),
         ("Ejecutivo(s) Comercial(es) a cargo", "El usuario que crea la solicitud queda asignado automáticamente como primer ejecutivo. Se pueden agregar hasta 2 ejecutivos adicionales con el selector predictivo."),
+        ("Superficies", "La Superficie Total debe ser mayor o igual a la Superficie Cubierta (pueden ser iguales). No se permiten valores negativos ni una superficie total en cero. Si no se cumple, el sistema resalta los campos y no deja enviar."),
+        ("Fecha de requerimiento / entrega", "La fecha comprometida que se ingresa en el formulario se muestra luego como 'Fecha de entrega' en el panel lateral de la solicitud."),
         ("Descripción general", "Describir el edificio y el entorno. Este texto se usa para la publicación y la ficha."),
         ("Documentación", "Agregar todos los elementos necesarios indicando el tipo: Fotografías, Planos, Brochure, Video, Tour Virtual, Render u Otro. Se pueden sumar varios."),
         ("Acciones de Marketing", "Selección múltiple: Ficha técnica, Portales, Campaña Email, Redes Sociales, Cartelería, Video, Tour Virtual, Otro."),
