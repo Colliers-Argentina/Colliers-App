@@ -14048,6 +14048,9 @@ function validarSuperficieTotalCubierta(total,cubierta,opts){
   return {ok:true,msg:''};
 }
 const SR_ESTADOS=['Pendiente','En proceso','Finalizada'];
+// Indicador de prioridad tipo semáforo (círculo sólido + tooltip). Reutilizable en todas las vistas.
+const SR_PRIO_COLOR={'Baja':'#16A34A','Media':'#EAB308','Alta':'#F97316','Urgente':'#DC2626'};
+function srPrioDot(p,size){const c=SR_PRIO_COLOR[p]||'#C7D2E8';const s=size||9;const t=p?('Prioridad: '+p):'Prioridad: sin definir';return `<span title="${esc(t)}" aria-label="${esc(t)}" style="display:inline-block;width:${s}px;height:${s}px;border-radius:50%;background:${c};flex:0 0 auto;vertical-align:middle"></span>`;}
 const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada':'#16A34A'};
 const SR_SERVICES=[
   {key:'ficha-oficinas',label:'Ficha y Publicaciones – Oficinas',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
@@ -14158,7 +14161,7 @@ function renderSolicitudesTable(rows){
   h+='</tr></thead><tbody>';
   rows.forEach(d=>{
     h+=`<tr onclick="srOpenDetail('${d._id}')" style="cursor:pointer">
-      <td><div class="crm-client-name">${esc(d.ticket||'–')}</div></td>
+      <td><div class="crm-client-name" style="display:flex;align-items:center;gap:.5rem">${srPrioDot(d.data&&d.data.prioridad)}${esc(d.ticket||'–')}</div></td>
       <td><div class="crm-broker-cell">${esc(d.servicioLabel||d.servicio||'–')}</div></td>
       <td><div class="crm-broker-cell">${esc(d.cuentaNombre||'–')}</div></td>
       <td><div class="crm-broker-cell">${esc(d.solicitante||'–')}</div></td>
@@ -14480,15 +14483,14 @@ window.srOpenDetail=function(id){
   const d=_srDocs.find(x=>x._id===id);if(!d)return;_srCurrentId=id;
   const canEdit=_canEditFicha()||(d.solicitanteEmail||'').toLowerCase()===(user?.email||'').toLowerCase();
   const data=d.data||{};
-  const PRIO_COLOR={'Baja':'#16A34A','Media':'#1C54F4','Alta':'#B45309','Urgente':'#ED1B34'};
   const prioridad=data.prioridad||'';
-  const prioBadge=prioridad?(pc=>`<span class="estado-badge" style="background:${pc}1a;color:${pc};border:1px solid ${pc}55">${esc(prioridad)}</span>`)(PRIO_COLOR[prioridad]||'#8898C0'):'<span style="color:#8898C0">–</span>';
+  const prioBadge=prioridad?(pc=>`<span class="estado-badge" style="background:${pc}1a;color:${pc};border:1px solid ${pc}55">${srPrioDot(prioridad,8)} ${esc(prioridad)}</span>`)(SR_PRIO_COLOR[prioridad]||'#8898C0'):'<span style="color:#8898C0">–</span>';
   const entrega=data.fechaRequerimiento||'';
   const entregaFmt=entrega?new Date(entrega+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}):'–';
   const ejec=Array.isArray(data.ejecutivos)&&data.ejecutivos.length?data.ejecutivos:(data.ejecutivosCreador?[data.ejecutivosCreador]:[]);
   const ejecHTML=ejec.length?ejec.map(e=>`<span class="crm-tag">${esc(e)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
   document.getElementById('sr-det-left').innerHTML=`
-    <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name">${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoBadge(d.estado)}</div></div>
+    <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name" style="display:flex;align-items:center;justify-content:center;gap:.4rem">${srPrioDot(prioridad,11)}${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoBadge(d.estado)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem">${canEdit?`<select class="crm-estado-sel" onchange="srUpdateEstado('${id}',this.value)">${SR_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('')}</select>`:srEstadoBadge(d.estado)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Prioridad</div><div style="margin-top:.3rem">${prioBadge}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
