@@ -2550,6 +2550,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       </div>
     </div>
 
+    <!-- Centro de Solicitudes -->
+    <button class="sb-item-solo" id="sbn-solicitudes" data-mod="solicitudes" onclick="_sbItemClick('solicitudes',null)">
+      <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></span><span>Centro de Solicitudes</span>
+    </button>
+
     <!-- Analytics (guarded) -->
     <div class="sb-grp sb-guarded" id="sbg-analytics" style="display:none">
       <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-analytics')">
@@ -4638,6 +4643,65 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <button class="tx-drawer-save" onclick="saveTxDrawer()">Guardar transacción</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══════════ CENTRO DE SOLICITUDES ══════════ -->
+<div id="solicitudes-panel" style="display:none">
+  <!-- LISTA -->
+  <div id="sr-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div class="crm-topbar">
+      <div class="crm-topbar-l">
+        <div class="crm-page-title">Centro de Solicitudes</div>
+        <div class="crm-page-sub" id="sr-subtitle">Cargando...</div>
+      </div>
+      <div class="crm-topbar-r">
+        <input id="sr-search" type="text" placeholder="🔍 Buscar ticket / cuenta..." class="crm-search-inp" oninput="filterSolicitudes()">
+        <select id="sr-filter-servicio" class="crm-sel" onchange="filterSolicitudes()"><option value="">Servicio</option></select>
+        <button class="crm-sel" id="sr-mias-btn" onclick="srToggleMias()" style="cursor:pointer">Mis Solicitudes</button>
+        <button class="crm-new-btn" onclick="openSrCatalog()">+ Nueva Solicitud</button>
+      </div>
+    </div>
+    <div class="crm-list-body">
+      <div class="crm-kpi-row" id="sr-widgets"></div>
+      <div class="crm-tbl-wrap"><div id="sr-table-wrap">Cargando...</div></div>
+    </div>
+  </div>
+  <!-- FORMULARIO DINÁMICO -->
+  <div id="sr-form-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+    <div class="crm-det-topbar">
+      <button class="crm-det-back-btn" onclick="srCloseForm()">← Volver al Centro de Solicitudes</button>
+      <div style="flex:1"></div>
+      <button class="cdr-save" id="sr-form-save" onclick="submitSolicitud()">Enviar solicitud</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:1.25rem 1.5rem">
+      <div id="sr-form-title" style="font-size:16px;font-weight:800;color:#0A1B4D;margin-bottom:.9rem"></div>
+      <div id="sr-form-body"></div>
+    </div>
+  </div>
+  <!-- DETALLE DEL TICKET -->
+  <div id="sr-detail-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+    <div class="crm-det-topbar">
+      <button class="crm-det-back-btn" onclick="srCloseDetail()">← Volver</button>
+      <div style="flex:1"></div>
+      <button class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srPrintPDF(_srCurrentId)">🖨 PDF</button>
+      <button class="crm-action-btn" style="background:#EDFAF2;color:#16A34A;border-color:#B7E9CB" onclick="srReenviarMail(_srCurrentId)">✉️ Reenviar al responsable</button>
+    </div>
+    <div class="crm-det-layout">
+      <div class="crm-det-left" id="sr-det-left"></div>
+      <div class="crm-det-right" id="sr-det-right"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CATÁLOGO DE SERVICIOS (modal) -->
+<div id="sr-catalog-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:550;align-items:center;justify-content:center;padding:1rem" onclick="if(event.target===this)closeSrCatalog()">
+  <div style="background:#fff;border-radius:16px;width:min(560px,96vw);max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,7,89,.28)" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid #E8EFF8">
+      <div style="font-size:15px;font-weight:800;color:#0A1B4D">Catálogo de servicios</div>
+      <button class="cdr-close" onclick="closeSrCatalog()">✕</button>
+    </div>
+    <div id="sr-catalog-body" style="padding:1rem 1.4rem 1.4rem"></div>
   </div>
 </div>
 </div><!-- /main-content -->
@@ -13409,12 +13473,12 @@ function renderTendencias(allDocs,dias){
 }
 
 function show(id){
-  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel","transacciones-panel"].forEach(s=>{
+  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel","transacciones-panel","solicitudes-panel"].forEach(s=>{
     const el=document.getElementById(s);
     if(!el)return;
     if(s==="ls")el.style.display=s===id?"grid":"none";
     else if(s==="ds")el.style.display=s===id?"flex":"none";
-    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel"||s==="transacciones-panel")el.style.display=s===id?"flex":"none";
+    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel"||s==="transacciones-panel"||s==="solicitudes-panel")el.style.display=s===id?"flex":"none";
     else el.style.display=s===id?"block":"none";
   });
   const isApp=id!=="ls"&&id!=="ds";
@@ -13542,6 +13606,9 @@ function showModule(mod){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
     show('admin-panel');
     cargarRegistros();
+  } else if(mod==='solicitudes'){
+    show('solicitudes-panel');
+    loadSolicitudes();
   } else if(mod==='transacciones'){
     show('transacciones-panel');
     loadTransacciones();
@@ -13959,6 +14026,344 @@ if(localStorage.getItem('colliers-theme')==='dark'){
   if(btn)btn.textContent='☀️';
 }
 // ===== TRANSACCIONES MODULE =====
+// ══════════════════ CENTRO DE SOLICITUDES ══════════════════
+// Motor reutilizable: catálogo de servicios + formularios dinámicos (schema) + tickets +
+// estados + timeline + PDF (vista imprimible) + email (EmailJS). Agregar un servicio nuevo
+// = sumar una entrada a SR_SERVICES con su schema; el motor no cambia.
+const SR_ESTADOS=['Pendiente','En proceso','Finalizada'];
+const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada':'#16A34A'};
+const SR_SERVICES=[
+  {key:'ficha-oficinas',label:'Ficha y Publicaciones – Oficinas',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
+   form:[
+     {title:'Solicitud',fields:[
+       {k:'prioridad',label:'Prioridad',type:'select',opts:['Normal','Alta','Urgente']},
+       {k:'observacionSolicitud',label:'Observaciones de la solicitud',type:'textarea'},
+     ]},
+     {title:'Datos Comerciales',fields:[
+       {k:'cuenta',label:'Cuenta',type:'cuenta',req:true},
+       {k:'propietario',label:'Propietario',type:'contacto'},
+       {k:'operacion',label:'Operación',type:'select',opts:['Alquiler','Venta','Alquiler o Venta']},
+     ]},
+     {title:'Ubicación',fields:[
+       {k:'direccion',label:'Dirección',type:'text'},
+       {k:'pisoUnidad',label:'Piso / Unidad',type:'text'},
+       {k:'corredor',label:'Corredor',type:'select',opts:['Catalinas','Macrocentro','Macrocentro Norte','Macrocentro Sur','Microcentro','Norte CABA','Norte GBA','Plaza Roma','Plaza San Martín','Puerto Madero Este','Puerto Madero Oeste']},
+       {k:'localidad',label:'Localidad',type:'text'},
+     ]},
+     {title:'Superficies',fields:[
+       {k:'supTotal',label:'Superficie total (m²)',type:'number'},
+       {k:'supPropia',label:'Superficie propia (m²)',type:'number'},
+       {k:'supMinima',label:'Superficie mínima divisible (m²)',type:'number'},
+       {k:'cocheras',label:'Cocheras',type:'number'},
+     ]},
+     {title:'Características',fields:[
+       {k:'categoria',label:'Categoría',type:'select',opts:['A+','A','B+','B','C']},
+       {k:'estadoEdificio',label:'Estado del edificio',type:'select',opts:['Existente','En Construcción','Proyecto']},
+       {k:'anio',label:'Año',type:'number'},
+       {k:'disposicion',label:'Disposición / tipología',type:'text'},
+     ]},
+     {title:'Equipamiento',fields:[
+       {k:'equipamiento',label:'',type:'checks',opts:['Aire acondicionado central','Piso técnico','Cielorraso','Luminarias LED','Detección de incendio','Grupo electrógeno','Seguridad 24h','Ascensores','Baños en el piso','Cocina / office','Sala de reuniones','Terraza']},
+     ]},
+     {title:'Descripción',fields:[
+       {k:'descripcion',label:'Descripción comercial',type:'textarea'},
+     ]},
+     {title:'Condiciones Comerciales',fields:[
+       {k:'precioAlq',label:'Precio alquiler (USD/m²)',type:'number'},
+       {k:'precioVta',label:'Precio venta (USD/m²)',type:'number'},
+       {k:'expensas',label:'Expensas (USD/m²)',type:'number'},
+       {k:'disponibilidad',label:'Disponibilidad',type:'select',opts:['Inmediata','A convenir','30 días','60 días']},
+     ]},
+     {title:'Documentación',fields:[
+       {k:'documentacion',label:'',type:'docs'},
+     ]},
+     {title:'Marketing',fields:[
+       {k:'marketing',label:'Acciones de Marketing',type:'multi',opts:['Ficha técnica','Portales','Campaña Email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
+     ]},
+   ]},
+];
+function _srService(key){return SR_SERVICES.find(s=>s.key===key);}
+let _srDocs=[],_srCurrentId=null,_srMias=false,_srFormService=null,_srDocList=[],_srPickerReady=false;
+
+function srEstadoBadge(e){const c=SR_ESTADO_COLOR[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'Pendiente')}</span>`;}
+
+async function loadSolicitudes(){
+  const wrap=document.getElementById('sr-table-wrap');
+  if(!db){if(wrap)wrap.innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
+  if(wrap)wrap.innerHTML='<div class="crm-empty">Cargando...</div>';
+  const sel=document.getElementById('sr-filter-servicio');
+  if(sel&&sel.options.length<=1)sel.innerHTML='<option value="">Servicio</option>'+SR_SERVICES.map(s=>`<option value="${s.key}">${esc(s.label)}</option>`).join('');
+  try{
+    const snap=await db.collection('solicitudes').get();
+    _srDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
+    filterSolicitudes();
+  }catch(e){if(wrap)wrap.innerHTML=`<div class="crm-empty">Error al cargar: ${e.message}</div>`;}
+}
+window.srToggleMias=function(){_srMias=!_srMias;const b=document.getElementById('sr-mias-btn');if(b){b.style.background=_srMias?'#1C54F4':'';b.style.color=_srMias?'#fff':'';}filterSolicitudes();};
+function filterSolicitudes(){
+  const q=(document.getElementById('sr-search')?.value||'').toLowerCase().trim();
+  const fSrv=document.getElementById('sr-filter-servicio')?.value||'';
+  const me=(user?.email||'').toLowerCase();
+  let rows=_srDocs.filter(d=>{
+    if(_srMias&&(d.solicitanteEmail||'').toLowerCase()!==me)return false;
+    if(fSrv&&d.servicio!==fSrv)return false;
+    if(_srWidget&&d.estado!==_srWidget)return false;
+    if(q&&!([d.ticket,d.cuentaNombre,d.solicitante,d.servicioLabel].some(v=>(v||'').toLowerCase().includes(q))))return false;
+    return true;
+  });
+  rows.sort((a,b)=>(_tsToDate(b.ultimaActualizacion||b.fechaCreacion)?.getTime()||0)-(_tsToDate(a.ultimaActualizacion||a.fechaCreacion)?.getTime()||0));
+  _renderSrWidgets();
+  renderSolicitudesTable(rows);
+  const st=document.getElementById('sr-subtitle');if(st)st.textContent=`${rows.length} solicitud${rows.length!==1?'es':''}${_srMias?' (mías)':''}`;
+}
+let _srWidget='';
+function _renderSrWidgets(){
+  const el=document.getElementById('sr-widgets');if(!el)return;
+  const base=_srMias?_srDocs.filter(d=>(d.solicitanteEmail||'').toLowerCase()===(user?.email||'').toLowerCase()):_srDocs;
+  const W=[['Pendiente','Pendientes'],['En proceso','En proceso'],['Finalizada','Finalizadas']];
+  el.innerHTML=W.map(([est,lbl])=>{const col=SR_ESTADO_COLOR[est];const n=base.filter(d=>d.estado===est).length;return `<div class="crm-kpi" style="cursor:pointer;${_srWidget===est?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="srToggleWidget('${est}')"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${n}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;}).join('');
+}
+window.srToggleWidget=function(e){_srWidget=_srWidget===e?'':e;filterSolicitudes();};
+function renderSolicitudesTable(rows){
+  const wrap=document.getElementById('sr-table-wrap');if(!wrap)return;
+  if(!rows.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin solicitudes. Creá una con "+ Nueva Solicitud".</div>';return;}
+  let h='<table class="crm-table"><thead><tr>';
+  ['Ticket','Servicio','Cuenta','Solicitante','Estado','Responsable','Fecha creación','Últ. actualización'].forEach(c=>h+=`<th>${c}</th>`);
+  h+='</tr></thead><tbody>';
+  rows.forEach(d=>{
+    h+=`<tr onclick="srOpenDetail('${d._id}')" style="cursor:pointer">
+      <td><div class="crm-client-name">${esc(d.ticket||'–')}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.servicioLabel||d.servicio||'–')}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.cuentaNombre||'–')}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.solicitante||'–')}</div></td>
+      <td>${srEstadoBadge(d.estado)}</td>
+      <td><div class="crm-broker-cell">${esc(d.responsable||'–')}</div></td>
+      <td class="crm-date">${fmtDate(d.fechaCreacion)}</td>
+      <td class="crm-date">${fmtDate(d.ultimaActualizacion)}</td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
+}
+// ── Catálogo de servicios ──
+window.openSrCatalog=function(){
+  const body=document.getElementById('sr-catalog-body');
+  body.innerHTML=SR_SERVICES.map(s=>`<div onclick="startSolicitud('${s.key}')" style="display:flex;align-items:center;gap:.9rem;padding:.9rem 1rem;border:1px solid #E8EFF8;border-radius:12px;margin-bottom:.6rem;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#1C54F4';this.style.background='#F8FAFF'" onmouseout="this.style.borderColor='#E8EFF8';this.style.background=''"><div style="font-size:22px">${s.icon}</div><div><div style="font-size:13.5px;font-weight:700;color:#0A1B4D">${esc(s.label)}</div><div style="font-size:11px;color:#8898C0">Responsable: ${esc(s.responsable)}</div></div></div>`).join('')
+    +'<div style="font-size:11px;color:#8898C0;margin-top:.4rem">Próximamente: Retail, Industria & Logística, Marketing, Research, Sistemas, RRHH, Administración, Legales.</div>';
+  document.getElementById('sr-catalog-overlay').style.display='flex';
+};
+window.closeSrCatalog=function(){document.getElementById('sr-catalog-overlay').style.display='none';};
+window.startSolicitud=function(key){closeSrCatalog();openSolicitudForm(key);};
+// ── Formulario dinámico (schema-driven) ──
+function openSolicitudForm(key){
+  const svc=_srService(key);if(!svc)return;
+  _srFormService=svc;_srDocList=[];
+  document.getElementById('sr-form-title').textContent=svc.label;
+  const now=new Date();
+  const auto=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Automático</div>
+    <div class="nx-row"><div class="nx-row-l">Solicitante</div><div class="nx-row-v">${esc(user?.displayName||user?.email||'–')}</div></div>
+    <div class="nx-row"><div class="nx-row-l">Broker</div><div class="nx-row-v">${esc(user?.displayName||user?.email||'–')}</div></div>
+    <div class="nx-row"><div class="nx-row-l">Fecha de solicitud</div><div class="nx-row-v">${now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}</div></div>
+    <div class="nx-row"><div class="nx-row-l">Responsable del servicio</div><div class="nx-row-v">${esc(svc.responsable)}</div></div></div>`;
+  const cards=svc.form.map(card=>`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.map(_srFieldHTML).join('')}</div>`).join('');
+  document.getElementById('sr-form-body').innerHTML=auto+cards;
+  // Registrar el picker de cuenta de forma diferida (registerCuentaPicker ya está definido en runtime).
+  if(document.getElementById('srf-cuenta')&&typeof registerCuentaPicker==='function'){registerCuentaPicker('sr',{inputId:'srf-cuenta',dropId:'srf-cuenta-drop',tagId:'srf-cuenta-tag',hidId:'srf-cuentaId',hidNombreId:'srf-cuentaNombre'});_srPickerReady=true;}
+  loadClientesParaSelector();
+  const btn=document.getElementById('sr-form-save');if(btn){btn.textContent='Enviar solicitud';btn.disabled=false;}
+  document.getElementById('sr-list-view').style.display='none';
+  document.getElementById('sr-detail-view').style.display='none';
+  const fv=document.getElementById('sr-form-view');fv.style.display='flex';fv.style.flexDirection='column';
+}
+function _srFieldHTML(f){
+  const id='srf-'+f.k;const req=f.req?' <span class="cdr-req">*</span>':'';
+  const lbl=f.label?`<div class="cdr-lbl">${esc(f.label)}${req}</div>`:'';
+  if(f.type==='text'||f.type==='number')return `<div class="cdr-field">${lbl}<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"></div>`;
+  if(f.type==='textarea')return `<div class="cdr-field">${lbl}<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"></textarea></div>`;
+  if(f.type==='date')return `<div class="cdr-field">${lbl}<input id="${id}" class="cdr-input" type="date"></div>`;
+  if(f.type==='select')return `<div class="cdr-field">${lbl}<select id="${id}" class="cdr-select"><option value="">— Seleccionar —</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select></div>`;
+  if(f.type==='cuenta')return `<div class="cdr-field" style="position:relative">${lbl}<input id="srf-cuenta" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('sr',this.value)" onfocus="ctaPickerInput('sr',this.value)" onblur="ctaPickerBlur('sr')"><div id="srf-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><div id="srf-cuenta-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-cuentaId" type="hidden"><input id="srf-cuentaNombre" type="hidden"></div>`;
+  if(f.type==='contacto')return `<div class="cdr-field" style="position:relative">${lbl}<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden"></div>`;
+  if(f.type==='checks')return `<div class="cdr-field">${lbl}<div id="${id}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.4rem">${f.opts.map(o=>`<label style="display:flex;align-items:center;gap:.45rem;font-size:12.5px;color:#353E59;cursor:pointer;padding:.35rem .5rem;border:1px solid #E8EFF8;border-radius:8px"><input type="checkbox" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div></div>`;
+  if(f.type==='multi')return `<div class="cdr-field">${lbl}<div id="${id}" class="cdr-toggle-group" style="flex-wrap:wrap;border-radius:8px">${f.opts.map(o=>`<button type="button" class="cto-pref-chip" data-v="${esc(o)}" onclick="this.classList.toggle('active')">${esc(o)}</button>`).join('')}</div></div>`;
+  if(f.type==='docs')return `<div class="cdr-field">${lbl}<div style="display:flex;gap:.4rem;flex-wrap:wrap"><select id="srf-doc-tipo" class="cdr-select" style="max-width:150px"><option>Foto</option><option>PDF</option><option>Plano</option><option>DWG</option><option>URL SharePoint</option></select><input id="srf-doc-url" class="cdr-input" placeholder="URL del archivo..." style="flex:1;min-width:180px"><button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srAddDoc()">Agregar</button></div><div id="srf-doc-list" class="cdr-ms-chips" style="margin-top:.4rem"></div></div>`;
+  return '';
+}
+window.srPropSearch=function(q){
+  const list=document.getElementById('srf-prop-list');if(!list)return;
+  document.getElementById('srf-propId').value='';document.getElementById('srf-propNombre').value='';
+  if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));if((document.getElementById('srf-propietario').value||'').trim())srPropSearch(document.getElementById('srf-propietario').value);}).catch(()=>{});}
+  if(!q.trim()){list.style.display='none';return;}
+  const lq=q.toLowerCase();const cuentaId=document.getElementById('srf-cuentaId')?.value||'';
+  let src=Array.isArray(_ctoDocs)?_ctoDocs:[];if(cuentaId)src=src.filter(c=>c.cuentaId===cuentaId);
+  const matches=src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')).toLowerCase().includes(lq)).slice(0,8);
+  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
+  list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();srPropPick('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}</div>`;}).join('');
+  list.style.display='block';
+};
+window.srPropPick=function(id,nombre){document.getElementById('srf-propId').value=id;document.getElementById('srf-propNombre').value=nombre;document.getElementById('srf-propietario').value=nombre;document.getElementById('srf-prop-list').style.display='none';};
+window.srAddDoc=function(){const t=document.getElementById('srf-doc-tipo').value;const u=(document.getElementById('srf-doc-url').value||'').trim();if(!u)return;_srDocList.push({tipo:t,url:u});document.getElementById('srf-doc-url').value='';_srRenderDocs();};
+window.srRemoveDoc=function(i){_srDocList.splice(i,1);_srRenderDocs();};
+function _srRenderDocs(){const c=document.getElementById('srf-doc-list');if(!c)return;c.innerHTML=_srDocList.map((d,i)=>`<span class="cdr-ms-chip">${esc(d.tipo)}: ${esc(d.url.length>40?d.url.slice(0,40)+'…':d.url)}<span class="cdr-ms-chip-x" onclick="srRemoveDoc(${i})">✕</span></span>`).join('');}
+function _srReadForm(svc){
+  const data={};const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+  svc.form.forEach(card=>card.fields.forEach(f=>{
+    const id='srf-'+f.k;
+    if(f.type==='cuenta'){data.cuentaId=gv('srf-cuentaId');data.cuentaNombre=gv('srf-cuentaNombre');}
+    else if(f.type==='contacto'){data.propietarioId=gv('srf-propId');data.propietarioNombre=gv('srf-propNombre');}
+    else if(f.type==='checks'){data[f.k]=[...document.querySelectorAll('#'+id+' input:checked')].map(x=>x.value);}
+    else if(f.type==='multi'){data[f.k]=[...document.querySelectorAll('#'+id+' .cto-pref-chip.active')].map(x=>x.dataset.v);}
+    else if(f.type==='docs'){data[f.k]=_srDocList.slice();}
+    else data[f.k]=gv(id);
+  }));
+  return data;
+}
+window.submitSolicitud=async function(){
+  const svc=_srFormService;if(!svc)return;
+  const data=_srReadForm(svc);
+  // Cuenta obligatoria si el servicio la define.
+  const needCuenta=svc.form.some(c=>c.fields.some(f=>f.type==='cuenta'&&f.req));
+  if(needCuenta&&!data.cuentaId){const el=document.getElementById('srf-cuenta');if(el)el.style.borderColor='#ED1B34';return;}
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('sr-form-save');btn.textContent='Enviando...';btn.disabled=true;
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    const ticketNum=(_srDocs.reduce((m,d)=>Math.max(m,d.ticketNum||0),0))+1;
+    const ticket='Solicitud #'+String(ticketNum).padStart(6,'0');
+    const solicitante=user?.displayName||user?.email||'';
+    const evento={tipo:'creacion',descripcion:'Solicitud creada',fecha:now,usuario:solicitante};
+    const doc={
+      ticketNum,ticket,servicio:svc.key,servicioLabel:svc.label,
+      cuentaId:data.cuentaId||'',cuentaNombre:data.cuentaNombre||'',
+      propietarioId:data.propietarioId||'',propietarioNombre:data.propietarioNombre||'',
+      solicitante,solicitanteEmail:user?.email||'',broker:solicitante,
+      responsable:svc.responsable,responsableEmail:svc.responsableEmail||'',
+      estado:'Pendiente',data,eventos:[evento],
+      fechaCreacion:now,ultimaActualizacion:now,
+    };
+    const ref=await db.collection('solicitudes').add(doc);
+    _srDocs.unshift({...doc,_id:ref.id});
+    _srNotifyResponsable({...doc,_id:ref.id});   // EmailJS (no-op si no hay claves configuradas)
+    srCloseForm();
+    srOpenDetail(ref.id);
+    showBldToast&&showBldToast(ticket+' creada');
+  }catch(e){alert('Error al crear la solicitud: '+e.message);const b=document.getElementById('sr-form-save');b.textContent='Enviar solicitud';b.disabled=false;}
+};
+window.srCloseForm=function(){document.getElementById('sr-form-view').style.display='none';document.getElementById('sr-list-view').style.display='flex';filterSolicitudes();};
+window.srCloseDetail=function(){document.getElementById('sr-detail-view').style.display='none';document.getElementById('sr-list-view').style.display='flex';filterSolicitudes();};
+// ── Detalle del ticket ──
+window.srOpenDetail=function(id){
+  const d=_srDocs.find(x=>x._id===id);if(!d)return;_srCurrentId=id;
+  const canEdit=_canEditFicha()||(d.solicitanteEmail||'').toLowerCase()===(user?.email||'').toLowerCase();
+  document.getElementById('sr-det-left').innerHTML=`
+    <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name">${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoBadge(d.estado)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Servicio</div><div class="crm-det-meta-val">${esc(d.servicioLabel||d.servicio)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta</div><div class="crm-det-meta-val">${d.cuentaNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')">${esc(d.cuentaNombre)}</span>`:'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario</div><div class="crm-det-meta-val">${esc(d.propietarioNombre||'–')}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Solicitante</div><div class="crm-det-meta-val">${esc(d.solicitante||'–')}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Responsable</div><div class="crm-det-meta-val">${esc(d.responsable||'–')}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem">${canEdit?`<select class="crm-estado-sel" onchange="srUpdateEstado('${id}',this.value)">${SR_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('')}</select>`:srEstadoBadge(d.estado)}</div></div>`;
+  document.getElementById('sr-det-right').innerHTML=`
+    <div class="crm-det-tabs"><button class="crm-det-tab active" onclick="srDetTab(this,'srd-info')">Información</button><button class="crm-det-tab" onclick="srDetTab(this,'srd-timeline')">Timeline</button></div>
+    <div class="crm-det-tab-body">
+      <div id="srd-info">${_srRenderData(d)}</div>
+      <div id="srd-timeline" style="display:none">${_srRenderTimeline(d)}<div style="margin-top:.8rem;display:flex;gap:.4rem"><input id="srd-comentario" class="cdr-input" placeholder="Agregar comentario..."><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="srAddComentario('${id}')">Comentar</button></div></div>
+    </div>`;
+  document.getElementById('sr-list-view').style.display='none';
+  document.getElementById('sr-form-view').style.display='none';
+  const dv=document.getElementById('sr-detail-view');dv.style.display='flex';dv.style.flexDirection='column';
+};
+window.srDetTab=function(el,tab){const r=document.getElementById('sr-det-right');r.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');r.querySelectorAll('[id^="srd-"]').forEach(p=>p.style.display='none');const t=r.querySelector('#'+tab);if(t)t.style.display='';};
+function _srRenderData(d){
+  const svc=_srService(d.servicio);const data=d.data||{};
+  if(!svc)return '<div class="anc-empty">Sin datos.</div>';
+  const val=(f)=>{const v=data[f.k];
+    if(f.type==='cuenta')return esc(d.cuentaNombre||'–');
+    if(f.type==='contacto')return esc(d.propietarioNombre||'–');
+    if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='docs')return (Array.isArray(v)&&v.length)?v.map(x=>`<div style="font-size:12px"><b>${esc(x.tipo)}:</b> <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(x.url)}</a></div>`).join(''):'<span style="color:#8898C0">–</span>';
+    return v?esc(v):'<span style="color:#8898C0">–</span>';};
+  return `<div class="nx-grid"><div class="nx-col" style="grid-column:1/-1">${svc.form.map(card=>`<div class="nx-card"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.map(f=>`<div class="nx-row"><div class="nx-row-l">${esc(f.label||card.title)}</div><div class="nx-row-v">${val(f)}</div></div>`).join('')}</div>`).join('')}</div></div>`;
+}
+function _srRenderTimeline(d){
+  const ev=(d.eventos||[]).slice().sort((a,b)=>(_tsToDate(b.fecha)?.getTime()||0)-(_tsToDate(a.fecha)?.getTime()||0));
+  if(!ev.length)return '<div class="anc-empty">Sin eventos.</div>';
+  const icon={creacion:'🟢',estado:'🔄',comentario:'💬',cierre:'✅'};
+  return '<div class="clt-timeline">'+ev.map(e=>{const t=_tsToDate(e.fecha);const f=t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'';return `<div class="clt-event"><div class="clt-event-dot"></div><div class="clt-event-inner"><div class="clt-event-meta"><span class="clt-event-date">${f}</span><span class="clt-event-user">${esc(e.usuario||'')}</span></div><div class="clt-event-desc">${icon[e.tipo]||'•'} ${esc(e.descripcion||'')}</div></div></div>`;}).join('')+'</div>';
+}
+window.srUpdateEstado=async function(id,val){
+  const d=_srDocs.find(x=>x._id===id);if(!d)return;
+  const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
+  const ev={tipo:val==='Finalizada'?'cierre':'estado',descripcion:`Estado → ${val}`,fecha:now,usuario};
+  try{
+    await db.collection('solicitudes').doc(id).update({estado:val,ultimaActualizacion:now,eventos:firebase.firestore.FieldValue.arrayUnion(ev)});
+    d.estado=val;d.ultimaActualizacion=now;d.eventos=[...(d.eventos||[]),ev];
+    srOpenDetail(id);
+  }catch(e){alert('Error: '+e.message);}
+};
+window.srAddComentario=async function(id){
+  const inp=document.getElementById('srd-comentario');const txt=(inp?.value||'').trim();if(!txt)return;
+  const d=_srDocs.find(x=>x._id===id);if(!d)return;
+  const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
+  const ev={tipo:'comentario',descripcion:txt,fecha:now,usuario};
+  try{
+    await db.collection('solicitudes').doc(id).update({ultimaActualizacion:now,eventos:firebase.firestore.FieldValue.arrayUnion(ev)});
+    d.ultimaActualizacion=now;d.eventos=[...(d.eventos||[]),ev];
+    srOpenDetail(id);document.querySelector('#sr-det-right .crm-det-tab:nth-child(2)')?.click();
+  }catch(e){alert('Error: '+e.message);}
+};
+// ── PDF (vista corporativa imprimible) ──
+window.srPrintPDF=function(id){
+  const d=_srDocs.find(x=>x._id===id);if(!d)return;
+  const w=window.open('','_blank');if(!w){alert('Habilitá las ventanas emergentes para generar el PDF.');return;}
+  w.document.write(_srBuildHTML(d));w.document.close();
+  setTimeout(()=>{try{w.focus();w.print();}catch(e){}},400);
+};
+function _srBuildHTML(d){
+  const svc=_srService(d.servicio);const data=d.data||{};
+  const row=(l,v)=>`<tr><td class="l">${l}</td><td class="v">${v||'–'}</td></tr>`;
+  const cell=(f)=>{const v=data[f.k];
+    if(f.type==='cuenta')return d.cuentaNombre||'';if(f.type==='contacto')return d.propietarioNombre||'';
+    if(f.type==='checks'||f.type==='multi')return Array.isArray(v)?v.join(', '):'';
+    if(f.type==='docs')return Array.isArray(v)?v.map(x=>`${x.tipo}: ${x.url}`).join('<br>'):'';
+    return v||'';};
+  const secciones=(svc?svc.form:[]).map(card=>`<h3>${card.title}</h3><table>${card.fields.map(f=>row(f.label||card.title,String(cell(f)).replace(/</g,'&lt;'))).join('')}</table>`).join('');
+  const fecha=(_tsToDate(d.fechaCreacion)||new Date()).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${d.ticket}</title><style>
+    *{font-family:'Segoe UI',Arial,sans-serif;box-sizing:border-box}body{margin:0;color:#222A40}
+    .hd{background:#00285A;color:#fff;padding:26px 40px;display:flex;justify-content:space-between;align-items:center}
+    .hd .brand{font-size:22px;font-weight:800;letter-spacing:1px}.hd .sub{font-size:12px;opacity:.8;margin-top:2px}
+    .hd .tk{text-align:right;font-size:13px}.hd .tk b{font-size:18px;display:block}
+    .meta{padding:16px 40px;background:#EEF3FF;font-size:12px;color:#25408F;display:flex;gap:28px;flex-wrap:wrap}
+    .body{padding:20px 40px 40px}h3{color:#00285A;font-size:14px;border-bottom:2px solid #E2EAF4;padding-bottom:5px;margin:22px 0 8px}
+    table{width:100%;border-collapse:collapse;margin-bottom:6px}td{padding:6px 8px;font-size:12.5px;vertical-align:top;border-bottom:1px solid #F1F5FE}
+    td.l{width:230px;color:#56648F;font-weight:600}td.v{color:#1F2A4D}
+    .ft{padding:16px 40px;font-size:10px;color:#8898C0;border-top:1px solid #E8EFF8}
+  </style></head><body>
+    <div class="hd"><div><div class="brand">COLLIERS</div><div class="sub">Centro de Solicitudes · Nexus</div></div><div class="tk">${esc(d.servicioLabel||'')}<b>${esc(d.ticket)}</b>${esc(d.estado||'')}</div></div>
+    <div class="meta"><span><b>Solicitante:</b> ${esc(d.solicitante||'')}</span><span><b>Cuenta:</b> ${esc(d.cuentaNombre||'–')}</span><span><b>Responsable:</b> ${esc(d.responsable||'')}</span><span><b>Fecha:</b> ${fecha}</span></div>
+    <div class="body">${secciones}</div>
+    <div class="ft">Documento generado automáticamente por Colliers Nexus · ${esc(d.ticket)}</div>
+  </body></html>`;
+}
+// ── Email al responsable (EmailJS; no-op si no está configurado) ──
+function _srNotifyResponsable(d){
+  try{
+    if(typeof emailjs==='undefined'||!EMAILJS_PUBLIC_KEY||!EMAILJS_SERVICE_ID||!EMAILJS_TEMPLATE_ID){
+      console.log('[solicitudes] EmailJS no configurado — se omite el envío. Ticket:',d.ticket,'→ responsable:',d.responsable);
+      return;
+    }
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{
+      to_email:d.responsableEmail||'',subject:`${d.ticket} · ${d.servicioLabel}`,
+      ticket:d.ticket,servicio:d.servicioLabel,cuenta:d.cuentaNombre||'',solicitante:d.solicitante||'',
+      estado:d.estado,mensaje:`Nueva solicitud ${d.ticket} (${d.servicioLabel}) de ${d.solicitante}. Cuenta: ${d.cuentaNombre||'–'}.`
+    }).catch(e=>console.warn('[solicitudes] email error:',e));
+  }catch(e){console.warn('[solicitudes] email error:',e);}
+}
+window.srReenviarMail=function(id){const d=_srDocs.find(x=>x._id===id);if(!d)return;_srNotifyResponsable(d);showBldToast&&showBldToast('Notificación enviada al responsable');};
+
 let _txDocs=[], _txFiltered=[], _txEditId=null;
 
 function loadTransacciones(){
