@@ -272,7 +272,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────────────── CENTRO DE SOLICITUDES ───────────────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Centro de Solicitudes", "1.1", FECHA,
+    "Centro de Solicitudes", "1.2", FECHA,
     "Centraliza las solicitudes internas de todas las áreas de Colliers. Cada servicio tiene su "
     "propio formulario; el primero disponible es 'Ficha y Publicaciones – Oficinas'. Al enviar se "
     "genera un Ticket, se puede descargar un PDF corporativo y se notifica al responsable.",
@@ -282,8 +282,12 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Cuenta", "Buscar la cuenta con el buscador inteligente. Si no existe, se puede crear en el momento (mismo flujo que en el resto de Nexus)."),
         ("Propietario", "Seleccionar un Contacto existente (no se escribe texto libre)."),
         ("Prioridad", "Definir la urgencia de la solicitud: Baja, Media, Alta o Urgente."),
-        ("Formulario (Oficinas)", "Se completa por tarjetas: Datos de la Solicitud (Prioridad + Fecha de requerimiento), Datos Generales (Tipo de transacción), Ubicación, Superficies y Dimensiones, Características Particulares, Equipamiento y Servicios (checkboxes), Descripción General, Condiciones Comerciales (Cuenta y Propietario) y Documentación y Marketing."),
-        ("Documentación", "Agregar enlaces indicando el tipo: Foto, PDF, Plano, DWG o URL SharePoint."),
+        ("Inmueble asociado", "Buscar el inmueble con el buscador inteligente. Si no existe, usar '+ Crear nuevo inmueble' (solo pide Dirección y Tipo). Al enviar la solicitud, el sistema ofrece continuar completando la ficha del inmueble."),
+        ("Tipo de transacción", "Alquiler, Venta o Ambas. Según lo elegido, en Condiciones Comerciales aparecen solo los precios que correspondan (alquiler y/o venta)."),
+        ("Equipamiento y Servicios", "Para cada servicio (aire acondicionado, ascensor, seguridad, etc.) marcar Sí o No, indicando si el edificio cuenta con él."),
+        ("Ejecutivo(s) Comercial(es) a cargo", "El usuario que crea la solicitud queda asignado automáticamente como primer ejecutivo. Se pueden agregar hasta 2 ejecutivos adicionales con el selector predictivo."),
+        ("Descripción general", "Describir el edificio y el entorno. Este texto se usa para la publicación y la ficha."),
+        ("Documentación", "Agregar todos los elementos necesarios indicando el tipo: Fotografías, Planos, Brochure, Video, Tour Virtual, Render u Otro. Se pueden sumar varios."),
         ("Acciones de Marketing", "Selección múltiple: Ficha técnica, Portales, Campaña Email, Redes Sociales, Cartelería, Video, Tour Virtual, Otro."),
         ("Estado", "Cada ticket tiene un estado: Pendiente, En proceso o Finalizada. Se puede cambiar desde la ficha del ticket."),
     ],

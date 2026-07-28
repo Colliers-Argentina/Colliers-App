@@ -14044,6 +14044,9 @@ const SR_SERVICES=[
      {title:'Datos Generales',fields:[
        {k:'tipoTransaccion',label:'Tipo de transacción',type:'select',opts:['Alquiler','Venta','Ambas'],req:true},
      ]},
+     {title:'Inmueble Asociado',fields:[
+       {k:'inmueble',label:'Inmueble (buscar existente o crear uno nuevo)',type:'inmueble'},
+     ]},
      {title:'Ubicación',fields:[
        {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
        {k:'urlMaps',label:'URL Google Maps',type:'text'},
@@ -14067,26 +14070,29 @@ const SR_SERVICES=[
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
      {title:'Equipamiento y Servicios',fields:[
-       {k:'equipamiento',label:'Marcar los que correspondan (para publicación en portales)',type:'checks',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
+       {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
      {title:'Descripción General',fields:[
-       {k:'comentarios',label:'Comentarios adicionales (descripción del edificio y del entorno — texto para la publicación y la ficha)',type:'textarea',req:true},
+       {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
      ]},
      {title:'Condiciones Comerciales',fields:[
-       {k:'valorTotal',label:'Valor total (venta / alquiler)',type:'text'},
-       {k:'valorM2',label:'Valor m² (venta / alquiler)',type:'text'},
-       {k:'brokersACargo',label:'Broker/s a cargo',type:'text'},
+       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Ambas']}},
+       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Ambas']}},
+       {k:'precioVenta',label:'Precio de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Ambas']}},
+       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Ambas']}},
+       {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
        {k:'cuenta',label:'Cuenta / Cliente',type:'cuenta',req:true},
        {k:'propietario',label:'Propietario (contacto registrado)',type:'contacto'},
      ]},
      {title:'Documentación y Marketing',fields:[
-       {k:'documentacion',label:'Carpeta SharePoint / fotos / planos (agregar ruta o URL)',type:'docs'},
+       {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
        {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
      ]},
    ]},
 ];
 function _srService(key){return SR_SERVICES.find(s=>s.key===key);}
 let _srDocs=[],_srCurrentId=null,_srMias=false,_srFormService=null,_srDocList=[],_srPickerReady=false;
+let _srEjecExtra=[],_srEjecOpts=[],_srNewBldId='';
 
 function srEstadoBadge(e){const c=SR_ESTADO_COLOR[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'Pendiente')}</span>`;}
 
@@ -14160,7 +14166,7 @@ window.startSolicitud=function(key){closeSrCatalog();openSolicitudForm(key);};
 // ── Formulario dinámico (schema-driven) ──
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
-  _srFormService=svc;_srDocList=[];
+  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';
   document.getElementById('sr-form-title').textContent=svc.label;
   const now=new Date();
   const auto=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Automático</div>
@@ -14173,6 +14179,8 @@ function openSolicitudForm(key){
   // Registrar el picker de cuenta de forma diferida (registerCuentaPicker ya está definido en runtime).
   if(document.getElementById('srf-cuenta')&&typeof registerCuentaPicker==='function'){registerCuentaPicker('sr',{inputId:'srf-cuenta',dropId:'srf-cuenta-drop',tagId:'srf-cuenta-tag',hidId:'srf-cuentaId',hidNombreId:'srf-cuentaNombre'});_srPickerReady=true;}
   loadClientesParaSelector();
+  _srRenderEjecChips();
+  _srApplyConditionals();
   const btn=document.getElementById('sr-form-save');if(btn){btn.textContent='Enviar solicitud';btn.disabled=false;}
   document.getElementById('sr-list-view').style.display='none';
   document.getElementById('sr-detail-view').style.display='none';
@@ -14181,17 +14189,106 @@ function openSolicitudForm(key){
 function _srFieldHTML(f){
   const id='srf-'+f.k;const req=f.req?' <span class="cdr-req">*</span>':'';
   const lbl=f.label?`<div class="cdr-lbl">${esc(f.label)}${req}</div>`:'';
-  if(f.type==='text'||f.type==='number')return `<div class="cdr-field">${lbl}<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"></div>`;
-  if(f.type==='textarea')return `<div class="cdr-field">${lbl}<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"></textarea></div>`;
-  if(f.type==='date')return `<div class="cdr-field">${lbl}<input id="${id}" class="cdr-input" type="date"></div>`;
-  if(f.type==='select')return `<div class="cdr-field">${lbl}<select id="${id}" class="cdr-select"><option value="">— Seleccionar —</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select></div>`;
-  if(f.type==='cuenta')return `<div class="cdr-field" style="position:relative">${lbl}<input id="srf-cuenta" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('sr',this.value)" onfocus="ctaPickerInput('sr',this.value)" onblur="ctaPickerBlur('sr')"><div id="srf-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><div id="srf-cuenta-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-cuentaId" type="hidden"><input id="srf-cuentaNombre" type="hidden"></div>`;
-  if(f.type==='contacto')return `<div class="cdr-field" style="position:relative">${lbl}<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden"></div>`;
-  if(f.type==='checks')return `<div class="cdr-field">${lbl}<div id="${id}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.4rem">${f.opts.map(o=>`<label style="display:flex;align-items:center;gap:.45rem;font-size:12.5px;color:#353E59;cursor:pointer;padding:.35rem .5rem;border:1px solid #E8EFF8;border-radius:8px"><input type="checkbox" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div></div>`;
-  if(f.type==='multi')return `<div class="cdr-field">${lbl}<div id="${id}" class="cdr-toggle-group" style="flex-wrap:wrap;border-radius:8px">${f.opts.map(o=>`<button type="button" class="cto-pref-chip" data-v="${esc(o)}" onclick="this.classList.toggle('active')">${esc(o)}</button>`).join('')}</div></div>`;
-  if(f.type==='docs')return `<div class="cdr-field">${lbl}<div style="display:flex;gap:.4rem;flex-wrap:wrap"><select id="srf-doc-tipo" class="cdr-select" style="max-width:150px"><option>Foto</option><option>PDF</option><option>Plano</option><option>DWG</option><option>URL SharePoint</option></select><input id="srf-doc-url" class="cdr-input" placeholder="URL del archivo..." style="flex:1;min-width:180px"><button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srAddDoc()">Agregar</button></div><div id="srf-doc-list" class="cdr-ms-chips" style="margin-top:.4rem"></div></div>`;
+  const w=(inner,extra)=>`<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}${extra||''}>${lbl}${inner}</div>`;
+  if(f.type==='text'||f.type==='number')return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}">`);
+  if(f.type==='textarea')return w(`<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"></textarea>`);
+  if(f.type==='date')return w(`<input id="${id}" class="cdr-input" type="date">`);
+  if(f.type==='select')return w(`<select id="${id}" class="cdr-select" onchange="_srApplyConditionals()"><option value="">— Seleccionar —</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`);
+  if(f.type==='cuenta')return w(`<input id="srf-cuenta" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('sr',this.value)" onfocus="ctaPickerInput('sr',this.value)" onblur="ctaPickerBlur('sr')"><div id="srf-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><div id="srf-cuenta-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-cuentaId" type="hidden"><input id="srf-cuentaNombre" type="hidden">`,' style="position:relative"');
+  if(f.type==='contacto')return w(`<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden">`,' style="position:relative"');
+  if(f.type==='inmueble')return w(`<input id="srf-inmueble" class="cdr-input" placeholder="Buscar inmueble por nombre o dirección..." autocomplete="off" oninput="srInmSearch(this.value)" onblur="srInmBlur()"><div id="srf-inm-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-inm-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-inm-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-inmuebleId" type="hidden"><input id="srf-inmuebleNombre" type="hidden">`,' style="position:relative"');
+  if(f.type==='sino')return w(`<div id="${id}">${f.opts.map((o,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem .55rem;border:1px solid #E8EFF8;border-radius:8px;margin-bottom:.3rem"><span style="font-size:12.5px;color:#353E59">${esc(o)}</span><span style="display:flex;gap:1rem" data-item="${esc(o)}"><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="Sí"> Sí</label><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="No"> No</label></span></div>`).join('')}</div>`);
+  if(f.type==='ejecutivos')return w(`<div id="srf-ejec-chips" class="cdr-ms-chips"></div><input id="srf-ejec-q" class="cdr-input" placeholder="Agregar ejecutivo (hasta 2 adicionales)..." autocomplete="off" oninput="srEjecSearch(this.value)" onblur="srEjecBlur()" style="margin-top:.4rem"><div id="srf-ejec-drop" class="cdr-ms-drop" style="display:none"></div>`,' style="position:relative"');
+  if(f.type==='multi')return w(`<div id="${id}" class="cdr-toggle-group" style="flex-wrap:wrap;border-radius:8px">${f.opts.map(o=>`<button type="button" class="cto-pref-chip" data-v="${esc(o)}" onclick="this.classList.toggle('active')">${esc(o)}</button>`).join('')}</div>`);
+  if(f.type==='docs'){const tipos=f.opts||['Foto','PDF','Plano','DWG','URL SharePoint'];return w(`<div style="display:flex;gap:.4rem;flex-wrap:wrap"><select id="srf-doc-tipo" class="cdr-select" style="max-width:160px">${tipos.map(t=>`<option>${esc(t)}</option>`).join('')}</select><input id="srf-doc-url" class="cdr-input" placeholder="URL o ruta del archivo..." style="flex:1;min-width:180px"><button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srAddDoc()">Agregar</button></div><div id="srf-doc-list" class="cdr-ms-chips" style="margin-top:.4rem"></div>`);}
   return '';
 }
+// Muestra/oculta campos condicionales (showIf) según el valor del campo controlador.
+function _srApplyConditionals(){
+  const svc=_srFormService;if(!svc)return;
+  const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+  svc.form.forEach(card=>card.fields.forEach(f=>{
+    if(!f.showIf)return;
+    const cur=gv('srf-'+f.showIf.k);
+    const wrap=document.getElementById('srfw-'+f.k);
+    if(wrap)wrap.style.display=f.showIf.vals.includes(cur)?'':'none';
+  }));
+}
+function _srFieldVisible(f,data){
+  if(!f.showIf)return true;
+  return f.showIf.vals.includes(data[f.showIf.k]||'');
+}
+// ── Inmueble asociado: buscador inteligente + creación rápida (dirección + tipo) ──
+window.srInmSearch=function(q){
+  const list=document.getElementById('srf-inm-list');if(!list)return;
+  document.getElementById('srf-inmuebleId').value='';document.getElementById('srf-inmuebleNombre').value='';
+  document.getElementById('srf-inm-tag').style.display='none';_srNewBldId='';
+  const create=document.getElementById('srf-inm-create');if(create){create.style.display='none';create.innerHTML='';}
+  if((!Array.isArray(_bldDocs)||!_bldDocs.length)&&db){db.collection('buildings').get().then(s=>{_bldDocs=s.docs.map(d=>({...d.data(),_id:d.id}));const cur=document.getElementById('srf-inmueble');if(cur&&(cur.value||'').trim())srInmSearch(cur.value);}).catch(()=>{});}
+  const ql=(q||'').toLowerCase().trim();
+  const src=Array.isArray(_bldDocs)?_bldDocs:[];
+  const matches=ql?src.filter(b=>(b.nombre||'').toLowerCase().includes(ql)||(b.direccion||'').toLowerCase().includes(ql)).slice(0,8):[];
+  let html=matches.map(b=>{const n=(b.nombre||b.direccion||b._id).replace(/'/g,"\\'");return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();srInmPick('${b._id}','${n}')">${esc(b.nombre||b.direccion||b._id)}${b.direccion&&b.nombre?`<span style="display:block;font-weight:500;color:#7B8BBD;font-size:11px">${esc(b.direccion)}</span>`:''}</div>`;}).join('');
+  html+=`<div style="padding:10px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#1C54F4;border-top:1px solid #E8EFF8" onmousedown="event.preventDefault();srInmCreateStart()">+ Crear nuevo inmueble</div>`;
+  list.innerHTML=html;list.style.display='block';
+};
+window.srInmBlur=function(){setTimeout(()=>{const l=document.getElementById('srf-inm-list');if(l)l.style.display='none';},180);};
+window.srInmPick=function(id,nombre){
+  document.getElementById('srf-inmuebleId').value=id;document.getElementById('srf-inmuebleNombre').value=nombre;
+  document.getElementById('srf-inmueble').value=nombre;document.getElementById('srf-inm-list').style.display='none';
+  _srNewBldId='';
+  const b=(_bldDocs||[]).find(x=>x._id===id);
+  if(b&&b.direccion){const dir=document.getElementById('srf-direccion');if(dir&&!dir.value.trim())dir.value=b.direccion;}
+};
+window.srInmCreateStart=function(){
+  const list=document.getElementById('srf-inm-list');if(list)list.style.display='none';
+  const box=document.getElementById('srf-inm-create');if(!box)return;
+  const pre=(document.getElementById('srf-inmueble').value||'').replace(/"/g,'&quot;');
+  box.innerHTML=`<div style="font-size:11.5px;font-weight:800;color:#0A1B4D;margin-bottom:.5rem">Nuevo inmueble</div>
+    <div class="cdr-field"><div class="cdr-lbl">Dirección <span class="cdr-req">*</span></div><input id="srf-newbld-dir" class="cdr-input" value="${pre}" placeholder="Calle y número"></div>
+    <div class="cdr-field"><div class="cdr-lbl">Tipo de inmueble <span class="cdr-req">*</span></div><select id="srf-newbld-tipo" class="cdr-select"><option value="">— Seleccionar —</option>${['Oficina','Retail','Industria','Depósito','Terreno'].map(t=>`<option>${t}</option>`).join('')}</select></div>
+    <div style="display:flex;gap:.4rem;margin-top:.3rem"><button type="button" class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="srInmCreateSave()">Crear inmueble</button><button type="button" class="crm-action-btn" onclick="document.getElementById('srf-inm-create').style.display='none'">Cancelar</button></div>`;
+  box.style.display='block';
+};
+window.srInmCreateSave=async function(){
+  const dirEl=document.getElementById('srf-newbld-dir');const tipoEl=document.getElementById('srf-newbld-tipo');
+  const dir=(dirEl?.value||'').trim();const tipo=tipoEl?.value||'';
+  let ok=true;if(!dir){dirEl.style.borderColor='#ED1B34';ok=false;}else dirEl.style.borderColor='';
+  if(!tipo){tipoEl.style.borderColor='#ED1B34';ok=false;}else tipoEl.style.borderColor='';
+  if(!ok)return;
+  if(!db){alert('Firebase no disponible.');return;}
+  const _tipoKey={'Oficina':'oficina','Retail':'retail','Industria':'industria','Depósito':'deposito','Terreno':'terreno'}[tipo]||tipo.toLowerCase();
+  const data={nombre:dir,direccion:dir,tipo:_tipoKey,_tipo:_tipoKey,assetType:_tipoKey,tipoLabel:tipo,
+    estado:'Disponible',activo:true,_source:'solicitud',
+    createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  try{
+    const ref=await db.collection('buildings').add(data);
+    if(Array.isArray(_bldDocs))_bldDocs.unshift({...data,_id:ref.id});
+    _srNewBldId=ref.id;
+    srInmPick(ref.id,dir);_srNewBldId=ref.id;
+    const box=document.getElementById('srf-inm-create');if(box){box.style.display='none';}
+    const tag=document.getElementById('srf-inm-tag');if(tag){tag.textContent='✓ Inmueble creado y vinculado';tag.style.display='block';}
+  }catch(e){alert('Error al crear el inmueble: '+e.message);}
+};
+// ── Ejecutivo(s) Comercial(es): creador automático + hasta 2 adicionales ──
+function _srCreadorNombre(){return user?.displayName||user?.email||'Usuario';}
+function _srRenderEjecChips(){
+  const c=document.getElementById('srf-ejec-chips');if(!c)return;
+  const creador=`<span class="cdr-ms-chip" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF">${esc(_srCreadorNombre())} <span style="font-size:9px;opacity:.7">(creador)</span></span>`;
+  c.innerHTML=creador+_srEjecExtra.map((k,i)=>`<span class="cdr-ms-chip">${esc(ejecDisplay(k))}<span class="cdr-ms-chip-x" onclick="srEjecRemove(${i})" title="Quitar">✕</span></span>`).join('');
+}
+window.srEjecSearch=function(q){
+  const drop=document.getElementById('srf-ejec-drop');if(!drop)return;
+  q=(q||'').toLowerCase().trim();
+  if(_srEjecExtra.length>=2){drop.innerHTML='<div class="cdr-ms-empty">Máximo 2 ejecutivos adicionales.</div>';drop.style.display='block';return;}
+  _srEjecOpts=CRM_EJECUTIVOS.filter(k=>!_srEjecExtra.includes(k)&&(k.toLowerCase().includes(q)||ejecDisplay(k).toLowerCase().includes(q)))
+    .sort((a,b)=>ejecDisplay(a).localeCompare(ejecDisplay(b),'es',{sensitivity:'base'}));
+  drop.innerHTML=_srEjecOpts.length?_srEjecOpts.map((k,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();srEjecAdd(${i})">${esc(ejecDisplay(k))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';
+  drop.style.display='block';
+};
+window.srEjecAdd=function(i){const k=_srEjecOpts[i];if(k==null||_srEjecExtra.length>=2)return;if(!_srEjecExtra.includes(k))_srEjecExtra.push(k);const q=document.getElementById('srf-ejec-q');if(q)q.value='';const d=document.getElementById('srf-ejec-drop');if(d)d.style.display='none';_srRenderEjecChips();};
+window.srEjecRemove=function(i){if(i<0||i>=_srEjecExtra.length)return;_srEjecExtra.splice(i,1);_srRenderEjecChips();};
+window.srEjecBlur=function(){setTimeout(()=>{const d=document.getElementById('srf-ejec-drop');if(d)d.style.display='none';},150);};
 window.srPropSearch=function(q){
   const list=document.getElementById('srf-prop-list');if(!list)return;
   document.getElementById('srf-propId').value='';document.getElementById('srf-propNombre').value='';
@@ -14214,10 +14311,14 @@ function _srReadForm(svc){
     const id='srf-'+f.k;
     if(f.type==='cuenta'){data.cuentaId=gv('srf-cuentaId');data.cuentaNombre=gv('srf-cuentaNombre');}
     else if(f.type==='contacto'){data.propietarioId=gv('srf-propId');data.propietarioNombre=gv('srf-propNombre');}
+    else if(f.type==='inmueble'){data.inmuebleId=gv('srf-inmuebleId');data.inmuebleNombre=gv('srf-inmuebleNombre');}
+    else if(f.type==='ejecutivos'){data.ejecutivosCreador=_srCreadorNombre();data.ejecutivosExtra=_srEjecExtra.slice();data[f.k]=[_srCreadorNombre(),..._srEjecExtra.map(ejecDisplay)];}
     else if(f.type==='checks'){data[f.k]=[...document.querySelectorAll('#'+id+' input:checked')].map(x=>x.value);}
+    else if(f.type==='sino'){const o={};f.opts.forEach((opt,i)=>{const sel=document.querySelector('#'+id+' input[name="'+id+'-'+i+'"]:checked');if(sel)o[opt]=sel.value;});data[f.k]=o;}
     else if(f.type==='multi'){data[f.k]=[...document.querySelectorAll('#'+id+' .cto-pref-chip.active')].map(x=>x.dataset.v);}
     else if(f.type==='docs'){data[f.k]=_srDocList.slice();}
-    else data[f.k]=gv(id);
+    else if(_srFieldVisible(f,{tipoTransaccion:gv('srf-tipoTransaccion')})){data[f.k]=gv(id);}
+    else data[f.k]='';
   }));
   return data;
 }
@@ -14228,6 +14329,7 @@ window.submitSolicitud=async function(){
   let ok=true,first=null;
   svc.form.forEach(card=>card.fields.forEach(f=>{
     if(!f.req)return;
+    if(!_srFieldVisible(f,data))return;
     const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:!String(data[f.k]||'').trim());
     const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':'srf-'+f.k);
     const el=document.getElementById(elId);
@@ -14246,6 +14348,7 @@ window.submitSolicitud=async function(){
     const doc={
       ticketNum,ticket,servicio:svc.key,servicioLabel:svc.label,
       cuentaId:data.cuentaId||'',cuentaNombre:data.cuentaNombre||'',
+      inmuebleId:data.inmuebleId||'',inmuebleNombre:data.inmuebleNombre||'',
       propietarioId:data.propietarioId||'',propietarioNombre:data.propietarioNombre||'',
       solicitante,solicitanteEmail:user?.email||'',broker:solicitante,
       responsable:svc.responsable,responsableEmail:svc.responsableEmail||'',
@@ -14255,9 +14358,14 @@ window.submitSolicitud=async function(){
     const ref=await db.collection('solicitudes').add(doc);
     _srDocs.unshift({...doc,_id:ref.id});
     _srNotifyResponsable({...doc,_id:ref.id});   // EmailJS (no-op si no hay claves configuradas)
+    const newBld=_srNewBldId;_srNewBldId='';
     srCloseForm();
     srOpenDetail(ref.id);
     showBldToast&&showBldToast(ticket+' creada');
+    if(newBld&&confirm('¿Deseás continuar completando la información del inmueble?')){
+      showModule('buildings');
+      setTimeout(()=>{try{openBuildingEditor(newBld);}catch(e){}},400);
+    }
   }catch(e){alert('Error al crear la solicitud: '+e.message);const b=document.getElementById('sr-form-save');b.textContent='Enviar solicitud';b.disabled=false;}
 };
 window.srCloseForm=function(){document.getElementById('sr-form-view').style.display='none';document.getElementById('sr-list-view').style.display='flex';filterSolicitudes();};
@@ -14270,6 +14378,7 @@ window.srOpenDetail=function(id){
     <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name">${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoBadge(d.estado)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Servicio</div><div class="crm-det-meta-val">${esc(d.servicioLabel||d.servicio)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta</div><div class="crm-det-meta-val">${d.cuentaNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')">${esc(d.cuentaNombre)}</span>`:'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Inmueble</div><div class="crm-det-meta-val">${d.inmuebleNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="showModule('buildings');setTimeout(()=>{try{openBuildingEditor('${esc(d.inmuebleId||'')}')}catch(e){}},400)">${esc(d.inmuebleNombre)}</span>`:'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Propietario</div><div class="crm-det-meta-val">${esc(d.propietarioNombre||'–')}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Solicitante</div><div class="crm-det-meta-val">${esc(d.solicitante||'–')}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Responsable</div><div class="crm-det-meta-val">${esc(d.responsable||'–')}</div></div>
@@ -14292,10 +14401,13 @@ function _srRenderData(d){
   const val=(f)=>{const v=data[f.k];
     if(f.type==='cuenta')return esc(d.cuentaNombre||'–');
     if(f.type==='contacto')return esc(d.propietarioNombre||'–');
+    if(f.type==='inmueble')return d.inmuebleNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="showModule('buildings');setTimeout(()=>{try{openBuildingEditor('${esc(d.inmuebleId||'')}')}catch(e){}},400)">${esc(d.inmuebleNombre)}</span>`:'<span style="color:#8898C0">–</span>';
+    if(f.type==='ejecutivos')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`<div style="font-size:12px"><b>${esc(k)}:</b> ${esc(v[k])}</div>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='docs')return (Array.isArray(v)&&v.length)?v.map(x=>`<div style="font-size:12px"><b>${esc(x.tipo)}:</b> <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(x.url)}</a></div>`).join(''):'<span style="color:#8898C0">–</span>';
     return v?esc(v):'<span style="color:#8898C0">–</span>';};
-  return `<div class="nx-grid"><div class="nx-col" style="grid-column:1/-1">${svc.form.map(card=>`<div class="nx-card"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.map(f=>`<div class="nx-row"><div class="nx-row-l">${esc(f.label||card.title)}</div><div class="nx-row-v">${val(f)}</div></div>`).join('')}</div>`).join('')}</div></div>`;
+  return `<div class="nx-grid"><div class="nx-col" style="grid-column:1/-1">${svc.form.map(card=>`<div class="nx-card"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>`<div class="nx-row"><div class="nx-row-l">${esc(f.label||card.title)}</div><div class="nx-row-v">${val(f)}</div></div>`).join('')}</div>`).join('')}</div></div>`;
 }
 function _srRenderTimeline(d){
   const ev=(d.eventos||[]).slice().sort((a,b)=>(_tsToDate(b.fecha)?.getTime()||0)-(_tsToDate(a.fecha)?.getTime()||0));
@@ -14336,10 +14448,13 @@ function _srBuildHTML(d){
   const row=(l,v)=>`<tr><td class="l">${l}</td><td class="v">${v||'–'}</td></tr>`;
   const cell=(f)=>{const v=data[f.k];
     if(f.type==='cuenta')return d.cuentaNombre||'';if(f.type==='contacto')return d.propietarioNombre||'';
+    if(f.type==='inmueble')return d.inmuebleNombre||'';
+    if(f.type==='ejecutivos')return Array.isArray(v)?v.join(', '):'';
+    if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`${k}: ${v[k]}`).join('<br>'):'';
     if(f.type==='checks'||f.type==='multi')return Array.isArray(v)?v.join(', '):'';
     if(f.type==='docs')return Array.isArray(v)?v.map(x=>`${x.tipo}: ${x.url}`).join('<br>'):'';
     return v||'';};
-  const secciones=(svc?svc.form:[]).map(card=>`<h3>${card.title}</h3><table>${card.fields.map(f=>row(f.label||card.title,String(cell(f)).replace(/</g,'&lt;'))).join('')}</table>`).join('');
+  const secciones=(svc?svc.form:[]).map(card=>`<h3>${card.title}</h3><table>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>row(f.label||card.title,String(cell(f)).replace(/</g,'&lt;'))).join('')}</table>`).join('');
   const fecha=(_tsToDate(d.fechaCreacion)||new Date()).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
   return `<!doctype html><html><head><meta charset="utf-8"><title>${d.ticket}</title><style>
     *{font-family:'Segoe UI',Arial,sans-serif;box-sizing:border-box}body{margin:0;color:#222A40}
