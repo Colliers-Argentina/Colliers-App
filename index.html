@@ -4549,7 +4549,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <!-- Inmueble -->
         <div class="tx-form-row">
-          <label class="tx-form-label">Inmueble<span class="tx-form-req">*</span></label>
+          <label class="tx-form-label">Inmueble</label>
           <div class="tx-inmueble-wrap">
             <input class="tx-form-inp" id="txf-inmueble" placeholder="Buscar inmueble existente..." autocomplete="off" oninput="_txSearchInmueble(this.value)">
             <div class="tx-inmueble-results" id="tx-inmueble-results" style="display:none"></div>
@@ -14149,7 +14149,7 @@ function saveTxDrawer(){
   const tipo=(document.getElementById('txf-tipo')||{}).value||'';
   const inmueble=(document.getElementById('txf-inmueble')||{}).value||'';
   let valid=true;
-  const req=['txf-tipo','txf-inmueble'];
+  const req=['txf-tipo'];
   req.forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
