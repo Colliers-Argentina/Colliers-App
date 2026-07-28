@@ -14037,50 +14037,51 @@ const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada'
 const SR_SERVICES=[
   {key:'ficha-oficinas',label:'Ficha y Publicaciones – Oficinas',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
    form:[
-     {title:'Solicitud',fields:[
+     {title:'Datos de la Solicitud',fields:[
        {k:'prioridad',label:'Prioridad',type:'select',opts:['Baja','Media','Alta','Urgente']},
-       {k:'observacionSolicitud',label:'Observaciones de la solicitud',type:'textarea'},
+       {k:'fechaRequerimiento',label:'Fecha de requerimiento (mín. 3 días de plazo)',type:'date'},
      ]},
-     {title:'Datos Comerciales',fields:[
-       {k:'cuenta',label:'Cuenta',type:'cuenta',req:true},
-       {k:'propietario',label:'Propietario',type:'contacto'},
-       {k:'operacion',label:'Operación',type:'select',opts:['Alquiler','Venta','Alquiler o Venta']},
+     {title:'Datos Generales',fields:[
+       {k:'tipoTransaccion',label:'Tipo de transacción',type:'select',opts:['Alquiler','Venta','Ambas'],req:true},
      ]},
      {title:'Ubicación',fields:[
-       {k:'direccion',label:'Dirección',type:'text'},
-       {k:'pisoUnidad',label:'Piso / Unidad',type:'text'},
-       {k:'corredor',label:'Corredor',type:'select',opts:['Catalinas','Macrocentro','Macrocentro Norte','Macrocentro Sur','Microcentro','Norte CABA','Norte GBA','Plaza Roma','Plaza San Martín','Puerto Madero Este','Puerto Madero Oeste']},
-       {k:'localidad',label:'Localidad',type:'text'},
+       {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
+       {k:'urlMaps',label:'URL Google Maps',type:'text'},
+       {k:'referencias',label:'Referencias del entorno (empresas, transporte, servicios, zona comercial)',type:'textarea'},
      ]},
-     {title:'Superficies',fields:[
-       {k:'supTotal',label:'Superficie total (m²)',type:'number'},
-       {k:'supPropia',label:'Superficie propia (m²)',type:'number'},
-       {k:'supMinima',label:'Superficie mínima divisible (m²)',type:'number'},
+     {title:'Superficies y Dimensiones',fields:[
+       {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true},
+       {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number'},
+       {k:'banos',label:'Baños',type:'number'},
+       {k:'banosPorPiso',label:'Baños por piso',type:'number'},
+       {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
+       {k:'numOficinas',label:'Número de oficinas',type:'number'},
+       {k:'oficinasPorPiso',label:'Oficinas por piso',type:'number'},
+       {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number'},
      ]},
-     {title:'Características',fields:[
-       {k:'categoria',label:'Categoría',type:'select',opts:['A+','A','B+','B','C']},
-       {k:'estadoEdificio',label:'Estado del edificio',type:'select',opts:['Existente','En Construcción','Proyecto']},
-       {k:'anio',label:'Año',type:'number'},
-       {k:'disposicion',label:'Disposición / tipología',type:'text'},
+     {title:'Características Particulares',fields:[
+       {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
+       {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
+       {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
+       {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
-     {title:'Equipamiento',fields:[
-       {k:'equipamiento',label:'',type:'checks',opts:['Aire acondicionado central','Piso técnico','Cielorraso','Luminarias LED','Detección de incendio','Grupo electrógeno','Seguridad 24h','Ascensores','Baños en el piso','Cocina / office','Sala de reuniones','Terraza']},
+     {title:'Equipamiento y Servicios',fields:[
+       {k:'equipamiento',label:'Marcar los que correspondan (para publicación en portales)',type:'checks',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
-     {title:'Descripción',fields:[
-       {k:'descripcion',label:'Descripción comercial',type:'textarea'},
+     {title:'Descripción General',fields:[
+       {k:'comentarios',label:'Comentarios adicionales (descripción del edificio y del entorno — texto para la publicación y la ficha)',type:'textarea',req:true},
      ]},
      {title:'Condiciones Comerciales',fields:[
-       {k:'precioAlq',label:'Precio alquiler (USD/m²)',type:'number'},
-       {k:'precioVta',label:'Precio venta (USD/m²)',type:'number'},
-       {k:'expensas',label:'Expensas (USD/m²)',type:'number'},
-       {k:'disponibilidad',label:'Disponibilidad',type:'select',opts:['Inmediata','A convenir','30 días','60 días']},
+       {k:'valorTotal',label:'Valor total (venta / alquiler)',type:'text'},
+       {k:'valorM2',label:'Valor m² (venta / alquiler)',type:'text'},
+       {k:'brokersACargo',label:'Broker/s a cargo',type:'text'},
+       {k:'cuenta',label:'Cuenta / Cliente',type:'cuenta',req:true},
+       {k:'propietario',label:'Propietario (contacto registrado)',type:'contacto'},
      ]},
-     {title:'Documentación',fields:[
-       {k:'documentacion',label:'',type:'docs'},
-     ]},
-     {title:'Marketing',fields:[
-       {k:'marketing',label:'Acciones de Marketing',type:'multi',opts:['Ficha técnica','Portales','Campaña Email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
+     {title:'Documentación y Marketing',fields:[
+       {k:'documentacion',label:'Carpeta SharePoint / fotos / planos (agregar ruta o URL)',type:'docs'},
+       {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
      ]},
    ]},
 ];
@@ -14223,9 +14224,17 @@ function _srReadForm(svc){
 window.submitSolicitud=async function(){
   const svc=_srFormService;if(!svc)return;
   const data=_srReadForm(svc);
-  // Cuenta obligatoria si el servicio la define.
-  const needCuenta=svc.form.some(c=>c.fields.some(f=>f.type==='cuenta'&&f.req));
-  if(needCuenta&&!data.cuentaId){const el=document.getElementById('srf-cuenta');if(el)el.style.borderColor='#ED1B34';return;}
+  // Validar todos los campos obligatorios (req) del schema.
+  let ok=true,first=null;
+  svc.form.forEach(card=>card.fields.forEach(f=>{
+    if(!f.req)return;
+    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:!String(data[f.k]||'').trim());
+    const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':'srf-'+f.k);
+    const el=document.getElementById(elId);
+    if(el)el.style.borderColor=empty?'#ED1B34':'';
+    if(empty){ok=false;if(!first)first=el;}
+  }));
+  if(!ok){if(first&&first.scrollIntoView)first.scrollIntoView({behavior:'smooth',block:'center'});return;}
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('sr-form-save');btn.textContent='Enviando...';btn.disabled=true;
   try{

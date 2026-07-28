@@ -272,7 +272,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────────────── CENTRO DE SOLICITUDES ───────────────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Centro de Solicitudes", "1.0", FECHA,
+    "Centro de Solicitudes", "1.1", FECHA,
     "Centraliza las solicitudes internas de todas las áreas de Colliers. Cada servicio tiene su "
     "propio formulario; el primero disponible es 'Ficha y Publicaciones – Oficinas'. Al enviar se "
     "genera un Ticket, se puede descargar un PDF corporativo y se notifica al responsable.",
@@ -281,7 +281,8 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Datos automáticos", "Solicitante, Broker y Fecha se toman solos del usuario logueado; no hay que cargarlos."),
         ("Cuenta", "Buscar la cuenta con el buscador inteligente. Si no existe, se puede crear en el momento (mismo flujo que en el resto de Nexus)."),
         ("Propietario", "Seleccionar un Contacto existente (no se escribe texto libre)."),
-        ("Formulario (Oficinas)", "Se completa por tarjetas: Solicitud, Datos Comerciales, Ubicación, Superficies, Características, Equipamiento (checkboxes), Descripción, Condiciones Comerciales, Documentación y Marketing."),
+        ("Prioridad", "Definir la urgencia de la solicitud: Baja, Media, Alta o Urgente."),
+        ("Formulario (Oficinas)", "Se completa por tarjetas: Datos de la Solicitud (Prioridad + Fecha de requerimiento), Datos Generales (Tipo de transacción), Ubicación, Superficies y Dimensiones, Características Particulares, Equipamiento y Servicios (checkboxes), Descripción General, Condiciones Comerciales (Cuenta y Propietario) y Documentación y Marketing."),
         ("Documentación", "Agregar enlaces indicando el tipo: Foto, PDF, Plano, DWG o URL SharePoint."),
         ("Acciones de Marketing", "Selección múltiple: Ficha técnica, Portales, Campaña Email, Redes Sociales, Cartelería, Video, Tour Virtual, Otro."),
         ("Estado", "Cada ticket tiene un estado: Pendiente, En proceso o Finalizada. Se puede cambiar desde la ficha del ticket."),
