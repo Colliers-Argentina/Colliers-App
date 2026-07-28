@@ -14058,12 +14058,11 @@ const SR_SERVICES=[
        {k:'tipoTransaccion',label:'Tipo de transacción',type:'select',opts:['Alquiler','Venta','Ambas'],req:true},
      ]},
      {title:'Inmueble Asociado',fields:[
-       {k:'inmueble',label:'Inmueble (buscar existente o crear uno nuevo)',type:'inmueble'},
+       {k:'inmueble',label:'Inmueble',type:'inmueble'},
      ]},
      {title:'Ubicación',fields:[
        {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
        {k:'urlMaps',label:'URL Google Maps',type:'text'},
-       {k:'referencias',label:'Referencias del entorno (empresas, transporte, servicios, zona comercial)',type:'textarea'},
      ]},
      {title:'Superficies y Dimensiones',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true},
@@ -14095,7 +14094,7 @@ const SR_SERVICES=[
        {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Ambas']}},
        {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
        {k:'cuenta',label:'Cuenta / Cliente',type:'cuenta',req:true},
-       {k:'propietario',label:'Propietario (contacto registrado)',type:'contacto'},
+       {k:'propietario',label:'Propietario',type:'contacto',req:true},
      ]},
      {title:'Documentación y Marketing',fields:[
        {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
@@ -14105,7 +14104,7 @@ const SR_SERVICES=[
 ];
 function _srService(key){return SR_SERVICES.find(s=>s.key===key);}
 let _srDocs=[],_srCurrentId=null,_srMias=false,_srFormService=null,_srDocList=[],_srPickerReady=false;
-let _srEjecExtra=[],_srEjecOpts=[],_srNewBldId='';
+let _srEjecExtra=[],_srEjecOpts=[],_srNewBldId='',_srNewContactId='';
 
 function srEstadoBadge(e){const c=SR_ESTADO_COLOR[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'Pendiente')}</span>`;}
 
@@ -14179,7 +14178,7 @@ window.startSolicitud=function(key){closeSrCatalog();openSolicitudForm(key);};
 // ── Formulario dinámico (schema-driven) ──
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
-  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';
+  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';_srNewContactId='';
   document.getElementById('sr-form-title').textContent=svc.label;
   const now=new Date();
   const auto=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Automático</div>
@@ -14209,7 +14208,7 @@ function _srFieldHTML(f){
   if(f.type==='date')return w(`<input id="${id}" class="cdr-input" type="date">`);
   if(f.type==='select')return w(`<select id="${id}" class="cdr-select" onchange="_srApplyConditionals()"><option value="">— Seleccionar —</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`);
   if(f.type==='cuenta')return w(`<input id="srf-cuenta" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('sr',this.value)" onfocus="ctaPickerInput('sr',this.value)" onblur="ctaPickerBlur('sr')"><div id="srf-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><div id="srf-cuenta-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-cuentaId" type="hidden"><input id="srf-cuentaNombre" type="hidden">`,' style="position:relative"');
-  if(f.type==='contacto')return w(`<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden">`,' style="position:relative"');
+  if(f.type==='contacto')return w(`<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)" onblur="srPropBlur()"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-prop-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-prop-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='inmueble')return w(`<input id="srf-inmueble" class="cdr-input" placeholder="Buscar inmueble por nombre o dirección..." autocomplete="off" oninput="srInmSearch(this.value)" onblur="srInmBlur()"><div id="srf-inm-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-inm-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-inm-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-inmuebleId" type="hidden"><input id="srf-inmuebleNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='sino')return w(`<div id="${id}">${f.opts.map((o,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem .55rem;border:1px solid #E8EFF8;border-radius:8px;margin-bottom:.3rem"><span style="font-size:12.5px;color:#353E59">${esc(o)}</span><span style="display:flex;gap:1rem" data-item="${esc(o)}"><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="Sí"> Sí</label><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="No"> No</label></span></div>`).join('')}</div>`);
   if(f.type==='ejecutivos')return w(`<div id="srf-ejec-chips" class="cdr-ms-chips"></div><input id="srf-ejec-q" class="cdr-input" placeholder="Agregar ejecutivo (hasta 2 adicionales)..." autocomplete="off" oninput="srEjecSearch(this.value)" onblur="srEjecBlur()" style="margin-top:.4rem"><div id="srf-ejec-drop" class="cdr-ms-drop" style="display:none"></div>`,' style="position:relative"');
@@ -14316,16 +14315,55 @@ window.srEjecBlur=function(){setTimeout(()=>{const d=document.getElementById('sr
 window.srPropSearch=function(q){
   const list=document.getElementById('srf-prop-list');if(!list)return;
   document.getElementById('srf-propId').value='';document.getElementById('srf-propNombre').value='';
+  _srNewContactId='';const tag=document.getElementById('srf-prop-tag');if(tag)tag.style.display='none';
   if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));if((document.getElementById('srf-propietario').value||'').trim())srPropSearch(document.getElementById('srf-propietario').value);}).catch(()=>{});}
-  if(!q.trim()){list.style.display='none';return;}
-  const lq=q.toLowerCase();const cuentaId=document.getElementById('srf-cuentaId')?.value||'';
+  const lq=q.toLowerCase().trim();const cuentaId=document.getElementById('srf-cuentaId')?.value||'';
   let src=Array.isArray(_ctoDocs)?_ctoDocs:[];if(cuentaId)src=src.filter(c=>c.cuentaId===cuentaId);
-  const matches=src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')).toLowerCase().includes(lq)).slice(0,8);
-  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
-  list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();srPropPick('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}</div>`;}).join('');
-  list.style.display='block';
+  const matches=lq?src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')).toLowerCase().includes(lq)).slice(0,8):[];
+  let html=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();srPropPick('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}</div>`;}).join('');
+  if(lq&&!matches.length)html+='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';
+  html+=`<div style="padding:10px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#1C54F4;border-top:1px solid #E8EFF8" onmousedown="event.preventDefault();srPropCreateStart()">+ Crear nuevo contacto</div>`;
+  list.innerHTML=html;list.style.display='block';
 };
-window.srPropPick=function(id,nombre){document.getElementById('srf-propId').value=id;document.getElementById('srf-propNombre').value=nombre;document.getElementById('srf-propietario').value=nombre;document.getElementById('srf-prop-list').style.display='none';};
+window.srPropBlur=function(){setTimeout(()=>{const l=document.getElementById('srf-prop-list');if(l)l.style.display='none';},180);};
+window.srPropPick=function(id,nombre){document.getElementById('srf-propId').value=id;document.getElementById('srf-propNombre').value=nombre;document.getElementById('srf-propietario').value=nombre;document.getElementById('srf-prop-list').style.display='none';_srNewContactId='';const box=document.getElementById('srf-prop-create');if(box)box.style.display='none';};
+window.srPropCreateStart=function(){
+  const list=document.getElementById('srf-prop-list');if(list)list.style.display='none';
+  const box=document.getElementById('srf-prop-create');if(!box)return;
+  const pre=(document.getElementById('srf-propietario').value||'').trim();
+  const parts=pre.split(' ');const preNom=(parts.shift()||'').replace(/"/g,'&quot;');const preApe=parts.join(' ').replace(/"/g,'&quot;');
+  box.innerHTML=`<div style="font-size:11.5px;font-weight:800;color:#0A1B4D;margin-bottom:.5rem">Nuevo contacto (propietario)</div>
+    <div class="cdr-field"><div class="cdr-lbl">Nombre <span class="cdr-req">*</span></div><input id="srf-newcto-nom" class="cdr-input" value="${preNom}" placeholder="Nombre"></div>
+    <div class="cdr-field"><div class="cdr-lbl">Apellidos</div><input id="srf-newcto-ape" class="cdr-input" value="${preApe}" placeholder="Apellidos"></div>
+    <div class="cdr-field"><div class="cdr-lbl">Email</div><input id="srf-newcto-email" class="cdr-input" type="email" placeholder="correo@ejemplo.com"></div>
+    <div class="cdr-field"><div class="cdr-lbl">Teléfono</div><input id="srf-newcto-tel" class="cdr-input" placeholder="Teléfono"></div>
+    <div style="display:flex;gap:.4rem;margin-top:.3rem"><button type="button" class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="srPropCreateSave()">Crear contacto</button><button type="button" class="crm-action-btn" onclick="document.getElementById('srf-prop-create').style.display='none'">Cancelar</button></div>`;
+  box.style.display='block';
+};
+window.srPropCreateSave=async function(){
+  const nomEl=document.getElementById('srf-newcto-nom');const nom=(nomEl?.value||'').trim();
+  if(!nom){if(nomEl)nomEl.style.borderColor='#ED1B34';return;}if(nomEl)nomEl.style.borderColor='';
+  if(!db){alert('Firebase no disponible.');return;}
+  const ape=(document.getElementById('srf-newcto-ape')?.value||'').trim();
+  const email=(document.getElementById('srf-newcto-email')?.value||'').trim();
+  const tel=(document.getElementById('srf-newcto-tel')?.value||'').trim();
+  const cuentaId=document.getElementById('srf-cuentaId')?.value||'';
+  const cuentaNombre=document.getElementById('srf-cuentaNombre')?.value||'';
+  const now=firebase.firestore.Timestamp.now();const autor=user?.displayName||user?.email||'';
+  const data={nombre:nom,apellidos:ape,email,telefono:tel,estadoCorreo:'sin_comprobar',
+    cuentaId,cuentaNombre,propietario:'Sí',estadoRegistro:'activo',
+    brokerResponsable:autor,userEmail:user?.email||'',
+    fechaCreacion:now,ultimoContacto:now,ultimaActividad:now};
+  if(!cuentaId)data.esParticular=true;
+  try{
+    const ref=await db.collection('contactos').add(data);
+    if(Array.isArray(_ctoDocs))_ctoDocs.unshift({...data,_id:ref.id});
+    const full=(nom+' '+ape).trim();
+    srPropPick(ref.id,full);_srNewContactId=ref.id;
+    const box=document.getElementById('srf-prop-create');if(box)box.style.display='none';
+    const tag=document.getElementById('srf-prop-tag');if(tag){tag.textContent='✓ Contacto creado y vinculado';tag.style.display='block';}
+  }catch(e){alert('Error al crear el contacto: '+e.message);}
+};
 window.srAddDoc=function(){const t=document.getElementById('srf-doc-tipo').value;const u=(document.getElementById('srf-doc-url').value||'').trim();if(!u)return;_srDocList.push({tipo:t,url:u});document.getElementById('srf-doc-url').value='';_srRenderDocs();};
 window.srRemoveDoc=function(i){_srDocList.splice(i,1);_srRenderDocs();};
 function _srRenderDocs(){const c=document.getElementById('srf-doc-list');if(!c)return;c.innerHTML=_srDocList.map((d,i)=>`<span class="cdr-ms-chip">${esc(d.tipo)}: ${esc(d.url.length>40?d.url.slice(0,40)+'…':d.url)}<span class="cdr-ms-chip-x" onclick="srRemoveDoc(${i})">✕</span></span>`).join('');}
@@ -14384,10 +14422,14 @@ window.submitSolicitud=async function(){
     _srDocs.unshift({...doc,_id:ref.id});
     _srNotifyResponsable({...doc,_id:ref.id});   // EmailJS (no-op si no hay claves configuradas)
     const newBld=_srNewBldId;_srNewBldId='';
+    const newCto=_srNewContactId;_srNewContactId='';
     srCloseForm();
     srOpenDetail(ref.id);
     showBldToast&&showBldToast(ticket+' creada');
-    if(newBld&&confirm('¿Deseás continuar completando la información del inmueble?')){
+    if(newCto&&confirm('¿Deseás continuar completando la información del contacto?')){
+      showModule('crm');
+      setTimeout(()=>{try{switchCRMTab('contactos');openContactoDetail(newCto);}catch(e){}},400);
+    } else if(newBld&&confirm('¿Deseás continuar completando la información del inmueble?')){
       showModule('buildings');
       setTimeout(()=>{try{openBuildingEditor(newBld);}catch(e){}},400);
     }

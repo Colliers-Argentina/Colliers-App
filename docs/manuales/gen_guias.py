@@ -272,7 +272,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────────────── CENTRO DE SOLICITUDES ───────────────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Centro de Solicitudes", "1.3", FECHA,
+    "Centro de Solicitudes", "1.4", FECHA,
     "Centraliza las solicitudes internas de todas las áreas de Colliers. Cada servicio tiene su "
     "propio formulario; el primero disponible es 'Ficha y Publicaciones – Oficinas'. Al enviar se "
     "genera un Ticket, se puede descargar un PDF corporativo y se notifica al responsable.",
@@ -280,7 +280,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Nueva Solicitud", "Abre el catálogo de servicios. Elegí el servicio (por ahora: Ficha y Publicaciones – Oficinas)."),
         ("Datos automáticos", "Solicitante, Broker y Fecha se toman solos del usuario logueado; no hay que cargarlos."),
         ("Cuenta", "Buscar la cuenta con el buscador inteligente. Si no existe, se puede crear en el momento (mismo flujo que en el resto de Nexus)."),
-        ("Propietario", "Seleccionar un Contacto existente (no se escribe texto libre)."),
+        ("Propietario", "Obligatorio y siempre asociado a un Contacto de Nexus (no se admite texto libre). Buscar el contacto; si no existe, usar '+ Crear nuevo contacto' (pide datos mínimos) y queda vinculado como propietario. Al enviar, el sistema ofrece completar luego la ficha del contacto."),
         ("Prioridad", "Definir la urgencia de la solicitud: Baja, Media, Alta o Urgente."),
         ("Inmueble asociado", "Buscar el inmueble con el buscador inteligente. Si no existe, usar '+ Crear nuevo inmueble' (solo pide Dirección y Tipo). Al enviar la solicitud, el sistema ofrece continuar completando la ficha del inmueble."),
         ("Tipo de transacción", "Alquiler, Venta o Ambas. Según lo elegido, en Condiciones Comerciales aparecen solo los precios que correspondan (alquiler y/o venta)."),
