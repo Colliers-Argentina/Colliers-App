@@ -6355,17 +6355,22 @@ function renderCrmFilterChips(){
   if(badge){badge.textContent=cnt;badge.style.display=cnt?'':'none';}
   if(tgl)tgl.classList.toggle('has-active',cnt>0);
 }
-let _crmWidget='';
+let _crmWidget='',_crmOppLoading=false,_crmSrLoading=false;
 // IDs de cuentas con oportunidades en gestión (activas): dato tomado del módulo Oportunidades.
 function _crmActiveOppCuentaIds(){const s=new Set();(_oppDocs||[]).forEach(o=>{if(o.cuentaId&&!['Ganada','Perdida'].includes(o.estado))s.add(o.cuentaId);});return s;}
 function _crmEnsureOpps(){if((_oppDocs&&_oppDocs.length)||!db||_crmOppLoading)return;_crmOppLoading=true;db.collection('oportunidades').get().then(s=>{_oppDocs=s.docs.map(d=>({...d.data(),_id:d.id}));renderCRMKPIs(_crmDocs);if(_crmWidget==='opps')filterCRM();}).catch(()=>{}).finally(()=>{_crmOppLoading=false;});}
-let _crmOppLoading=false;
+// Solicitudes por cuenta: dato tomado del módulo Solicitudes.
+function _crmSrCount(cuentaId){return (_srDocs||[]).filter(s=>s.cuentaId===cuentaId).length;}
+function _crmEnsureSr(){if((_srDocs&&_srDocs.length)||!db||_crmSrLoading)return;_crmSrLoading=true;db.collection('solicitudes').get().then(s=>{_srDocs=s.docs.map(d=>({...d.data(),_id:d.id}));filterCRM();}).catch(()=>{}).finally(()=>{_crmSrLoading=false;});}
+// Cuenta con actividad comercial en los últimos 30 días (visitas, oportunidades, propuestas, etc. → ultimaActividad).
+function _crmActividad30(d){const t=_tsToDate(d.ultimaActividad);return t?(Date.now()-t.getTime())<=30*864e5:false;}
 window.crmToggleWidget=function(key){_crmWidget=_crmWidget===key?'':key;filterCRM();};
 function filterCRM(){
   const base=_crmDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado');
   let filtered=_crmFilterEngine.apply(base);
   if(_crmWidget==='activas')filtered=filtered.filter(d=>cuentaEstadoAuto(d).activa);
   else if(_crmWidget==='opps'){const ids=_crmActiveOppCuentaIds();filtered=filtered.filter(d=>ids.has(d._id));}
+  else if(_crmWidget==='act30')filtered=filtered.filter(_crmActividad30);
   renderCrmFilterChips();
   renderCRMTable(filtered);
   const el=document.getElementById('crm-subtitle');
@@ -6578,9 +6583,11 @@ function renderCRMKPIs(docs){
   const activos=docs.filter(d=>cuentaEstadoAuto(d).activa).length;
   const oppIds=_crmActiveOppCuentaIds();
   const conOpp=docs.filter(d=>oppIds.has(d._id)).length;
+  const conAct=docs.filter(_crmActividad30).length;
   const k=(key,icon,bg,val,lbl,col)=>`<div class="crm-kpi" style="cursor:pointer;${_crmWidget===key&&key?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="crmToggleWidget('${key}')"><div class="crm-kpi-icon" style="background:${bg}">${icon}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;
   row.innerHTML=k('','🏢','#EEF3FF',total,'Cuentas totales','#1C54F4')
     +k('activas','✅','#EDFAF2',activos,'Activas','#16A34A')
+    +k('act30','🔥','#FFF7EC',conAct,'Con actividad (30 días)','#F97316')
     +k('opps','📈','#EEF3FF',conOpp,'Oportunidades en gestión','#1C54F4');
 }
 
@@ -6590,13 +6597,14 @@ function crmInitials(nombre){return(nombre||'').split(' ').slice(0,2).map(w=>w[0
 
 function renderCRMTable(docs){
   renderCRMKPIs(_crmDocs);
+  _crmEnsureSr();
   const wrap=document.getElementById('crm-table-wrap');
   if(!docs.length){
     wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin cuentas registradas.</div>';
     return;
   }
   let h='<table class="crm-table"><thead><tr>';
-  ['Cliente','Ejecutivo Comercial','Superficie','Última actividad','PPTs','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
+  ['Cliente','Ejecutivo Comercial','Superficie','Última actividad','Solicitudes','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const nombre=d.nombre||d._id;
@@ -6613,7 +6621,7 @@ function renderCRMTable(docs){
       <td><div class="crm-broker-cell">${d.broker||'–'}</div></td>
       <td class="crm-date" style="white-space:nowrap;font-size:11px;color:#56648F">${supLabel}</td>
       <td class="crm-date">${fmtDate(d.ultimaActividad)}</td>
-      <td class="crm-ppts">${d.cantidadPPTs||0}</td>
+      <td class="crm-ppts">${_crmSrCount(d._id)}</td>
       <td class="crm-zonas-cell">${zonas||'–'}</td>
       <td>${cuentaEstadoAuto(d).html}</td>
       <td><button class="crm-action-btn" onclick="event.stopPropagation();openClientDetail('${d._id}')">Ver ficha →</button></td>
