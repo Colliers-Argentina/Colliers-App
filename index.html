@@ -4498,17 +4498,17 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <div class="tx-form-2col">
           <div class="tx-form-row">
             <label class="tx-form-label">Superficie (m²)</label>
-            <input class="tx-form-inp" id="txf-superficie" type="number" min="0" placeholder="0" oninput="_txCalcTotal()">
+            <input class="tx-form-inp" id="txf-superficie" type="number" min="0" placeholder="0" oninput="_txPriceInput('superficie')">
           </div>
           <div class="tx-form-row">
             <label class="tx-form-label">Precio m²</label>
-            <input class="tx-form-inp" id="txf-pm2" type="number" min="0" placeholder="0" oninput="_txCalcTotal()">
+            <input class="tx-form-inp" id="txf-pm2" type="number" min="0" placeholder="0" oninput="_txPriceInput('pm2')">
           </div>
         </div>
         <div class="tx-form-2col">
           <div class="tx-form-row">
             <label class="tx-form-label">Precio Total</label>
-            <input class="tx-form-inp" id="txf-total" type="number" min="0" placeholder="Calculado automáticamente">
+            <input class="tx-form-inp" id="txf-total" type="number" min="0" placeholder="Calculado automáticamente" oninput="_txPriceInput('total')">
           </div>
           <div class="tx-form-row">
             <label class="tx-form-label">Moneda</label>
@@ -14663,6 +14663,7 @@ function openNewTransaccion(){
     if(el)el.value='';
   });
   ['tx-inm-create','tx-comprador-create','tx-vendedor-create'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.display='none';b.innerHTML='';}});
+  _txEditOrder=['superficie','pm2','total'];
   _txTipoChange();
   const fe=document.getElementById('txf-fecha');
   if(fe)fe.value=new Date().toISOString().slice(0,10);
@@ -14720,12 +14721,25 @@ function _txDrawerBgClick(e){
   if(e.target===document.getElementById('tx-drawer-overlay'))closeTxDrawer();
 }
 
-function _txCalcTotal(){
-  const sup=parseFloat((document.getElementById('txf-superficie')||{}).value)||0;
-  const pm2=parseFloat((document.getElementById('txf-pm2')||{}).value)||0;
-  const tot=document.getElementById('txf-total');
-  if(tot&&sup>0&&pm2>0)tot.value=Math.round(sup*pm2);
+// Cálculo bidireccional: Precio Total = Superficie × Precio m². Se recalcula la
+// variable menos editada (la "calculada") a partir de las otras dos. Orden de edición:
+// los dos primeros son los ingresados manualmente; el tercero es el calculado.
+let _txEditOrder=['superficie','pm2','total'];
+function _txPriceInput(field){
+  _txEditOrder=[field,..._txEditOrder.filter(f=>f!==field)];
+  _txRecalc();
 }
+function _txRecalc(){
+  const g=id=>{const v=parseFloat((document.getElementById(id)||{}).value);return isNaN(v)?null:v;};
+  const sup=g('txf-superficie'),pm2=g('txf-pm2'),total=g('txf-total');
+  const calc=_txEditOrder[2];
+  if(calc==='total'){if(sup!=null&&pm2!=null)_txSetCalc('txf-total',sup*pm2);}
+  else if(calc==='pm2'){if(sup!=null&&total!=null&&sup!==0)_txSetCalc('txf-pm2',total/sup);}
+  else if(calc==='superficie'){if(pm2!=null&&total!=null&&pm2!==0)_txSetCalc('txf-superficie',total/pm2);}
+}
+function _txSetCalc(id,val){const el=document.getElementById(id);if(!el||!isFinite(val)||val<0)return;el.value=id==='txf-pm2'?Math.round(val*100)/100:Math.round(val);}
+// Compat: alias del cálculo previo (por si se invoca desde otro punto).
+function _txCalcTotal(){_txRecalc();}
 
 const TX_SEARCH_TIPOS=['Oficina','Retail','Industria y Logística'];
 // Alterna entre buscador de inmuebles (Oficina/Retail/Industria y Logística) y Dirección manual (Terreno/Otro).
