@@ -4429,48 +4429,64 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <!-- Tipo inmueble -->
         <div class="tx-form-row">
           <label class="tx-form-label">Tipo de inmueble<span class="tx-form-req">*</span></label>
-          <select class="tx-form-sel" id="txf-tipo" onchange="_txUpdateInmuebleHint()">
+          <select class="tx-form-sel" id="txf-tipo" onchange="_txTipoChange()">
             <option value="">Seleccionar tipo...</option>
-            <option value="Oficinas">Oficinas</option>
-            <option value="Industrial">Industrial</option>
+            <option value="Oficina">Oficina</option>
             <option value="Retail">Retail</option>
+            <option value="Industria y Logística">Industria y Logística</option>
             <option value="Terreno">Terreno</option>
+            <option value="Otro">Otro</option>
           </select>
         </div>
-        <!-- Inmueble -->
-        <div class="tx-form-row">
+        <!-- Inmueble (Oficina / Retail / Industria y Logística) -->
+        <div class="tx-form-row" id="tx-inmueble-row" style="display:none">
           <label class="tx-form-label">Inmueble</label>
           <div class="tx-inmueble-wrap">
-            <input class="tx-form-inp" id="txf-inmueble" placeholder="Buscar inmueble existente..." autocomplete="off" oninput="_txSearchInmueble(this.value)">
+            <input class="tx-form-inp" id="txf-inmueble" placeholder="Buscar inmueble existente..." autocomplete="off" oninput="_txSearchInmueble(this.value)" onblur="_txInmBlur()">
             <div class="tx-inmueble-results" id="tx-inmueble-results" style="display:none"></div>
           </div>
+          <div id="tx-inm-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div>
           <input type="hidden" id="txf-inmueble-id">
+        </div>
+        <!-- Dirección (Terreno / Otro) -->
+        <div class="tx-form-row" id="tx-direccion-row" style="display:none">
+          <label class="tx-form-label">Dirección</label>
+          <input class="tx-form-inp" id="txf-direccion" placeholder="Calle, número, localidad" autocomplete="off">
         </div>
         <!-- Corredor -->
         <div class="tx-form-row">
           <label class="tx-form-label">Corredor</label>
           <select class="tx-form-sel" id="txf-corredor">
             <option value="">Seleccionar...</option>
-            <option value="Norte">Norte</option>
-            <option value="Catalinas / Puerto Madero">Catalinas / Puerto Madero</option>
-            <option value="Microcentro">Microcentro</option>
-            <option value="Macrocentro">Macrocentro</option>
-            <option value="Palermo / Soho">Palermo / Soho</option>
-            <option value="Libertador">Libertador</option>
-            <option value="Panamericana">Panamericana</option>
-            <option value="Sur">Sur</option>
-            <option value="Otro">Otro</option>
+            <option>Catalinas</option>
+            <option>Macrocentro</option>
+            <option>Macrocentro Norte</option>
+            <option>Macrocentro Sur</option>
+            <option>Microcentro</option>
+            <option>Norte CABA</option>
+            <option>Norte GBA</option>
+            <option>Plaza Roma</option>
+            <option>Plaza San Martín</option>
+            <option>Puerto Madero Este</option>
+            <option>Puerto Madero Oeste</option>
+            <option>Zona Sur</option>
           </select>
         </div>
         <!-- Comprador / Vendedor -->
         <div class="tx-form-2col">
-          <div class="tx-form-row">
+          <div class="tx-form-row" style="position:relative">
             <label class="tx-form-label">Comprador / Locatario</label>
-            <input class="tx-form-inp" id="txf-comprador" placeholder="Empresa o persona">
+            <input class="tx-form-inp" id="txf-comprador" placeholder="Buscar cuenta o contacto..." autocomplete="off" oninput="_txPartySearch('comprador',this.value)" onblur="_txPartyBlur('comprador')">
+            <div class="tx-inmueble-results" id="tx-comprador-results" style="display:none"></div>
+            <div id="tx-comprador-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div>
+            <input type="hidden" id="txf-compradorId"><input type="hidden" id="txf-compradorTipo">
           </div>
-          <div class="tx-form-row">
+          <div class="tx-form-row" style="position:relative">
             <label class="tx-form-label">Vendedor / Locador</label>
-            <input class="tx-form-inp" id="txf-vendedor" placeholder="Empresa o persona">
+            <input class="tx-form-inp" id="txf-vendedor" placeholder="Buscar cuenta o contacto..." autocomplete="off" oninput="_txPartySearch('vendedor',this.value)" onblur="_txPartyBlur('vendedor')">
+            <div class="tx-inmueble-results" id="tx-vendedor-results" style="display:none"></div>
+            <div id="tx-vendedor-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div>
+            <input type="hidden" id="txf-vendedorId"><input type="hidden" id="txf-vendedorTipo">
           </div>
         </div>
         <!-- Broker -->
@@ -14642,10 +14658,12 @@ function _renderTxTable(docs){
 function openNewTransaccion(){
   _txEditId=null;
   document.getElementById('tx-drawer-title').textContent='Nueva Transacción';
-  ['txf-tipo','txf-corredor','txf-inmueble','txf-inmueble-id','txf-comprador','txf-vendedor','txf-broker','txf-superficie','txf-pm2','txf-total','txf-notas'].forEach(id=>{
+  ['txf-tipo','txf-corredor','txf-inmueble','txf-inmueble-id','txf-direccion','txf-comprador','txf-compradorId','txf-compradorTipo','txf-vendedor','txf-vendedorId','txf-vendedorTipo','txf-broker','txf-superficie','txf-pm2','txf-total','txf-notas'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.value='';
   });
+  ['tx-inm-create','tx-comprador-create','tx-vendedor-create'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.display='none';b.innerHTML='';}});
+  _txTipoChange();
   const fe=document.getElementById('txf-fecha');
   if(fe)fe.value=new Date().toISOString().slice(0,10);
   const est=document.getElementById('txf-estado');
@@ -14666,9 +14684,15 @@ function openEditTx(id){
   _txSetVal('txf-corredor',d.corredor||'');
   _txSetVal('txf-inmueble',d.inmueble||'');
   _txSetVal('txf-inmueble-id',d.inmuebleId||'');
+  _txSetVal('txf-direccion',d.direccion||(!d.inmuebleId?d.inmueble||'':''));
   _txSetVal('txf-comprador',d.comprador||'');
+  _txSetVal('txf-compradorId',d.compradorId||'');
+  _txSetVal('txf-compradorTipo',d.compradorTipo||'');
   _txSetVal('txf-vendedor',d.vendedor||'');
+  _txSetVal('txf-vendedorId',d.vendedorId||'');
+  _txSetVal('txf-vendedorTipo',d.vendedorTipo||'');
   _txSetVal('txf-broker',d.broker||'');
+  _txTipoChange();
   _txSetVal('txf-superficie',d.superficie||'');
   _txSetVal('txf-pm2',d.precioM2||'');
   _txSetVal('txf-total',d.precioTotal||'');
@@ -14703,38 +14727,114 @@ function _txCalcTotal(){
   if(tot&&sup>0&&pm2>0)tot.value=Math.round(sup*pm2);
 }
 
-function _txUpdateInmuebleHint(){
-  const res=document.getElementById('tx-inmueble-results');
-  if(res)res.style.display='none';
-}
-
-function _txSearchInmueble(q){
-  const res=document.getElementById('tx-inmueble-results');
-  if(!res)return;
-  if(!q||q.length<2){res.style.display='none';return;}
-  const ql=q.toLowerCase();
-  const matches=_bldDocs.filter(b=>(b.nombre||'').toLowerCase().includes(ql)||(b.direccion||'').toLowerCase().includes(ql)).slice(0,8);
+const TX_SEARCH_TIPOS=['Oficina','Retail','Industria y Logística'];
+// Alterna entre buscador de inmuebles (Oficina/Retail/Industria y Logística) y Dirección manual (Terreno/Otro).
+function _txTipoChange(){
   const tipo=(document.getElementById('txf-tipo')||{}).value||'';
-  const html=matches.map(b=>`<div class="tx-inmueble-opt" onclick="_txSelectInmueble('${b._id}','${esc(b.nombre||b.direccion||'').replace(/'/g,'\'')}')">${esc(b.nombre||b.direccion||b._id)}</div>`).join('')
-    +`<div class="tx-inmueble-create" onclick="_txCreateInmueble()">+ Crear nuevo inmueble${tipo?' de tipo '+tipo:''}</div>`;
-  res.innerHTML=html;
-  res.style.display='block';
+  const search=TX_SEARCH_TIPOS.includes(tipo),dir=['Terreno','Otro'].includes(tipo);
+  const inmRow=document.getElementById('tx-inmueble-row');if(inmRow)inmRow.style.display=search?'':'none';
+  const dirRow=document.getElementById('tx-direccion-row');if(dirRow)dirRow.style.display=dir?'':'none';
+  const res=document.getElementById('tx-inmueble-results');if(res)res.style.display='none';
 }
-
+function _txInmBlur(){setTimeout(()=>{const r=document.getElementById('tx-inmueble-results');if(r)r.style.display='none';},180);}
+function _txSearchInmueble(q){
+  const res=document.getElementById('tx-inmueble-results');if(!res)return;
+  _txSetVal('txf-inmueble-id','');
+  const c=document.getElementById('tx-inm-create');if(c){c.style.display='none';c.innerHTML='';}
+  if((!_bldDocs||!_bldDocs.length)&&db){db.collection('buildings').get().then(s=>{_bldDocs=s.docs.map(d=>({...d.data(),_id:d.id}));const cur=document.getElementById('txf-inmueble');if(cur&&(cur.value||'').trim())_txSearchInmueble(cur.value);}).catch(()=>{});}
+  const ql=(q||'').toLowerCase().trim();
+  const matches=ql?(_bldDocs||[]).filter(b=>(b.nombre||'').toLowerCase().includes(ql)||(b.direccion||'').toLowerCase().includes(ql)).slice(0,8):[];
+  let html=matches.map(b=>`<div class="tx-inmueble-opt" onmousedown="event.preventDefault();_txSelectInmueble('${b._id}','${esc((b.nombre||b.direccion||'')).replace(/'/g,"\\'")}')">${esc(b.nombre||b.direccion||b._id)}</div>`).join('');
+  if(ql&&!matches.length)html+='<div class="tx-inmueble-opt" style="color:#7B8BBD;cursor:default">Sin resultados</div>';
+  html+='<div class="tx-inmueble-create" onmousedown="event.preventDefault();_txInmCreateStart()">+ Crear nuevo inmueble</div>';
+  res.innerHTML=html;res.style.display='block';
+}
 function _txSelectInmueble(id,nombre){
-  _txSetVal('txf-inmueble',nombre);
-  _txSetVal('txf-inmueble-id',id);
-  const b=_bldDocs.find(x=>x._id===id);
-  if(b){
-    if(b.corredor||b.zona){const sel=document.getElementById('txf-corredor');if(sel)sel.value=b.corredor||b.zona||'';}
-  }
-  const res=document.getElementById('tx-inmueble-results');
-  if(res)res.style.display='none';
+  _txSetVal('txf-inmueble',nombre);_txSetVal('txf-inmueble-id',id);
+  const b=(_bldDocs||[]).find(x=>x._id===id);
+  if(b&&(b.corredor||b.zona)){const sel=document.getElementById('txf-corredor');const v=b.corredor||b.zona;if(sel&&[...sel.options].some(o=>o.value===v))sel.value=v;}
+  const res=document.getElementById('tx-inmueble-results');if(res)res.style.display='none';
 }
-
-function _txCreateInmueble(){
-  closeTxDrawer();
-  showModule('buildings');
+function _txInmCreateStart(){
+  const res=document.getElementById('tx-inmueble-results');if(res)res.style.display='none';
+  const box=document.getElementById('tx-inm-create');if(!box)return;
+  const tipo=(document.getElementById('txf-tipo')||{}).value||'';
+  const pre=(document.getElementById('txf-inmueble').value||'').replace(/"/g,'&quot;');
+  box.innerHTML=`<div style="font-size:11.5px;font-weight:800;color:#0A1B4D;margin-bottom:.5rem">Nuevo inmueble${tipo?' · '+esc(tipo):''}</div>
+    <input id="txf-newbld-nom" class="tx-form-inp" placeholder="Nombre del inmueble" value="${pre}" style="margin-bottom:.4rem">
+    <input id="txf-newbld-dir" class="tx-form-inp" placeholder="Dirección *" style="margin-bottom:.4rem">
+    <div style="display:flex;gap:.4rem"><button type="button" class="tx-drawer-save" style="padding:.4rem .8rem" onclick="_txInmCreateSave()">Crear</button><button type="button" class="tx-drawer-cancel" style="padding:.4rem .8rem" onclick="document.getElementById('tx-inm-create').style.display='none'">Cancelar</button></div>`;
+  box.style.display='block';
+}
+async function _txInmCreateSave(){
+  const dirEl=document.getElementById('txf-newbld-dir');const dir=(dirEl?.value||'').trim();
+  if(!dir){if(dirEl)dirEl.style.borderColor='#ED1B34';return;}
+  if(!db){alert('Firebase no disponible.');return;}
+  const nom=(document.getElementById('txf-newbld-nom')?.value||'').trim()||dir;
+  const tipo=(document.getElementById('txf-tipo')||{}).value||'';
+  const _k={'Oficina':'oficina','Retail':'retail','Industria y Logística':'industria'}[tipo]||'';
+  const data={nombre:nom,direccion:dir,tipo:_k,_tipo:_k,assetType:_k,tipoLabel:tipo,estado:'Disponible',activo:true,_source:'transaccion',createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  try{const ref=await db.collection('buildings').add(data);if(Array.isArray(_bldDocs))_bldDocs.unshift({...data,_id:ref.id});_txSelectInmueble(ref.id,nom);const box=document.getElementById('tx-inm-create');if(box)box.style.display='none';}catch(e){alert('Error al crear el inmueble: '+e.message);}
+}
+// ── Comprador / Vendedor: búsqueda predictiva sobre Cuentas + Contactos, con creación rápida ──
+function _txPartyIds(which){return {inp:'txf-'+which,res:'tx-'+which+'-results',box:'tx-'+which+'-create',id:'txf-'+which+'Id',tipo:'txf-'+which+'Tipo'};}
+function _txPartyBlur(which){setTimeout(()=>{const r=document.getElementById(_txPartyIds(which).res);if(r)r.style.display='none';},180);}
+function _txPartySearch(which,q){
+  const ids=_txPartyIds(which);const res=document.getElementById(ids.res);if(!res)return;
+  _txSetVal(ids.id,'');_txSetVal(ids.tipo,'');
+  const box=document.getElementById(ids.box);if(box){box.style.display='none';box.innerHTML='';}
+  if((!_crmDocs||!_crmDocs.length)&&db)db.collection('clientes').get().then(s=>{_crmDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});
+  if((!_ctoDocs||!_ctoDocs.length)&&db)db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});
+  const ql=(q||'').toLowerCase().trim();let html='';
+  if(ql){
+    const cta=(_crmDocs||[]).filter(c=>(c.nombre||'').toLowerCase().includes(ql)).slice(0,5);
+    const cto=(_ctoDocs||[]).filter(c=>((c.nombre||'')+' '+(c.apellidos||'')).toLowerCase().includes(ql)).slice(0,5);
+    if(cta.length)html+='<div style="padding:5px 12px;font-size:10px;font-weight:700;color:#8898C0;text-transform:uppercase">Cuentas</div>'+cta.map(c=>`<div class="tx-inmueble-opt" onmousedown="event.preventDefault();_txPartyPick('${which}','cuenta','${c._id}','${esc((c.nombre||'')).replace(/'/g,"\\'")}')">🏢 ${esc(c.nombre||c._id)}</div>`).join('');
+    if(cto.length)html+='<div style="padding:5px 12px;font-size:10px;font-weight:700;color:#8898C0;text-transform:uppercase">Contactos</div>'+cto.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div class="tx-inmueble-opt" onmousedown="event.preventDefault();_txPartyPick('${which}','contacto','${c._id}','${esc(n).replace(/'/g,"\\'")}')">👤 ${esc(n)}</div>`;}).join('');
+    if(!cta.length&&!cto.length)html+='<div class="tx-inmueble-opt" style="color:#7B8BBD;cursor:default">Sin resultados</div>';
+  }
+  html+=`<div class="tx-inmueble-create" onmousedown="event.preventDefault();_txPartyCreateStart('${which}','cuenta')">+ Crear nueva Cuenta</div><div class="tx-inmueble-create" onmousedown="event.preventDefault();_txPartyCreateStart('${which}','contacto')">+ Crear nuevo Contacto</div>`;
+  res.innerHTML=html;res.style.display='block';
+}
+function _txPartyPick(which,tipo,id,nombre){const ids=_txPartyIds(which);_txSetVal(ids.inp,nombre);_txSetVal(ids.id,id);_txSetVal(ids.tipo,tipo);const r=document.getElementById(ids.res);if(r)r.style.display='none';const box=document.getElementById(ids.box);if(box)box.style.display='none';}
+function _txPartyCreateStart(which,tipo){
+  const ids=_txPartyIds(which);const res=document.getElementById(ids.res);if(res)res.style.display='none';
+  const box=document.getElementById(ids.box);if(!box)return;
+  const pre=(document.getElementById(ids.inp).value||'').replace(/"/g,'&quot;');
+  if(tipo==='cuenta'){
+    box.innerHTML=`<div style="font-size:11.5px;font-weight:800;color:#0A1B4D;margin-bottom:.5rem">Nueva cuenta</div>
+      <input id="tx-party-nom" class="tx-form-inp" placeholder="Nombre de la cuenta *" value="${pre}" style="margin-bottom:.4rem">
+      <div style="display:flex;gap:.4rem"><button type="button" class="tx-drawer-save" style="padding:.4rem .8rem" onclick="_txPartyCreateSave('${which}','cuenta')">Crear</button><button type="button" class="tx-drawer-cancel" style="padding:.4rem .8rem" onclick="document.getElementById('${ids.box}').style.display='none'">Cancelar</button></div>`;
+  }else{
+    const parts=pre.split(' ');const pn=parts.shift()||'',pa=parts.join(' ');
+    box.innerHTML=`<div style="font-size:11.5px;font-weight:800;color:#0A1B4D;margin-bottom:.5rem">Nuevo contacto</div>
+      <input id="tx-party-nom" class="tx-form-inp" placeholder="Nombre *" value="${pn}" style="margin-bottom:.4rem">
+      <input id="tx-party-ape" class="tx-form-inp" placeholder="Apellidos" value="${pa}" style="margin-bottom:.4rem">
+      <input id="tx-party-email" class="tx-form-inp" placeholder="Email" style="margin-bottom:.4rem">
+      <input id="tx-party-tel" class="tx-form-inp" placeholder="Teléfono" style="margin-bottom:.4rem">
+      <div style="display:flex;gap:.4rem"><button type="button" class="tx-drawer-save" style="padding:.4rem .8rem" onclick="_txPartyCreateSave('${which}','contacto')">Crear</button><button type="button" class="tx-drawer-cancel" style="padding:.4rem .8rem" onclick="document.getElementById('${ids.box}').style.display='none'">Cancelar</button></div>`;
+  }
+  box.style.display='block';
+}
+async function _txPartyCreateSave(which,tipo){
+  const nomEl=document.getElementById('tx-party-nom');const nom=(nomEl?.value||'').trim();
+  if(!nom){if(nomEl)nomEl.style.borderColor='#ED1B34';return;}
+  if(!db){alert('Firebase no disponible.');return;}
+  const now=firebase.firestore.Timestamp.now();const autor=user?.displayName||user?.email||'';
+  try{
+    if(tipo==='cuenta'){
+      const data={nombre:nom,clienteColliers:'No',estadoRegistro:'activo',brokerCreador:autor,capturadoPor:autor,pptsGenerados:0,cantidadPPTs:0,fechaCreacion:now,ultimaActividad:now,_source:'transaccion'};
+      const ref=await db.collection('clientes').add(data);if(Array.isArray(_crmDocs))_crmDocs.unshift({...data,_id:ref.id});
+      _txPartyPick(which,'cuenta',ref.id,nom);
+    }else{
+      const ape=(document.getElementById('tx-party-ape')?.value||'').trim();
+      const email=(document.getElementById('tx-party-email')?.value||'').trim();
+      const tel=(document.getElementById('tx-party-tel')?.value||'').trim();
+      const data={nombre:nom,apellidos:ape,email,telefono:tel,estadoCorreo:'sin_comprobar',estadoRegistro:'activo',brokerResponsable:autor,userEmail:user?.email||'',fechaCreacion:now,ultimoContacto:now,ultimaActividad:now,esParticular:true,_source:'transaccion'};
+      const ref=await db.collection('contactos').add(data);if(Array.isArray(_ctoDocs))_ctoDocs.unshift({...data,_id:ref.id});
+      _txPartyPick(which,'contacto',ref.id,(nom+' '+ape).trim());
+    }
+  }catch(e){alert('Error al crear: '+e.message);}
 }
 
 function saveTxDrawer(){
@@ -14750,13 +14850,20 @@ function saveTxDrawer(){
   });
   if(!valid)return;
   const fechaVal=(document.getElementById('txf-fecha')||{}).value||'';
+  const gv=id=>(document.getElementById(id)||{}).value||'';
+  const isSearch=TX_SEARCH_TIPOS.includes(tipo);
+  const direccion=gv('txf-direccion');
+  const inmuebleName=isSearch?inmueble:direccion;
   const data={
     tipo,
-    inmueble,
-    inmuebleId:(document.getElementById('txf-inmueble-id')||{}).value||'',
+    inmueble:inmuebleName,
+    inmuebleId:isSearch?gv('txf-inmueble-id'):'',
+    direccion:isSearch?'':direccion,
     corredor:(document.getElementById('txf-corredor')||{}).value||'',
     comprador:(document.getElementById('txf-comprador')||{}).value||'',
+    compradorId:gv('txf-compradorId'),compradorTipo:gv('txf-compradorTipo'),
     vendedor:(document.getElementById('txf-vendedor')||{}).value||'',
+    vendedorId:gv('txf-vendedorId'),vendedorTipo:gv('txf-vendedorTipo'),
     broker:(document.getElementById('txf-broker')||{}).value||'',
     superficie:parseFloat((document.getElementById('txf-superficie')||{}).value)||null,
     precioM2:parseFloat((document.getElementById('txf-pm2')||{}).value)||null,
