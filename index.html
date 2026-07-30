@@ -2910,6 +2910,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
       </div>
       <div class="crm-list-body">
+        <div class="crm-kpi-row" id="vis-kpi-row" style="grid-template-columns:repeat(3,1fr)"></div>
         <div class="crm-tbl-wrap"><div id="vis-table-wrap">Cargando...</div></div>
       </div>
     </div>
@@ -8602,10 +8603,31 @@ function _visSetSubtitle(){
   const st=document.getElementById('vis-subtitle');
   if(st)st.textContent=`${_visDocs.length} visita${_visDocs.length!==1?'s':''} registrada${_visDocs.length!==1?'s':''}`;
 }
+let _visWidget='',_visOppLoading=false;
+window.visToggleWidget=function(key){_visWidget=_visWidget===key?'':key;filterVisitas();};
+function _visEnsureOpps(){if((_oppDocs&&_oppDocs.length)||!db||_visOppLoading)return;_visOppLoading=true;db.collection('oportunidades').get().then(s=>{_oppDocs=s.docs.map(d=>({...d.data(),_id:d.id}));if(_crmActiveTab==='visitas')filterVisitas();}).catch(()=>{}).finally(()=>{_visOppLoading=false;});}
+// Una visita "generó una oportunidad" si su cuenta tiene una oportunidad creada en/después de la visita.
+function _visGeneroOpp(v){if(!v.cuentaId)return false;const vt=_tsToDate(v.fecha);return (_oppDocs||[]).some(o=>{if(o.cuentaId!==v.cuentaId)return false;const ot=_tsToDate(o.fechaCreacion);return !vt||!ot||ot.getTime()>=vt.getTime();});}
+function _visEn90(v){const t=_tsToDate(v.fecha);return t?(Date.now()-t.getTime())<=90*864e5:false;}
 function filterVisitas(){
   const q=(document.getElementById('vis-search')?.value||'').trim().toLowerCase();
-  const docs=!q?_visDocs:_visDocs.filter(d=>[d.cuentaNombre,d.buildingName,d.contactoNombre,d.ejecutivo,d.usuario].some(v=>(v||'').toLowerCase().includes(q)));
+  let docs=!q?_visDocs.slice():_visDocs.filter(d=>[d.cuentaNombre,d.buildingName,d.contactoNombre,d.ejecutivo,d.usuario].some(v=>(v||'').toLowerCase().includes(q)));
+  if(_visWidget==='d90')docs=docs.filter(_visEn90);
+  else if(_visWidget==='conv')docs=docs.filter(_visGeneroOpp);
+  renderVisitasKPIs(_visDocs);
   renderVisitasTable(docs);
+}
+function renderVisitasKPIs(docs){
+  const row=document.getElementById('vis-kpi-row');if(!row)return;
+  _visEnsureOpps();
+  const total=docs.length;
+  const d90=docs.filter(_visEn90).length;
+  const conv=docs.filter(_visGeneroOpp).length;
+  const pct=total?Math.round(conv/total*100):0;
+  const k=(key,icon,bg,val,lbl,col,sub)=>`<div class="crm-kpi" style="cursor:pointer;${_visWidget===key&&key?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="visToggleWidget('${key}')"><div class="crm-kpi-icon" style="background:${bg}">${icon}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div>${sub?`<div style="font-size:10px;color:#8A9AC0;font-weight:600;margin-top:1px">${sub}</div>`:''}</div></div>`;
+  row.innerHTML=k('','📍','#EEF3FF',total,'Visitas realizadas','#1C54F4')
+    +k('d90','🗓️','#FFF7EC',d90,'Visitas (últimos 90 días)','#F97316')
+    +k('conv','🎯','#EDFAF2',pct+' %','Tasa de conversión','#16A34A',`${conv} de ${total} visitas generaron una oportunidad`);
 }
 function renderVisitasTable(docs){
   const wrap=document.getElementById('vis-table-wrap');if(!wrap)return;
