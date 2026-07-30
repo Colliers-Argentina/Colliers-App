@@ -6355,9 +6355,17 @@ function renderCrmFilterChips(){
   if(badge){badge.textContent=cnt;badge.style.display=cnt?'':'none';}
   if(tgl)tgl.classList.toggle('has-active',cnt>0);
 }
+let _crmWidget='';
+// IDs de cuentas con oportunidades en gestión (activas): dato tomado del módulo Oportunidades.
+function _crmActiveOppCuentaIds(){const s=new Set();(_oppDocs||[]).forEach(o=>{if(o.cuentaId&&!['Ganada','Perdida'].includes(o.estado))s.add(o.cuentaId);});return s;}
+function _crmEnsureOpps(){if((_oppDocs&&_oppDocs.length)||!db||_crmOppLoading)return;_crmOppLoading=true;db.collection('oportunidades').get().then(s=>{_oppDocs=s.docs.map(d=>({...d.data(),_id:d.id}));renderCRMKPIs(_crmDocs);if(_crmWidget==='opps')filterCRM();}).catch(()=>{}).finally(()=>{_crmOppLoading=false;});}
+let _crmOppLoading=false;
+window.crmToggleWidget=function(key){_crmWidget=_crmWidget===key?'':key;filterCRM();};
 function filterCRM(){
   const base=_crmDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado');
-  const filtered=_crmFilterEngine.apply(base);
+  let filtered=_crmFilterEngine.apply(base);
+  if(_crmWidget==='activas')filtered=filtered.filter(d=>cuentaEstadoAuto(d).activa);
+  else if(_crmWidget==='opps'){const ids=_crmActiveOppCuentaIds();filtered=filtered.filter(d=>ids.has(d._id));}
   renderCrmFilterChips();
   renderCRMTable(filtered);
   const el=document.getElementById('crm-subtitle');
@@ -6565,16 +6573,15 @@ window.renderContactosAnalytics=function(docs,totalBase){
 function renderCRMKPIs(docs){
   const row=document.getElementById('crm-kpi-row');
   if(!row)return;
+  _crmEnsureOpps();
   const total=docs.length;
   const activos=docs.filter(d=>cuentaEstadoAuto(d).activa).length;
-  const totalPPTs=docs.reduce((s,d)=>s+(d.cantidadPPTs||0),0);
-  const negociacion=docs.filter(d=>d.estado==='Negociación').length;
-  row.innerHTML=`
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🏢</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Cuentas totales</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${activos}</div><div class="crm-kpi-l">Activas</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">📄</div><div class="crm-kpi-data"><div class="crm-kpi-v">${totalPPTs}</div><div class="crm-kpi-l">PPTs generados</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FFF7EC">🤝</div><div class="crm-kpi-data"><div class="crm-kpi-v">${negociacion}</div><div class="crm-kpi-l">En negociación</div></div></div>
-  `;
+  const oppIds=_crmActiveOppCuentaIds();
+  const conOpp=docs.filter(d=>oppIds.has(d._id)).length;
+  const k=(key,icon,bg,val,lbl,col)=>`<div class="crm-kpi" style="cursor:pointer;${_crmWidget===key&&key?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="crmToggleWidget('${key}')"><div class="crm-kpi-icon" style="background:${bg}">${icon}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;
+  row.innerHTML=k('','🏢','#EEF3FF',total,'Cuentas totales','#1C54F4')
+    +k('activas','✅','#EDFAF2',activos,'Activas','#16A34A')
+    +k('opps','📈','#EEF3FF',conOpp,'Oportunidades en gestión','#1C54F4');
 }
 
 const CRM_AVATAR_COLORS=['#1C54F4','#25408F','#0E7AC7','#0D9488','#7C3AED','#B45309','#DC2626','#16A34A'];
@@ -7107,22 +7114,30 @@ function filterContactos(){
     if(q&&!fullname.includes(q)&&!(d.email||'').toLowerCase().includes(q)&&!(d.cuentaNombre||'').toLowerCase().includes(q))return false;
     if(cargo&&d.cargo!==cargo)return false;
     if(emailF&&d.estadoCorreo!==emailF)return false;
+    if(_ctoWidget==='funcional'&&d.estadoCorreo!=='funcional')return false;
+    if(_ctoWidget==='rebotado'&&d.estadoCorreo!=='rebotado')return false;
+    if(_ctoWidget==='inactivos'&&!_ctoInactivo(d))return false;
     return true;
   });
   renderContactosTable(filtered);
 }
-
+// Inactividad de contacto: sin actividad comercial en los últimos 90 días.
+const CTO_INACTIVO_DIAS=90;
+function _ctoInactivo(d){const t=_tsToDate(d.ultimaActividad||d.ultimoContacto||d.fechaCreacion);return t?(Date.now()-t.getTime())>CTO_INACTIVO_DIAS*864e5:false;}
+let _ctoWidget='';
+window.ctoToggleWidget=function(key){_ctoWidget=_ctoWidget===key?'':key;filterContactos();};
 function renderContactosKPIs(docs){
   const row=document.getElementById('cto-kpi-row');
   if(!row)return;
   const total=docs.length;
   const funcionales=docs.filter(d=>d.estadoCorreo==='funcional').length;
   const rebotados=docs.filter(d=>d.estadoCorreo==='rebotado').length;
-  row.innerHTML=`
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">👤</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Contactos totales</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">🟢</div><div class="crm-kpi-data"><div class="crm-kpi-v">${funcionales}</div><div class="crm-kpi-l">Emails funcionales</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FEF2F2">🔴</div><div class="crm-kpi-data"><div class="crm-kpi-v">${rebotados}</div><div class="crm-kpi-l">Emails rebotados</div></div></div>
-  `;
+  const inactivos=docs.filter(_ctoInactivo).length;
+  const k=(key,icon,bg,val,lbl,col)=>`<div class="crm-kpi" style="cursor:pointer;${_ctoWidget===key&&key?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="ctoToggleWidget('${key}')"><div class="crm-kpi-icon" style="background:${bg}">${icon}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;
+  row.innerHTML=k('','👤','#EEF3FF',total,'Contactos totales','#1C54F4')
+    +k('funcional','🟢','#EDFAF2',funcionales,'Emails funcionales','#16A34A')
+    +k('rebotado','🔴','#FEF2F2',rebotados,'Emails rebotados','#EF3340')
+    +k('inactivos','💤','#F3F4F6',inactivos,'Contactos inactivos','#8898C0');
 }
 
 function emailBadge(estado){
@@ -8059,23 +8074,26 @@ function filterLeads(){
     if(q&&!full.includes(q))return false;
     if(estado&&_leadEstadoText(d)!==estado)return false;
     if(origen&&d.origen!==origen)return false;
+    if(_leadWidget==='pendientes'&&_leadEstadoText(d)!=='Pendiente')return false;
+    if(_leadWidget==='convertidos'&&d.estado!=='Convertido')return false;
+    if(_leadWidget==='inactivos'&&_leadEstadoText(d)!=='Inactivo')return false;
     return true;
   });
   renderLeadsTable(filtered);
 }
-
+let _leadWidget='';
+window.leadToggleWidget=function(key){_leadWidget=_leadWidget===key?'':key;filterLeads();};
 function renderLeadsKPIs(docs){
   const row=document.getElementById('lead-kpi-row');if(!row)return;
   const total=docs.length;
   const pendientes=docs.filter(d=>_leadEstadoText(d)==='Pendiente').length;
   const convertidos=docs.filter(d=>d.estado==='Convertido').length;
   const inactivos=docs.filter(d=>_leadEstadoText(d)==='Inactivo').length;
-  row.innerHTML=`
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EEF3FF">🎯</div><div class="crm-kpi-data"><div class="crm-kpi-v">${total}</div><div class="crm-kpi-l">Total leads</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#FEF6E7">⏳</div><div class="crm-kpi-data"><div class="crm-kpi-v">${pendientes}</div><div class="crm-kpi-l">Pendientes</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#EDFAF2">✅</div><div class="crm-kpi-data"><div class="crm-kpi-v">${convertidos}</div><div class="crm-kpi-l">Convertidos</div></div></div>
-    <div class="crm-kpi"><div class="crm-kpi-icon" style="background:#F3F4F6">⚪</div><div class="crm-kpi-data"><div class="crm-kpi-v">${inactivos}</div><div class="crm-kpi-l">Inactivos</div></div></div>
-  `;
+  const k=(key,icon,bg,val,lbl,col)=>`<div class="crm-kpi" style="cursor:pointer;${_leadWidget===key&&key?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="leadToggleWidget('${key}')"><div class="crm-kpi-icon" style="background:${bg}">${icon}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;
+  row.innerHTML=k('','🎯','#EEF3FF',total,'Total leads','#1C54F4')
+    +k('pendientes','⏳','#FEF6E7',pendientes,'Pendientes por gestionar','#B45309')
+    +k('convertidos','✅','#EDFAF2',convertidos,'Convertidos','#16A34A')
+    +k('inactivos','⚪','#F3F4F6',inactivos,'Inactivos','#8898C0');
 }
 
 function renderLeadsTable(docs){
