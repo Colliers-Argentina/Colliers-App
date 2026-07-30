@@ -36,7 +36,7 @@ La app tiene una barra de navegación lateral/superior. Los módulos son:
 - **crm** — CRM (Leads / Cuentas / Contactos)
 - **generator** — Generador de informes PPT
 - **buildings / inventario** — Inventario de edificios
-- **analytics** — Solo visible para `ANALYTICS_ALLOWED`
+- **analytics** — Solo visible para `ANALYTICS_ALLOWED`. Rediseñado como "Centro de Inteligencia Comercial" (Analytics 2.0): dos niveles — Dashboard Ejecutivo (KPIs con sparkline+variación, Evolución comercial, Distribución de oportunidades, Top Brokers, Centro de Alertas) y "Explorar por módulo" → dashboards específicos (Leads, Cuentas, Contactos, Oportunidades, Visitas, Transacciones, Inmuebles). Navegación interna por tarjetas/botones/pestañas (sin submenús en el sidebar). Motor `an2*` en `index.html` (contenedor `#an2-root`, `an2Render`/`an2RenderExec`/`an2RenderModule`/`an2Alerts`), reutiliza `_ancBars`/`_ancCard`/`_ancCountBy`/`_ancMonthlyVbars`. Icono del módulo Cuentas: portafolio (briefcase).
 
 ## Módulo CRM (estructura actual)
 

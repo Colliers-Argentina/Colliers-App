@@ -1706,6 +1706,63 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 body.dark #solicitudes-panel{background:#040A1C}
 .sr-zebra-row{background:#F6F8FC;border-radius:6px}
 body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
+/* Analytics 2.0 — Centro de Inteligencia Comercial */
+#analytics-panel{display:flex;flex-direction:column;background:#F4F6FB}
+body.dark #analytics-panel{background:#040A1C}
+#an2-root{flex:1;min-width:0;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1.25rem 1.5rem}
+.an2-head{margin-bottom:1rem}
+.an2-title{font-size:20px;font-weight:800;color:#0A1B4D}
+body.dark .an2-title{color:#fff}
+.an2-sub{font-size:12px;color:#8898C0;margin-top:2px}
+.an2-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem}
+.an2-kpis{margin-bottom:1rem}
+.an2-kpi{background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:.8rem .9rem}
+body.dark .an2-kpi{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
+.an2-kpi-top{display:flex;align-items:center;justify-content:space-between;gap:.4rem}
+.an2-kpi-l{font-size:11.5px;font-weight:700;color:#56648F}
+.an2-kpi-v{font-size:25px;font-weight:800;color:#0A1B4D;margin:.1rem 0}
+body.dark .an2-kpi-v{color:#fff}
+.an2-kpi-spark{height:28px;margin-top:.1rem}
+.an2-delta{font-size:11px;font-weight:800;white-space:nowrap}
+.an2-delta-flat{color:#8898C0}
+.an2-card{background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:1rem 1.1rem;margin-bottom:1rem}
+body.dark .an2-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
+.an2-card-t{font-size:13.5px;font-weight:800;color:#0A1B4D;margin-bottom:.7rem}
+body.dark .an2-card-t{color:#fff}
+.an2-card-wide{width:100%}
+.an2-grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0}
+.an2-grid2 .an2-card{margin-bottom:1rem}
+@media(max-width:860px){.an2-grid2{grid-template-columns:1fr}}
+.an2-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem}
+.an2-leg{font-size:11px;color:#56648F;display:inline-flex;align-items:center;gap:.35rem}
+.an2-leg-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.an2-alerts-card{border-color:#FCD9B6;background:linear-gradient(180deg,#FFF8F0,#fff)}
+body.dark .an2-alerts-card{background:rgba(245,166,35,.06);border-color:rgba(245,166,35,.25)}
+.an2-alerts{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:.7rem}
+.an2-alert{background:#fff;border:1px solid #F0E2CF;border-radius:12px;padding:.7rem .8rem;transition:all .15s}
+body.dark .an2-alert{background:rgba(255,255,255,.03);border-color:rgba(245,166,35,.2)}
+.an2-alert:hover{border-color:#F5A623;box-shadow:0 4px 14px rgba(245,166,35,.15)}
+.an2-alert-n{font-size:24px;font-weight:800;line-height:1}
+.an2-alert-l{font-size:11px;color:#56648F;margin-top:.25rem;font-weight:600}
+.an2-explore-t{font-size:16px;font-weight:800;color:#0A1B4D;margin:.6rem 0 .8rem}
+body.dark .an2-explore-t{color:#fff}
+.an2-explore{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.9rem;margin-bottom:1.5rem}
+.an2-mod-card{background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.25rem;transition:all .15s}
+body.dark .an2-mod-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
+.an2-mod-card:hover{border-color:#1C54F4;box-shadow:0 8px 22px rgba(0,7,89,.08)}
+.an2-mod-ic{font-size:26px}
+.an2-mod-n{font-size:14px;font-weight:800;color:#0A1B4D}
+body.dark .an2-mod-n{color:#fff}
+.an2-mod-d{font-size:11.5px;color:#8898C0;flex:1}
+.an2-mod-btn{margin-top:.5rem;align-self:flex-start;background:#EEF3FF;color:#1C54F4;border:1px solid #C7D7FF;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:700;cursor:pointer}
+.an2-mod-btn:hover{background:#1C54F4;color:#fff}
+.an2-back{display:inline-flex;align-items:center;gap:.3rem;font-size:12px;font-weight:700;color:#1C54F4;cursor:pointer;margin-bottom:.7rem}
+.an2-fbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:1rem}
+.an2-chip{font-size:11.5px;font-weight:700;color:#56648F;background:#fff;border:1px solid #E8EFF8;border-radius:20px;padding:.35rem .85rem;cursor:pointer}
+body.dark .an2-chip{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:#9FB0D0}
+.an2-chip.active{background:#1C54F4;color:#fff;border-color:#1C54F4}
+.an2-fsel{font-size:12px;padding:.4rem .6rem;border:1px solid #E8EFF8;border-radius:8px;background:#fff;color:#0A1B4D}
+body.dark .an2-fsel{background:#0D1B40;border-color:rgba(255,255,255,.12);color:#C3E6FF}
 #admin-panel{background:#F4F6FB;display:flex;flex-direction:column}
 body.dark #admin-panel{background:#0D1733}
 #buildings-panel{display:flex;flex-direction:column}
@@ -2519,7 +2576,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-comercial">
-        <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/><line x1="8" y1="16" x2="11" y2="16"/></svg></span><span>Cuentas</span></button>
+        <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></span><span>Cuentas</span></button>
         <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contactos</span></button>
         <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Leads</span></button>
         <button class="sb-item" data-mod="crm" data-submod="visitas" onclick="_sbItemClick('crm','visitas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>Visitas</span></button>
@@ -2561,19 +2618,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 
     <!-- Analytics (guarded) -->
     <div class="sb-grp sb-guarded" id="sbg-analytics" style="display:none">
-      <button class="sb-grp-hd" onclick="_sbGrpToggle('sbg-analytics')">
-        <span class="sb-grp-hd-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>
-        <span class="sb-grp-hd-label">Analytics</span>
-        <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-      <div class="sb-grp-body sb-closed" id="sbb-analytics">
-        <button class="sb-item" data-mod="analytics" data-submod="intel" onclick="_sbItemClick('analytics','intel')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0012 2z"/></svg></span><span>Inteligencia Comercial</span></button>
-        <button class="sb-item" data-mod="analytics" data-submod="heatmaps" onclick="_sbItemClick('analytics','heatmaps')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span><span>Heatmaps</span></button>
-        <button class="sb-item" data-mod="analytics" data-submod="brokers" onclick="_sbItemClick('analytics','brokers')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span><span>Dashboard Brokers</span></button>
-        <button class="sb-item" data-mod="analytics" data-submod="tendencias" onclick="_sbItemClick('analytics','tendencias')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span>Tendencias</span></button>
-        <button class="sb-item" data-mod="analytics" data-submod="rankings" onclick="_sbItemClick('analytics','rankings')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg></span><span>Rankings</span></button>
-        <button class="sb-item" data-mod="analytics" data-submod="cuentas" onclick="_sbItemClick('analytics','cuentas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/></svg></span><span>Cuentas</span></button>
-        <button class="sb-item" data-mod="analytics" data-submod="contactos" onclick="_sbItemClick('analytics','contactos')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contactos</span></button>
+      <div class="sb-grp-body" id="sbb-analytics">
+        <button class="sb-item" data-mod="analytics" data-submod="exec" onclick="_sbItemClick('analytics','exec')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span><span>Analytics</span></button>
       </div>
     </div>
 
@@ -2679,182 +2725,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 
 <!-- ANALYTICS -->
 <div id="analytics-panel" style="display:none">
-  <div class="an-topbar">
-    <div class="an-topbar-l">
-      <div class="an-page-title" id="an-page-title">Analítica · Inteligencia Comercial</div>
-      <div class="an-subtitle" id="an-last-update">Cargando datos...</div>
-    </div>
-    <div class="an-topbar-r">
-      <div class="an-period-row">
-        <button class="an-period-btn active" id="an-gp-0" onclick="setAnGlobalPeriod(0)">Todo</button>
-        <button class="an-period-btn" id="an-gp-7" onclick="setAnGlobalPeriod(7)">7d</button>
-        <button class="an-period-btn" id="an-gp-30" onclick="setAnGlobalPeriod(30)">30d</button>
-        <button class="an-period-btn" id="an-gp-90" onclick="setAnGlobalPeriod(90)">90d</button>
-        <button class="an-period-btn" id="an-gp-365" onclick="setAnGlobalPeriod(365)">1a</button>
-      </div>
-      <button class="an-export-btn" onclick="exportAnPDF()" title="Exportar PDF">⬇ PDF</button>
-      <button class="an-export-btn" onclick="exportAnPPT()" title="Exportar PPT">⬇ PPT</button>
-      <button class="mod-back-btn" onclick="showModule('home')">← Volver</button>
-    </div>
-  </div>
-  <div class="an-fbar" id="an-fbar">
-    <div class="an-fbar-row">
-      <div class="mz-dd" id="an-zona-dd">
-        <button class="an-fbar-sel mz-dd-btn" id="an-zona-btn" onclick="toggleAnZonaDD(event)" type="button">Todas las zonas ▾</button>
-        <div class="mz-dd-panel" id="an-zona-panel">
-          <div id="an-zona-list"></div>
-          <div class="mz-dd-footer"><button class="mz-dd-clear-btn" onclick="clearAnZonas()">✕ Limpiar</button></div>
-        </div>
-      </div>
-      <select class="an-fbar-sel" id="an-f-asset-type" onchange="applyAnFilters()">
-        <option value="">Todos los tipos</option>
-        <option value="office">Oficinas</option>
-        <option value="industrial">Industrial</option>
-        <option value="retail">Retail</option>
-      </select>
-      <select class="an-fbar-sel" id="an-f-asset-type" onchange="applyAnFilters()">
-        <option value="">Todos los tipos</option>
-        <option value="office">Oficinas</option>
-        <option value="industrial">Industrial</option>
-        <option value="retail">Retail</option>
-      </select>
-      <select class="an-fbar-sel" id="an-f-ejecutivo" onchange="applyAnFilters()"><option value="">Todos los ejecutivos</option></select>
-      <select class="an-fbar-sel" id="an-f-edificio" onchange="applyAnFilters()"><option value="">Todos los edificios</option></select>
-      <div style="display:flex;align-items:center;gap:.3rem">
-        <span class="an-filter-lbl">m²:</span>
-        <input id="an-m2-min" type="number" min="0" step="100" placeholder="mín" class="an-filter-inp" oninput="applyAnFilters()">
-        <span style="font-size:10px;color:#C8D5F0">–</span>
-        <input id="an-m2-max" type="number" min="0" step="100" placeholder="máx" class="an-filter-inp" oninput="applyAnFilters()">
-      </div>
-      <button class="an-filter-chip an-clear-btn" id="an-clear-all-btn" onclick="clearAllAnFilters()" style="display:none">✕ Limpiar todo</button>
-    </div>
-    <div class="an-chips-row" id="an-chips-row"></div>
-  </div>
-  <div class="an-body">
-    <div class="an-kpis" id="an-kpis">
-      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
-      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
-      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
-      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
-      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
-      <div class="kpi-card"><div class="kpi-icon-box" style="background:#EEF3FF"><div class="an-skel" style="width:20px;height:20px;margin:0"></div></div><div class="kpi-data"><div class="an-skel" style="width:52px;height:24px;margin:0"></div><div class="an-skel" style="width:80px;height:10px;margin-top:5px"></div></div></div>
-    </div>
-    <div class="an-insights-row" id="an-insights"></div>
-    <div class="an-charts-row">
-      <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Zonas más demandadas</div><div class="an-card-hint">click para filtrar</div></div>
-        <div class="an-card-body" id="an-body-zonas"><div class="an-chart-wrap"><canvas id="chart-zonas"></canvas></div></div>
-      </div>
-      <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Rangos de m² demandados</div><div class="an-card-hint">click para filtrar</div></div>
-        <div class="an-card-body" id="an-body-m2"><div class="an-chart-wrap"><canvas id="chart-m2"></canvas></div></div>
-      </div>
-      <div class="an-card">
-        <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Top Edificios más enviados</div></div>
-        <div class="an-card-body" id="an-body-edificios"><div class="an-empty">Cargando...</div></div>
-      </div>
-    </div>
-    <div class="an-card">
-      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ejecutivos Comerciales más activos</div></div>
-      <div id="an-brokers-lb" class="an-brokers-row"></div>
-    </div>
-    <div class="an-card" id="an-heatmap-card">
-      <div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Mapa de Calor de Corredores</div><div class="an-card-hint">click corredor para filtrar</div></div>
-      <div id="an-heatmap-body"></div>
-    </div>
-    <div class="an-card" id="an-tend-card">
-      <div class="an-tend-hdr">
-        <div style="display:flex;align-items:center;gap:.4rem"><div class="an-card-accent"></div><div class="an-card-title">Tendencias Comerciales</div></div>
-        <div class="an-period-row">
-          <button class="an-period-btn active" id="an-pd-30" onclick="setTendPeriodo(30)">30d</button>
-          <button class="an-period-btn" id="an-pd-90" onclick="setTendPeriodo(90)">90d</button>
-          <button class="an-period-btn" id="an-pd-365" onclick="setTendPeriodo(365)">12m</button>
-        </div>
-      </div>
-      <div class="an-tend-grid" id="an-tend-grid">
-        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Zonas más demandadas</div><div style="height:160px;position:relative"><canvas id="chart-tend-zonas"></canvas></div></div>
-        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Rangos m² buscados</div><div style="height:160px;position:relative"><canvas id="chart-tend-m2"></canvas></div></div>
-        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Edificios más enviados</div><div id="an-tend-edif" style="height:160px;overflow-y:auto"></div></div>
-        <div class="an-tend-subcrd"><div class="an-tend-sub-title">Ejecutivos Comerciales más activos</div><div id="an-tend-brokers" style="height:160px;overflow-y:auto"></div></div>
-      </div>
-      <div style="padding:0 .85rem .85rem">
-        <div class="an-tend-sub-title" style="margin-bottom:.6rem">Evolución temporal</div>
-        <div class="an-evol-wrap"><canvas id="chart-tend-evol"></canvas></div>
-      </div>
-    </div>
-    <!-- PHASE 3: BROKERS DASHBOARD -->
-    <div class="an-card" id="an-brokers-dash-card" style="margin-top:.5rem">
-      <div class="an-card-hd">
-        <div class="an-card-accent"></div>
-        <div class="an-card-title">Dashboard de Brokers · Operaciones</div>
-        <div style="margin-left:auto;display:flex;gap:.5rem;align-items:center">
-          <input type="date" id="anb-f-desde" class="an-filter-inp" style="height:28px" onchange="renderAnBrokersDash()" title="Desde">
-          <input type="date" id="anb-f-hasta" class="an-filter-inp" style="height:28px" onchange="renderAnBrokersDash()" title="Hasta">
-          <select id="anb-f-corredor" class="an-fbar-sel" style="height:28px;font-size:11px" onchange="renderAnBrokersDash()">
-            <option value="">Todos los corredores</option>
-            <option>Norte</option><option>Catalinas / Puerto Madero</option><option>Microcentro</option>
-            <option>Macrocentro</option><option>Palermo / Soho</option><option>Libertador</option>
-            <option>Panamericana</option><option>Sur</option><option>Otro</option>
-          </select>
-        </div>
-      </div>
-      <div class="an-card-body" style="padding:.75rem 1rem">
-        <div class="anb-kpi-row" id="anb-kpi-row"></div>
-        <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-          <div>
-            <div class="anb-section-title">Ranking de Brokers</div>
-            <div id="anb-ranking"></div>
-          </div>
-          <div>
-            <div class="anb-section-title">Operaciones por mes</div>
-            <div style="height:160px;position:relative"><canvas id="chart-anb-ops"></canvas></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PHASE 5: HEATMAP DE DEMANDA -->
-    <div class="an-card" id="an-demand-heatmap-card" style="margin-top:.5rem">
-      <div class="an-card-hd">
-        <div class="an-card-accent" style="background:linear-gradient(135deg,#22C55E,#EF4444)"></div>
-        <div class="an-card-title">Mapa de Demanda · Corredores</div>
-        <div class="an-card-hint">Score = búsquedas × 3 + edificios × 2 + inventario · click para filtrar</div>
-      </div>
-      <div class="an-card-body" style="padding:.5rem 1rem 1rem">
-        <div id="an-demand-hm-body"></div>
-      </div>
-    </div>
-
-    <!-- LEADS ANALYTICS -->
-    <div id="an-leads-section">
-      <div style="display:flex;align-items:center;gap:.4rem;margin:-.1rem 0 .65rem"><div class="an-card-accent"></div><div class="an-card-title" style="font-size:13px;font-weight:700;color:#0A1B4D">Comercial · Funnel de Leads</div></div>
-      <div class="lead-an-kpis" id="an-lead-kpis"></div>
-      <div class="leads-an-grid">
-        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Funnel</div></div><div class="an-card-body" id="an-leads-funnel" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
-        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Origen de Leads</div></div><div class="an-card-body" id="an-leads-origen" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
-        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Ranking Ejecutivos Comerciales</div></div><div class="an-card-body" id="an-leads-brokers" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
-        <div class="an-card"><div class="an-card-hd"><div class="an-card-accent"></div><div class="an-card-title">Motivos de Descarte</div></div><div class="an-card-body" id="an-leads-descarte" style="padding:.75rem 1rem"><div class="an-empty">Sin datos</div></div></div>
-      </div>
-    </div>
-
-    <!-- ANALYTICS · CUENTAS (submódulo) -->
-    <div id="an-cuentas-section" style="margin-top:1.2rem">
-      <div style="display:flex;align-items:center;gap:.4rem;margin:-.1rem 0 .65rem"><div class="an-card-accent"></div><div class="an-card-title" style="font-size:13px;font-weight:700;color:#0A1B4D">Comercial · Análisis de Cuentas</div><div id="anc-subtitle" style="font-size:11px;color:#8898C0;margin-left:.2rem"></div></div>
-      <div id="anc-panel"></div>
-      <div id="anc-chips" class="crm-flt-chips" style="margin-bottom:.6rem"></div>
-      <div id="anc-kpis" class="anc-tiles"></div>
-      <div id="anc-charts" class="anc-charts"><div class="anc-empty" style="padding:1.5rem">Cargando análisis de cuentas...</div></div>
-    </div>
-
-    <!-- ANALYTICS · CONTACTOS (submódulo) -->
-    <div id="an-contactos-section" style="margin-top:1.2rem">
-      <div style="display:flex;align-items:center;gap:.4rem;margin:-.1rem 0 .65rem"><div class="an-card-accent"></div><div class="an-card-title" style="font-size:13px;font-weight:700;color:#0A1B4D">Comercial · Análisis de Contactos</div><div id="antc-subtitle" style="font-size:11px;color:#8898C0;margin-left:.2rem"></div></div>
-      <div id="antc-panel"></div>
-      <div id="antc-chips" class="crm-flt-chips" style="margin-bottom:.6rem"></div>
-      <div id="antc-kpis" class="anc-tiles"></div>
-      <div id="antc-charts" class="anc-charts"><div class="anc-empty" style="padding:1.5rem">Cargando análisis de contactos...</div></div>
-    </div>
-  </div>
+  <div id="an2-root"></div>
 </div>
 <!-- ANALYTICS BUILDING SIDE PANEL -->
 <div id="an-bld-panel" class="an-bld-panel" style="display:none" onclick="if(event.target===this)closeAnBldPanel()">
@@ -2871,7 +2742,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 <div id="crm-panel" style="display:none">
   <!-- SUBNAV -->
   <div class="crm-subnav">
-    <button class="crm-subnav-tab active" id="crm-snav-cuentas" onclick="switchCRMTab('cuentas')"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/><line x1="8" y1="16" x2="11" y2="16"/></svg>Cuentas</button>
+    <button class="crm-subnav-tab active" id="crm-snav-cuentas" onclick="switchCRMTab('cuentas')"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>Cuentas</button>
     <button class="crm-subnav-tab" id="crm-snav-contactos" onclick="switchCRMTab('contactos')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Contactos</button>
     <button class="crm-subnav-tab" id="crm-snav-leads" onclick="switchCRMTab('leads')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Leads</button>
     <button class="crm-subnav-tab" id="crm-snav-visitas" onclick="switchCRMTab('visitas')"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Visitas</button>
@@ -12434,8 +12305,8 @@ window.toggleAnalytics=()=>{
   if(!ANALYTICS_ALLOWED.includes(user?.email)){alert('No autorizado.');return;}
   const panel=document.getElementById('analytics-panel');
   const open=panel.style.display==='none'||!panel.style.display;
-  panel.style.display=open?'block':'none';
-  if(open)loadAnalytics();
+  panel.style.display=open?'flex':'none';
+  if(open)an2Render();
 };
 
 async function loadAnalytics(){
@@ -13542,8 +13413,9 @@ function _sbItemClick(mod,submod){
     showModule('crm-'+submod);
     switchCRMTab(submod);
     _setSbActive('crm',submod);
-  }else if(mod==='analytics'&&submod){
-    _anGoTo(submod);
+  }else if(mod==='analytics'){
+    showModule('analytics');
+    document.querySelectorAll('#sb-nav .sb-item[data-mod="analytics"]').forEach(el=>el.classList.add('active'));
   }else{
     showModule(mod);
   }
@@ -13605,7 +13477,7 @@ function showModule(mod){
   } else if(mod==='analytics'){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
     show('analytics-panel');
-    loadAnalytics();
+    an2Render();
   } else if(mod==='admin'){
     if(!ANALYTICS_ALLOWED.includes(user?.email)){return;}
     show('admin-panel');
@@ -13635,7 +13507,7 @@ const NX_ICON={
   industrial:'<path d="M2 20h20"/><path d="M4 20V9l6 4V9l6 4V6l4 2.5V20"/>',
   retail:'<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>',
   leads:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-  cuentas:'<path d="M3 21h18"/><path d="M5 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M19 21V11a1 1 0 00-1-1h-3"/><line x1="8" y1="8" x2="11" y2="8"/><line x1="8" y1="12" x2="11" y2="12"/><line x1="8" y1="16" x2="11" y2="16"/>',
+  cuentas:'<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>',
   contactos:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   visitas:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
   nuevaVisita:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0110.5-7.6"/><circle cx="11" cy="10" r="2.5"/><line x1="19" y1="2.5" x2="19" y2="8.5"/><line x1="16" y1="5.5" x2="22" y2="5.5"/>',
@@ -15633,6 +15505,239 @@ async function generateFichaComercial(buildingId){
     const btn=document.getElementById('btn-gen-ficha');
     if(btn){btn.disabled=false;btn.textContent='Generar Ficha (.pptx)';}
   }
+}
+
+// ============================================================================
+//  ANALYTICS 2.0 · Centro de Inteligencia Comercial
+//  Dos niveles: Dashboard Ejecutivo (resumen + alertas + explorar) y
+//  dashboards por módulo. Sistema modular que reutiliza componentes
+//  (KPIs, barras _ancBars, tiles, alertas, filtros) para sumar módulos
+//  sin reorganizar el módulo. Reemplaza la antigua vista con submenús.
+// ============================================================================
+let _an2View='exec',_an2Module='',_an2Visitas=[],_an2VisLoaded=false,_an2Flt={period:'all',ejecutivo:'',sub:'oficina'};
+const AN2_MODULES=[
+  {key:'leads',label:'Leads',icon:'🎯',desc:'Conversión, origen, tiempos y ejecutivos'},
+  {key:'cuentas',label:'Cuentas',icon:'💼',desc:'Rubros, categorías, ejecutivos y evolución'},
+  {key:'contactos',label:'Contactos',icon:'👥',desc:'Cargos, inversores y estado de emails'},
+  {key:'oportunidades',label:'Oportunidades',icon:'📈',desc:'Estado, probabilidad y conversión'},
+  {key:'visitas',label:'Visitas',icon:'📍',desc:'Inmuebles, cuentas y ejecutivos'},
+  {key:'transacciones',label:'Transacciones',icon:'🔁',desc:'Operaciones, m², honorarios y zonas'},
+  {key:'inmuebles',label:'Inmuebles',icon:'🏢',desc:'Oficinas, Retail e Industria y Logística'},
+];
+function an2N(n){return new Intl.NumberFormat('es-AR').format(Math.round(n||0));}
+function _an2LeadEjec(d){return d.ejecutivo||d.broker||d.brokerAsignado||d.brokerResponsable||'';}
+function _an2BldTipo(b){const t=(b.assetType||b._tipo||b.tipo||'').toString().toLowerCase();if(t.includes('ofic'))return 'oficina';if(t.includes('retail')||t.includes('local'))return 'retail';if(t.includes('indus')||t.includes('logi')||t.includes('depos')||t.includes('galp'))return 'industria';return 'otro';}
+function an2Monthly(docs,field,n){
+  const base=new Date();base.setDate(1);const arr=[];
+  for(let i=n-1;i>=0;i--){const dt=new Date(base.getFullYear(),base.getMonth()-i,1);arr.push({key:dt.getFullYear()+'-'+(dt.getMonth()+1),lbl:dt.toLocaleDateString('es-AR',{month:'short'}),count:0});}
+  const idx={};arr.forEach((m,i)=>idx[m.key]=i);
+  (docs||[]).forEach(d=>{const t=_tsToDate(d[field]);if(!t)return;const k=t.getFullYear()+'-'+(t.getMonth()+1);if(k in idx)arr[idx[k]].count++;});
+  return {labels:arr.map(m=>m.lbl),counts:arr.map(m=>m.count)};
+}
+function an2Delta(c){const n=c.length;if(n<2)return null;const cur=c[n-1],prev=c[n-2];if(prev===0)return cur>0?100:null;return Math.round((cur-prev)/prev*100);}
+function an2Spark(vals,color){
+  const w=92,h=28,n=vals.length;if(!n)return '';const mx=Math.max(1,...vals),mn=Math.min(...vals);const rng=(mx-mn)||1;
+  const pts=vals.map((v,i)=>`${(i/(n-1||1))*w},${(h-2)-((v-mn)/rng)*(h-6)}`).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+function an2DeltaChip(d){if(d==null)return '<span class="an2-delta an2-delta-flat">—</span>';const up=d>=0;return `<span class="an2-delta" style="color:${up?'#16A34A':'#EF3340'}">${up?'▲':'▼'} ${Math.abs(d)}%</span>`;}
+function an2Kpi(label,total,delta,vals,color){return `<div class="an2-kpi"><div class="an2-kpi-top"><span class="an2-kpi-l">${esc(label)}</span>${an2DeltaChip(delta)}</div><div class="an2-kpi-v">${an2N(total)}</div><div class="an2-kpi-spark">${an2Spark(vals,color)}</div></div>`;}
+function an2LineChart(series,labels){
+  const w=760,h=230,pl=34,pb=24,pt=12,pr=12,iw=w-pl-pr,ih=h-pt-pb;
+  const mx=Math.max(1,...series.flatMap(s=>s.data));const n=labels.length;
+  const x=i=>pl+(n<=1?iw/2:(i/(n-1))*iw),y=v=>pt+ih-(v/mx)*ih;
+  const grid=[0,.25,.5,.75,1].map(f=>{const yy=pt+ih-f*ih;return `<line x1="${pl}" y1="${yy}" x2="${w-pr}" y2="${yy}" stroke="#E8EFF8" stroke-width="1"/><text x="${pl-6}" y="${yy+3}" text-anchor="end" font-size="9" fill="#8898C0">${Math.round(mx*f)}</text>`;}).join('');
+  const lines=series.map(s=>{const pts=s.data.map((v,i)=>`${x(i)},${y(v)}`).join(' ');return `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`+s.data.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="2.6" fill="${s.color}"/>`).join('');}).join('');
+  const xl=labels.map((l,i)=>`<text x="${x(i)}" y="${h-7}" text-anchor="middle" font-size="9" fill="#8898C0">${esc(l)}</text>`).join('');
+  const legend=series.map(s=>`<span class="an2-leg"><span class="an2-leg-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
+  return `<div class="an2-legend">${legend}</div><div style="overflow-x:auto"><svg width="100%" viewBox="0 0 ${w} ${h}" style="min-width:520px">${grid}${lines}${xl}</svg></div>`;
+}
+function an2Ensure(){
+  const j=[];
+  if(!db)return Promise.resolve();
+  if(!(_leadDocs&&_leadDocs.length))j.push(db.collection('leads').get().then(s=>{_leadDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{}));
+  if(!(_oppDocs&&_oppDocs.length))j.push(db.collection('oportunidades').get().then(s=>{_oppDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{}));
+  if(!(_crmDocs&&_crmDocs.length))j.push(db.collection('clientes').get().then(s=>{_crmDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{}));
+  if(!(_ctoDocs&&_ctoDocs.length))j.push(db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{}));
+  if(!(_txDocs&&_txDocs.length))j.push(db.collection('transacciones').get().then(s=>{_txDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{}));
+  if(!(_srDocs&&_srDocs.length))j.push(db.collection('solicitudes').get().then(s=>{_srDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{}));
+  if(!(_bldDocs&&_bldDocs.length))j.push(db.collection('buildings').get().then(s=>{_bldDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{}));
+  if(!_an2VisLoaded)j.push(db.collection('visitas').get().then(s=>{_an2Visitas=s.docs.map(d=>({...d.data(),_id:d.id}));_an2VisLoaded=true;}).catch(()=>{_an2VisLoaded=true;}));
+  return Promise.all(j);
+}
+async function an2Render(){
+  const root=document.getElementById('an2-root');if(!root)return;
+  root.innerHTML='<div class="an2-loading" style="padding:3rem;text-align:center;color:#8898C0">Cargando inteligencia comercial…</div>';
+  await an2Ensure();
+  if(_an2View==='module'&&_an2Module)an2RenderModule(_an2Module);
+  else an2RenderExec();
+}
+function an2RenderExec(){
+  const root=document.getElementById('an2-root');if(!root)return;_an2View='exec';_an2Module='';
+  const leads=_leadDocs||[],opp=_oppDocs||[],ctas=_crmDocs||[],ctos=_ctoDocs||[],tx=_txDocs||[],vis=_an2Visitas||[];
+  const mk=(label,docs,field,color)=>{const m=an2Monthly(docs,field,6);return an2Kpi(label,docs.length,an2Delta(m.counts),m.counts,color);};
+  const kpis=[mk('Leads',leads,'fechaCreacion','#1C54F4'),mk('Cuentas',ctas,'fechaCreacion','#7C3AED'),mk('Contactos',ctos,'fechaCreacion','#0090C7'),mk('Oportunidades',opp,'fechaCreacion','#16A34A'),mk('Visitas',vis,'fecha','#F97316'),mk('Transacciones',tx,'fecha','#DC2626')].join('');
+  const lbls=an2Monthly(leads,'fechaCreacion',6).labels;
+  const evol=an2LineChart([
+    {name:'Leads',color:'#1C54F4',data:an2Monthly(leads,'fechaCreacion',6).counts},
+    {name:'Oportunidades',color:'#16A34A',data:an2Monthly(opp,'fechaCreacion',6).counts},
+    {name:'Visitas',color:'#F97316',data:an2Monthly(vis,'fecha',6).counts},
+    {name:'Transacciones',color:'#DC2626',data:an2Monthly(tx,'fecha',6).counts},
+  ],lbls);
+  const oppOpen=opp.filter(o=>!['Ganada','Perdida'].includes(o.estado));
+  const oppDist=_ancBars([['0–50 %',oppOpen.filter(o=>o.conversion==='0-50').length],['50–80 %',oppOpen.filter(o=>o.conversion==='50-80').length],['80–100 %',oppOpen.filter(o=>o.conversion==='80-100').length]],{order:['0–50 %','50–80 %','80–100 %']});
+  const topBrk=_ancBars([..._ancCountBy(opp,o=>o.ejecutivo)].map(([k,v])=>[ejecDisplay(k),v]),{max:5});
+  const al=an2Alerts();
+  root.innerHTML=`
+    <div class="an2-head"><div class="an2-title">Centro de Inteligencia Comercial</div><div class="an2-sub">Resumen ejecutivo · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</div></div>
+    <div class="an2-tiles an2-kpis">${kpis}</div>
+    ${al}
+    <div class="an2-card an2-card-wide"><div class="an2-card-t">Evolución comercial (6 meses)</div>${evol}</div>
+    <div class="an2-grid2">
+      <div class="an2-card"><div class="an2-card-t">Distribución de oportunidades</div>${oppDist}</div>
+      <div class="an2-card"><div class="an2-card-t">Top Brokers</div>${topBrk}</div>
+    </div>
+    <div class="an2-explore-t">Explorar por módulo</div>
+    <div class="an2-explore">${AN2_MODULES.map(m=>`<div class="an2-mod-card"><div class="an2-mod-ic">${m.icon}</div><div class="an2-mod-n">${m.label}</div><div class="an2-mod-d">${esc(m.desc)}</div><button class="an2-mod-btn" onclick="an2Open('${m.key}')">Ver análisis ›</button></div>`).join('')}</div>`;
+}
+function an2Alerts(){
+  const now=Date.now();const leads=_leadDocs||[],opp=_oppDocs||[],ctas=_crmDocs||[],ctos=_ctoDocs||[],sr=_srDocs||[],blds=_bldDocs||[];
+  const days=ts=>{const t=_tsToDate(ts);return t?(now-t.getTime())/864e5:Infinity;};
+  const pend=d=>d.estado!=='Convertido'&&(d.estadoActividad||'Activo')!=='Inactivo'&&(d.resultado||'Pendiente')==='Pendiente';
+  const A=[
+    {n:leads.filter(d=>pend(d)&&_leadDiasPendiente(d)>14).length,l:'Leads pendientes +14 días',mod:'leads',c:'#B45309'},
+    {n:opp.filter(o=>!['Ganada','Perdida'].includes(o.estado)&&days(o.ultimaActividad||o.fechaCreacion)>30).length,l:'Oportunidades sin movimiento +30 días',mod:'oportunidades',c:'#7C3AED'},
+    {n:ctas.filter(c=>days(c.ultimaActividad||c.fechaCreacion)>90).length,l:'Cuentas sin actividad +90 días',mod:'cuentas',c:'#DC2626'},
+    {n:sr.filter(s=>s.data&&s.data.prioridad==='Urgente'&&s.estado!=='Finalizada'&&s.data.fechaRequerimiento&&new Date(s.data.fechaRequerimiento+'T23:59:59').getTime()<now).length,l:'Solicitudes urgentes vencidas',mod:null,c:'#DC2626'},
+    {n:blds.filter(b=>{try{return !getBldFoto(b);}catch(e){return !b.foto;}}).length,l:'Inmuebles sin fotografías',mod:'inmuebles',c:'#0090C7'},
+    {n:ctos.filter(c=>!((c.telefono||'').trim())).length,l:'Contactos sin teléfono',mod:'contactos',c:'#1C54F4'},
+    {n:leads.filter(d=>pend(d)&&_leadDiasPendiente(d)>=12&&_leadDiasPendiente(d)<=14).length,l:'Leads próximos a inactivarse',mod:'leads',c:'#EAB308'},
+  ];
+  return `<div class="an2-card an2-alerts-card"><div class="an2-card-t">⚠️ Centro de Alertas</div><div class="an2-alerts">${A.map(a=>`<div class="an2-alert"${a.mod?` onclick="an2Open('${a.mod}')" style="cursor:pointer"`:''}><div class="an2-alert-n" style="color:${a.c}">${a.n}</div><div class="an2-alert-l">${esc(a.l)}</div></div>`).join('')}</div></div>`;
+}
+window.an2Open=function(key){_an2View='module';_an2Module=key;_an2Flt={period:'all',ejecutivo:'',sub:'oficina'};const r=document.getElementById('an2-root');if(r)r.scrollTop=0;an2RenderModule(key);};
+window.an2Back=function(){_an2View='exec';_an2Module='';an2RenderExec();const r=document.getElementById('an2-root');if(r)r.scrollTop=0;};
+window.an2SetFlt=function(k,v){_an2Flt[k]=v;an2RenderModule(_an2Module);};
+function an2InPeriod(ts){if(_an2Flt.period==='all')return true;const t=_tsToDate(ts);if(!t)return false;return (Date.now()-t.getTime())<=parseInt(_an2Flt.period)*864e5;}
+function an2FilterBar(opts){opts=opts||{};
+  const P=[['all','Todo'],['365','12m'],['180','6m'],['90','90d'],['30','30d']];
+  let h='<div class="an2-fbar">'+P.map(([v,l])=>`<span class="an2-chip${_an2Flt.period===v?' active':''}" onclick="an2SetFlt('period','${v}')">${l}</span>`).join('');
+  if(opts.ejec)h+=`<select class="an2-fsel" onchange="an2SetFlt('ejecutivo',this.value)"><option value="">Todos los ejecutivos</option>${CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}"${_an2Flt.ejecutivo===k?' selected':''}>${esc(ejecDisplay(k))}</option>`).join('')}</select>`;
+  return h+'</div>';
+}
+function an2ModuleShell(title,desc,fltOpts,tiles,charts,extraTop){
+  const kh=tiles.map(([l,v,sub])=>`<div class="anc-tile"><div class="anc-tile-v">${typeof v==='number'?an2N(v):esc(String(v))}</div><div class="anc-tile-l">${esc(l)}</div>${sub?`<div class="anc-tile-sub">${esc(sub)}</div>`:''}</div>`).join('');
+  return `<div class="an2-back" onclick="an2Back()">‹ Volver al Dashboard Ejecutivo</div>
+    <div class="an2-head"><div class="an2-title">${title}</div><div class="an2-sub">${esc(desc)}</div></div>
+    ${an2FilterBar(fltOpts)}${extraTop||''}
+    <div class="an2-tiles" style="margin-bottom:1rem">${kh}</div>
+    <div class="anc-charts">${charts}</div>`;
+}
+function an2RenderModule(key){
+  const root=document.getElementById('an2-root');if(!root)return;
+  const R={leads:an2ModLeads,cuentas:an2ModCuentas,contactos:an2ModContactos,oportunidades:an2ModOpp,visitas:an2ModVisitas,transacciones:an2ModTx,inmuebles:an2ModInmuebles}[key];
+  root.innerHTML=R?R():an2ModuleShell('Módulo','En preparación',{},[],'<div class="anc-empty">Sin datos.</div>');
+}
+function an2ModLeads(){
+  let d=(_leadDocs||[]).filter(x=>an2InPeriod(x.fechaCreacion));
+  if(_an2Flt.ejecutivo)d=d.filter(x=>_an2LeadEjec(x)===_an2Flt.ejecutivo);
+  const recibidos=d.length,calif=d.filter(x=>x.clasificacion==='Calificado').length,prosp=d.filter(x=>x.resultado==='Próspero').length,conv=d.filter(x=>x.estado==='Convertido').length;
+  const ct=d.filter(x=>x.estado==='Convertido').map(x=>{const a=_tsToDate(x.fechaCreacion),b=_tsToDate(x.ultimaActividad);return a&&b?(b-a)/864e5:null;}).filter(v=>v!=null);
+  const avg=ct.length?Math.round(ct.reduce((s,v)=>s+v,0)/ct.length):0;
+  const charts=_ancCard('Embudo de conversión',_ancBars([['Recibidos',recibidos],['Calificados',calif],['Prósperos',prosp],['Convertidos',conv]],{order:['Recibidos','Calificados','Prósperos','Convertidos']}))
+    +_ancCard('Origen',_ancBars([..._ancCountBy(d,x=>x.origen||'Sin origen')],{max:8}))
+    +_ancCard('Tipo de consulta',_ancBars([..._ancCountBy(d,x=>x.tipoInmueble||'Sin especificar')],{max:8}))
+    +_ancCard('Conversión por ejecutivo',_ancBars([..._ancCountBy(d.filter(x=>x.estado==='Convertido'),x=>_an2LeadEjec(x))].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
+    +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Evolución (12m)</div>${_ancMonthlyVbars(d,'fechaCreacion')}</div>`;
+  return an2ModuleShell('🎯 Leads','Conversión, origen, tiempos y ejecutivos',{ejec:true},[['Leads recibidos',recibidos],['Calificados',calif],['Prósperos',prosp],['Convertidos',conv],['T. prom. conversión',avg+' d']],charts);
+}
+function an2ModCuentas(){
+  let d=(_crmDocs||[]).filter(x=>an2InPeriod(x.fechaCreacion)||_an2Flt.period==='all');
+  if(_an2Flt.period!=='all')d=(_crmDocs||[]).filter(x=>an2InPeriod(x.fechaCreacion));else d=(_crmDocs||[]);
+  if(_an2Flt.ejecutivo)d=d.filter(x=>_docGestion(x).includes(_an2Flt.ejecutivo));
+  const now=Date.now();const total=d.length;
+  const nuevas=d.filter(x=>{const t=_tsToDate(x.fechaCreacion);return t&&(now-t.getTime())<=30*864e5;}).length;
+  const inact=d.filter(x=>{const t=_tsToDate(x.ultimaActividad||x.fechaCreacion);return t&&(now-t.getTime())>90*864e5;}).length;
+  const cli=d.filter(x=>x.clienteColliers==='Sí').length;
+  const norm=x=>{const n=_normBU(x);return n==='oficina'?'Oficinas':n==='industria'?'Industria':n==='retail'?'Retail':x;};
+  const charts=_ancCard('Top Rubros',_ancBars([..._ancCountBy(d,x=>_docRubros(x))],{max:8}))
+    +_ancCard('Por Categoría',_ancBars([..._ancCountBy(d,x=>x.categoria||'Sin categoría')],{order:['Top','A','B','C','No aplica','Sin categoría']}))
+    +_ancCard('Por Unidad de Negocio',_ancBars([..._ancCountBy(d,x=>(Array.isArray(x.bu)?x.bu:(x.bu?[x.bu]:[])).map(norm))]))
+    +_ancCard('Top Ejecutivos',_ancBars([..._ancCountBy(d,x=>_docGestion(x))].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
+    +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Cuentas creadas por mes (12m)</div>${_ancMonthlyVbars(d,'fechaCreacion')}</div>`;
+  return an2ModuleShell('💼 Cuentas','Rubros, categorías, ejecutivos y evolución',{ejec:true},[['Cuentas activas',total],['Nuevas (30d)',nuevas],['Inactivas (+90d)',inact],['Clientes Colliers',cli],['Prospectos',total-cli]],charts);
+}
+function an2ModContactos(){
+  let d=(_ctoDocs||[]);if(_an2Flt.period!=='all')d=d.filter(x=>an2InPeriod(x.fechaCreacion));
+  if(_an2Flt.ejecutivo)d=d.filter(x=>_ctoEjecutivo(x)===_an2Flt.ejecutivo);
+  const now=Date.now();const total=d.length;
+  const nuevos=d.filter(x=>{const t=_tsToDate(x.fechaCreacion);return t&&(now-t.getTime())<=30*864e5;}).length;
+  const inv=d.filter(x=>x.inversor==='Sí').length;
+  const emp=new Set(d.filter(x=>x.cuentaId).map(x=>x.cuentaId)).size;
+  const emailOk=d.filter(x=>(x.estadoCorreo||'sin_comprobar')==='funcional').length;
+  const charts=_ancCard('Distribución por Cargo',_ancBars([..._ancCountBy(d,x=>x.cargo||'Sin cargo')],{max:10}))
+    +_ancCard('Estado de emails',_ancBars([..._ancCountBy(d,x=>_ESTADO_CORREO_LBL[x.estadoCorreo||'sin_comprobar']||'Sin comprobar')]))
+    +_ancCard('Por Ejecutivo',_ancBars([..._ancCountBy(d,x=>_ctoEjecutivo(x))].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
+    +_ancCard('Inversores',_ancBars([['Inversores',inv],['No inversores',total-inv]]))
+    +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Contactos creados por mes (12m)</div>${_ancMonthlyVbars(d,'fechaCreacion')}</div>`;
+  return an2ModuleShell('👥 Contactos','Cargos, inversores y estado de emails',{ejec:true},[['Contactos',total],['Nuevos (30d)',nuevos],['Inversores',inv],['Empresas con contactos',emp],['Emails válidos',emailOk]],charts);
+}
+function an2ModOpp(){
+  let d=(_oppDocs||[]);if(_an2Flt.period!=='all')d=d.filter(x=>an2InPeriod(x.fechaCreacion));
+  if(_an2Flt.ejecutivo)d=d.filter(x=>x.ejecutivo===_an2Flt.ejecutivo);
+  const abiertas=d.filter(o=>!['Ganada','Perdida'].includes(o.estado)).length;
+  const ganadas=d.filter(o=>o.estado==='Ganada').length,perdidas=d.filter(o=>o.estado==='Perdida').length;
+  const now=Date.now();const estanc=d.filter(o=>!['Ganada','Perdida'].includes(o.estado)&&(()=>{const t=_tsToDate(o.ultimaActividad||o.fechaCreacion);return t&&(now-t.getTime())>30*864e5;})()).length;
+  const open=d.filter(o=>!['Ganada','Perdida'].includes(o.estado));
+  const charts=_ancCard('Por Probabilidad',_ancBars([['0–50 %',open.filter(o=>o.conversion==='0-50').length],['50–80 %',open.filter(o=>o.conversion==='50-80').length],['80–100 %',open.filter(o=>o.conversion==='80-100').length]],{order:['0–50 %','50–80 %','80–100 %']}))
+    +_ancCard('Por Estado',_ancBars([..._ancCountBy(d,o=>o.estado||'—')],{order:OPP_ESTADOS}))
+    +_ancCard('Actividades comerciales',_ancBars([..._ancCountBy(d,o=>o.actividadComercial||'Sin actividad')],{max:8}))
+    +_ancCard('Por Ejecutivo',_ancBars([..._ancCountBy(d,o=>o.ejecutivo)].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
+    +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Oportunidades por mes (12m)</div>${_ancMonthlyVbars(d,'fechaCreacion')}</div>`;
+  return an2ModuleShell('📈 Oportunidades','Estado, probabilidad y conversión',{ejec:true},[['Abiertas',abiertas],['Ganadas',ganadas],['Perdidas',perdidas],['Estancadas',estanc]],charts);
+}
+function an2ModVisitas(){
+  let d=(_an2Visitas||[]);if(_an2Flt.period!=='all')d=d.filter(x=>an2InPeriod(x.fecha));
+  if(_an2Flt.ejecutivo)d=d.filter(x=>x.ejecutivo===_an2Flt.ejecutivo);
+  const total=d.length;const cuentas=new Set(d.map(x=>x.cuentaId).filter(Boolean));
+  const inm=new Set(d.map(x=>x.buildingId).filter(Boolean)).size;
+  const cuentasConOpp=new Set((_oppDocs||[]).map(o=>o.cuentaId).filter(Boolean));
+  const conv=cuentas.size?Math.round([...cuentas].filter(c=>cuentasConOpp.has(c)).length/cuentas.size*100):0;
+  const charts=_ancCard('Ranking de inmuebles',_ancBars([..._ancCountBy(d,x=>x.buildingName||'Sin inmueble')],{max:10}))
+    +_ancCard('Ranking de cuentas',_ancBars([..._ancCountBy(d,x=>x.cuentaNombre||'Sin cuenta')],{max:10}))
+    +_ancCard('Por Ejecutivo',_ancBars([..._ancCountBy(d,x=>x.ejecutivo)].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
+    +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Visitas por mes (12m)</div>${_ancMonthlyVbars(d,'fecha')}</div>`;
+  return an2ModuleShell('📍 Visitas','Inmuebles, cuentas y ejecutivos',{ejec:true},[['Visitas',total],['Clientes visitados',cuentas.size],['Inmuebles visitados',inm],['Conv. visita → oportunidad',conv+' %']],charts);
+}
+function an2ModTx(){
+  let d=(_txDocs||[]);if(_an2Flt.period!=='all')d=d.filter(x=>an2InPeriod(x.fecha));
+  if(_an2Flt.ejecutivo)d=d.filter(x=>x.broker===_an2Flt.ejecutivo);
+  const ops=d.length;const m2=d.reduce((s,x)=>s+(parseFloat(x.superficie)||0),0);
+  const hon=d.reduce((s,x)=>s+(parseFloat(x.honorarios)||0),0);
+  const tickets=d.map(x=>parseFloat(x.precioTotal)||0).filter(v=>v>0);
+  const ticket=tickets.length?Math.round(tickets.reduce((s,v)=>s+v,0)/tickets.length):0;
+  const charts=_ancCard('Operaciones por zona',_ancBars([..._ancCountBy(d,x=>x.corredor||x.zona||'Sin zona')],{max:10}))
+    +_ancCard('Por tipología',_ancBars([..._ancCountBy(d,x=>x.tipo||'Sin tipo')]))
+    +_ancCard('Por Broker',_ancBars([..._ancCountBy(d,x=>x.broker)].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
+    +_ancCard('Por Estado',_ancBars([..._ancCountBy(d,x=>x.estado||'—')]))
+    +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Operaciones por mes (12m)</div>${_ancMonthlyVbars(d,'fecha')}</div>`;
+  return an2ModuleShell('🔁 Transacciones','Operaciones, m², honorarios y zonas',{ejec:true},[['Operaciones',ops],['m² comercializados',an2N(m2)],['Honorarios',hon?an2N(hon):'—'],['Ticket promedio',ticket?an2N(ticket):'—']],charts);
+}
+function an2ModInmuebles(){
+  const sub=_an2Flt.sub||'oficina';
+  const tabs=[['oficina','Oficinas'],['retail','Retail'],['industria','Industria y Logística']];
+  const tabsHTML=`<div class="an2-fbar">${tabs.map(([k,l])=>`<span class="an2-chip${sub===k?' active':''}" onclick="an2SetFlt('sub','${k}')">${l}</span>`).join('')}</div>`;
+  let d=(_bldDocs||[]).filter(b=>_an2BldTipo(b)===sub);
+  const total=d.length;
+  const disp=d.filter(b=>(b.estado||'Disponible')==='Disponible'||b.disponible===true).length;
+  const conFoto=d.filter(b=>{try{return !!getBldFoto(b);}catch(e){return !!b.foto;}}).length;
+  const sinFoto=total-conFoto;
+  const charts=_ancCard('Por Corredor / Zona',_ancBars([..._ancCountBy(d,b=>b.corredor||b.zona||b.submercado||'Sin zona')],{max:10}))
+    +_ancCard('Por Estado',_ancBars([..._ancCountBy(d,b=>b.estado||(b.disponible===false?'Ocupado':'Disponible'))]))
+    +_ancCard('Fotografías',_ancBars([['Con fotos',conFoto],['Sin fotos',sinFoto]]))
+    +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Altas por mes (12m)</div>${_ancMonthlyVbars(d.map(b=>({...b,_f:b.createdAt||b.fechaCreacion})),'_f')}</div>`;
+  const label={oficina:'Oficinas',retail:'Retail',industria:'Industria y Logística'}[sub];
+  return an2ModuleShell('🏢 Inmuebles · '+label,'Inventario de '+label,{},[['Inmuebles',total],['Disponibles',disp],['Con fotos',conFoto],['Sin fotos',sinFoto]],charts,tabsHTML);
 }
 
 </script>
