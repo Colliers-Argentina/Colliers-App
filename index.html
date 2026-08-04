@@ -2858,16 +2858,21 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <div class="crm-topbar-r">
           <input id="lead-search" type="text" placeholder="🔍 Buscar lead..." class="crm-search-inp" oninput="filterLeads()">
-          <select id="lead-filter-estado" class="crm-sel" onchange="filterLeads()">
-            <option value="">Todos los estados</option>
-            <option>Pendiente</option><option>Próspero</option><option>No Próspero</option>
-            <option>Inactivo</option><option>Convertido</option>
-          </select>
+          <select id="lead-filter-ejecutivo" class="crm-sel" onchange="filterLeads()"><option value="">Todos los ejecutivos</option></select>
           <select id="lead-filter-origen" class="crm-sel" onchange="filterLeads()">
             <option value="">Todos los orígenes</option>
             <option>Zonaprop</option><option>Argenprop</option><option>Mercado Libre</option><option>Referido</option>
             <option>LinkedIn</option><option>Web</option><option>Llamado</option>
             <option>Email</option><option>Otro</option>
+          </select>
+          <select id="lead-filter-estado" class="crm-sel" onchange="filterLeads()">
+            <option value="">Todos los estados</option>
+            <option>Pendiente</option><option>Próspero</option><option>No Próspero</option>
+            <option>Inactivo</option>
+          </select>
+          <select id="lead-sort" class="crm-sel" onchange="filterLeads()">
+            <option value="reciente">Más reciente</option>
+            <option value="antiguo">Más antiguo</option>
           </select>
           <button class="crm-new-btn" onclick="openLeadDrawer()">+ Nuevo lead</button>
         </div>
@@ -3072,7 +3077,14 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
       </div>
       <div class="cdr-section">
-        <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Origen e Inmueble</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Requerimiento</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Requerimiento inicial del cliente</div>
+          <textarea id="ldr-requerimiento" class="cdr-input" rows="3" placeholder="¿Qué está buscando el cliente? Superficie, zona, presupuesto, plazos..." style="resize:vertical;min-height:64px;line-height:1.5"></textarea>
+        </div>
+      </div>
+      <div class="cdr-section">
+        <div class="cdr-section-hd"><div class="cdr-section-num">3</div><div class="cdr-section-name">Origen e Inmueble</div><div class="cdr-section-line"></div></div>
         <div class="cdr-row">
           <div class="cdr-field">
             <div class="cdr-lbl">Origen <span class="cdr-req">*</span></div>
@@ -3083,7 +3095,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
               <option>Email</option><option>Otro</option>
             </select>
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Ejecutivo Comercial asignado <span class="cdr-req">*</span></div><select id="ldr-broker" class="cdr-select"><option value="">— Seleccionar —</option><option value="Bartra">Bartra Alejandro</option><option value="Farola">Farola Juan Manuel</option><option value="Giancontieri">Giancontieri Juan</option><option value="Matienzo">Matienzo Nicolas</option><option value="Troncoso">Troncoso Juan Manuel</option><option value="Zuliani">Zuliani Marcelo</option></select></div>
+          <div class="cdr-field" id="ldr-ejec-field"><div class="cdr-lbl">Ejecutivo(s) Comercial(es) asignado(s) <span class="cdr-req">*</span> <span style="font-weight:400;color:#8898C0;font-size:11px">(hasta 3)</span></div><div id="ldr-ejec-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="ldr-ejec-q" class="cdr-input" type="text" placeholder="Buscar ejecutivo..." autocomplete="off" oninput="ldrEjecSearch(this.value)" onfocus="ldrEjecSearch(this.value)" onblur="ldrEjecBlur()"><div id="ldr-ejec-drop" class="cdr-ms-drop" style="display:none"></div></div><input id="ldr-broker" type="hidden"></div>
         </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Inmueble consultado</div>
@@ -3099,7 +3111,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
       </div>
       <div class="cdr-section">
-        <div class="cdr-section-hd"><div class="cdr-section-num">3</div><div class="cdr-section-name">Comentarios</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-section-hd"><div class="cdr-section-num">4</div><div class="cdr-section-name">Comentarios</div><div class="cdr-section-line"></div></div>
         <div class="cdr-field">
           <textarea id="ldr-comentarios" class="cdr-input" rows="3" placeholder="Observaciones, superficie buscada, urgencia..." style="resize:vertical;min-height:72px;line-height:1.5"></textarea>
         </div>
@@ -8073,7 +8085,28 @@ function _leadDiasPendiente(d){const base=_tsToDate(d.resultadoDesde)||_tsToDate
 
 function leadEstadoBadge(e){const cls=LEAD_ESTADO_CLS[e]||'nuevo';return`<span class="lead-estado ${cls}">${e||'Nuevo'}</span>`;}
 function leadOrigenBadge(o){return o?`<span class="lead-origen">${o}</span>`:'–';}
+// Ejecutivos del lead: soporta múltiples (ejecutivos[]) con compat al legacy brokerAsignado.
+function _leadEjecs(d){if(Array.isArray(d.ejecutivos)&&d.ejecutivos.length)return d.ejecutivos.filter(Boolean);return d.brokerAsignado?[d.brokerAsignado]:[];}
+// Clave de ejecutivo del usuario logueado (para visibilidad): email → BROKERS → EJECUTIVOS_CATALOG.
+function _leadCurrentEjec(){
+  const email=(user?.email||'').toLowerCase();if(!email)return '';
+  const b=BROKERS.find(x=>(x.email||'').toLowerCase()===email);
+  if(!b)return '';const cat=EJECUTIVOS_CATALOG.find(e=>e.display===b.displayName);return cat?cat.key:'';
+}
+// Vencimiento del lead: 30 días desde resultadoDesde (o fechaCreacion). Countdown con semáforo.
+function _leadVenc(d){const base=_tsToDate(d.resultadoDesde)||_tsToDate(d.fechaCreacion);if(!base)return null;return new Date(base.getTime()+30*864e5);}
+function _leadDiasRestantes(d){const v=_leadVenc(d);if(!v)return null;return Math.ceil((v.getTime()-Date.now())/864e5);}
+function _leadCountdownColor(n){return n<=10?'#DC2626':(n<=20?'#EAB308':'#16A34A');} // 1–10 rojo · 11–20 amarillo · 21–30 verde
+function _leadCountdownBadge(d){const n=_leadDiasRestantes(d);if(n==null)return '<span style="color:#8898C0">–</span>';const c=_leadCountdownColor(n);const txt=n<=0?'Vencido':(n+' día'+(n!==1?'s':''));return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:5px;vertical-align:middle"></span>${txt}</span>`;}
 
+// Selección múltiple de Ejecutivos Comerciales para el drawer de Lead (prefijo 'ldr', hasta 3).
+let _ldrEjec=[],_ldrEjecOpts=[];
+function _ldrRenderEjecChips(){const c=document.getElementById('ldr-ejec-chips');if(!c)return;c.innerHTML=_ldrEjec.map((k,i)=>`<span class="cdr-ms-chip">${esc(ejecDisplay(k))}<span class="cdr-ms-chip-x" onclick="ldrEjecRemoveIdx(${i})" title="Quitar">✕</span></span>`).join('');}
+window.ldrEjecSearch=function(q){const drop=document.getElementById('ldr-ejec-drop');if(!drop)return;q=(q||'').toLowerCase().trim();if(_ldrEjec.length>=3){drop.innerHTML='<div class="cdr-ms-empty">Máximo 3 ejecutivos.</div>';drop.style.display='block';return;}_ldrEjecOpts=CRM_EJECUTIVOS.filter(k=>!_ldrEjec.includes(k)&&(k.toLowerCase().includes(q)||ejecDisplay(k).toLowerCase().includes(q))).sort((a,b)=>ejecDisplay(a).localeCompare(ejecDisplay(b),'es',{sensitivity:'base'}));drop.innerHTML=_ldrEjecOpts.length?_ldrEjecOpts.map((k,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ldrEjecAddIdx(${i})">${esc(ejecDisplay(k))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.ldrEjecAddIdx=function(i){const k=_ldrEjecOpts[i];if(k==null||_ldrEjec.length>=3)return;if(!_ldrEjec.includes(k))_ldrEjec.push(k);const q=document.getElementById('ldr-ejec-q');if(q)q.value='';const dp=document.getElementById('ldr-ejec-drop');if(dp)dp.style.display='none';_ldrRenderEjecChips();};
+window.ldrEjecRemoveIdx=function(i){if(i<0||i>=_ldrEjec.length)return;_ldrEjec.splice(i,1);_ldrRenderEjecChips();};
+window.ldrEjecBlur=function(){setTimeout(()=>{const d=document.getElementById('ldr-ejec-drop');if(d)d.style.display='none';},150);};
+function _ldrSetEjec(keys){_ldrEjec=(keys||[]).filter(Boolean).slice(0,3);const q=document.getElementById('ldr-ejec-q');if(q)q.value='';const d=document.getElementById('ldr-ejec-drop');if(d)d.style.display='none';_ldrRenderEjecChips();}
 async function loadLeads(){
   if(!db){document.getElementById('lead-table-wrap').innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
   document.getElementById('lead-table-wrap').innerHTML='<div class="crm-empty">Cargando...</div>';
@@ -8090,30 +8123,47 @@ async function loadLeads(){
 }
 
 function filterLeads(){
+  // Poblar filtro de ejecutivos una vez.
+  const esel=document.getElementById('lead-filter-ejecutivo');
+  if(esel&&esel.options.length<=1)esel.innerHTML='<option value="">Todos los ejecutivos</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
   const q=(document.getElementById('lead-search')?.value||'').toLowerCase();
   const estado=document.getElementById('lead-filter-estado')?.value||'';
   const origen=document.getElementById('lead-filter-origen')?.value||'';
+  const fEjec=document.getElementById('lead-filter-ejecutivo')?.value||'';
+  const sort=document.getElementById('lead-sort')?.value||'reciente';
+  // Visibilidad: el Ejecutivo Comercial sólo ve sus leads asignados.
+  const restrict=_nexusRole()==='ejecutivo';
+  const myKey=restrict?_leadCurrentEjec():'';
+  const verConvertidos=_leadWidget==='convertidos';
   const filtered=_leadDocs.filter(d=>{
     if((d.estadoRegistro||'activo')==='archivado')return false;
+    if(restrict&&!_leadEjecs(d).includes(myKey))return false;
+    // Los convertidos no aparecen en la lista principal (solo en la vista "Convertidos").
+    if(verConvertidos){if(d.estado!=='Convertido')return false;}
+    else if(d.estado==='Convertido')return false;
     const full=((d.nombre||'')+' '+(d.apellido||'')+' '+(d.empresa||'')+' '+(d.email||'')).toLowerCase();
     if(q&&!full.includes(q))return false;
     if(estado&&_leadEstadoText(d)!==estado)return false;
     if(origen&&d.origen!==origen)return false;
+    if(fEjec&&!_leadEjecs(d).includes(fEjec))return false;
     if(_leadWidget==='pendientes'&&_leadEstadoText(d)!=='Pendiente')return false;
-    if(_leadWidget==='convertidos'&&d.estado!=='Convertido')return false;
     if(_leadWidget==='inactivos'&&_leadEstadoText(d)!=='Inactivo')return false;
     return true;
   });
+  filtered.sort((a,b)=>{const ta=_tsToDate(a.fechaCreacion)?.getTime()||0,tb=_tsToDate(b.fechaCreacion)?.getTime()||0;return sort==='antiguo'?ta-tb:tb-ta;});
   renderLeadsTable(filtered);
 }
 let _leadWidget='';
 window.leadToggleWidget=function(key){_leadWidget=_leadWidget===key?'':key;filterLeads();};
 function renderLeadsKPIs(docs){
   const row=document.getElementById('lead-kpi-row');if(!row)return;
-  const total=docs.length;
-  const pendientes=docs.filter(d=>_leadEstadoText(d)==='Pendiente').length;
-  const convertidos=docs.filter(d=>d.estado==='Convertido').length;
-  const inactivos=docs.filter(d=>_leadEstadoText(d)==='Inactivo').length;
+  const restrict=_nexusRole()==='ejecutivo';const myKey=restrict?_leadCurrentEjec():'';
+  const base=docs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(!restrict||_leadEjecs(d).includes(myKey)));
+  const activos=base.filter(d=>d.estado!=='Convertido');
+  const total=activos.length;
+  const pendientes=activos.filter(d=>_leadEstadoText(d)==='Pendiente').length;
+  const convertidos=base.filter(d=>d.estado==='Convertido').length;
+  const inactivos=activos.filter(d=>_leadEstadoText(d)==='Inactivo').length;
   const k=(key,icon,bg,val,lbl,col)=>`<div class="crm-kpi" style="cursor:pointer;${_leadWidget===key&&key?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="leadToggleWidget('${key}')"><div class="crm-kpi-icon" style="background:${bg}">${icon}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;
   row.innerHTML=k('','🎯','#EEF3FF',total,'Total leads','#1C54F4')
     +k('pendientes','⏳','#FEF6E7',pendientes,'Pendientes por gestionar','#B45309')
@@ -8126,19 +8176,21 @@ function renderLeadsTable(docs){
   const wrap=document.getElementById('lead-table-wrap');
   if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin leads registrados.</div>';return;}
   let h='<table class="crm-table"><thead><tr>';
-  ['Lead','Empresa','Origen','Estado','Inmueble','Ejecutivo Comercial','Fecha',''].forEach(c=>h+=`<th>${c}</th>`);
+  ['Nombre','Empresa','Estado','Tipo de consulta / Inmueble','Fecha de vencimiento','Countdown',''].forEach(c=>h+=`<th>${c}</th>`);
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
     const bg=crmAvatarBg(fullname);const ini=crmInitials(fullname);
+    const tipoTxt=d.tipoInmueble==='Otros'&&d.tipoConsultaOtro?('Otros — '+d.tipoConsultaOtro):(d.tipoInmueble||'–');
+    const tipoCell=tipoTxt+(d.buildingName?`<div class="crm-client-sub">${esc(d.buildingName)}</div>`:'');
+    const venc=_leadVenc(d);
     h+=`<tr onclick="openLeadDetail('${d._id}')">
       <td><div class="crm-client-cell"><div class="crm-avatar" style="background:${bg}">${ini}</div><div><div class="crm-client-name">${fullname}</div><div class="crm-client-sub">${d.email||''}</div></div></div></td>
-      <td><div class="crm-broker-cell">${d.empresa||'–'}</div></td>
-      <td>${leadOrigenBadge(d.origen)}</td>
+      <td><div class="crm-broker-cell">${d.cuentaNombre||d.empresa||'–'}</div></td>
       <td>${_leadEstadoDisplay(d)}</td>
-      <td><div class="crm-broker-cell">${d.buildingName||'–'}</div></td>
-      <td><div class="crm-broker-cell">${esc(ejecDisplay(d.brokerAsignado))||'–'}</div></td>
-      <td class="crm-date">${fmtDate(d.fechaCreacion)}</td>
+      <td><div class="crm-broker-cell">${tipoCell}</div></td>
+      <td class="crm-date">${venc?fmtDate(firebase.firestore.Timestamp.fromDate(venc)):'–'}</td>
+      <td>${d.estado==='Convertido'?'<span style="color:#16A34A;font-weight:700;font-size:11px">Convertido</span>':_leadCountdownBadge(d)}</td>
       <td><button class="crm-action-btn" onclick="event.stopPropagation();openLeadDetail('${d._id}')">Ver ficha →</button></td>
     </tr>`;
   });
@@ -8153,7 +8205,8 @@ function renderLeadInfoCards(d){
   const row=(lbl,val)=>`<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-v">${val||dash}</div></div>`;
   const t=v=>v?esc(v):null;
   const link=d.linkOrigen?`<a href="${esc(d.linkOrigen)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600;word-break:break-all">${esc(d.linkOrigen)}</a>`:null;
-  return `
+  const reqCard=d.requerimiento?`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Requerimiento</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(d.requerimiento)}</div></div>`:'';
+  return reqCard+`
     <div class="nx-grid">
       <div class="nx-col">
         <div class="nx-card">
@@ -8168,20 +8221,17 @@ function renderLeadInfoCards(d){
       </div>
       <div class="nx-col">
         ${(()=>{
-          // Empresa: Cuenta asociada si existe; si no, "Sin cuenta asociada".
-          const empresaVal=d.cuentaNombre
-            ?`<a href="javascript:void(0)" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`
-            :'<span style="color:#8898C0">Sin cuenta asociada</span>';
           // Inmueble: solo para consultas de inmuebles; oculto para SPS/Valuaciones/Otros.
           const TIPOS_CON_INMUEBLE=['Oficina','Retail','Industria','Depósito','Terreno'];
           const mostrarInmueble=TIPOS_CON_INMUEBLE.includes(d.tipoInmueble||'');
           const tipoVal=d.tipoInmueble==='Otros'&&d.tipoConsultaOtro?`Otros — ${d.tipoConsultaOtro}`:d.tipoInmueble;
+          const ejecs=_leadEjecs(d);
+          const ejecVal=ejecs.length?ejecs.map(k=>`<span class="crm-tag">${esc(ejecDisplay(k))}</span>`).join(''):null;
           return `<div class="nx-card">
             <div class="nx-card-title">Información Comercial</div>
-            ${row('Empresa',empresaVal)}
             ${row('Tipo de consulta',t(tipoVal))}
             ${mostrarInmueble?row('Inmueble',t(d.buildingName)):''}
-            ${row('Ejecutivo Comercial asignado',d.brokerAsignado?esc(ejecDisplay(d.brokerAsignado)):null)}
+            ${row('Ejecutivo(s) Comercial(es) asignado(s)',ejecVal)}
             <div class="nx-row"><div class="nx-row-l">Origen</div><div class="nx-row-v">${d.origen?leadOrigenBadge(d.origen):dash}</div></div>
             ${row('Link de origen',link)}
           </div>`;
@@ -8288,18 +8338,27 @@ function openLeadDetail(docId){
   const convertBtn=document.getElementById('lead-convert-btn');
   // "Convertir a Contacto" solo cuando el Resultado es Próspero y aún no fue convertido.
   if(convertBtn)convertBtn.style.display=(d.resultado==='Próspero'&&d.estado!=='Convertido')?'inline-block':'none';
+  // Permisos: el perfil Ejecutivo Comercial sólo puede Estado, Comentarios y Convertir.
+  const admin=_canEditFicha();
   const editBtn=document.getElementById('lead-edit-btn');
-  if(editBtn){editBtn.onclick=()=>leadFichaEdit(docId);}
+  if(editBtn){editBtn.onclick=()=>openLeadDrawer_edit(docId);editBtn.style.display=admin?'':'none';}
   const archiveBtn=document.getElementById('lead-archive-btn');
-  if(archiveBtn){archiveBtn.onclick=()=>archiveLead(docId);}
-  // Panel izquierdo: Estado (Resultado; Inactivo si corresponde), Clasificación y fechas.
+  if(archiveBtn){archiveBtn.onclick=()=>archiveLead(docId);archiveBtn.style.display=admin?'':'none';}
+  const venc=_leadVenc(d);
+  // Panel izquierdo: Estado, Empresa, Clasificación, vencimiento + countdown y fechas.
+  const empresaVal=d.cuentaNombre
+    ?`<a href="javascript:void(0)" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`
+    :(d.empresa?esc(d.empresa):'<span style="color:#8898C0">Sin cuenta asociada</span>');
   document.getElementById('lead-det-left').innerHTML=`
     <div class="crm-det-av-wrap">
       <div class="crm-det-av" style="background:${bg}">${ini}</div>
       <div class="crm-det-av-name">${fullname}</div>
     </div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><span id="lead-estado-badge">${_leadEstadoDisplay(d)}</span></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${empresaVal}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Clasificación</div>${leadClasifBadge(d.clasificacion)}</div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de vencimiento</div><div class="crm-det-meta-val">${venc?fmtDate(firebase.firestore.Timestamp.fromDate(venc)):'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Días restantes</div><div style="margin-top:.3rem">${d.estado==='Convertido'?'<span style="color:#16A34A;font-weight:700">Convertido</span>':_leadCountdownBadge(d)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
   `;
@@ -8316,6 +8375,7 @@ function openLeadDetail(docId){
           <select class="crm-estado-sel" onchange="updateLeadResultado('${docId}',this.value)">${LEAD_RESULTADOS.map(r=>`<option${(d.resultado||'Pendiente')===r?' selected':''}>${r}</option>`).join('')}</select>
         </div>
         ${renderLeadInfoCards(d)}
+        ${!admin?`<div class="nx-card" style="margin-top:.9rem"><div class="nx-card-title">Comentarios</div><textarea id="lead-com-edit" class="cdr-input" style="min-height:64px;resize:vertical;line-height:1.5">${esc(d.comentarios||'')}</textarea><div style="text-align:right;margin-top:.5rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="updateLeadComentarios('${docId}')">Guardar comentario</button></div></div>`:''}
       </div>
       <div id="ldt-timeline" style="display:none">
         <div id="lead-timeline-body"><div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Cargando...</div></div></div>
@@ -8447,6 +8507,18 @@ async function updateLeadResultado(docId,valor){
     if(typeof filterLeads==='function')filterLeads();
   }catch(e){alert('Error: '+e.message);}
 }
+// Ejecutivo Comercial: puede agregar/editar el comentario del lead.
+window.updateLeadComentarios=async function(docId){
+  const ta=document.getElementById('lead-com-edit');if(!ta)return;
+  const txt=(ta.value||'').trim();
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    await db.collection('leads').doc(docId).update({comentarios:txt,ultimaActividad:now});
+    const idx=_leadDocs.findIndex(d=>d._id===docId);if(idx>=0){_leadDocs[idx].comentarios=txt;_leadDocs[idx].ultimaActividad=now;}
+    await addLeadTimeline(docId,{tipo:'comentario',descripcion:'Comentario actualizado'});
+    showBldToast&&showBldToast('Comentario guardado');
+  }catch(e){alert('Error: '+e.message);}
+};
 
 async function updateLeadMotivo(docId,motivo){
   try{await db.collection('leads').doc(docId).update({motivoDescarte:motivo});}catch(e){console.error(e);}
@@ -8535,8 +8607,9 @@ window.ldrTipoConsultaChange=function(){
 // LEAD DRAWER
 window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBroker){
   _ldrEditId=null;
-  ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-cargo','ldr-bld-q','ldr-comentarios','ldr-link-origen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ldr-nombre','ldr-apellido','ldr-email','ldr-telefono','ldr-empresa','ldr-puesto','ldr-cargo','ldr-bld-q','ldr-comentarios','ldr-link-origen','ldr-requerimiento'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ldrCargoChange();
+  _ldrSetEjec([]);
   ['ldr-tipoInmueble','ldr-origen','ldr-broker','ldr-clasificacion','ldr-tipoConsultaOtro'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ldrTipoConsultaChange();
   document.getElementById('ldr-buildingId').value='';
@@ -8550,14 +8623,13 @@ window.openLeadDrawer=function(prefillBuildingId,prefillBuildingName,prefillBrok
     document.getElementById('ldr-buildingName').value=prefillBuildingName||'';
     document.getElementById('ldr-bld-q').value=prefillBuildingName||'';
   }
-  const brokerSel=document.getElementById('ldr-broker');
   if(prefillBroker){
-    brokerSel.value=prefillBroker;
+    _ldrSetEjec([prefillBroker]);
   } else if(prefillBuildingId){
     const bld=(_bldDocs.length?_bldDocs:masterBuildings).find(d=>(d._id||d.id)===prefillBuildingId);
     const bBroker=bld?.brokerAsignado||'';
     const validBrokers=['Matienzo','Bartra','Farola','Troncoso','Giancontieri','Zuliani'];
-    if(validBrokers.includes(bBroker))brokerSel.value=bBroker;
+    if(validBrokers.includes(bBroker))_ldrSetEjec([bBroker]);
   }
   document.querySelector('#ldr-drawer .cdr-title').textContent='Nuevo Lead';
   const btn=document.getElementById('ldr-save-btn');btn.textContent='Crear lead';btn.disabled=false;
@@ -8577,8 +8649,8 @@ window.openLeadDrawer_edit=function(docId){
   set('ldr-cargo',d.cargo);ldrCargoChange();
   if(d.cuentaId)_ctaPickerSet('ldr',d.cuentaId,d.cuentaNombre||d.empresa||'');
   set('ldr-tipoInmueble',d.tipoInmueble);set('ldr-tipoConsultaOtro',d.tipoConsultaOtro);ldrTipoConsultaChange();
-  set('ldr-origen',d.origen);set('ldr-broker',d.brokerAsignado);
-  set('ldr-clasificacion',d.clasificacion);
+  set('ldr-origen',d.origen);_ldrSetEjec(_leadEjecs(d));
+  set('ldr-clasificacion',d.clasificacion);set('ldr-requerimiento',d.requerimiento);
   set('ldr-comentarios',d.comentarios);set('ldr-link-origen',d.linkOrigen);
   if(d.buildingId){document.getElementById('ldr-buildingId').value=d.buildingId;document.getElementById('ldr-buildingName').value=d.buildingName||'';document.getElementById('ldr-bld-q').value=d.buildingName||'';}
   document.querySelector('#ldr-drawer .cdr-title').textContent='Editar Lead';
@@ -9056,16 +9128,18 @@ window.saveLeadDrawer=async function(){
   const email=(document.getElementById('ldr-email').value||'').trim();
   const telefono=(document.getElementById('ldr-telefono').value||'').trim();
   const origen=document.getElementById('ldr-origen').value||'';
-  const brokerAsignado=document.getElementById('ldr-broker').value||'';
+  const ejecutivos=_ldrEjec.slice();
+  const brokerAsignado=ejecutivos[0]||'';
   const linkOrigen=(document.getElementById('ldr-link-origen').value||'').trim();
   const clasificacion=document.getElementById('ldr-clasificacion')?.value||'';
   let ok=true;
-  // Obligatorios: Nombre, Apellido, Origen, Ejecutivo y Clasificación.
+  // Obligatorios: Nombre, Apellido, Origen, Ejecutivo(s) y Clasificación.
   // Teléfono, Email y Link de origen son opcionales (se completan durante la gestión).
-  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-origen',v:origen},{id:'ldr-broker',v:brokerAsignado},{id:'ldr-clasificacion',v:clasificacion}].forEach(({id,v})=>{
+  [{id:'ldr-nombre',v:nombre},{id:'ldr-apellido',v:apellido},{id:'ldr-origen',v:origen},{id:'ldr-clasificacion',v:clasificacion}].forEach(({id,v})=>{
     const el=document.getElementById(id);if(!el)return;
     if(!v){el.style.borderColor='#ED1B34';ok=false;}else{el.style.borderColor='';}
   });
+  {const ef=document.getElementById('ldr-ejec-field');if(ef)ef.style.outline=ejecutivos.length?'':'1px solid #ED1B34';if(!ejecutivos.length)ok=false;}
   // Validación de formato SOLO si el campo opcional fue completado.
   const markFmt=(id,bad)=>{const el=document.getElementById(id);if(el)el.style.borderColor=bad?'#ED1B34':'';if(bad)ok=false;};
   markFmt('ldr-email',!!email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
@@ -9089,8 +9163,10 @@ window.saveLeadDrawer=async function(){
       buildingId:document.getElementById('ldr-buildingId').value||'',
       buildingName:document.getElementById('ldr-buildingName').value||'',
       brokerAsignado,
+      ejecutivos,
       linkOrigen,
       clasificacion,
+      requerimiento:(document.getElementById('ldr-requerimiento')?.value||'').trim(),
       comentarios:(document.getElementById('ldr-comentarios').value||'').trim(),
     };
     if(_ldrEditId){
@@ -9392,14 +9468,18 @@ async function _finishLeadConversion(cuentaId,cuentaNombre,opts){
   };
   if(opts.particular&&!cuentaId)contacto.esParticular=true;
   const contactRef=await db.collection('contactos').add(contacto);
-  await db.collection('leads').doc(_currentLeadId).update({estado:'Convertido',contactoId:contactRef.id,cuentaId:cuentaId||'',ultimaActividad:now});
+  const leadUpd={estado:'Convertido',contactoId:contactRef.id,cuentaId:cuentaId||'',ultimaActividad:now};
+  // Vincular la Cuenta (nueva o existente) al Lead: nombre + empresa para que se refleje en toda la UI.
+  if(cuentaId||cuentaNombre){leadUpd.cuentaNombre=cuentaNombre||'';leadUpd.empresa=cuentaNombre||lead.empresa||'';}
+  await db.collection('leads').doc(_currentLeadId).update(leadUpd);
   const destino=opts.particular?'Particular (sin cuenta)':(cuentaNombre?('en '+cuentaNombre):'sin cuenta');
   await addLeadTimeline(_currentLeadId,{tipo:'convertido',descripcion:`Convertido → Contacto (${destino})`});
   if(cuentaId&&typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'alta_contacto',descripcion:`Contacto desde conversión de Lead: ${((lead.nombre||'')+' '+(lead.apellido||'')).trim()}`});
   const idx=_leadDocs.findIndex(d=>d._id===_currentLeadId);
-  if(idx>=0){_leadDocs[idx].estado='Convertido';_leadDocs[idx].contactoId=contactRef.id;_leadDocs[idx].cuentaId=cuentaId||'';}
+  if(idx>=0)_leadDocs[idx]={..._leadDocs[idx],...leadUpd};
   _ctoDocs=[];_crmDocs=[];_clientesCache=[];
   closeConvertModal();
+  if(typeof filterLeads==='function')filterLeads();
   _gotoContacto(contactRef.id);
 }
 // Navega a la ficha del Contacto recién creado (cambia a la solapa Contactos y la abre).
@@ -9434,12 +9514,16 @@ async function _completeLeadConversionFromContact(contactId,cuentaId,cuentaNombr
   const now=firebase.firestore.Timestamp.now();
   try{
     if(!cuentaId)await db.collection('contactos').doc(contactId).update({esParticular:true}).catch(()=>{});
-    await db.collection('leads').doc(ctx.leadId).update({estado:'Convertido',contactoId:contactId,cuentaId:cuentaId||'',ultimaActividad:now});
+    const idx0=_leadDocs.findIndex(d=>d._id===ctx.leadId);const leadPrev=idx0>=0?_leadDocs[idx0]:{};
+    const leadUpd={estado:'Convertido',contactoId:contactId,cuentaId:cuentaId||'',ultimaActividad:now};
+    // Vincular la Cuenta recién creada/seleccionada al Lead (nombre + empresa) para reflejarlo en toda la UI.
+    if(cuentaId||cuentaNombre){leadUpd.cuentaNombre=cuentaNombre||'';leadUpd.empresa=cuentaNombre||leadPrev.empresa||'';}
+    await db.collection('leads').doc(ctx.leadId).update(leadUpd);
     const destino=cuentaNombre?('en '+cuentaNombre):'Particular (sin cuenta)';
     await addLeadTimeline(ctx.leadId,{tipo:'convertido',descripcion:`Convertido → Contacto (${destino})`});
     if(cuentaId&&typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'alta_contacto',descripcion:'Contacto desde conversión de Lead'});
-    const idx=_leadDocs.findIndex(d=>d._id===ctx.leadId);
-    if(idx>=0){_leadDocs[idx].estado='Convertido';_leadDocs[idx].contactoId=contactId;_leadDocs[idx].cuentaId=cuentaId||'';}
+    if(idx0>=0)_leadDocs[idx0]={..._leadDocs[idx0],...leadUpd};
+    if(typeof filterLeads==='function')filterLeads();
   }catch(e){console.warn('completeLeadConversion',e);}
   _gotoContacto(contactId);
 }

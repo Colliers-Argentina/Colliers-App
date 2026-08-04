@@ -71,7 +71,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "2.6", FECHA,
+    "Leads", "2.7", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
     "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
     "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
@@ -86,8 +86,10 @@ GUIAS["Guia_Leads"] = Guia(
         ("Puesto", "Aparece solo cuando en Cargo se elige \"Otro\": campo de texto para especificar el cargo (igual que en Contactos)."),
         ("Tipo de consulta", "Tipo de consulta realizada: Oficina, Industria, Depósito, Terreno, Retail, SPS, Valuaciones u Otros. Si se elige \"Otros\", aparece un campo para especificar la consulta."),
         ("Clasificación", "Obligatorio. Indicar la calidad del lead al ingresar: Estándar o Calificado. No tiene valor por defecto."),
+        ("Requerimiento", "Caja de texto libre (entre Datos del Lead y Origen) para registrar el requerimiento inicial del cliente: qué busca, superficie, zona, presupuesto, plazos. En la ficha, si tiene contenido, se muestra arriba de todo; si está vacío, no se muestra."),
         ("Origen", "Cómo llegó la consulta: Zonaprop, Argenprop, Mercado Libre, Referido, LinkedIn, Web, Llamado, Email u Otro."),
-        ("Ejecutivo Comercial asignado", "Ejecutivo que se hará cargo del seguimiento del lead."),
+        ("Ejecutivo(s) Comercial(es) asignado(s)", "Obligatorio. Se pueden asignar hasta 3 ejecutivos con el buscador predictivo (selección múltiple). Cada ejecutivo ve únicamente los leads que tiene asignados; los administradores ven toda la base."),
+        ("Fecha de vencimiento y Countdown", "Cada lead tiene una fecha de vencimiento (30 días) y un contador de días restantes con semáforo: rojo 1–10, amarillo 11–20, verde 21–30. Se muestra en la lista y en el panel del lead."),
         ("Inmueble de interés", "Buscar y seleccionar el edificio/inmueble por el que consulta (opcional)."),
         ("Link de origen", "Pegar el enlace del aviso o publicación de donde surgió la consulta (opcional). Si se completa, debe ser una URL válida."),
         ("Comentarios", "Observaciones: superficie buscada, urgencia, detalles de la consulta."),
@@ -97,7 +99,8 @@ GUIAS["Guia_Leads"] = Guia(
         "Se crea el Lead con Resultado Pendiente y Estado Activo, asignado al ejecutivo indicado.",
         "Si pasa 14 días en Pendiente sin resolución, el lead pasa automáticamente a Inactivo (con recordatorios previos en los días 10 y 13). No se elimina.",
         "Al actualizar el Resultado (u otra acción comercial), un lead Inactivo vuelve a Activo.",
-        "Con Resultado Próspero, 'Convertir a Contacto' abre el formulario completo de Contacto precargado con los datos del Lead; se completa lo que falte y recién al presionar 'Crear Contacto' se genera. Dentro del formulario se elige la cuenta: existente, nueva o vacío (Particular). Antes de crear, avisa si ya existe un contacto con el mismo nombre y apellido. El lead queda como registro histórico.",
+        "Con Resultado Próspero, 'Convertir a Contacto' abre el formulario completo de Contacto precargado con los datos del Lead; se completa lo que falte y recién al presionar 'Crear Contacto' se genera. Dentro del formulario se elige la cuenta: existente, nueva o vacío (Particular). Si se crea una cuenta nueva durante la conversión, queda vinculada al lead y su Empresa se actualiza en toda la interfaz. Antes de crear, avisa si ya existe un contacto con el mismo nombre y apellido. El lead queda como registro histórico y desaparece de la lista principal (accesible desde la vista 'Convertidos').",
+        "El perfil Ejecutivo Comercial sólo puede cambiar el Estado, agregar/editar Comentarios y Convertir a Contacto; el resto de los datos los edita un administrador.",
     ],
 )
 
