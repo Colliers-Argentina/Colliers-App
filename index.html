@@ -8091,9 +8091,12 @@ function leadClasifBadge(c){const s={'Calificado':'background:rgba(34,197,94,.12
 function leadResultadoBadge(r){r=r||'Pendiente';const s={'Próspero':'background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)','No Próspero':'background:rgba(239,51,64,.1);color:#EF3340;border:1px solid rgba(239,51,64,.3)','Pendiente':'background:rgba(245,158,11,.12);color:#B45309;border:1px solid rgba(245,158,11,.3)'}[r];return `<span class="estado-badge" style="${s}">${esc(r)}</span>`;}
 function leadActividadBadge(e){e=e||'Activo';const on=e==='Activo';return `<span class="estado-badge" style="${on?'background:rgba(28,84,244,.1);color:#1C54F4;border:1px solid rgba(28,84,244,.3)':'background:rgba(123,139,189,.12);color:#8898C0;border:1px solid rgba(123,139,189,.3)'}">${on?'🟢 Activo':'⚪ Inactivo'}</span>`;}
 // "Estado" unificado del Lead (texto): Convertido → Inactivo → Resultado (Pendiente inicial).
-function _leadEstadoText(d){return d.estado==='Convertido'?'Convertido':((d.estadoActividad||'Activo')==='Inactivo'?'Inactivo':(d.resultado||'Pendiente'));}
+// Marcador canónico de conversión: estado 'Convertido' O presencia de contactoId (compat con leads
+// convertidos antes de estandarizar el campo). El mismo predicado se usa en widget, historial, filtros y grilla.
+function _leadConvertido(d){return d.estado==='Convertido'||!!d.contactoId;}
+function _leadEstadoText(d){return _leadConvertido(d)?'Convertido':((d.estadoActividad||'Activo')==='Inactivo'?'Inactivo':(d.resultado||'Pendiente'));}
 function _leadEstadoDisplay(d){
-  if(d.estado==='Convertido')return `<span class="estado-badge" style="background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)">Convertido</span>`;
+  if(_leadConvertido(d))return `<span class="estado-badge" style="background:rgba(34,197,94,.12);color:#16A34A;border:1px solid rgba(34,197,94,.3)">Convertido</span>`;
   return (d.estadoActividad||'Activo')==='Inactivo'?leadActividadBadge('Inactivo'):leadResultadoBadge(d.resultado||'Pendiente');
 }
 // Días que un lead lleva con resultado Pendiente (base: resultadoDesde o fechaCreacion).
@@ -8131,6 +8134,7 @@ async function loadLeads(){
     _leadDocs=snap.docs.map(d=>({...d.data(),_id:d.id}));
     document.getElementById('lead-subtitle').textContent=`${_leadDocs.length} lead${_leadDocs.length!==1?'s':''} registrados`;
     filterLeads();
+    _leadNormalizarConvertidos();  // normaliza estado='Convertido' en leads con contactoId (histórico)
     _leadSweepInactividad();   // marca Inactivos y dispara recordatorios (día 10/13/14)
   }catch(e){
     document.getElementById('lead-table-wrap').innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;
@@ -8138,6 +8142,19 @@ async function loadLeads(){
   }
 }
 
+// Normaliza el campo estado de leads convertidos (tienen contactoId pero un estado legacy
+// distinto de 'Convertido'), para que widget, historial y filtros usen el mismo valor.
+async function _leadNormalizarConvertidos(){
+  if(!db||!Array.isArray(_leadDocs))return;
+  let cambios=false;
+  for(const d of _leadDocs){
+    if(d.contactoId&&d.estado!=='Convertido'){
+      d.estado='Convertido';cambios=true;
+      try{await db.collection('leads').doc(d._id).update({estado:'Convertido'});}catch(e){}
+    }
+  }
+  if(cambios&&_currentLeadId==null)filterLeads();
+}
 function filterLeads(){
   // Poblar filtro de ejecutivos una vez.
   const esel=document.getElementById('lead-filter-ejecutivo');
@@ -8155,8 +8172,8 @@ function filterLeads(){
     if((d.estadoRegistro||'activo')==='archivado')return false;
     if(restrict&&!_leadEjecs(d).includes(myKey))return false;
     // Los convertidos no aparecen en la lista principal (solo en la vista "Convertidos").
-    if(verConvertidos){if(d.estado!=='Convertido')return false;}
-    else if(d.estado==='Convertido')return false;
+    if(verConvertidos){if(!_leadConvertido(d))return false;}
+    else if(_leadConvertido(d))return false;
     const full=((d.nombre||'')+' '+(d.apellido||'')+' '+(d.empresa||'')+' '+(d.email||'')).toLowerCase();
     if(q&&!full.includes(q))return false;
     if(estado&&_leadEstadoText(d)!==estado)return false;
@@ -8176,10 +8193,10 @@ function renderLeadsKPIs(docs){
   const row=document.getElementById('lead-kpi-row');if(!row)return;
   const restrict=_nexusRole()==='ejecutivo';const myKey=restrict?_leadCurrentEjec():'';
   const base=docs.filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&(!restrict||_leadEjecs(d).includes(myKey)));
-  const activos=base.filter(d=>d.estado!=='Convertido');
+  const activos=base.filter(d=>!_leadConvertido(d));
   const total=activos.length;
   const pendientes=activos.filter(d=>_leadEstadoText(d)==='Pendiente').length;
-  const convertidos=base.filter(d=>d.estado==='Convertido').length;
+  const convertidos=base.filter(d=>_leadConvertido(d)).length;
   const inactivos=activos.filter(d=>_leadEstadoText(d)==='Inactivo').length;
   const k=(key,icon,bg,val,lbl,col)=>`<div class="crm-kpi" style="cursor:pointer;${_leadWidget===key&&key?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="leadToggleWidget('${key}')"><div class="crm-kpi-icon" style="background:${bg}">${icon}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;
   row.innerHTML=k('','🎯','#EEF3FF',total,'Total leads','#1C54F4')
@@ -8207,7 +8224,7 @@ function renderLeadsTable(docs){
       <td>${_leadEstadoDisplay(d)}</td>
       <td><div class="crm-broker-cell">${tipoCell}</div></td>
       <td class="crm-date">${venc?fmtDate(firebase.firestore.Timestamp.fromDate(venc)):'–'}</td>
-      <td>${d.estado==='Convertido'?'<span style="color:#16A34A;font-weight:700;font-size:11px">Convertido</span>':_leadCountdownBadge(d)}</td>
+      <td>${_leadConvertido(d)?(d.fechaConversion?'<span style="color:#16A34A;font-weight:700;font-size:11px">'+fmtDate(d.fechaConversion)+'</span>':'<span style="color:#16A34A;font-weight:700;font-size:11px">Convertido</span>'):_leadCountdownBadge(d)}</td>
       <td><button class="crm-action-btn" onclick="event.stopPropagation();openLeadDetail('${d._id}')">Ver ficha →</button></td>
     </tr>`;
   });
@@ -8359,7 +8376,7 @@ function openLeadDetail(docId){
   const bg=crmAvatarBg(fullname);const ini=crmInitials(fullname);
   const convertBtn=document.getElementById('lead-convert-btn');
   // "Convertir a Contacto" solo cuando el Resultado es Próspero y aún no fue convertido.
-  if(convertBtn)convertBtn.style.display=(d.resultado==='Próspero'&&d.estado!=='Convertido')?'inline-block':'none';
+  if(convertBtn)convertBtn.style.display=(d.resultado==='Próspero'&&!_leadConvertido(d))?'inline-block':'none';
   // Permisos: el perfil Ejecutivo Comercial sólo puede Estado, Comentarios y Convertir.
   const admin=_canEditFicha();
   const editBtn=document.getElementById('lead-edit-btn');
@@ -8380,7 +8397,7 @@ function openLeadDetail(docId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Empresa</div><div class="crm-det-meta-val">${empresaVal}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Clasificación</div>${leadClasifBadge(d.clasificacion)}</div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de vencimiento</div><div class="crm-det-meta-val">${venc?fmtDate(firebase.firestore.Timestamp.fromDate(venc)):'–'}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Días restantes</div><div style="margin-top:.3rem">${d.estado==='Convertido'?'<span style="color:#16A34A;font-weight:700">Convertido</span>':_leadCountdownBadge(d)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Días restantes</div><div style="margin-top:.3rem">${_leadConvertido(d)?'<span style="color:#16A34A;font-weight:700">Convertido</span>':_leadCountdownBadge(d)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Última actividad</div><div class="crm-det-meta-val">${fmtDate(d.ultimaActividad)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
   `;
@@ -8525,7 +8542,7 @@ async function updateLeadResultado(docId,valor){
     // Actualizar el badge "Estado" del panel izquierdo.
     const eb=document.getElementById('lead-estado-badge');if(eb&&idx>=0)eb.innerHTML=_leadEstadoDisplay(_leadDocs[idx]);
     const convertBtn=document.getElementById('lead-convert-btn');
-    if(convertBtn)convertBtn.style.display=(valor==='Próspero'&&d?.estado!=='Convertido')?'inline-block':'none';
+    if(convertBtn)convertBtn.style.display=(valor==='Próspero'&&!(d&&_leadConvertido(d)))?'inline-block':'none';
     if(typeof filterLeads==='function')filterLeads();
   }catch(e){alert('Error: '+e.message);}
 }
@@ -8552,7 +8569,7 @@ async function _leadSweepInactividad(){
   if(!db||!Array.isArray(_leadDocs))return;
   for(const d of _leadDocs){
     if((d.estadoRegistro||'activo')==='archivado')continue;
-    if(d.estado==='Convertido')continue;
+    if(_leadConvertido(d))continue;
     if((d.resultado||'Pendiente')!=='Pendiente')continue;
     const dias=_leadDiasPendiente(d);
     if(dias>=LEAD_INACT_DIAS){
@@ -8575,7 +8592,7 @@ function _notifyLeadAlert(d,dia){
 function _renderLeadAlertBanner(){
   const el=document.getElementById('lead-alert-banner');if(!el)return;
   const activos=_leadDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado');
-  const seguimiento=activos.filter(d=>(d.resultado||'Pendiente')==='Pendiente'&&d.estado!=='Convertido'&&d.estadoActividad!=='Inactivo'&&_leadDiasPendiente(d)>=LEAD_ALERTA_DIAS[0]);
+  const seguimiento=activos.filter(d=>(d.resultado||'Pendiente')==='Pendiente'&&!_leadConvertido(d)&&d.estadoActividad!=='Inactivo'&&_leadDiasPendiente(d)>=LEAD_ALERTA_DIAS[0]);
   const inactivos=activos.filter(d=>d.estadoActividad==='Inactivo');
   if(!seguimiento.length&&!inactivos.length){el.style.display='none';el.innerHTML='';return;}
   el.style.display='block';
@@ -9490,7 +9507,7 @@ async function _finishLeadConversion(cuentaId,cuentaNombre,opts){
   };
   if(opts.particular&&!cuentaId)contacto.esParticular=true;
   const contactRef=await db.collection('contactos').add(contacto);
-  const leadUpd={estado:'Convertido',contactoId:contactRef.id,cuentaId:cuentaId||'',ultimaActividad:now};
+  const leadUpd={estado:'Convertido',contactoId:contactRef.id,cuentaId:cuentaId||'',ultimaActividad:now,fechaConversion:now};
   // Vincular la Cuenta (nueva o existente) al Lead: nombre + empresa para que se refleje en toda la UI.
   if(cuentaId||cuentaNombre){leadUpd.cuentaNombre=cuentaNombre||'';leadUpd.empresa=cuentaNombre||lead.empresa||'';}
   await db.collection('leads').doc(_currentLeadId).update(leadUpd);
@@ -9537,7 +9554,7 @@ async function _completeLeadConversionFromContact(contactId,cuentaId,cuentaNombr
   try{
     if(!cuentaId)await db.collection('contactos').doc(contactId).update({esParticular:true}).catch(()=>{});
     const idx0=_leadDocs.findIndex(d=>d._id===ctx.leadId);const leadPrev=idx0>=0?_leadDocs[idx0]:{};
-    const leadUpd={estado:'Convertido',contactoId:contactId,cuentaId:cuentaId||'',ultimaActividad:now};
+    const leadUpd={estado:'Convertido',contactoId:contactId,cuentaId:cuentaId||'',ultimaActividad:now,fechaConversion:now};
     // Vincular la Cuenta recién creada/seleccionada al Lead (nombre + empresa) para reflejarlo en toda la UI.
     if(cuentaId||cuentaNombre){leadUpd.cuentaNombre=cuentaNombre||'';leadUpd.empresa=cuentaNombre||leadPrev.empresa||'';}
     await db.collection('leads').doc(ctx.leadId).update(leadUpd);
@@ -9562,7 +9579,7 @@ async function loadLeadsAnalytics(){
 
 function renderLeadsAnalytics(leads){
   const total=leads.length;
-  const convertidos=leads.filter(d=>d.estado==='Convertido').length;
+  const convertidos=leads.filter(d=>_leadConvertido(d)).length;
   const contactados=leads.filter(d=>!['Nuevo','Intento de contacto','Descartado'].includes(d.estado)).length;
   const pct=n=>total?Math.round(n/total*100)+'%':'0%';
 
@@ -9621,7 +9638,7 @@ function renderLeadsAnalytics(leads){
       const b=ejecDisplay(d.brokerAsignado)||'Sin asignar';
       if(!bmap[b])bmap[b]={total:0,conv:0};
       bmap[b].total++;
-      if(d.estado==='Convertido')bmap[b].conv++;
+      if(_leadConvertido(d))bmap[b].conv++;
     });
     const sorted=Object.entries(bmap).sort((a,b)=>b[1].total-a[1].total).slice(0,6);
     if(!sorted.length){brokersEl.innerHTML='<div class="an-empty">Sin datos</div>';
@@ -15924,7 +15941,7 @@ function an2RenderExec(){
 function an2Alerts(){
   const now=Date.now();const leads=_leadDocs||[],opp=_oppDocs||[],ctas=_crmDocs||[],ctos=_ctoDocs||[],sr=_srDocs||[],blds=_bldDocs||[];
   const days=ts=>{const t=_tsToDate(ts);return t?(now-t.getTime())/864e5:Infinity;};
-  const pend=d=>d.estado!=='Convertido'&&(d.estadoActividad||'Activo')!=='Inactivo'&&(d.resultado||'Pendiente')==='Pendiente';
+  const pend=d=>!_leadConvertido(d)&&(d.estadoActividad||'Activo')!=='Inactivo'&&(d.resultado||'Pendiente')==='Pendiente';
   const A=[
     {n:leads.filter(d=>pend(d)&&_leadDiasPendiente(d)>14).length,l:'Leads pendientes +14 días',mod:'leads',c:'#B45309'},
     {n:opp.filter(o=>!['Ganada','Perdida'].includes(o.estado)&&days(o.ultimaActividad||o.fechaCreacion)>30).length,l:'Oportunidades sin movimiento +30 días',mod:'oportunidades',c:'#7C3AED'},
@@ -15962,13 +15979,13 @@ function an2RenderModule(key){
 function an2ModLeads(){
   let d=(_leadDocs||[]).filter(x=>an2InPeriod(x.fechaCreacion));
   if(_an2Flt.ejecutivo)d=d.filter(x=>_an2LeadEjec(x)===_an2Flt.ejecutivo);
-  const recibidos=d.length,calif=d.filter(x=>x.clasificacion==='Calificado').length,prosp=d.filter(x=>x.resultado==='Próspero').length,conv=d.filter(x=>x.estado==='Convertido').length;
-  const ct=d.filter(x=>x.estado==='Convertido').map(x=>{const a=_tsToDate(x.fechaCreacion),b=_tsToDate(x.ultimaActividad);return a&&b?(b-a)/864e5:null;}).filter(v=>v!=null);
+  const recibidos=d.length,calif=d.filter(x=>x.clasificacion==='Calificado').length,prosp=d.filter(x=>x.resultado==='Próspero').length,conv=d.filter(x=>_leadConvertido(x)).length;
+  const ct=d.filter(x=>_leadConvertido(x)).map(x=>{const a=_tsToDate(x.fechaCreacion),b=_tsToDate(x.ultimaActividad);return a&&b?(b-a)/864e5:null;}).filter(v=>v!=null);
   const avg=ct.length?Math.round(ct.reduce((s,v)=>s+v,0)/ct.length):0;
   const charts=_ancCard('Embudo de conversión',_ancBars([['Recibidos',recibidos],['Calificados',calif],['Prósperos',prosp],['Convertidos',conv]],{order:['Recibidos','Calificados','Prósperos','Convertidos']}))
     +_ancCard('Origen',_ancBars([..._ancCountBy(d,x=>x.origen||'Sin origen')],{max:8}))
     +_ancCard('Tipo de consulta',_ancBars([..._ancCountBy(d,x=>x.tipoInmueble||'Sin especificar')],{max:8}))
-    +_ancCard('Conversión por ejecutivo',_ancBars([..._ancCountBy(d.filter(x=>x.estado==='Convertido'),x=>_an2LeadEjec(x))].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
+    +_ancCard('Conversión por ejecutivo',_ancBars([..._ancCountBy(d.filter(x=>_leadConvertido(x)),x=>_an2LeadEjec(x))].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
     +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Evolución (12m)</div>${_ancMonthlyVbars(d,'fechaCreacion')}</div>`;
   return an2ModuleShell(an2Icon('leads')+' Leads','Conversión, origen, tiempos y ejecutivos',{ejec:true},[['Leads recibidos',recibidos],['Calificados',calif],['Prósperos',prosp],['Convertidos',conv],['T. prom. conversión',avg+' d']],charts);
 }
