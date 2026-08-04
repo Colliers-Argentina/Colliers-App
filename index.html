@@ -7607,7 +7607,7 @@ async function loadContactoTimeline(contactoId){
       db.collection('contactos').doc(contactoId).collection('actividades').orderBy('fecha','desc').limit(100).get().catch(()=>({docs:[]})),
     ]);
     const items=[];
-    tlSnap.docs.forEach(doc=>{const d=doc.data();items.push({t:_tsToDate(d.fecha),icon:d.tipo==='comentario'?'💬':'✏️',desc:d.descripcion||d.tipo||'Evento',usuario:d.usuario||'Sistema'});});
+    tlSnap.docs.forEach(doc=>{const d=doc.data();items.push({t:_tsToDate(d.fecha),icon:d.tipo==='comentario'?'💬':(d.tipo==='oportunidad_creada'?'📈':'✏️'),desc:d.descripcion||d.tipo||'Evento',usuario:d.usuario||'Sistema'});});
     actSnap.docs.forEach(doc=>{const a=doc.data();items.push({t:_tsToDate(a.fecha),icon:'📌',desc:`Actividad Comercial: ${a.tipo||''}${a.descripcion?'\n'+a.descripcion:''}`,usuario:a.usuario||'Sistema'});});
     const soloUltimoAnio=_nexusRole()==='ejecutivo',corte=Date.now()-365*864e5;
     const list=items.filter(it=>it.t&&(!soloUltimoAnio||it.t.getTime()>=corte)).sort((a,b)=>b.t-a.t);
@@ -9183,8 +9183,15 @@ window.saveOportunidadDrawer=async function(){
     await db.collection('clientes').doc(cuentaId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id});
     await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now});
     const idx=_crmDocs.findIndex(x=>x._id===cuentaId);if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividad:now};
-    // Actividad en el Contacto principal (si corresponde).
-    if(contactoId){db.collection('contactos').doc(contactoId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id}).catch(()=>{});db.collection('contactos').doc(contactoId).update({ultimaActividad:now}).catch(()=>{});}
+    // Timeline de la Cuenta: registrar la creación de la oportunidad.
+    const tlDesc=`Oportunidad creada${nota?': '+nota:''} · Estado: ${estado}`+(actividadComercial?` · Origen: ${actividadComercial}`:'')+(contactoNombre?`\nContacto: ${contactoNombre}`:'');
+    if(typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'oportunidad_creada',descripcion:tlDesc,oportunidadId:ref.id});
+    // Actividad en el Contacto principal (si corresponde) + Timeline del Contacto.
+    if(contactoId){
+      db.collection('contactos').doc(contactoId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id}).catch(()=>{});
+      db.collection('contactos').doc(contactoId).update({ultimaActividad:now}).catch(()=>{});
+      db.collection('contactoTimeline').add({contactoId,tipo:'oportunidad_creada',descripcion:tlDesc,fecha:now,usuario,userEmail:user?.email||'',oportunidadId:ref.id}).catch(()=>{});
+    }
     // Si se eligió una Actividad Comercial, se registra también como actividad (Cuenta + Contacto + Timeline).
     if(actividadComercial)await _oppRegistrarActividadComercial(cuentaId,contactoId,actividadComercial);
     _oppDocs.unshift({...opp,_id:ref.id});
@@ -13147,7 +13154,7 @@ async function loadClientTimeline(docId){
       db.collection('clientes').doc(docId).collection('timeline').orderBy('fecha','desc').limit(100).get(),
       db.collection('clientes').doc(docId).collection('actividades').orderBy('fecha','desc').limit(100).get().catch(()=>({docs:[]})),
     ]);
-    const TIPO_ICON={cliente_creado:'🟢',ppt_generado:'📄',cambio_estado:'🔄',cambio_zona:'📍',cambio_m2:'📐',cambio_broker:'👤',cambio_ejecutivo:'👤',actualizacion:'✏️',cuenta_actualizada:'✏️',alternativas_enviadas:'📧',ppt_descargado:'⬇️',alta_contacto:'👤',lead_vinculado:'🎯',archivado:'📦'};
+    const TIPO_ICON={cliente_creado:'🟢',ppt_generado:'📄',cambio_estado:'🔄',cambio_zona:'📍',cambio_m2:'📐',cambio_broker:'👤',cambio_ejecutivo:'👤',actualizacion:'✏️',cuenta_actualizada:'✏️',alternativas_enviadas:'📧',ppt_descargado:'⬇️',alta_contacto:'👤',lead_vinculado:'🎯',oportunidad_creada:'📈',archivado:'📦'};
     const items=[];
     tlSnap.docs.forEach(doc=>{const d=doc.data();items.push({t:_tsToDate(d.fecha),icon:TIPO_ICON[d.tipo]||'·',desc:d.descripcion||d.tipo||'Evento',usuario:d.usuario||'Sistema',dot:''});});
     actSnap.docs.forEach(doc=>{const a=doc.data();const esM=(a.cat||'C')==='M';items.push({t:_tsToDate(a.fecha),icon:esM?'📣':'📌',desc:`Actividad ${esM?'Marketing & Research':'Comercial'}: ${a.tipo||''}${a.descripcion?'\n'+a.descripcion:''}`,usuario:a.usuario||'Sistema',dot:esM?'#7C3AED':'#16A34A'});});
