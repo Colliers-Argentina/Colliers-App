@@ -1706,6 +1706,26 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 body.dark #solicitudes-panel{background:#040A1C}
 .sr-zebra-row{background:#F6F8FC;border-radius:6px}
 body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
+/* Wizard de Solicitudes (paso a paso, mismo patrón que el alta de Oficinas) */
+.sr-wiz{max-width:760px;margin:0 auto}
+.sr-wiz-progress{display:flex;align-items:flex-start;justify-content:center;margin-bottom:1.4rem;padding:0 .2rem}
+.sr-wiz-node{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px}
+.sr-wiz-dot{width:30px;height:30px;border-radius:50%;background:#EEF1F8;border:1px solid #DBE2F0;color:#8898C0;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.sr-wiz-node.active .sr-wiz-dot{background:#1C54F4;border-color:#1C54F4;color:#fff;box-shadow:0 0 0 4px rgba(28,84,244,.15)}
+.sr-wiz-node.done .sr-wiz-dot{background:#16A34A;border-color:#16A34A;color:#fff}
+.sr-wiz-lbl{font-size:10px;font-weight:700;color:#8898C0;text-align:center;max-width:82px;line-height:1.2}
+.sr-wiz-node.active .sr-wiz-lbl{color:#0A1B4D}
+.sr-wiz-node.done .sr-wiz-lbl{color:#16A34A}
+.sr-wiz-line{flex:1;height:2px;background:#E4E9F3;margin:15px 2px 0;min-width:14px;max-width:60px}
+.sr-wiz-step{animation:srWizIn .18s ease}
+@keyframes srWizIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sr-wiz-footer{display:flex;align-items:center;gap:.6rem;margin-top:1rem;padding-top:1rem;border-top:1px solid #E8EFF8}
+body.dark .sr-wiz-dot{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#9FB0D0}
+body.dark .sr-wiz-lbl{color:#8093B8}
+body.dark .sr-wiz-node.active .sr-wiz-lbl{color:#fff}
+body.dark .sr-wiz-line{background:rgba(255,255,255,.1)}
+body.dark .sr-wiz-footer{border-top-color:rgba(255,255,255,.08)}
+@media(max-width:640px){.sr-wiz-lbl{display:none}.sr-wiz-line{margin-top:15px}}
 /* Analytics 2.0 — Centro de Inteligencia Comercial */
 #analytics-panel{display:flex;flex-direction:column;background:#F4F6FB}
 body.dark #analytics-panel{background:#040A1C}
@@ -14123,21 +14143,34 @@ const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada'
 const SR_SERVICES=[
   {key:'ficha-oficinas',label:'Ficha y Publicaciones – Oficinas',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
    form:[
-     {title:'Datos de la Solicitud',fields:[
+     // Paso 1 — Información General
+     {step:1,title:'Datos de la Solicitud',fields:[
        {k:'prioridad',label:'Prioridad',type:'select',opts:['Baja','Media','Alta','Urgente']},
-       {k:'fechaRequerimiento',label:'Fecha de requerimiento (mín. 3 días de plazo)',type:'date'},
+       {k:'fechaRequerimiento',label:'Fecha de entrega (mín. 3 días de plazo)',type:'date'},
      ]},
-     {title:'Datos Generales',fields:[
-       {k:'tipoTransaccion',label:'Tipo de transacción',type:'select',opts:['Alquiler','Venta','Ambas'],req:true},
-     ]},
-     {title:'Inmueble Asociado',fields:[
+     {step:1,title:'Inmueble Asociado',fields:[
        {k:'inmueble',label:'Inmueble',type:'inmueble'},
      ]},
-     {title:'Ubicación',fields:[
+     {step:1,title:'Ubicación',fields:[
        {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
        {k:'urlMaps',label:'URL Google Maps',type:'text'},
      ]},
-     {title:'Superficies y Dimensiones',fields:[
+     {step:1,title:'Cuenta y Responsables',fields:[
+       {k:'cuenta',label:'Cuenta / Cliente',type:'cuenta',req:true},
+       {k:'propietario',label:'Propietario',type:'contacto',req:true},
+       {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
+     ]},
+     // Paso 2 — Información Comercial
+     {step:2,title:'Datos Generales',fields:[
+       {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Ambas'],req:true},
+     ]},
+     {step:2,title:'Condiciones Comerciales',fields:[
+       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Ambas']}},
+       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Ambas']}},
+       {k:'precioVenta',label:'Precio de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Ambas']}},
+       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Ambas']}},
+     ]},
+     {step:2,title:'Superficies y Dimensiones',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true},
        {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number'},
@@ -14148,31 +14181,24 @@ const SR_SERVICES=[
        {k:'oficinasPorPiso',label:'Oficinas por piso',type:'number'},
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number'},
      ]},
-     {title:'Características Particulares',fields:[
+     // Paso 3 — Características
+     {step:3,title:'Características Particulares',fields:[
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
        {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
-     {title:'Equipamiento y Servicios',fields:[
+     {step:3,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
-     {title:'Especificaciones de los Equipos',fields:[
+     {step:3,title:'Especificaciones de los Equipos',fields:[
        {k:'especificaciones',label:'Especificaciones de los equipos',type:'textarea',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
      ]},
-     {title:'Descripción General',fields:[
+     // Paso 4 — Marketing
+     {step:4,title:'Descripción General',fields:[
        {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
      ]},
-     {title:'Condiciones Comerciales',fields:[
-       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Ambas']}},
-       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Ambas']}},
-       {k:'precioVenta',label:'Precio de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Ambas']}},
-       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Ambas']}},
-       {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
-       {k:'cuenta',label:'Cuenta / Cliente',type:'cuenta',req:true},
-       {k:'propietario',label:'Propietario',type:'contacto',req:true},
-     ]},
-     {title:'Documentación y Marketing',fields:[
+     {step:4,title:'Documentación y Marketing',fields:[
        {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
        {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
      ]},
@@ -14281,32 +14307,91 @@ function srCatalogStep2(serviceKey){
 }
 window.startSolicitud=function(serviceKey){if(!_srService(serviceKey))return;closeSrCatalog();openSolicitudForm(serviceKey);};
 // ── Formulario dinámico (schema-driven) ──
+// ── Wizard de carga (paso a paso, mismo patrón que el alta de Oficinas) ──
+const SR_WIZ_STEPS=['Información General','Información Comercial','Características','Marketing','Revisión'];
+let _srWizStep=1;
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
-  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';_srNewContactId='';
+  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;
   document.getElementById('sr-form-title').textContent=svc.label;
   const now=new Date();
   const auto=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Automático</div>
     <div class="nx-row"><div class="nx-row-l">Solicitante</div><div class="nx-row-v">${esc(user?.displayName||user?.email||'–')}</div></div>
     <div class="nx-row"><div class="nx-row-l">Broker</div><div class="nx-row-v">${esc(user?.displayName||user?.email||'–')}</div></div>
+    <div class="nx-row"><div class="nx-row-l">Tipo de solicitud</div><div class="nx-row-v">${esc(svc.label)}</div></div>
     <div class="nx-row"><div class="nx-row-l">Fecha de solicitud</div><div class="nx-row-v">${now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}</div></div>
     <div class="nx-row"><div class="nx-row-l">Responsable del servicio</div><div class="nx-row-v">${esc(svc.responsable)}</div></div></div>`;
-  const cards=svc.form.map(card=>{
+  const cardHTML=card=>{
     const zebra=card.title==='Superficies y Dimensiones';
     const fields=card.fields.map((f,i)=>{let html=_srFieldHTML(f);if(zebra&&i%2===1)html=html.replace('class="cdr-field"','class="cdr-field sr-zebra-row"');return html;}).join('');
     return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div>${fields}</div>`;
-  }).join('');
-  document.getElementById('sr-form-body').innerHTML=auto+cards;
-  // Registrar el picker de cuenta de forma diferida (registerCuentaPicker ya está definido en runtime).
+  };
+  // Un contenedor por paso (1-4 con campos, 5 revisión, 6 confirmación). Todos los campos quedan
+  // siempre en el DOM (solo se ocultan) → no se pierde información al navegar y _srReadForm los lee.
+  let steps='';
+  for(let n=1;n<=4;n++){
+    const cards=svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
+    steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${n===1?auto:''}${cards}</div>`;
+  }
+  steps+=`<div class="sr-wiz-step" data-step="5" id="sr-wiz-review" style="display:none"></div>`;
+  steps+=`<div class="sr-wiz-step" data-step="6" id="sr-wiz-confirm" style="display:none"></div>`;
+  const progress=`<div class="sr-wiz-progress" id="sr-wiz-progress">${SR_WIZ_STEPS.map((l,i)=>`<div class="sr-wiz-node" data-node="${i+1}"><div class="sr-wiz-dot">${i+1}</div><div class="sr-wiz-lbl">${esc(l)}</div></div>${i<SR_WIZ_STEPS.length-1?'<div class="sr-wiz-line"></div>':''}`).join('')}</div>`;
+  const footer=`<div class="sr-wiz-footer" id="sr-wiz-footer">
+    <button type="button" class="crm-action-btn" id="sr-wiz-back" onclick="srWizPrev()" style="visibility:hidden">← Atrás</button>
+    <div style="flex:1"></div>
+    <button type="button" class="cdr-save" id="sr-wiz-next" onclick="srWizNext()">Siguiente →</button>
+  </div>`;
+  document.getElementById('sr-form-body').innerHTML=`<div class="sr-wiz">${progress}<div class="sr-wiz-panels">${steps}</div>${footer}</div>`;
   if(document.getElementById('srf-cuenta')&&typeof registerCuentaPicker==='function'){registerCuentaPicker('sr',{inputId:'srf-cuenta',dropId:'srf-cuenta-drop',tagId:'srf-cuenta-tag',hidId:'srf-cuentaId',hidNombreId:'srf-cuentaNombre'});_srPickerReady=true;}
   loadClientesParaSelector();
   _srRenderEjecChips();
   _srApplyConditionals();
   ['srf-supTotal','srf-supCubierta'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',_srValidateSuperficies);});
-  const btn=document.getElementById('sr-form-save');if(btn){btn.textContent='Enviar solicitud';btn.disabled=false;}
+  const btn=document.getElementById('sr-form-save');if(btn)btn.style.display='none';
+  srWizGoto(1);
   document.getElementById('sr-list-view').style.display='none';
   document.getElementById('sr-detail-view').style.display='none';
   const fv=document.getElementById('sr-form-view');fv.style.display='flex';fv.style.flexDirection='column';
+}
+function srWizGoto(n){
+  _srWizStep=n;
+  document.querySelectorAll('#sr-form-body .sr-wiz-step').forEach(el=>el.style.display=(+el.dataset.step===n)?'':'none');
+  if(n===5)_srWizRenderReview();
+  // Progreso (5 nodos visibles; el paso 6 es confirmación).
+  document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===6);});
+  const back=document.getElementById('sr-wiz-back'),next=document.getElementById('sr-wiz-next'),foot=document.getElementById('sr-wiz-footer');
+  if(n===6){if(foot)foot.style.display='none';return;}
+  if(foot)foot.style.display='flex';
+  if(back)back.style.visibility=n>1?'visible':'hidden';
+  if(next)next.textContent=n===5?'Finalizar ✓':'Siguiente →';
+  const body=document.querySelector('#sr-form-view [class*="overflow-y"]')||document.getElementById('sr-form-view');if(body&&body.scrollTo)body.scrollTo({top:0,behavior:'smooth'});
+}
+window.srWizPrev=function(){if(_srWizStep>1)srWizGoto(_srWizStep-1);};
+window.srWizNext=function(){
+  if(_srWizStep<=4){if(!_srWizValidateStep(_srWizStep))return;srWizGoto(_srWizStep+1);}
+  else if(_srWizStep===5){submitSolicitud();}
+};
+function _srWizValidateStep(n){
+  const svc=_srFormService;if(!svc)return true;
+  const data=_srReadForm(svc);
+  let ok=true,first=null;
+  svc.form.filter(c=>(c.step||1)===n).forEach(card=>card.fields.forEach(f=>{
+    if(!f.req||!_srFieldVisible(f,data))return;
+    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:!String(data[f.k]||'').trim());
+    const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':'srf-'+f.k);
+    const el=document.getElementById(elId);if(el)el.style.borderColor=empty?'#ED1B34':'';
+    if(empty){ok=false;if(!first)first=el;}
+  }));
+  if(n===2&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
+  if(!ok&&first&&first.scrollIntoView)first.scrollIntoView({behavior:'smooth',block:'center'});
+  return ok;
+}
+function _srWizRenderReview(){
+  const svc=_srFormService;const el=document.getElementById('sr-wiz-review');if(!svc||!el)return;
+  const data=_srReadForm(svc);
+  const pseudo={servicio:svc.key,data,cuentaNombre:data.cuentaNombre,inmuebleId:data.inmuebleId,inmuebleNombre:data.inmuebleNombre,propietarioNombre:data.propietarioNombre};
+  const jumps=SR_WIZ_STEPS.slice(0,4).map((l,i)=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${i+1})">✏️ ${esc(l)}</button>`).join('');
+  el.innerHTML=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Revisión</div><div style="font-size:12.5px;color:#56648F;line-height:1.5">Revisá la información antes de enviar. Podés volver a cualquier paso para corregir.</div><div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem">${jumps}</div></div>${_srRenderData(pseudo)}`;
 }
 function _srFieldHTML(f){
   const id='srf-'+f.k;const req=f.req?' <span class="cdr-req">*</span>':'';
@@ -14510,7 +14595,7 @@ window.submitSolicitud=async function(){
   if(!ok){if(first&&first.scrollIntoView)first.scrollIntoView({behavior:'smooth',block:'center'});return;}
   if(!_srValidateSuperficies()){const el=document.getElementById('srf-supTotal');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});return;}
   if(!db){alert('Firebase no disponible.');return;}
-  const btn=document.getElementById('sr-form-save');btn.textContent='Enviando...';btn.disabled=true;
+  const btn=document.getElementById('sr-wiz-next')||document.getElementById('sr-form-save');if(btn){btn.textContent='Enviando...';btn.disabled=true;}
   try{
     const now=firebase.firestore.Timestamp.now();
     const ticketNum=(_srDocs.reduce((m,d)=>Math.max(m,d.ticketNum||0),0))+1;
@@ -14532,9 +14617,20 @@ window.submitSolicitud=async function(){
     _srNotifyResponsable({...doc,_id:ref.id});   // EmailJS (no-op si no hay claves configuradas)
     const newBld=_srNewBldId;_srNewBldId='';
     const newCto=_srNewContactId;_srNewContactId='';
-    srCloseForm();
-    srOpenDetail(ref.id);
     showBldToast&&showBldToast(ticket+' creada');
+    // Paso 6 — Confirmación: pantalla con el número de solicitud generado.
+    const conf=document.getElementById('sr-wiz-confirm');
+    if(conf){
+      conf.innerHTML=`<div class="nx-card" style="text-align:center;padding:2.2rem 1.2rem">
+        <div style="font-size:44px">✅</div>
+        <div style="font-size:17px;font-weight:800;color:#0A1B4D;margin-top:.5rem">¡Solicitud enviada!</div>
+        <div style="font-size:13px;color:#56648F;margin-top:.35rem">Se generó la solicitud <b style="color:#16A34A">${esc(ticket)}</b> y se notificó a ${esc(svc.responsable)}.</div>
+        <div style="display:flex;gap:.6rem;justify-content:center;margin-top:1.3rem;flex-wrap:wrap">
+          <button type="button" class="cdr-save" onclick="srCloseForm();srOpenDetail('${ref.id}')">Ver solicitud</button>
+          <button type="button" class="crm-action-btn" onclick="srCloseForm()">Volver al listado</button>
+        </div></div>`;
+      srWizGoto(6);
+    } else { srCloseForm(); srOpenDetail(ref.id); }
     if(newCto&&confirm('¿Deseás continuar completando la información del contacto?')){
       showModule('crm');
       setTimeout(()=>{try{switchCRMTab('contactos');openContactoDetail(newCto);}catch(e){}},400);
@@ -14542,7 +14638,7 @@ window.submitSolicitud=async function(){
       showModule('buildings');
       setTimeout(()=>{try{openBuildingEditor(newBld);}catch(e){}},400);
     }
-  }catch(e){alert('Error al crear la solicitud: '+e.message);const b=document.getElementById('sr-form-save');b.textContent='Enviar solicitud';b.disabled=false;}
+  }catch(e){alert('Error al crear la solicitud: '+e.message);const b=document.getElementById('sr-wiz-next');if(b){b.textContent='Finalizar ✓';b.disabled=false;}}
 };
 window.srCloseForm=function(){document.getElementById('sr-form-view').style.display='none';document.getElementById('sr-list-view').style.display='flex';filterSolicitudes();};
 window.srCloseDetail=function(){document.getElementById('sr-detail-view').style.display='none';document.getElementById('sr-list-view').style.display='flex';filterSolicitudes();};

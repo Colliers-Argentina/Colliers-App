@@ -275,12 +275,13 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────────────── CENTRO DE SOLICITUDES ───────────────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Centro de Solicitudes", "1.6", FECHA,
+    "Centro de Solicitudes", "1.7", FECHA,
     "Centraliza las solicitudes internas de todas las áreas de Colliers. Cada servicio tiene su "
     "propio formulario; el primero disponible es 'Ficha y Publicaciones – Oficinas'. Al enviar se "
     "genera un Ticket, se puede descargar un PDF corporativo y se notifica al responsable.",
     [
         ("Nueva Solicitud", "El alta se hace en dos pasos: 1) elegir el Servicio (por ahora 'Ficha y Publicaciones'); 2) elegir el Tipo de inmueble (Oficinas, Retail o Industria y Logística). En esta etapa solo está disponible Oficinas; el resto figura como 'Próximamente'. Según la opción elegida se abre el formulario correspondiente."),
+        ("Carga guiada (wizard)", "El formulario de 'Ficha y Publicaciones – Oficinas' se completa en pasos, con la misma experiencia que el alta de Oficinas: 1) Información General, 2) Información Comercial, 3) Características, 4) Marketing, 5) Revisión y 6) Confirmación. Arriba se ve una barra de progreso; se avanza con 'Siguiente' y se puede volver con 'Atrás' sin perder datos. Cada paso valida solo sus campos obligatorios; no deja avanzar si faltan. En Revisión se ve el resumen y se puede volver a cualquier paso para corregir; al 'Finalizar' se genera la solicitud, el PDF, el historial y el aviso al responsable, y aparece la pantalla de confirmación con el número de solicitud."),
         ("Datos automáticos", "Solicitante, Broker y Fecha se toman solos del usuario logueado; no hay que cargarlos."),
         ("Cuenta", "Buscar la cuenta con el buscador inteligente. Si no existe, se puede crear en el momento (mismo flujo que en el resto de Nexus)."),
         ("Propietario", "Obligatorio y siempre asociado a un Contacto de Nexus (no se admite texto libre). Buscar el contacto; si no existe, usar '+ Crear nuevo contacto' (pide datos mínimos) y queda vinculado como propietario. Al enviar, el sistema ofrece completar luego la ficha del contacto."),
