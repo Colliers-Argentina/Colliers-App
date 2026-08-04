@@ -247,7 +247,7 @@ GUIAS["Guia_Componentes"] = Guia(
 
 # ─────────────────────────── OPORTUNIDADES ───────────────────────────
 GUIAS["Guia_Oportunidades"] = Guia(
-    "Oportunidades", "1.1", FECHA,
+    "Oportunidades", "2.0", FECHA,
     "Centro de seguimiento de la gestión comercial. Cada oportunidad es una gestión entre una "
     "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
     "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
@@ -256,8 +256,8 @@ GUIAS["Guia_Oportunidades"] = Guia(
         ("Cuenta", "Buscar y seleccionar la empresa de la oportunidad (obligatorio)."),
         ("Contacto principal", "Buscar y seleccionar el contacto de la cuenta (opcional). Si no hay, se continúa solo con la Cuenta."),
         ("Inmueble(s) asociado(s)", "Buscar y agregar uno o varios inmuebles relacionados (opcional)."),
-        ("Estado", "Etapa de la gestión: Prospectando, Calificando, En negociación, Ganada o Perdida."),
-        ("% Conversión", "Elegir una categoría: 0–50% (naranja), 50–80% (amarillo) o 80–100% (verde). Es obligatorio."),
+        ("Estado", "Etapa de la gestión con cuatro estados: En gestión, En negociación, Ganada o Perdida."),
+        ("Probabilidad", "Ya NO se elige por separado: queda implícita según el estado. En gestión = 0–50%, En negociación = 51–80%, Ganada = 100%, Perdida = 0%."),
         ("Ejecutivo Comercial", "Ejecutivo responsable de la oportunidad (obligatorio)."),
         ("Actividad Comercial", "Acción comercial más relevante en curso: Visita comercial, Informe de alternativas o Propuesta de servicios. Al elegirla o cambiarla se registra automáticamente esa actividad en la Cuenta y el Contacto. Convive con el Estado (no lo reemplaza)."),
         ("Unidad de negocio", "Oficinas, Retail o Industria & Logística (opcional)."),
@@ -267,7 +267,8 @@ GUIAS["Guia_Oportunidades"] = Guia(
         "Se crea la Oportunidad asociada a la Cuenta.",
         "Se registra automáticamente una actividad en la Cuenta y, si hay contacto, también en el Contacto.",
         "La Cuenta aparece en la grilla de Oportunidades, ordenada por la actividad más reciente.",
-        "Desde la grilla se puede cambiar el Estado y el % de Conversión, y esos cambios también quedan registrados.",
+        "Desde la grilla se puede cambiar el Estado (la Probabilidad se ajusta sola) y esos cambios quedan registrados.",
+        "Al pasar el estado a 'Ganada', la oportunidad aún no está finalizada: aparece un aviso destacado y el botón 'Completar cierre', que abre el formulario de Cierre de Transacción precargado. La Transacción queda vinculada a la Oportunidad (trazabilidad completa): Lead → Cuenta/Contacto → Oportunidad → Ganada → Cierre → Transacción.",
         "También se puede crear una oportunidad desde la ficha de la Cuenta (botón '+ Nueva oportunidad').",
     ],
 )

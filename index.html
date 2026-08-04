@@ -3012,13 +3012,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Gestión</div><div class="cdr-section-line"></div></div>
         <div class="cdr-row">
           <div class="cdr-field"><div class="cdr-lbl">Estado <span class="cdr-req">*</span></div>
-            <select id="opdr-estado" class="cdr-select"></select>
+            <select id="opdr-estado" class="cdr-select" onchange="opdrEstadoChange()"></select>
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">% Conversión <span class="cdr-req">*</span></div>
-            <select id="opdr-conversion" class="cdr-select">
-              <option value="">Seleccionar...</option>
-              <option value="0-50">🟠 0–50%</option><option value="50-80">🟡 50–80%</option><option value="80-100">🟢 80–100%</option>
-            </select>
+          <div class="cdr-field"><div class="cdr-lbl">Probabilidad <span style="font-weight:400;color:#8898C0;font-size:11px">(según estado)</span></div>
+            <div id="opdr-prob" style="padding:.45rem 0;font-size:12.5px;font-weight:700">–</div>
+            <input id="opdr-conversion" type="hidden">
           </div>
         </div>
         <div class="cdr-row">
@@ -8934,17 +8932,29 @@ window.saveVisitaDrawer=async function(){
 // Centro de gestión comercial (Etapa 1, carga manual). Reutiliza cuentas (_crmDocs),
 // el picker de cuentas, la búsqueda de contactos/inmuebles y el modelo de actividades:
 // cada oportunidad y sus cambios alimentan las Actividades de la Cuenta (y del Contacto).
-const OPP_ESTADOS=['Prospectando','Calificando','En negociación','Ganada','Perdida'];
+// Estados oficiales (esta definición reemplaza a la del documento): 4 estados.
+// La probabilidad ya no la elige el usuario: queda IMPLÍCITA según el estado.
+const OPP_ESTADOS=['En gestión','En negociación','Ganada','Perdida'];
 const OPP_ACTIVIDADES=['Visita comercial','Informe de alternativas','Propuesta de servicios'];
-const OPP_CONV_LBL={'0-50':'🟠 0–50%','50-80':'🟡 50–80%','80-100':'🟢 80–100%'};
-let _oppDocs=[],_oppWidget='',_opdrBlds=[],_oppFiltersReady=false;
-function oppEstadoBadge(e){const m={'Prospectando':'#1C54F4','Calificando':'#0090C7','En negociación':'#7C3AED','Ganada':'#16A34A','Perdida':'#EF3340'};const c=m[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'–')}</span>`;}
+const OPP_CONV_LBL={'0-50':'🟠 0–50%','50-80':'🟡 51–80%','80-100':'🟢 100%'};
+// Probabilidad implícita por estado. conv = bucket para Analytics/Dashboard (compat).
+const OPP_ESTADO_PROB={'En gestión':{conv:'0-50',lbl:'0–50%',pct:25},'En negociación':{conv:'50-80',lbl:'51–80%',pct:65},'Ganada':{conv:'80-100',lbl:'100%',pct:100},'Perdida':{conv:'0-50',lbl:'0%',pct:0}};
+// Normaliza estados legacy (Inicial/Prospectando/Calificando/Nuevo) a los 4 oficiales (sin migrar datos).
+function _oppNormEstado(e){return {'Prospectando':'En gestión','Calificando':'En gestión','Inicial':'En gestión','Nuevo':'En gestión','En gestión':'En gestión','En negociación':'En negociación','Ganada':'Ganada','Perdida':'Perdida'}[e]||'En gestión';}
+function _oppConvFromEstado(e){return (OPP_ESTADO_PROB[_oppNormEstado(e)]||{}).conv||'0-50';}
+function oppProbBadge(e){const n=_oppNormEstado(e);const p=OPP_ESTADO_PROB[n]||{};const c=n==='Ganada'?'#16A34A':(n==='Perdida'?'#EF3340':(n==='En negociación'?'#CA8A04':'#F59E0B'));return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${p.lbl||'–'}</span>`;}
+let _oppDocs=[],_oppWidget='',_opdrBlds=[],_oppFiltersReady=false,_txOppLink='';
+function oppEstadoBadge(e){e=_oppNormEstado(e);const m={'En gestión':'#F59E0B','En negociación':'#7C3AED','Ganada':'#16A34A','Perdida':'#EF3340'};const c=m[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'–')}</span>`;}
 function oppConvBadge(v){const m={'0-50':'#F59E0B','50-80':'#CA8A04','80-100':'#16A34A'};const c=m[v];return c?`<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${OPP_CONV_LBL[v]}</span>`:'<span style="color:#8898C0">–</span>';}
 function _oppMatchWidget(o,w){
+  const e=_oppNormEstado(o.estado);
   switch(w){
-    case 'activas':return !['Ganada','Perdida'].includes(o.estado);
-    case 'ganadas':return o.estado==='Ganada';
-    case 'perdidas':return o.estado==='Perdida';
+    case 'activas':return !['Ganada','Perdida'].includes(e);
+    case 'engestion':return e==='En gestión';
+    case 'ennegociacion':return e==='En negociación';
+    case 'ganadas':return e==='Ganada';
+    case 'perdidas':return e==='Perdida';
+    case 'cierre':return e==='Ganada'&&!o.transaccionId;
     case 'act:Visita comercial':return o.actividadComercial==='Visita comercial';
     case 'act:Informe de alternativas':return o.actividadComercial==='Informe de alternativas';
     case 'act:Propuesta de servicios':return o.actividadComercial==='Propuesta de servicios';
@@ -8980,9 +8990,9 @@ function filterOportunidades(){
   const opps=_oppDocs.filter(o=>{
     if(q&&!((o.cuentaNombre||'').toLowerCase().includes(q)))return false;
     if(fEje&&o.ejecutivo!==fEje)return false;
-    if(fEst&&o.estado!==fEst)return false;
+    if(fEst&&_oppNormEstado(o.estado)!==fEst)return false;
     if(fAct&&o.actividadComercial!==fAct)return false;
-    if(fConv&&o.conversion!==fConv)return false;
+    if(fConv&&_oppConvFromEstado(o.estado)!==fConv)return false;
     if(fUn&&o.unidadNegocio!==fUn)return false;
     if(_oppWidget&&!_oppMatchWidget(o,_oppWidget))return false;
     return true;
@@ -8995,7 +9005,7 @@ function filterOportunidades(){
 function _renderOppWidgets(){
   const el=document.getElementById('opp-widgets');if(!el)return;
   const c=k=>_oppDocs.filter(o=>_oppMatchWidget(o,k)).length;
-  const W=[['activas','Activas','#1C54F4'],['ganadas','Ganadas','#16A34A'],['perdidas','Perdidas','#EF3340'],['act:Visita comercial','Visitas comerciales','#0090C7'],['act:Informe de alternativas','Informes de alternativas','#7C3AED'],['act:Propuesta de servicios','Propuestas de servicios','#B45309']];
+  const W=[['activas','Activas','#1C54F4'],['engestion','En gestión','#F59E0B'],['ennegociacion','En negociación','#7C3AED'],['ganadas','Ganadas','#16A34A'],['perdidas','Perdidas','#EF3340'],['cierre','Cierre pendiente','#DC2626']];
   el.innerHTML=W.map(([k,lbl,col])=>`<div class="crm-kpi" style="cursor:pointer;${_oppWidget===k?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="oppToggleWidget('${k}')"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${c(k)}</div><div class="crm-kpi-l">${lbl}</div></div></div>`).join('');
 }
 window.oppToggleWidget=function(k){_oppWidget=_oppWidget===k?'':k;filterOportunidades();};
@@ -9003,25 +9013,29 @@ function renderOportunidadesTable(rows){
   const wrap=document.getElementById('opp-table-wrap');if(!wrap)return;
   if(!rows.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin oportunidades. Creá una con "+ Nueva Oportunidad".</div>';return;}
   let h='<table class="crm-table"><thead><tr>';
-  ['','Cuenta','Última actividad','Actividad Comercial','Estado','% Conversión','Ejecutivo','Últ. actualización',''].forEach(c=>h+=`<th>${c}</th>`);
+  ['','Cuenta','Última actividad','Actividad Comercial','Estado','Probabilidad','Ejecutivo','Últ. actualización',''].forEach(c=>h+=`<th>${c}</th>`);
   h+='</tr></thead><tbody>';
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
     const nombre=o.cuentaNombre||cuenta?.nombre||o.cuentaId;
     const logo=(cuenta&&_logoValida(cuenta.logoUrl))?`<img src="${esc(cuenta.logoUrl)}" style="width:30px;height:30px;border-radius:7px;object-fit:cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'crm-avatar',style:'background:${crmAvatarBg(nombre)}',innerText:'${crmInitials(nombre)}'}))">`:`<div class="crm-avatar" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>`;
     const actSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateActividad('${o._id}','${o.cuentaId}','${o.contactoId||''}',this.value)"><option value="">–</option>${OPP_ACTIVIDADES.map(s=>`<option${o.actividadComercial===s?' selected':''}>${s}</option>`).join('')}</select>`;
-    const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${o.estado===s?' selected':''}>${s}</option>`).join('')}</select>`;
-    const convSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateConv('${o._id}','${o.cuentaId}',this.value)"><option value="">–</option>${Object.keys(OPP_CONV_LBL).map(v=>`<option value="${v}"${o.conversion===v?' selected':''}>${OPP_CONV_LBL[v]}</option>`).join('')}</select>`;
-    h+=`<tr onclick="crmOpenCuenta('${o.cuentaId}')">
+    const enorm=_oppNormEstado(o.estado);
+    const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${enorm===s?' selected':''}>${s}</option>`).join('')}</select>`;
+    const cierrePend=enorm==='Ganada'&&!o.transaccionId;
+    const accion=cierrePend
+      ?`<button class="crm-action-btn" style="background:#FEF2F2;color:#DC2626;border-color:#F5C2C7;font-weight:700" onclick="event.stopPropagation();oppCompletarCierre('${o._id}')">⚠ Completar cierre</button>`
+      :(o.transaccionId?`<span style="font-size:10.5px;font-weight:700;color:#16A34A">✓ Cerrada${o.transaccionNumero?' · '+esc(o.transaccionNumero):''}</span>`:`<button class="crm-action-btn" onclick="event.stopPropagation();crmOpenCuenta('${o.cuentaId}')">Ver ficha →</button>`);
+    h+=`<tr onclick="crmOpenCuenta('${o.cuentaId}')"${cierrePend?' style="background:#FFF6F6"':''}>
       <td>${logo}</td>
       <td><div class="crm-client-name">${esc(nombre)}</div>${o.contactoNombre?`<div class="crm-client-sub">👤 ${esc(o.contactoNombre)}</div>`:''}</td>
       <td class="crm-date">${fmtDate(o.ultimaActividad)}</td>
       <td>${actSel}</td>
       <td>${estSel}</td>
-      <td>${convSel}</td>
+      <td>${oppProbBadge(o.estado)}</td>
       <td><div class="crm-broker-cell">${esc(ejecDisplay(o.ejecutivo))||'–'}</div></td>
       <td class="crm-date">${fmtDate(o.ultimaActualizacion)}</td>
-      <td><button class="crm-action-btn" onclick="event.stopPropagation();crmOpenCuenta('${o.cuentaId}')">Ver ficha →</button></td>
+      <td>${accion}</td>
     </tr>`;
   });
   h+='</tbody></table>';
@@ -9035,13 +9049,32 @@ async function _oppRegistrarCambio(cuentaId,desc){
   const idx=_crmDocs.findIndex(x=>x._id===cuentaId);if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividad:now};
 }
 window.oppUpdateEstado=async function(oppId,cuentaId,val){
+  val=_oppNormEstado(val);
   const now=firebase.firestore.Timestamp.now();
-  try{await db.collection('oportunidades').doc(oppId).update({estado:val,ultimaActividad:now,ultimaActualizacion:now,tipoActividad:'Cambio de estado de una Oportunidad'});
-    const o=_oppDocs.find(x=>x._id===oppId);if(o){o.estado=val;o.ultimaActividad=now;o.ultimaActualizacion=now;o.tipoActividad='Cambio de estado de una Oportunidad';}
+  const upd={estado:val,conversion:_oppConvFromEstado(val),ultimaActividad:now,ultimaActualizacion:now,tipoActividad:'Cambio de estado de una Oportunidad'};
+  if(val==='Ganada')upd.cierrePendiente=true;
+  try{await db.collection('oportunidades').doc(oppId).update(upd);
+    const o=_oppDocs.find(x=>x._id===oppId);if(o)Object.assign(o,upd);
     await _oppRegistrarCambio(cuentaId,`Oportunidad → Estado: ${val}`);
     filterOportunidades();
+    // Ganada: la oportunidad aún no está finalizada; falta el cierre del negocio (Transacción).
+    if(val==='Ganada'&&o&&!o.transaccionId&&confirm('¡Oportunidad ganada! 🎉\n\nFalta completar el cierre del negocio. ¿Abrir el formulario de Cierre de Transacción ahora?'))oppCompletarCierre(oppId);
   }catch(e){alert('Error: '+e.message);}
 };
+// Cierre: abre el formulario de Transacción precargado con los datos de la oportunidad y las vincula.
+window.oppCompletarCierre=function(oppId){
+  const o=_oppDocs.find(x=>x._id===oppId);if(!o)return;
+  showModule('transacciones');
+  setTimeout(()=>{try{openNewTransaccion();_txOppLink=oppId;_txPrefillFromOpp(o);}catch(e){console.warn('cierre',e);}},350);
+};
+function _txPrefillFromOpp(o){
+  const map={'Oficinas':'Oficina','Retail':'Retail','Industria & Logística':'Industria y Logística'};
+  const tipoSel=document.getElementById('txf-tipo');if(tipoSel){tipoSel.value=map[o.unidadNegocio]||'';if(typeof _txTipoChange==='function')_txTipoChange();}
+  if(o.buildingIds&&o.buildingIds[0]&&typeof _txSelectInmueble==='function')_txSelectInmueble(o.buildingIds[0],(o.buildingNames&&o.buildingNames[0])||'');
+  if(o.cuentaId&&typeof _txPartyPick==='function')_txPartyPick('comprador','cuenta',o.cuentaId,o.cuentaNombre||'');
+  const br=document.getElementById('txf-broker');if(br)br.value=o.ejecutivo?ejecDisplay(o.ejecutivo):'';
+  const notas=document.getElementById('txf-notas');if(notas&&!notas.value)notas.value='Cierre de la oportunidad: '+(o.nota||o.cuentaNombre||'');
+}
 window.oppUpdateConv=async function(oppId,cuentaId,val){
   const now=firebase.firestore.Timestamp.now();
   try{await db.collection('oportunidades').doc(oppId).update({conversion:val,ultimaActualizacion:now});
@@ -9086,6 +9119,7 @@ window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
   const est=document.getElementById('opdr-estado');if(est)est.innerHTML=OPP_ESTADOS.map((s,i)=>`<option${i===0?' selected':''}>${s}</option>`).join('');
   const eje=document.getElementById('opdr-ejecutivo');if(eje)eje.innerHTML='<option value="">— Seleccionar —</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
   document.getElementById('opdr-conversion').value='';document.getElementById('opdr-un').value='';
+  opdrEstadoChange();
   {const a=document.getElementById('opdr-actividad');if(a)a.value='';}
   loadClientesParaSelector();_loadBldDocsIfNeeded().catch(()=>{});
   if(prefillCuentaId){document.getElementById('opdr-cuentaId').value=prefillCuentaId;document.getElementById('opdr-cuentaNombre').value=prefillCuentaNombre||'';document.getElementById('opdr-cuenta').value=prefillCuentaNombre||'';}
@@ -9094,6 +9128,7 @@ window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
   document.getElementById('opdr-drawer').classList.add('open');
   setTimeout(()=>document.getElementById(prefillCuentaId?'opdr-cto-q':'opdr-cuenta')?.focus(),60);
 };
+window.opdrEstadoChange=function(){const e=document.getElementById('opdr-estado')?.value||'';const p=document.getElementById('opdr-prob');if(p)p.innerHTML=e?oppProbBadge(e):'<span style="color:#8898C0">–</span>';const h=document.getElementById('opdr-conversion');if(h)h.value=e?_oppConvFromEstado(e):'';};
 window.closeOportunidadDrawer=function(){
   document.getElementById('opdr-overlay').classList.remove('open');
   document.getElementById('opdr-drawer').classList.remove('open');
@@ -9127,11 +9162,11 @@ function _opdrRenderChips(){const c=document.getElementById('opdr-bld-chips');if
 window.saveOportunidadDrawer=async function(){
   const cuentaId=document.getElementById('opdr-cuentaId').value||'';
   const cuentaNombre=document.getElementById('opdr-cuentaNombre').value||'';
-  const estado=document.getElementById('opdr-estado').value||'';
-  const conversion=document.getElementById('opdr-conversion').value||'';
+  const estado=_oppNormEstado(document.getElementById('opdr-estado').value||'En gestión');
+  const conversion=_oppConvFromEstado(estado);  // probabilidad implícita según el estado
   const ejecutivo=document.getElementById('opdr-ejecutivo').value||'';
   let ok=true;const mark=(id,cond)=>{const el=document.getElementById(id);if(el)el.style.borderColor=cond?'':'#ED1B34';if(!cond)ok=false;};
-  mark('opdr-cuenta',!!cuentaId);mark('opdr-estado',!!estado);mark('opdr-conversion',!!conversion);mark('opdr-ejecutivo',!!ejecutivo);
+  mark('opdr-cuenta',!!cuentaId);mark('opdr-estado',!!estado);mark('opdr-ejecutivo',!!ejecutivo);
   if(!ok)return;
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('opdr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
@@ -14875,7 +14910,7 @@ function _renderTxTable(docs){
 }
 
 function openNewTransaccion(){
-  _txEditId=null;
+  _txEditId=null;_txOppLink='';
   document.getElementById('tx-drawer-title').textContent='Nueva Transacción';
   ['txf-tipo','txf-corredor','txf-inmueble','txf-inmueble-id','txf-direccion','txf-comprador','txf-compradorId','txf-compradorTipo','txf-vendedor','txf-vendedorId','txf-vendedorTipo','txf-broker','txf-superficie','txf-pm2','txf-total','txf-notas'].forEach(id=>{
     const el=document.getElementById(id);
@@ -15105,6 +15140,7 @@ function saveTxDrawer(){
     estado:(document.getElementById('txf-estado')||{}).value||'En negociación',
     notas:(document.getElementById('txf-notas')||{}).value||'',
     fecha:fechaVal?firebase.firestore.Timestamp.fromDate(new Date(fechaVal)):firebase.firestore.Timestamp.now(),
+    oportunidadId:_txOppLink||'',
     updatedAt:firebase.firestore.Timestamp.now(),
     updatedBy:user?.email||''
   };
@@ -15112,7 +15148,15 @@ function saveTxDrawer(){
   if(btn){btn.disabled=true;btn.textContent='Guardando...';}
   const ref=_txEditId?db.collection('transacciones').doc(_txEditId):db.collection('transacciones').doc();
   const payload=_txEditId?data:{...data,createdAt:firebase.firestore.Timestamp.now(),createdBy:user?.email||''};
+  const oppLink=_txOppLink;_txOppLink='';
   ref.set(payload,{merge:true}).then(()=>{
+    // Cierre de Oportunidad: vincular la Transacción a la Oportunidad (trazabilidad completa).
+    if(oppLink){
+      const num='Transacción '+(data.comprador||data.inmueble||'');
+      db.collection('oportunidades').doc(oppLink).update({transaccionId:ref.id,transaccionNumero:num,cierrePendiente:false,ultimaActualizacion:firebase.firestore.Timestamp.now()}).catch(()=>{});
+      const o=_oppDocs.find(x=>x._id===oppLink);if(o){o.transaccionId=ref.id;o.transaccionNumero=num;o.cierrePendiente=false;}
+      try{addClientTimeline&&data&&_oppDocs.find(x=>x._id===oppLink)&&addClientTimeline((_oppDocs.find(x=>x._id===oppLink)||{}).cuentaId,{tipo:'cuenta_actualizada',descripcion:'Oportunidad ganada cerrada → Transacción registrada'});}catch(e){}
+    }
     closeTxDrawer();
     loadTransacciones();
   }).catch(e=>{
@@ -16018,8 +16062,8 @@ function an2RenderExec(){
     {name:'Visitas',color:'#F97316',data:an2Monthly(vis,'fecha',6).counts},
     {name:'Transacciones',color:'#DC2626',data:an2Monthly(tx,'fecha',6).counts},
   ],lbls);
-  const oppOpen=opp.filter(o=>!['Ganada','Perdida'].includes(o.estado));
-  const oppDist=_ancBars([['0–50 %',oppOpen.filter(o=>o.conversion==='0-50').length],['50–80 %',oppOpen.filter(o=>o.conversion==='50-80').length],['80–100 %',oppOpen.filter(o=>o.conversion==='80-100').length]],{order:['0–50 %','50–80 %','80–100 %']});
+  const oppOpen=opp.filter(o=>!['Ganada','Perdida'].includes(_oppNormEstado(o.estado)));
+  const oppDist=_ancBars([['0–50 %',oppOpen.filter(o=>_oppConvFromEstado(o.estado)==='0-50').length],['51–80 %',oppOpen.filter(o=>_oppConvFromEstado(o.estado)==='50-80').length]],{order:['0–50 %','51–80 %']});
   const topBrk=_ancBars([..._ancCountBy(opp,o=>o.ejecutivo)].map(([k,v])=>[ejecDisplay(k),v]),{max:5});
   const al=an2Alerts();
   root.innerHTML=`
@@ -16119,12 +16163,13 @@ function an2ModContactos(){
 function an2ModOpp(){
   let d=(_oppDocs||[]);if(_an2Flt.period!=='all')d=d.filter(x=>an2InPeriod(x.fechaCreacion));
   if(_an2Flt.ejecutivo)d=d.filter(x=>x.ejecutivo===_an2Flt.ejecutivo);
-  const abiertas=d.filter(o=>!['Ganada','Perdida'].includes(o.estado)).length;
-  const ganadas=d.filter(o=>o.estado==='Ganada').length,perdidas=d.filter(o=>o.estado==='Perdida').length;
-  const now=Date.now();const estanc=d.filter(o=>!['Ganada','Perdida'].includes(o.estado)&&(()=>{const t=_tsToDate(o.ultimaActividad||o.fechaCreacion);return t&&(now-t.getTime())>30*864e5;})()).length;
-  const open=d.filter(o=>!['Ganada','Perdida'].includes(o.estado));
-  const charts=_ancCard('Por Probabilidad',_ancBars([['0–50 %',open.filter(o=>o.conversion==='0-50').length],['50–80 %',open.filter(o=>o.conversion==='50-80').length],['80–100 %',open.filter(o=>o.conversion==='80-100').length]],{order:['0–50 %','50–80 %','80–100 %']}))
-    +_ancCard('Por Estado',_ancBars([..._ancCountBy(d,o=>o.estado||'—')],{order:OPP_ESTADOS}))
+  const est=o=>_oppNormEstado(o.estado);
+  const abiertas=d.filter(o=>!['Ganada','Perdida'].includes(est(o))).length;
+  const ganadas=d.filter(o=>est(o)==='Ganada').length,perdidas=d.filter(o=>est(o)==='Perdida').length;
+  const now=Date.now();const estanc=d.filter(o=>!['Ganada','Perdida'].includes(est(o))&&(()=>{const t=_tsToDate(o.ultimaActividad||o.fechaCreacion);return t&&(now-t.getTime())>30*864e5;})()).length;
+  const open=d.filter(o=>!['Ganada','Perdida'].includes(est(o)));
+  const charts=_ancCard('Por Probabilidad',_ancBars([['0–50 %',open.filter(o=>_oppConvFromEstado(o.estado)==='0-50').length],['51–80 %',open.filter(o=>_oppConvFromEstado(o.estado)==='50-80').length]],{order:['0–50 %','51–80 %']}))
+    +_ancCard('Por Estado',_ancBars([..._ancCountBy(d,o=>_oppNormEstado(o.estado))],{order:OPP_ESTADOS}))
     +_ancCard('Actividades comerciales',_ancBars([..._ancCountBy(d,o=>o.actividadComercial||'Sin actividad')],{max:8}))
     +_ancCard('Por Ejecutivo',_ancBars([..._ancCountBy(d,o=>o.ejecutivo)].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
     +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Oportunidades por mes (12m)</div>${_ancMonthlyVbars(d,'fechaCreacion')}</div>`;
