@@ -2965,7 +2965,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <input id="opp-search" type="text" placeholder="🔍 Buscar cuenta..." class="crm-search-inp" oninput="filterOportunidades()">
           <select id="opp-filter-ejecutivo" class="crm-sel" onchange="filterOportunidades()"><option value="">Ejecutivo</option></select>
           <select id="opp-filter-estado" class="crm-sel" onchange="filterOportunidades()"><option value="">Estado</option></select>
-          <select id="opp-filter-actividad" class="crm-sel" onchange="filterOportunidades()"><option value="">Actividad comercial</option><option>Visita comercial</option><option>Informe de alternativas</option><option>Propuesta de servicios</option></select>
+          <select id="opp-filter-actividad" class="crm-sel" onchange="filterOportunidades()"><option value="">Actividad comercial</option></select>
           <select id="opp-filter-conversion" class="crm-sel" onchange="filterOportunidades()"><option value="">% Conversión</option><option value="0-50">0–50%</option><option value="50-80">50–80%</option><option value="80-100">80–100%</option></select>
           <select id="opp-filter-un" class="crm-sel" onchange="filterOportunidades()"><option value="">Unidad de negocio</option><option>Oficinas</option><option>Retail</option><option>Industria &amp; Logística</option></select>
           <button class="crm-new-btn" onclick="openOportunidadDrawer()">+ Nueva Oportunidad</button>
@@ -3028,10 +3028,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           </div>
         </div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Actividad Comercial</div>
+          <div class="cdr-lbl">Actividad que origina la Oportunidad</div>
           <select id="opdr-actividad" class="cdr-select">
             <option value="">— Seleccionar —</option>
-            <option>Visita comercial</option><option>Informe de alternativas</option><option>Propuesta de servicios</option>
           </select>
           <div style="font-size:10.5px;color:#8898C0;margin-top:.25rem">Al seleccionar, se registra la actividad en la Cuenta y el Contacto.</div>
         </div>
@@ -8935,7 +8934,7 @@ window.saveVisitaDrawer=async function(){
 // Estados oficiales (esta definición reemplaza a la del documento): 4 estados.
 // La probabilidad ya no la elige el usuario: queda IMPLÍCITA según el estado.
 const OPP_ESTADOS=['En gestión','En negociación','Ganada','Perdida'];
-const OPP_ACTIVIDADES=['Visita comercial','Informe de alternativas','Propuesta de servicios'];
+const OPP_ACTIVIDADES=['Propuesta Comercial','BOV (Broker Opinion of Value)','Contrato de Listing','Contrato de Tenant Representation','Carta Oferta / LOI / Reserva','Colocación de Cartel','Reporte de Alternativas','Tour de Propiedades','Participación en RFP','Solicitud de Valuación','Solicitud de Project Management','Solicitud de otra oficina Colliers'];
 const OPP_CONV_LBL={'0-50':'🟠 0–50%','50-80':'🟡 51–80%','80-100':'🟢 100%'};
 // Probabilidad implícita por estado. conv = bucket para Analytics/Dashboard (compat).
 const OPP_ESTADO_PROB={'En gestión':{conv:'0-50',lbl:'0–50%',pct:25},'En negociación':{conv:'50-80',lbl:'51–80%',pct:65},'Ganada':{conv:'80-100',lbl:'100%',pct:100},'Perdida':{conv:'0-50',lbl:'0%',pct:0}};
@@ -8976,6 +8975,7 @@ async function loadOportunidades(){
 function _oppInitFilters(){
   if(_oppFiltersReady)return;_oppFiltersReady=true;
   const est=document.getElementById('opp-filter-estado');if(est)est.innerHTML='<option value="">Estado</option>'+OPP_ESTADOS.map(s=>`<option>${s}</option>`).join('');
+  const act=document.getElementById('opp-filter-actividad');if(act)act.innerHTML='<option value="">Actividad comercial</option>'+OPP_ACTIVIDADES.map(s=>`<option>${esc(s)}</option>`).join('');
   const eje=document.getElementById('opp-filter-ejecutivo');if(eje)eje.innerHTML='<option value="">Ejecutivo</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
 }
 function _oppByCuenta(opps){
@@ -9120,7 +9120,7 @@ window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
   const eje=document.getElementById('opdr-ejecutivo');if(eje)eje.innerHTML='<option value="">— Seleccionar —</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
   document.getElementById('opdr-conversion').value='';document.getElementById('opdr-un').value='';
   opdrEstadoChange();
-  {const a=document.getElementById('opdr-actividad');if(a)a.value='';}
+  {const a=document.getElementById('opdr-actividad');if(a){a.innerHTML='<option value="">— Seleccionar —</option>'+OPP_ACTIVIDADES.map(o=>`<option>${esc(o)}</option>`).join('');a.value='';}}
   loadClientesParaSelector();_loadBldDocsIfNeeded().catch(()=>{});
   if(prefillCuentaId){document.getElementById('opdr-cuentaId').value=prefillCuentaId;document.getElementById('opdr-cuentaNombre').value=prefillCuentaNombre||'';document.getElementById('opdr-cuenta').value=prefillCuentaNombre||'';}
   const btn=document.getElementById('opdr-save-btn');if(btn){btn.textContent='Crear oportunidad';btn.disabled=false;}
