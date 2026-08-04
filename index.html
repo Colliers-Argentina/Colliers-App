@@ -14208,21 +14208,21 @@ const SR_SERVICES=[
        {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
      ]},
      {step:2,title:'Condiciones Comerciales',fields:[
-       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
-       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
-       {k:'precioVenta',label:'Precio de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
-       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
+       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
+       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
+       {k:'precioVenta',label:'Precio de venta',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
+       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
      ]},
      {step:2,title:'Superficies y Dimensiones',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true},
        {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
-       {k:'cocheras',label:'Cocheras',type:'number'},
-       {k:'banos',label:'Baños',type:'number'},
+       {k:'cocheras',label:'Cocheras',type:'number',req:true},
+       {k:'banos',label:'Baños',type:'number',req:true},
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
        {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
        {k:'oficinasPorPiso',label:'Oficinas por piso',type:'number'},
-       {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number'},
+       {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
      ]},
      // Paso 3 — Características
      {step:3,title:'Características Particulares',fields:[
@@ -14415,16 +14415,20 @@ window.srWizNext=function(){
 function _srWizValidateStep(n){
   const svc=_srFormService;if(!svc)return true;
   const data=_srReadForm(svc);
-  let ok=true,first=null;
+  let ok=true,first=null;const faltan=[];
   svc.form.filter(c=>(c.step||1)===n).forEach(card=>card.fields.forEach(f=>{
     if(!f.req||!_srFieldVisible(f,data))return;
     const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:!String(data[f.k]||'').trim());
     const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':'srf-'+f.k);
     const el=document.getElementById(elId);if(el)el.style.borderColor=empty?'#ED1B34':'';
-    if(empty){ok=false;if(!first)first=el;}
+    if(empty){ok=false;if(!first)first=el;faltan.push((f.label||f.k).replace(/\s*\(.*?\)\s*$/,''));}
   }));
   if(n===2&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
-  if(!ok&&first&&first.scrollIntoView)first.scrollIntoView({behavior:'smooth',block:'center'});
+  if(!ok){
+    if(first&&first.scrollIntoView)first.scrollIntoView({behavior:'smooth',block:'center'});
+    const msg=faltan.length?('Faltan campos obligatorios: '+faltan.join(', ')):'Revisá los campos obligatorios (Superficie total).';
+    if(typeof showBldToast==='function')showBldToast('⚠ '+msg,4000); else alert(msg);
+  }
   return ok;
 }
 function _srWizRenderReview(){
