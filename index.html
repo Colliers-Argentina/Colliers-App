@@ -14352,13 +14352,9 @@ function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
   _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;
   document.getElementById('sr-form-title').textContent=svc.label;
-  const now=new Date();
-  const auto=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Automático</div>
-    <div class="nx-row"><div class="nx-row-l">Solicitante</div><div class="nx-row-v">${esc(user?.displayName||user?.email||'–')}</div></div>
-    <div class="nx-row"><div class="nx-row-l">Broker</div><div class="nx-row-v">${esc(user?.displayName||user?.email||'–')}</div></div>
-    <div class="nx-row"><div class="nx-row-l">Tipo de solicitud</div><div class="nx-row-v">${esc(svc.label)}</div></div>
-    <div class="nx-row"><div class="nx-row-l">Fecha de solicitud</div><div class="nx-row-v">${now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}</div></div>
-    <div class="nx-row"><div class="nx-row-l">Responsable del servicio</div><div class="nx-row-v">${esc(svc.responsable)}</div></div></div>`;
+  // El bloque "Automático" (Solicitante/Broker/Tipo/Fecha/Responsable) ya no se muestra en la
+  // carga: esos datos se siguen generando y guardando automáticamente en submitSolicitud
+  // (base de datos, PDF, timeline, auditoría, correos y detalle).
   const cardHTML=card=>{
     const zebra=card.title==='Superficies y Dimensiones';
     const fields=card.fields.map((f,i)=>{let html=_srFieldHTML(f);if(zebra&&i%2===1)html=html.replace('class="cdr-field"','class="cdr-field sr-zebra-row"');return html;}).join('');
@@ -14369,7 +14365,7 @@ function openSolicitudForm(key){
   let steps='';
   for(let n=1;n<=4;n++){
     const cards=svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
-    steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${n===1?auto:''}${cards}</div>`;
+    steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${cards}</div>`;
   }
   steps+=`<div class="sr-wiz-step" data-step="5" id="sr-wiz-review" style="display:none"></div>`;
   steps+=`<div class="sr-wiz-step" data-step="6" id="sr-wiz-confirm" style="display:none"></div>`;
