@@ -1707,12 +1707,12 @@ body.dark #solicitudes-panel{background:#040A1C}
 .sr-zebra-row{background:#F6F8FC;border-radius:6px}
 body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 /* Wizard de Solicitudes (paso a paso, mismo patrón que el alta de Oficinas) */
-.sr-wiz{max-width:820px;margin:0 auto}
+.sr-wiz{max-width:1100px;margin:0 auto}
 /* Layout de 2 columnas dentro de cada tarjeta del wizard (escritorio); 1 columna en móvil. */
-.sr-grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 1.1rem;align-items:start}
+.sr-grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 1.4rem;align-items:start}
 .sr-grid2>.cdr-field{margin-bottom:.85rem;min-width:0}
 .sr-grid2>.sr-col-full{grid-column:1/-1}
-@media(max-width:720px){.sr-grid2{grid-template-columns:1fr}}
+@media(max-width:760px){.sr-grid2{grid-template-columns:1fr}}
 .sr-wiz-progress{display:flex;align-items:flex-start;justify-content:center;margin-bottom:1.4rem;padding:0 .2rem}
 .sr-wiz-node{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px}
 .sr-wiz-dot{width:30px;height:30px;border-radius:50%;background:#EEF1F8;border:1px solid #DBE2F0;color:#8898C0;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:all .2s}
@@ -14205,13 +14205,13 @@ const SR_SERVICES=[
      ]},
      // Paso 2 — Información Comercial
      {step:2,title:'Datos Generales',fields:[
-       {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta'],req:true},
+       {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
      ]},
      {step:2,title:'Condiciones Comerciales',fields:[
-       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler']}},
-       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler']}},
-       {k:'precioVenta',label:'Precio de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta']}},
-       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta']}},
+       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
+       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
+       {k:'precioVenta',label:'Precio de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
+       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
      ]},
      {step:2,title:'Superficies y Dimensiones',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true},
@@ -14360,9 +14360,9 @@ function openSolicitudForm(key){
   // El bloque "Automático" (Solicitante/Broker/Tipo/Fecha/Responsable) ya no se muestra en la
   // carga: esos datos se siguen generando y guardando automáticamente en submitSolicitud
   // (base de datos, PDF, timeline, auditoría, correos y detalle).
-  // Layout de dos columnas (escritorio): los campos independientes van a media columna;
-  // textareas, pickers, listas y selecciones múltiples ocupan el ancho completo.
-  const SR_FULL_TYPES=['textarea','docs','multi','sino','ejecutivos','cuenta','contacto','inmueble'];
+  // Layout de dos columnas (escritorio): todos los campos van a media columna,
+  // salvo texto largo / listas / cargas de archivos, que ocupan el ancho completo.
+  const SR_FULL_TYPES=['textarea','docs','multi','sino'];
   const cardHTML=card=>{
     const fields=card.fields.map(f=>{let html=_srFieldHTML(f);if(SR_FULL_TYPES.includes(f.type))html=html.replace('class="cdr-field"','class="cdr-field sr-col-full"');return html;}).join('');
     return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div><div class="sr-grid2">${fields}</div></div>`;
