@@ -8210,6 +8210,10 @@ function renderLeadInfoCards(d){
   const row=(lbl,val)=>`<div class="nx-row"><div class="nx-row-l">${lbl}</div><div class="nx-row-v">${val||dash}</div></div>`;
   const t=v=>v?esc(v):null;
   const link=d.linkOrigen?`<a href="${esc(d.linkOrigen)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600;word-break:break-all">${esc(d.linkOrigen)}</a>`:null;
+  // Empresa: campo informativo dentro de Datos del Lead (consistente con el panel izquierdo).
+  const empresaInfo=d.cuentaNombre
+    ?`<a href="javascript:void(0)" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`
+    :(d.empresa?esc(d.empresa):'<span style="color:#8898C0">Sin empresa asociada</span>');
   const reqCard=d.requerimiento?`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Requerimiento</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(d.requerimiento)}</div></div>`:'';
   return reqCard+`
     <div class="nx-grid">
@@ -8218,6 +8222,7 @@ function renderLeadInfoCards(d){
           <div class="nx-card-title">Datos del Lead</div>
           ${row('Nombre',t(d.nombre))}
           ${row('Apellido',t(d.apellido))}
+          ${row('Empresa',empresaInfo)}
           ${row('Email',t(d.email))}
           ${row('Teléfono',t(d.telefono))}
           ${row('Cargo',t(d.cargo))}
