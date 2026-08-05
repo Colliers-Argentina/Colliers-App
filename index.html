@@ -3026,9 +3026,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <div id="opdr-cuenta-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
             <input id="opdr-cuentaId" type="hidden"><input id="opdr-cuentaNombre" type="hidden">
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Nombre del proyecto</div><input id="opdr-proyecto" class="cdr-input" type="text" placeholder="Ej: Búsqueda depósito Zona Norte"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Nombre del proyecto <span class="cdr-req">*</span></div><input id="opdr-proyecto" class="cdr-input" type="text" placeholder="Ej: Búsqueda depósito Zona Norte"></div>
           <div class="cdr-row">
-            <div class="cdr-field"><div class="cdr-lbl">División</div><select id="opdr-division" class="cdr-select"><option>Brokerage</option><option>SPS</option><option>V&amp;C</option></select></div>
+            <div class="cdr-field"><div class="cdr-lbl">División <span class="cdr-req">*</span></div><select id="opdr-division" class="cdr-select"><option value="">–</option><option>Brokerage</option><option>SPS</option><option>V&amp;C</option></select></div>
             <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio</div><select id="opdr-un" class="cdr-select"><option value="">— Seleccionar —</option><option>Oficinas</option><option>Industrial</option><option>Logística</option><option>Retail</option></select></div>
           </div>
           <div class="cdr-row">
@@ -3036,7 +3036,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <div class="cdr-field"><div class="cdr-lbl">Tipo de transacción</div><select id="opdr-tipoTx" class="cdr-select"><option value="">— Seleccionar —</option><option>Venta</option><option>Compra</option><option>Alquiler</option><option>Venta / Alquiler</option></select></div>
           </div>
           <div class="cdr-row">
-            <div class="cdr-field"><div class="cdr-lbl">Superficie cubierta (m²)</div><input id="opdr-supCub" class="cdr-input" type="number" min="0" placeholder="0"></div>
+            <div class="cdr-field"><div class="cdr-lbl">Superficie cubierta (m²) <span class="cdr-req">*</span></div><input id="opdr-supCub" class="cdr-input" type="number" min="0" placeholder="0"></div>
             <div class="cdr-field"><div class="cdr-lbl">Superficie de terreno (m²)</div><input id="opdr-supTer" class="cdr-input" type="number" min="0" placeholder="0"></div>
           </div>
           <div class="cdr-field" id="opdr-ejec-field"><div class="cdr-lbl">Ejecutivos comerciales <span style="font-weight:400;color:#8898C0;font-size:11px">(hasta 3)</span></div><div id="opdr-ejec-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="opdr-ejec-q" class="cdr-input" type="text" placeholder="Agregar ejecutivo..." autocomplete="off" oninput="opeEjecSearch(this.value)" onfocus="opeEjecSearch(this.value)" onblur="opeEjecBlur()"><div id="opdr-ejec-drop" class="cdr-ms-drop" style="display:none"></div></div><input id="opdr-ejecutivo" type="hidden"></div>
@@ -3053,8 +3053,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <input id="opdr-contactoId" type="hidden"><input id="opdr-contactoNombre" type="hidden">
           </div>
           <div class="cdr-row">
-            <div class="cdr-field"><div class="cdr-lbl">Cliente Colliers</div><select id="opdr-cliente" class="cdr-select"><option>No</option><option>Sí</option></select></div>
-            <div class="cdr-field"><div class="cdr-lbl">Exclusividad</div><select id="opdr-exclusividad" class="cdr-select" onchange="opdrExclChange()"><option>No</option><option>Sí</option><option>Contacto directo</option></select></div>
+            <div class="cdr-field"><div class="cdr-lbl">Cliente Colliers <span class="cdr-req">*</span></div><select id="opdr-cliente" class="cdr-select"><option value="">–</option><option>Sí</option><option>No</option></select></div>
+            <div class="cdr-field"><div class="cdr-lbl">Exclusividad</div><select id="opdr-exclusividad" class="cdr-select" onchange="opdrExclChange()"><option value="">–</option><option>Sí</option><option>No</option><option>Contacto directo</option></select></div>
           </div>
           <div class="cdr-row" id="opdr-excl-extra" style="display:none">
             <div class="cdr-field"><div class="cdr-lbl">Fecha de autorización</div><input id="opdr-fechaAut" class="cdr-input" type="date"></div>
@@ -9223,19 +9223,21 @@ window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
   ['opdr-cuenta','opdr-cto-q','opdr-nota','opdr-proyecto','opdr-supCub','opdr-supTer'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['opdr-cuentaId','opdr-cuentaNombre','opdr-contactoId','opdr-contactoNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['opdr-cuenta-drop','opdr-cto-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  ['opdr-cuenta','opdr-estado'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
+  ['opdr-cuenta','opdr-estado','opdr-proyecto','opdr-division','opdr-supCub','opdr-cliente'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
   const ctag=document.getElementById('opdr-cuenta-tag');if(ctag)ctag.style.display='none';
   _opdrBlds=[];_opdrCtos=[];_opdrRenderCtoChips();
   const est=document.getElementById('opdr-estado');if(est)est.innerHTML=OPP_ESTADOS.map((s,i)=>`<option${i===0?' selected':''}>${s}</option>`).join('');
   ['opdr-un','opdr-tipoOp','opdr-tipoTx','opdr-conversion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  {const c=document.getElementById('opdr-cliente');if(c)c.value='No';}
-  {const ex=document.getElementById('opdr-exclusividad');if(ex)ex.value='No';}opdrExclChange();
-  {const d=document.getElementById('opdr-division');if(d)d.value=_userDivision();}
+  {const c=document.getElementById('opdr-cliente');if(c)c.value='';}
+  {const ex=document.getElementById('opdr-exclusividad');if(ex)ex.value='';}opdrExclChange();
+  {const d=document.getElementById('opdr-division');if(d)d.value='';}
   opdrEstadoChange();
   _opeSet(_leadCurrentEjec()?[_leadCurrentEjec()]:[]);   // 1º ejecutivo = usuario logueado
   {const a=document.getElementById('opdr-actividad');if(a){a.innerHTML='<option value="">— Seleccionar —</option>'+OPP_ACTIVIDADES.map(o=>`<option>${esc(o)}</option>`).join('');a.value='';}}
   {const gc=document.getElementById('opdr-gc');if(gc)gc.innerHTML=_oppEsGerente()?_oppBuildGC({}):'';}
   loadClientesParaSelector();
+  // Contactos disponibles para el buscador "Cuenta o Contacto" y el selector de contactos asociados.
+  if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});}
   if(prefillCuentaId){document.getElementById('opdr-cuentaId').value=prefillCuentaId;document.getElementById('opdr-cuentaNombre').value=prefillCuentaNombre||'';document.getElementById('opdr-cuenta').value=prefillCuentaNombre||'';_oppAutoClienteColliers(prefillCuentaId);}
   document.querySelector('#opdr-drawer .cdr-title').textContent='Nueva Oportunidad';
   const btn=document.getElementById('opdr-save-btn');if(btn){btn.textContent='Crear oportunidad';btn.disabled=false;}
@@ -9249,18 +9251,19 @@ window.openOportunidadDrawer_edit=function(oppId){
   _oppEditId=oppId;
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v==null?'':v;};
   if(o.cuentaId)_ctaPickerSet('opdr',o.cuentaId,o.cuentaNombre||'');
-  set('opdr-proyecto',o.nombreProyecto);set('opdr-division',o.division||_userDivision());set('opdr-un',o.unidadNegocio);
+  set('opdr-proyecto',o.nombreProyecto);set('opdr-division',o.division||'');set('opdr-un',o.unidadNegocio);
   set('opdr-tipoOp',o.tipoOportunidad);set('opdr-tipoTx',o.tipoTransaccion);set('opdr-supCub',o.superficieCubierta);set('opdr-supTer',o.superficieTerreno);
   _opeSet(_oppEjecs(o));
   _opdrCtos=Array.isArray(o.contactosAsociados)?o.contactosAsociados.slice():(o.contactoId?[{id:o.contactoId,nombre:o.contactoNombre,empresa:o.cuentaNombre,tipo:'Cliente'}]:[]);_opdrRenderCtoChips();
-  set('opdr-cliente',o.clienteColliers||'No');set('opdr-exclusividad',o.exclusividad||'No');opdrExclChange();
+  set('opdr-cliente',o.clienteColliers||'');set('opdr-exclusividad',o.exclusividad||'');opdrExclChange();
   set('opdr-fechaAut',o.fechaAutorizacion);set('opdr-tipoExcl',o.tipoExclusividad);
   set('opdr-estado',_oppNormEstado(o.estado));set('opdr-actividad',o.actividadComercial);set('opdr-nota',o.nota);
   if(_oppEsGerente()){const gc=document.getElementById('opdr-gc');if(gc)gc.innerHTML=_oppBuildGC(o);}
   document.querySelector('#opdr-drawer .cdr-title').textContent='Editar Oportunidad';
   const btn=document.getElementById('opdr-save-btn');if(btn)btn.textContent='Guardar cambios';
 };
-function _oppAutoClienteColliers(cuentaId){const c=(_crmDocs||[]).find(x=>x._id===cuentaId);if(c&&c.clienteColliers){const el=document.getElementById('opdr-cliente');if(el)el.value=(c.clienteColliers==='Sí')?'Sí':'No';}}
+// Cliente Colliers: se autocompleta desde la Cuenta si está definido; si no, queda en "–" y el usuario debe elegir.
+function _oppAutoClienteColliers(cuentaId){const c=(_crmDocs||[]).find(x=>x._id===cuentaId);const el=document.getElementById('opdr-cliente');if(!el)return;el.value=(c&&c.clienteColliers)?((c.clienteColliers==='Sí')?'Sí':'No'):'';}
 window.opdrEstadoChange=function(){const h=document.getElementById('opdr-conversion');const e=document.getElementById('opdr-estado')?.value||'';if(h)h.value=e?_oppConvFromEstado(e):'';
   // En alta (opp nueva), el Estado asigna el default de Probabilidad; al editar se respeta el valor manual.
   if(!_oppEditId){const p=document.getElementById('opdr-probabilidad');if(p&&e)p.value=_oppProbDefault(e);}};
@@ -9288,8 +9291,14 @@ window.saveOportunidadDrawer=async function(){
   const conversion=_oppConvFromEstado(estado);
   const ejecutivos=_opeEjec.slice();const ejecutivo=ejecutivos[0]||'';
   let ok=true;const mark=(id,cond)=>{const el=document.getElementById(id);if(el)el.style.borderColor=cond?'':'#ED1B34';if(!cond)ok=false;};
-  mark('opdr-cuenta',!!cuentaId);mark('opdr-estado',!!estado);
-  if(!ok)return;
+  // Obligatorios Broker: Cuenta o Contacto, Nombre del proyecto, División, Superficie cubierta.
+  const cuentaOk=!!cuentaId||_opdrCtos.length>0;
+  mark('opdr-cuenta',cuentaOk);mark('opdr-estado',!!estado);
+  mark('opdr-proyecto',!!(gv('opdr-proyecto')||'').trim());mark('opdr-division',!!gv('opdr-division'));
+  mark('opdr-cliente',!!gv('opdr-cliente'));mark('opdr-supCub',parseFloat(gv('opdr-supCub'))>0);
+  // Obligatorios Gerencia Comercial (solo si el rol los renderizó): Origen, Suborigen, Probabilidad, Cierre (Q y Año).
+  if(_oppEsGerente()){mark('opdr-origen',!!gv('opdr-origen'));mark('opdr-suborigen',!!gv('opdr-suborigen'));mark('opdr-probabilidad',!!gv('opdr-probabilidad'));mark('opdr-cierreQ',!!gv('opdr-cierreQ'));mark('opdr-cierreAnio',!!gv('opdr-cierreAnio'));}
+  if(!ok){alert('Completá los campos obligatorios resaltados.');return;}
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('opdr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
   try{
@@ -9298,11 +9307,11 @@ window.saveOportunidadDrawer=async function(){
     const contactosAsociados=_opdrCtos.map(p=>({id:p.id,nombre:p.nombre,empresa:p.empresa||'',cargo:p.cargo||'',email:p.email||'',telefono:p.telefono||'',tipo:p.tipo||'Cliente'}));
     const contactoId=contactosAsociados[0]?.id||'';const contactoNombre=contactosAsociados[0]?.nombre||'';
     const base={cuentaId,cuentaNombre,contactoId,contactoNombre,contactosAsociados,
-      nombreProyecto:(gv('opdr-proyecto')||'').trim(),division:gv('opdr-division')||_userDivision(),
+      nombreProyecto:(gv('opdr-proyecto')||'').trim(),division:gv('opdr-division'),
       unidadNegocio:gv('opdr-un'),tipoOportunidad:gv('opdr-tipoOp'),tipoTransaccion:gv('opdr-tipoTx'),
       superficieCubierta:parseFloat(gv('opdr-supCub'))||null,superficieTerreno:parseFloat(gv('opdr-supTer'))||null,
-      ejecutivos,ejecutivo,clienteColliers:gv('opdr-cliente')||'No',
-      exclusividad:gv('opdr-exclusividad')||'No',fechaAutorizacion:gv('opdr-fechaAut')||'',tipoExclusividad:gv('opdr-tipoExcl')||'',
+      ejecutivos,ejecutivo,clienteColliers:gv('opdr-cliente'),
+      exclusividad:gv('opdr-exclusividad'),fechaAutorizacion:gv('opdr-fechaAut')||'',tipoExclusividad:gv('opdr-tipoExcl')||'',
       estado,conversion,actividadComercial,tipoActividad:actividadComercial||'Oportunidad Comercial creada',nota,
       buildingIds:[],buildingNames:[],
       ultimaActividad:now,ultimaActualizacion:now};
@@ -9385,13 +9394,13 @@ function _oppRenderInfo(o){
   }
   return `<div class="nx-grid"><div class="nx-col">
       <div class="nx-card"><div class="nx-card-title">Información General</div>
-        ${row('Nombre del proyecto',esc(o.nombreProyecto||''))}${row('División',esc(o.division||''))}${row('Unidad de negocio',esc(o.unidadNegocio||''))}
+        ${row('Cuenta',esc(o.cuentaNombre||''))}${row('Nombre del proyecto',esc(o.nombreProyecto||''))}${row('División',esc(o.division||''))}${row('Unidad de negocio',esc(o.unidadNegocio||''))}
         ${row('Tipo de oportunidad',esc(o.tipoOportunidad||''))}${row('Tipo de transacción',esc(o.tipoTransaccion||''))}
         ${row('Superficie cubierta',sup(o.superficieCubierta))}${row('Superficie de terreno',sup(o.superficieTerreno))}
         ${row('Ejecutivos',_oppEjecs(o).map(k=>esc(ejecDisplay(k))).join(', ')||null)}</div>
     </div><div class="nx-col">
       <div class="nx-card"><div class="nx-card-title">Oportunidad</div>
-        ${row('Cuenta',esc(o.cuentaNombre||''))}${row('Cliente Colliers',esc(o.clienteColliers||''))}
+        ${row('Cliente Colliers',esc(o.clienteColliers||''))}
         ${row('Exclusividad',esc(o.exclusividad||''))}${o.exclusividad==='Sí'?row('Fecha de autorización',esc(o.fechaAutorizacion||''))+row('Tipo de exclusividad',esc(o.tipoExclusividad||'')):''}
         ${row('Estado',oppEstadoBadge(o.estado))}${row('Actividad de origen',esc(o.actividadComercial||''))}</div>
       ${o.nota?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(o.nota)}</div></div>`:''}
@@ -9616,16 +9625,25 @@ window.ctaPickerInput=function(key,val){
   const tag=document.getElementById(c.tagId);if(tag)tag.style.display='none';
   const drop=document.getElementById(c.dropId);if(!drop)return;
   const q=(val||'').trim();
-  c._opts=q?_ctaSimilares(q,8):[];
-  let h=c._opts.map((d,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctaPickerPickIdx('${key}',${i})">🏢 ${esc(d.nombre||'')}</div>`).join('');
+  let opts=(q?_ctaSimilares(q,8):[]).map(d=>({...d,_tipo:'cuenta'}));
+  // Buscador combinado Cuenta / Contacto (item: "Cuenta o Contacto").
+  if(c.includeContactos&&q){
+    const lq=q.toLowerCase();
+    const ctos=(Array.isArray(_ctoDocs)?_ctoDocs:[]).filter(x=>(((x.nombre||'')+' '+(x.apellidos||'')+' '+(x.cuentaNombre||'')).toLowerCase().includes(lq))).slice(0,6);
+    opts=opts.concat(ctos.map(x=>({...x,_tipo:'contacto'})));
+  }
+  c._opts=opts;
+  let h=c._opts.map((d,i)=>d._tipo==='contacto'
+    ?`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctaPickerPickIdx('${key}',${i})">👤 ${esc(((d.nombre||'')+' '+(d.apellidos||'')).trim())}${d.cuentaNombre?` <span style="color:#8898C0;font-size:11px">· ${esc(d.cuentaNombre)}</span>`:''} <span style="color:#8898C0;font-size:10px">Contacto</span></div>`
+    :`<div class="cdr-ms-item" onmousedown="event.preventDefault();ctaPickerPickIdx('${key}',${i})">🏢 ${esc(d.nombre||'')} <span style="color:#8898C0;font-size:10px">Cuenta</span></div>`).join('');
   // "Crear nueva cuenta" solo aparece cuando no hay coincidencias relevantes.
   // Si hay cuentas similares, se muestran primero para evitar duplicados.
   if(q&&!c._opts.length&&c.allowCreate!==false)h+=`<div class="cdr-ms-item" style="color:#1C54F4;font-weight:700;border-top:1px solid #EEF2FA" onmousedown="event.preventDefault();ctaPickerCreate('${key}')">➕ Crear nueva cuenta "${esc(q)}"</div>`;
-  drop.innerHTML=h||'<div class="cdr-ms-empty">Escribí para buscar en Cuentas…</div>';
+  drop.innerHTML=h||`<div class="cdr-ms-empty">Escribí para buscar en ${c.includeContactos?'Cuentas o Contactos':'Cuentas'}…</div>`;
   drop.style.display=q?'block':'none';
 };
 window.ctaPickerBlur=function(key){const c=_ctaPickers[key];if(!c)return;setTimeout(()=>{const d=document.getElementById(c.dropId);if(d)d.style.display='none';},150);};
-window.ctaPickerPickIdx=function(key,i){const c=_ctaPickers[key];const d=c&&c._opts&&c._opts[i];if(!d)return;_ctaPickerSet(key,d._id,d.nombre||'');};
+window.ctaPickerPickIdx=function(key,i){const c=_ctaPickers[key];const d=c&&c._opts&&c._opts[i];if(!d)return;if(d._tipo==='contacto'){if(typeof c.onPickContacto==='function'){c.onPickContacto(d);}else{_ctaPickerSet(key,d.cuentaId||'',d.cuentaNombre||'');}return;}_ctaPickerSet(key,d._id,d.nombre||'');};
 function _ctaPickerSet(key,id,nombre){
   const c=_ctaPickers[key];if(!c)return;
   document.getElementById(c.inputId).value=nombre;
@@ -9640,7 +9658,15 @@ window.ctaPickerClear=function(key){const c=_ctaPickers[key];if(!c)return;docume
 window.ctaPickerCreate=function(key){const c=_ctaPickers[key];if(!c)return;const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';openClientDrawer((nombre,newId)=>_ctaPickerSet(key,newId,nombre),document.getElementById(c.inputId).value.trim());};
 registerCuentaPicker('ldr',{inputId:'ldr-empresa',dropId:'ldr-empresa-drop',tagId:'ldr-empresa-tag',hidId:'ldr-cuentaId',hidNombreId:'ldr-cuentaNombre'});
 registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre',onSelect:function(){ _visClearCto(); }});
-registerCuentaPicker('opdr',{inputId:'opdr-cuenta',dropId:'opdr-cuenta-drop',tagId:'opdr-cuenta-tag',hidId:'opdr-cuentaId',hidNombreId:'opdr-cuentaNombre',allowCreate:false});
+registerCuentaPicker('opdr',{inputId:'opdr-cuenta',dropId:'opdr-cuenta-drop',tagId:'opdr-cuenta-tag',hidId:'opdr-cuentaId',hidNombreId:'opdr-cuentaNombre',includeContactos:true,
+  onSelect:function(id){_oppAutoClienteColliers(id);},
+  onPickContacto:function(cto){
+    const nom=((cto.nombre||'')+' '+(cto.apellidos||'')).trim();
+    if(cto.cuentaId){_ctaPickerSet('opdr',cto.cuentaId,cto.cuentaNombre||'');}
+    else{const inp=document.getElementById('opdr-cuenta');if(inp)inp.value=nom;const dr=document.getElementById('opdr-cuenta-drop');if(dr)dr.style.display='none';}
+    if(cto._id&&!_opdrCtos.some(p=>p.id===cto._id))_opdrCtos.push({id:cto._id,nombre:nom,empresa:cto.cuentaNombre||'',cargo:cto.cargo||cto.puesto||'',email:cto.email||'',telefono:cto.telefono||'',tipo:'Cliente'});
+    _opdrRenderCtoChips();
+  }});
 
 // --- Modal de creación rápida de Cuenta (sin abandonar el formulario actual) ---
 let _qcRubros=[],_qcSubrubros=[],_qcRubroOpts=[],_qcSubOpts=[],_qcOnDone=null,_qcDupes=[];

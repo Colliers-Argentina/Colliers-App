@@ -247,20 +247,26 @@ GUIAS["Guia_Componentes"] = Guia(
 
 # ─────────────────────────── OPORTUNIDADES ───────────────────────────
 GUIAS["Guia_Oportunidades"] = Guia(
-    "Oportunidades", "3.1", FECHA,
+    "Oportunidades", "3.2", FECHA,
     "Módulo independiente con ficha propia por oportunidad (vista, timeline, actividades y contactos propios), integrado con Cuentas, Contactos, Actividades, Transacciones y Analytics. Cada oportunidad es una gestión entre una "
     "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
     "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
     "automáticamente una actividad en la Cuenta (y en el Contacto asociado).",
     [
-        ("Cuenta", "Buscar y seleccionar la empresa de la oportunidad (obligatorio)."),
-        ("Contacto principal", "Buscar y seleccionar el contacto de la cuenta (opcional). Si no hay, se continúa solo con la Cuenta."),
+        ("Cuenta o Contacto", "Buscar por nombre: el buscador encuentra tanto Cuentas como Contactos e indica el tipo de cada resultado. Al elegir un Contacto, se vincula también su Cuenta. Si no existe, se puede crear una nueva Cuenta desde el mismo buscador (obligatorio)."),
+        ("Nombre del proyecto", "Título de la oportunidad. Ej: 'Búsqueda depósito Zona Norte' (obligatorio)."),
+        ("División", "Área responsable: Brokerage, SPS o V&C. Sin valor por defecto: hay que elegirlo (obligatorio)."),
+        ("Superficie cubierta (m²)", "Metros cubiertos de la búsqueda o inmueble (obligatorio)."),
+        ("Contactos asociados", "Se pueden agregar varios contactos a la misma oportunidad; todos quedan vinculados y visibles en la ficha."),
+        ("Cliente Colliers", "Sí / No. Si la Cuenta ya tiene este dato, se completa solo; si no, queda en '–' y hay que elegir Sí o No antes de guardar (obligatorio)."),
+        ("Exclusividad", "Sí, No o Contacto directo. Sin valor por defecto: hay que elegirlo."),
         ("Inmueble(s) asociado(s)", "Buscar y agregar uno o varios inmuebles relacionados (opcional)."),
         ("Estado", "Etapa de la gestión con cuatro estados: En gestión, En negociación, Ganada o Perdida."),
         ("Probabilidad", "Probabilidad de cierre de la oportunidad, con cuatro niveles: 🔴 Muy baja, 🟠 Baja, 🟡 Media o 🟢 Alta (sin porcentajes). El Estado le asigna un valor inicial (En gestión → Muy baja, En negociación → Media), pero es un atributo independiente que el Gerente Comercial puede modificar. Solo la visualizan y editan el Gerente Comercial y el Administrador; el Broker no la ve ni la edita. Se muestra como etiqueta en la grilla, en la ficha y en Analytics."),
         ("Ejecutivo Comercial", "Ejecutivo responsable de la oportunidad (obligatorio)."),
         ("Actividad Comercial", "Acción comercial más relevante en curso: Visita comercial, Informe de alternativas o Propuesta de servicios. Al elegirla o cambiarla se registra automáticamente esa actividad en la Cuenta y el Contacto. Convive con el Estado (no lo reemplaza)."),
         ("Unidad de negocio", "Oficinas, Retail o Industria & Logística (opcional)."),
+        ("Gerencia Comercial", "Sección visible solo para Gerencia Comercial y Administrador (el Broker no la ve). Para esos usuarios son obligatorios Origen, Suborigen, Probabilidad y Fecha estimada de cierre (Quarter y Año); solo el Ingreso estimado es opcional."),
         ("Título / Nota", "Breve descripción de la oportunidad (opcional)."),
     ],
     [
