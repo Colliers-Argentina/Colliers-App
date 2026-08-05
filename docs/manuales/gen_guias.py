@@ -247,7 +247,7 @@ GUIAS["Guia_Componentes"] = Guia(
 
 # ─────────────────────────── OPORTUNIDADES ───────────────────────────
 GUIAS["Guia_Oportunidades"] = Guia(
-    "Oportunidades", "3.0", FECHA,
+    "Oportunidades", "3.1", FECHA,
     "Módulo independiente con ficha propia por oportunidad (vista, timeline, actividades y contactos propios), integrado con Cuentas, Contactos, Actividades, Transacciones y Analytics. Cada oportunidad es una gestión entre una "
     "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
     "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
@@ -257,7 +257,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
         ("Contacto principal", "Buscar y seleccionar el contacto de la cuenta (opcional). Si no hay, se continúa solo con la Cuenta."),
         ("Inmueble(s) asociado(s)", "Buscar y agregar uno o varios inmuebles relacionados (opcional)."),
         ("Estado", "Etapa de la gestión con cuatro estados: En gestión, En negociación, Ganada o Perdida."),
-        ("Prioridad", "Atributo independiente del estado, con tres niveles: 🟢 Alta, 🟡 Media o ⚪ Baja. Reemplaza a los porcentajes de probabilidad (ya no se usan). Se elige del desplegable y se puede cambiar desde la grilla; se muestra como etiqueta en la lista y en Analytics."),
+        ("Probabilidad", "Probabilidad de cierre de la oportunidad, con cuatro niveles: 🔴 Muy baja, 🟠 Baja, 🟡 Media o 🟢 Alta (sin porcentajes). El Estado le asigna un valor inicial (En gestión → Muy baja, En negociación → Media), pero es un atributo independiente que el Gerente Comercial puede modificar. Solo la visualizan y editan el Gerente Comercial y el Administrador; el Broker no la ve ni la edita. Se muestra como etiqueta en la grilla, en la ficha y en Analytics."),
         ("Ejecutivo Comercial", "Ejecutivo responsable de la oportunidad (obligatorio)."),
         ("Actividad Comercial", "Acción comercial más relevante en curso: Visita comercial, Informe de alternativas o Propuesta de servicios. Al elegirla o cambiarla se registra automáticamente esa actividad en la Cuenta y el Contacto. Convive con el Estado (no lo reemplaza)."),
         ("Unidad de negocio", "Oficinas, Retail o Industria & Logística (opcional)."),
