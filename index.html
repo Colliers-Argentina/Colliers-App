@@ -2292,6 +2292,10 @@ body.dark .an-bld-tag{background:rgba(28,84,244,.15);color:#72AEFF}
 }
 /* ===== CLIENT DRAWER ===== */
 .cdr-drawer{position:fixed;top:0;right:0;bottom:0;width:500px;z-index:501;background:#fff;box-shadow:-8px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+/* Oportunidad: drawer ancho a dos columnas (Información General | Oportunidad) */
+.cdr-drawer.opdr-wide{width:min(880px,96vw)}
+.opdr-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 1.5rem}
+@media(max-width:760px){.cdr-drawer.opdr-wide{width:100vw}.opdr-cols{grid-template-columns:1fr;gap:0}}
 .cdr-drawer.open{transform:translateX(0)}
 body.dark .cdr-drawer{background:#101c3b;color:#e0eaff}
 /* La Cuenta se puede crear desde otros drawers (Leads/Visitas/Contactos): su drawer
@@ -2967,19 +2971,19 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 
   <!-- OPORTUNIDADES SECTION -->
   <div id="crm-oportunidades-section" style="display:none;flex-direction:column;flex:1;overflow:hidden">
-    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+    <div id="opp-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
       <div class="crm-topbar">
         <div class="crm-topbar-l">
           <div class="crm-page-title">Oportunidades</div>
           <div class="crm-page-sub" id="opp-subtitle">Cargando...</div>
         </div>
         <div class="crm-topbar-r">
-          <input id="opp-search" type="text" placeholder="🔍 Buscar cuenta..." class="crm-search-inp" oninput="filterOportunidades()">
+          <input id="opp-search" type="text" placeholder="🔍 Buscar cuenta o proyecto..." class="crm-search-inp" oninput="filterOportunidades()">
           <select id="opp-filter-ejecutivo" class="crm-sel" onchange="filterOportunidades()"><option value="">Ejecutivo</option></select>
           <select id="opp-filter-estado" class="crm-sel" onchange="filterOportunidades()"><option value="">Estado</option></select>
           <select id="opp-filter-actividad" class="crm-sel" onchange="filterOportunidades()"><option value="">Actividad comercial</option></select>
           <select id="opp-filter-prioridad" class="crm-sel" onchange="filterOportunidades()"><option value="">Prioridad</option><option>Alta</option><option>Media</option><option>Baja</option></select>
-          <select id="opp-filter-un" class="crm-sel" onchange="filterOportunidades()"><option value="">Unidad de negocio</option><option>Oficinas</option><option>Retail</option><option>Industria &amp; Logística</option><option>SPS</option><option>Valuaciones</option></select>
+          <select id="opp-filter-un" class="crm-sel" onchange="filterOportunidades()"><option value="">Unidad de negocio</option><option>Oficinas</option><option>Industrial</option><option>Logística</option><option>Retail</option></select>
           <button class="crm-new-btn" onclick="openOportunidadDrawer()">+ Nueva Oportunidad</button>
         </div>
       </div>
@@ -2988,68 +2992,83 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <div class="crm-tbl-wrap"><div id="opp-table-wrap">Cargando...</div></div>
       </div>
     </div>
+    <!-- OPORTUNIDAD DETAIL VIEW (ficha propia) -->
+    <div id="opp-detail-view" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="crm-det-topbar">
+        <button class="crm-det-back-btn" onclick="closeOppDetail()">← Volver a oportunidades</button>
+        <div style="flex:1"></div>
+        <button id="opp-cierre-btn" onclick="oppCompletarCierre(_oppCurrentId)" style="display:none;background:#DC2626;color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer">⚠ Completar cierre</button>
+        <button id="opp-edit-btn" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="openOportunidadDrawer_edit(_oppCurrentId)">✏️ Editar</button>
+      </div>
+      <div class="crm-det-layout">
+        <div class="crm-det-left" id="opp-det-left"></div>
+        <div class="crm-det-right" id="opp-det-right"></div>
+      </div>
+    </div>
   </div>
 
 <!-- OPORTUNIDAD DRAWER -->
   <div id="opdr-overlay" class="cdr-overlay" onclick="closeOportunidadDrawer()"></div>
-  <div id="opdr-drawer" class="cdr-drawer" role="dialog" aria-modal="true" aria-label="Nueva Oportunidad">
+  <div id="opdr-drawer" class="cdr-drawer opdr-wide" role="dialog" aria-modal="true" aria-label="Nueva Oportunidad">
     <div class="cdr-hd">
       <div class="cdr-title">Nueva Oportunidad</div>
       <button class="cdr-close" onclick="closeOportunidadDrawer()" title="Cerrar">✕</button>
     </div>
     <div class="cdr-body">
-      <div class="cdr-section">
-        <div class="cdr-section-hd"><div class="cdr-section-num">1</div><div class="cdr-section-name">Oportunidad</div><div class="cdr-section-line"></div></div>
-        <div class="cdr-field" style="position:relative">
-          <div class="cdr-lbl">Cuenta <span class="cdr-req">*</span></div>
-          <input id="opdr-cuenta" class="cdr-input" type="text" placeholder="Buscar cuenta en Cuentas..." autocomplete="off" oninput="ctaPickerInput('opdr',this.value)" onfocus="ctaPickerInput('opdr',this.value)" onblur="ctaPickerBlur('opdr')">
-          <div id="opdr-cuenta-drop" class="cdr-ms-drop" style="display:none"></div>
-          <div id="opdr-cuenta-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
-          <input id="opdr-cuentaId" type="hidden"><input id="opdr-cuentaNombre" type="hidden">
-        </div>
-        <div class="cdr-field" style="position:relative">
-          <div class="cdr-lbl">Contacto principal</div>
-          <input id="opdr-cto-q" class="cdr-input" type="text" placeholder="Buscar contacto (opcional)..." autocomplete="off" oninput="opdrCtoSearch(this.value)">
-          <div id="opdr-cto-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
-          <input id="opdr-contactoId" type="hidden"><input id="opdr-contactoNombre" type="hidden">
-        </div>
-        <div class="cdr-field" style="position:relative">
-          <div class="cdr-lbl">Inmueble(s) asociado(s)</div>
-          <input id="opdr-bld-q" class="cdr-input" type="text" placeholder="Buscar inmueble (opcional)..." autocomplete="off" oninput="opdrBldSearch(this.value)">
-          <div id="opdr-bld-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
-          <div id="opdr-bld-chips" class="cdr-ms-chips" style="margin-top:.35rem"></div>
-        </div>
-      </div>
-      <div class="cdr-section">
-        <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Gestión</div><div class="cdr-section-line"></div></div>
-        <div class="cdr-row">
-          <div class="cdr-field"><div class="cdr-lbl">Estado <span class="cdr-req">*</span></div>
-            <select id="opdr-estado" class="cdr-select" onchange="opdrEstadoChange()"></select>
+      <div class="opdr-cols">
+       <div class="opdr-col">
+        <div class="cdr-section">
+          <div class="cdr-section-hd"><div class="cdr-section-num">1</div><div class="cdr-section-name">Información General</div><div class="cdr-section-line"></div></div>
+          <div class="cdr-field" style="position:relative">
+            <div class="cdr-lbl">Cuenta o Contacto <span class="cdr-req">*</span></div>
+            <input id="opdr-cuenta" class="cdr-input" type="text" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('opdr',this.value)" onfocus="ctaPickerInput('opdr',this.value)" onblur="ctaPickerBlur('opdr')">
+            <div id="opdr-cuenta-drop" class="cdr-ms-drop" style="display:none"></div>
+            <div id="opdr-cuenta-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
+            <input id="opdr-cuentaId" type="hidden"><input id="opdr-cuentaNombre" type="hidden">
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Prioridad</div>
-            <select id="opdr-prioridad" class="cdr-select"><option>Baja</option><option selected>Media</option><option>Alta</option></select>
-            <input id="opdr-conversion" type="hidden">
+          <div class="cdr-field"><div class="cdr-lbl">Nombre del proyecto</div><input id="opdr-proyecto" class="cdr-input" type="text" placeholder="Ej: Búsqueda depósito Zona Norte"></div>
+          <div class="cdr-row">
+            <div class="cdr-field"><div class="cdr-lbl">División</div><select id="opdr-division" class="cdr-select"><option>Brokerage</option><option>SPS</option><option>V&amp;C</option></select></div>
+            <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio</div><select id="opdr-un" class="cdr-select"><option value="">— Seleccionar —</option><option>Oficinas</option><option>Industrial</option><option>Logística</option><option>Retail</option></select></div>
           </div>
-        </div>
-        <div class="cdr-row">
-          <div class="cdr-field"><div class="cdr-lbl">Ejecutivo Comercial <span class="cdr-req">*</span></div>
-            <select id="opdr-ejecutivo" class="cdr-select"></select>
+          <div class="cdr-row">
+            <div class="cdr-field"><div class="cdr-lbl">Tipo de oportunidad</div><select id="opdr-tipoOp" class="cdr-select"><option value="">— Seleccionar —</option><option>Tenant</option><option>Listing</option></select></div>
+            <div class="cdr-field"><div class="cdr-lbl">Tipo de transacción</div><select id="opdr-tipoTx" class="cdr-select"><option value="">— Seleccionar —</option><option>Venta</option><option>Compra</option><option>Alquiler</option><option>Venta / Alquiler</option></select></div>
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio</div>
-            <select id="opdr-un" class="cdr-select"><option value="">— Seleccionar —</option><option>Oficinas</option><option>Retail</option><option>Industria &amp; Logística</option><option>SPS</option><option>Valuaciones</option></select>
+          <div class="cdr-row">
+            <div class="cdr-field"><div class="cdr-lbl">Superficie cubierta (m²)</div><input id="opdr-supCub" class="cdr-input" type="number" min="0" placeholder="0"></div>
+            <div class="cdr-field"><div class="cdr-lbl">Superficie de terreno (m²)</div><input id="opdr-supTer" class="cdr-input" type="number" min="0" placeholder="0"></div>
           </div>
+          <div class="cdr-field" id="opdr-ejec-field"><div class="cdr-lbl">Ejecutivos comerciales <span style="font-weight:400;color:#8898C0;font-size:11px">(hasta 3)</span></div><div id="opdr-ejec-chips" class="cdr-ms-chips"></div><div class="cdr-ms-wrap"><input id="opdr-ejec-q" class="cdr-input" type="text" placeholder="Agregar ejecutivo..." autocomplete="off" oninput="opeEjecSearch(this.value)" onfocus="opeEjecSearch(this.value)" onblur="opeEjecBlur()"><div id="opdr-ejec-drop" class="cdr-ms-drop" style="display:none"></div></div><input id="opdr-ejecutivo" type="hidden"></div>
         </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Actividad que origina la Oportunidad</div>
-          <select id="opdr-actividad" class="cdr-select">
-            <option value="">— Seleccionar —</option>
-          </select>
-          <div style="font-size:10.5px;color:#8898C0;margin-top:.25rem">Al seleccionar, se registra la actividad en la Cuenta y el Contacto.</div>
+       </div>
+       <div class="opdr-col">
+        <div class="cdr-section">
+          <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Oportunidad</div><div class="cdr-section-line"></div></div>
+          <div class="cdr-field" style="position:relative">
+            <div class="cdr-lbl">Contactos asociados</div>
+            <input id="opdr-cto-q" class="cdr-input" type="text" placeholder="Buscar contacto..." autocomplete="off" oninput="opdrCtoSearch(this.value)">
+            <div id="opdr-cto-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+            <div id="opdr-cto-chips" style="margin-top:.4rem;display:flex;flex-direction:column;gap:.35rem"></div>
+            <input id="opdr-contactoId" type="hidden"><input id="opdr-contactoNombre" type="hidden">
+          </div>
+          <div class="cdr-row">
+            <div class="cdr-field"><div class="cdr-lbl">Cliente Colliers</div><select id="opdr-cliente" class="cdr-select"><option>No</option><option>Sí</option></select></div>
+            <div class="cdr-field"><div class="cdr-lbl">Exclusividad</div><select id="opdr-exclusividad" class="cdr-select" onchange="opdrExclChange()"><option>No</option><option>Sí</option><option>Contacto directo</option></select></div>
+          </div>
+          <div class="cdr-row" id="opdr-excl-extra" style="display:none">
+            <div class="cdr-field"><div class="cdr-lbl">Fecha de autorización</div><input id="opdr-fechaAut" class="cdr-input" type="date"></div>
+            <div class="cdr-field"><div class="cdr-lbl">Tipo de exclusividad</div><select id="opdr-tipoExcl" class="cdr-select"><option value="">— Seleccionar —</option><option>Contrato</option><option>Mail</option><option>Acuerdo verbal</option></select></div>
+          </div>
+          <div class="cdr-row">
+            <div class="cdr-field"><div class="cdr-lbl">Estado <span class="cdr-req">*</span></div><select id="opdr-estado" class="cdr-select" onchange="opdrEstadoChange()"></select></div>
+            <div class="cdr-field"><div class="cdr-lbl">Prioridad</div><select id="opdr-prioridad" class="cdr-select"><option>Baja</option><option selected>Media</option><option>Alta</option></select><input id="opdr-conversion" type="hidden"></div>
+          </div>
+          <div class="cdr-field"><div class="cdr-lbl">Actividad que origina la Oportunidad</div><select id="opdr-actividad" class="cdr-select"><option value="">— Seleccionar —</option></select></div>
+          <div id="opdr-gc"></div>
+          <div class="cdr-field"><div class="cdr-lbl">Comentarios</div><textarea id="opdr-nota" class="cdr-input" rows="2" placeholder="Comentarios..." style="resize:vertical;min-height:56px;line-height:1.5"></textarea></div>
         </div>
-        <div class="cdr-field">
-          <div class="cdr-lbl">Título / Nota</div>
-          <textarea id="opdr-nota" class="cdr-input" rows="2" placeholder="Breve descripción de la oportunidad..." style="resize:vertical;min-height:56px;line-height:1.5"></textarea>
-        </div>
+       </div>
       </div>
     </div>
     <div class="cdr-footer">
@@ -6427,7 +6446,7 @@ function renderCrmFilterChips(){
 }
 let _crmWidget='',_crmOppLoading=false,_crmSrLoading=false;
 // IDs de cuentas con oportunidades en gestión (activas): dato tomado del módulo Oportunidades.
-function _crmActiveOppCuentaIds(){const s=new Set();(_oppDocs||[]).forEach(o=>{if(o.cuentaId&&!['Ganada','Perdida'].includes(o.estado))s.add(o.cuentaId);});return s;}
+function _crmActiveOppCuentaIds(){const s=new Set();(_oppDocs||[]).forEach(o=>{if(o.cuentaId&&!['Ganada','Perdida'].includes(_oppNormEstado(o.estado)))s.add(o.cuentaId);});return s;}
 function _crmEnsureOpps(){if((_oppDocs&&_oppDocs.length)||!db||_crmOppLoading)return;_crmOppLoading=true;db.collection('oportunidades').get().then(s=>{_oppDocs=s.docs.map(d=>({...d.data(),_id:d.id}));renderCRMKPIs(_crmDocs);if(_crmWidget==='opps')filterCRM();}).catch(()=>{}).finally(()=>{_crmOppLoading=false;});}
 // Solicitudes por cuenta: dato tomado del módulo Solicitudes.
 function _crmSrCount(cuentaId){return (_srDocs||[]).filter(s=>s.cuentaId===cuentaId).length;}
@@ -8979,6 +8998,8 @@ function _oppMatchWidget(o,w){
   }
 }
 async function loadOportunidades(){
+  // Al entrar al módulo, mostrar la lista (no una ficha abierta previamente).
+  {const lv=document.getElementById('opp-list-view');if(lv)lv.style.display='flex';const dv=document.getElementById('opp-detail-view');if(dv)dv.style.display='none';_oppCurrentId=null;}
   const wrap=document.getElementById('opp-table-wrap');
   if(!db){if(wrap)wrap.innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
   if(wrap)wrap.innerHTML='<div class="crm-empty">Cargando...</div>';
@@ -9005,58 +9026,76 @@ function filterOportunidades(){
   const gv=id=>document.getElementById(id)?.value||'';
   const q=gv('opp-search').toLowerCase().trim();
   const fEje=gv('opp-filter-ejecutivo'),fEst=gv('opp-filter-estado'),fPrio=gv('opp-filter-prioridad'),fUn=gv('opp-filter-un'),fAct=gv('opp-filter-actividad');
+  // Cada oportunidad es su propia fila (ya NO se agrupa por cuenta).
   const opps=_oppDocs.filter(o=>{
-    if(q&&!((o.cuentaNombre||'').toLowerCase().includes(q)))return false;
-    if(fEje&&o.ejecutivo!==fEje)return false;
+    if(q&&!(((o.cuentaNombre||'')+' '+(o.nombreProyecto||'')+' '+(o.contactoNombre||'')).toLowerCase().includes(q)))return false;
+    if(fEje&&!_oppEjecs(o).includes(fEje))return false;
     if(fEst&&_oppNormEstado(o.estado)!==fEst)return false;
     if(fAct&&o.actividadComercial!==fAct)return false;
     if(fPrio&&_oppPrioridad(o)!==fPrio)return false;
     if(fUn&&o.unidadNegocio!==fUn)return false;
     if(_oppWidget&&!_oppMatchWidget(o,_oppWidget))return false;
     return true;
-  });
+  }).sort((a,b)=>(_tsToDate(b.ultimaActividad||b.fechaCreacion)?.getTime()||0)-(_tsToDate(a.ultimaActividad||a.fechaCreacion)?.getTime()||0));
   _renderOppWidgets();
-  const rows=_oppByCuenta(opps);
-  renderOportunidadesTable(rows);
-  const st=document.getElementById('opp-subtitle');if(st)st.textContent=`${rows.length} cuenta${rows.length!==1?'s':''} con oportunidades · ${opps.length} oportunidad${opps.length!==1?'es':''}`;
+  renderOportunidadesTable(opps);
+  const st=document.getElementById('opp-subtitle');if(st)st.textContent=`${opps.length} oportunidad${opps.length!==1?'es':''}`;
 }
+function _oppMoneyShort(n){n=n||0;return n>=1e6?('USD '+(n/1e6).toFixed(n%1e6?1:0)+'M'):('USD '+an2N(n));}
 function _renderOppWidgets(){
   const el=document.getElementById('opp-widgets');if(!el)return;
-  const c=k=>_oppDocs.filter(o=>_oppMatchWidget(o,k)).length;
-  const W=[['activas','Activas','#1C54F4'],['engestion','En gestión','#F59E0B'],['ennegociacion','En negociación','#7C3AED'],['ganadas','Ganadas','#16A34A'],['perdidas','Perdidas','#EF3340'],['cierre','Cierre pendiente','#DC2626']];
-  el.innerHTML=W.map(([k,lbl,col])=>`<div class="crm-kpi" style="cursor:pointer;${_oppWidget===k?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="oppToggleWidget('${k}')"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${c(k)}</div><div class="crm-kpi-l">${lbl}</div></div></div>`).join('');
+  const abiertas=_oppDocs.filter(o=>!['Ganada','Perdida'].includes(_oppNormEstado(o.estado)));
+  const activas=abiertas.length;
+  const ganadas=_oppDocs.filter(o=>_oppNormEstado(o.estado)==='Ganada').length;
+  const perdidas=_oppDocs.filter(o=>_oppNormEstado(o.estado)==='Perdida').length;
+  const conv=activas?Math.round(ganadas/(ganadas+activas)*100):0;   // conversión promedio
+  const cerrado=_oppDocs.filter(o=>_oppNormEstado(o.estado)==='Ganada').reduce((s,o)=>s+(parseFloat(o.ingresoEstimado)||0),0);
+  const prod=OPP_OBJETIVO_ANUAL?Math.round(cerrado/OPP_OBJETIVO_ANUAL*100):0;   // producción vs objetivo
+  const pipeline=abiertas.reduce((s,o)=>s+(parseFloat(o.ingresoEstimado)||0),0);  // suma ingresos estimados abiertas
+  const W=[
+    ['activas','Activas',String(activas),'#1C54F4'],
+    ['ganadas','Ganadas',String(ganadas),'#16A34A'],
+    ['perdidas','Perdidas',String(perdidas),'#EF3340'],
+    ['','Conversión prom.',conv+' %','#0090C7'],
+    ['','Producción',prod+' %','#7C3AED'],
+    ['','Pipeline abierto',_oppMoneyShort(pipeline),'#B45309'],
+  ];
+  el.innerHTML=W.map(([k,lbl,val,col])=>`<div class="crm-kpi" style="${k?'cursor:pointer;':''}${k&&_oppWidget===k?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}"${k?` onclick="oppToggleWidget('${k}')"`:''}><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`).join('');
 }
 window.oppToggleWidget=function(k){_oppWidget=_oppWidget===k?'':k;filterOportunidades();};
 function renderOportunidadesTable(rows){
   const wrap=document.getElementById('opp-table-wrap');if(!wrap)return;
   if(!rows.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin oportunidades. Creá una con "+ Nueva Oportunidad".</div>';return;}
+  const gerente=_oppEsGerente();
   let h='<table class="crm-table"><thead><tr>';
-  ['','Cuenta','Última actividad','Actividad Comercial','Estado','Prioridad','Ejecutivo','Últ. actualización',''].forEach(c=>h+=`<th>${c}</th>`);
+  const cols=gerente
+    ?['','Cuenta / Contacto','Proyecto','Ejecutivo','Estado','Prioridad','Origen','Suborigen','Cierre est.','Ingreso est.','']
+    :['','Cuenta / Contacto','Proyecto','Últ. actividad','Actividad','Unidad','Tipo op.','Tipo tx.','Sup. cub.','Estado','Ejecutivo',''];
+  cols.forEach(c=>h+=`<th>${c}</th>`);
   h+='</tr></thead><tbody>';
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
     const nombre=o.cuentaNombre||cuenta?.nombre||o.cuentaId;
     const logo=(cuenta&&_logoValida(cuenta.logoUrl))?`<img src="${esc(cuenta.logoUrl)}" style="width:30px;height:30px;border-radius:7px;object-fit:cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'crm-avatar',style:'background:${crmAvatarBg(nombre)}',innerText:'${crmInitials(nombre)}'}))">`:`<div class="crm-avatar" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>`;
-    const actSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateActividad('${o._id}','${o.cuentaId}','${o.contactoId||''}',this.value)"><option value="">–</option>${OPP_ACTIVIDADES.map(s=>`<option${o.actividadComercial===s?' selected':''}>${s}</option>`).join('')}</select>`;
     const enorm=_oppNormEstado(o.estado);
+    const cierrePend=enorm==='Ganada'&&!o.transaccionId;
     const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${enorm===s?' selected':''}>${s}</option>`).join('')}</select>`;
     const prio=_oppPrioridad(o);
     const prioSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdatePrioridad('${o._id}',this.value)">${OPP_PRIORIDADES.map(s=>`<option value="${s}"${prio===s?' selected':''}>${OPP_PRIO_META[s].dot} ${s}</option>`).join('')}</select>`;
-    const cierrePend=enorm==='Ganada'&&!o.transaccionId;
+    const ejec=_oppEjecs(o).map(k=>ejecDisplay(k)).join(', ')||'–';
     const accion=cierrePend
       ?`<button class="crm-action-btn" style="background:#FEF2F2;color:#DC2626;border-color:#F5C2C7;font-weight:700" onclick="event.stopPropagation();oppCompletarCierre('${o._id}')">⚠ Completar cierre</button>`
-      :(o.transaccionId?`<span style="font-size:10.5px;font-weight:700;color:#16A34A">✓ Cerrada${o.transaccionNumero?' · '+esc(o.transaccionNumero):''}</span>`:`<button class="crm-action-btn" onclick="event.stopPropagation();crmOpenCuenta('${o.cuentaId}')">Ver ficha →</button>`);
-    h+=`<tr onclick="crmOpenCuenta('${o.cuentaId}')"${cierrePend?' style="background:#FFF6F6"':''}>
-      <td>${logo}</td>
-      <td><div class="crm-client-name">${esc(nombre)}</div>${o.contactoNombre?`<div class="crm-client-sub">👤 ${esc(o.contactoNombre)}</div>`:''}</td>
-      <td class="crm-date">${fmtDate(o.ultimaActividad)}</td>
-      <td>${actSel}</td>
-      <td>${estSel}</td>
-      <td>${prioSel}</td>
-      <td><div class="crm-broker-cell">${esc(ejecDisplay(o.ejecutivo))||'–'}</div></td>
-      <td class="crm-date">${fmtDate(o.ultimaActualizacion)}</td>
-      <td>${accion}</td>
-    </tr>`;
+      :`<button class="crm-action-btn" onclick="event.stopPropagation();openOppDetail('${o._id}')">Ver ficha →</button>`;
+    const cuentaCell=`<td><div class="crm-client-name">${esc(nombre)}</div>${o.contactoNombre?`<div class="crm-client-sub">👤 ${esc(o.contactoNombre)}</div>`:''}</td>`;
+    const proyCell=`<td><div class="crm-broker-cell">${esc(o.nombreProyecto||'–')}</div></td>`;
+    let body;
+    if(gerente){
+      body=`${cuentaCell}${proyCell}<td><div class="crm-broker-cell">${esc(ejec)}</div></td><td>${estSel}</td><td>${prioSel}</td><td><div class="crm-broker-cell">${esc(o.origen||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.suborigen==='Otro'?(o.suborigenOtro||'Otro'):(o.suborigen||'–'))}</div></td><td class="crm-date">${esc((o.fechaCierreQ||'')+' '+(o.fechaCierreAnio||'')).trim()||'–'}</td><td class="crm-date">${o.ingresoEstimado?('USD '+an2N(o.ingresoEstimado)):'–'}</td><td>${accion}</td>`;
+    }else{
+      const actSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateActividad('${o._id}','${o.cuentaId}','${o.contactoId||''}',this.value)"><option value="">–</option>${OPP_ACTIVIDADES.map(s=>`<option${o.actividadComercial===s?' selected':''}>${s}</option>`).join('')}</select>`;
+      body=`${cuentaCell}${proyCell}<td class="crm-date">${fmtDate(o.ultimaActividad)}</td><td>${actSel}</td><td><div class="crm-broker-cell">${esc(o.unidadNegocio||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoOportunidad||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoTransaccion||'–')}</div></td><td class="crm-date">${o.superficieCubierta?an2N(o.superficieCubierta)+' m²':'–'}</td><td>${estSel}</td><td><div class="crm-broker-cell">${esc(ejec)}</div></td><td>${accion}</td>`;
+    }
+    h+=`<tr onclick="openOppDetail('${o._id}')"${cierrePend?' style="background:#FFF6F6"':''}><td>${logo}</td>${body}</tr>`;
   });
   h+='</tbody></table>';
   wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
@@ -9076,7 +9115,8 @@ window.oppUpdateEstado=async function(oppId,cuentaId,val){
   try{await db.collection('oportunidades').doc(oppId).update(upd);
     const o=_oppDocs.find(x=>x._id===oppId);if(o)Object.assign(o,upd);
     await _oppRegistrarCambio(cuentaId,`Oportunidad → Estado: ${val}`);
-    filterOportunidades();
+    await _oppRegistrarEvento(oppId,'estado',`Estado → ${val}`);
+    if(_oppCurrentId===oppId)openOppDetail(oppId); else filterOportunidades();
     // Ganada: la oportunidad aún no está finalizada; falta el cierre del negocio (Transacción).
     if(val==='Ganada'&&o&&!o.transaccionId&&confirm('¡Oportunidad ganada! 🎉\n\nFalta completar el cierre del negocio. ¿Abrir el formulario de Cierre de Transacción ahora?'))oppCompletarCierre(oppId);
   }catch(e){alert('Error: '+e.message);}
@@ -9088,12 +9128,13 @@ window.oppCompletarCierre=function(oppId){
   setTimeout(()=>{try{openNewTransaccion();_txOppLink=oppId;_txPrefillFromOpp(o);}catch(e){console.warn('cierre',e);}},350);
 };
 function _txPrefillFromOpp(o){
-  const map={'Oficinas':'Oficina','Retail':'Retail','Industria & Logística':'Industria y Logística'};
+  const map={'Oficinas':'Oficina','Retail':'Retail','Industria & Logística':'Industria y Logística','Industrial':'Industria y Logística','Logística':'Industria y Logística'};
   const tipoSel=document.getElementById('txf-tipo');if(tipoSel){tipoSel.value=map[o.unidadNegocio]||'';if(typeof _txTipoChange==='function')_txTipoChange();}
   if(o.buildingIds&&o.buildingIds[0]&&typeof _txSelectInmueble==='function')_txSelectInmueble(o.buildingIds[0],(o.buildingNames&&o.buildingNames[0])||'');
   if(o.cuentaId&&typeof _txPartyPick==='function')_txPartyPick('comprador','cuenta',o.cuentaId,o.cuentaNombre||'');
-  const br=document.getElementById('txf-broker');if(br)br.value=o.ejecutivo?ejecDisplay(o.ejecutivo):'';
-  const notas=document.getElementById('txf-notas');if(notas&&!notas.value)notas.value='Cierre de la oportunidad: '+(o.nota||o.cuentaNombre||'');
+  const ej=_oppEjecs(o)[0]||'';const br=document.getElementById('txf-broker');if(br)br.value=ej?ejecDisplay(ej):'';
+  const sup=document.getElementById('txf-superficie');if(sup&&o.superficieCubierta)sup.value=o.superficieCubierta;
+  const notas=document.getElementById('txf-notas');if(notas&&!notas.value)notas.value='Cierre de la oportunidad: '+(o.nombreProyecto||o.nota||o.cuentaNombre||'');
 }
 // Prioridad (Baja/Media/Alta): atributo independiente, editable desde la grilla.
 window.oppUpdatePrioridad=async function(oppId,val){
@@ -9101,7 +9142,8 @@ window.oppUpdatePrioridad=async function(oppId,val){
   const now=firebase.firestore.Timestamp.now();
   try{await db.collection('oportunidades').doc(oppId).update({prioridad:val,ultimaActualizacion:now});
     const o=_oppDocs.find(x=>x._id===oppId);if(o){o.prioridad=val;o.ultimaActualizacion=now;}
-    filterOportunidades();
+    await _oppRegistrarEvento(oppId,'prioridad',`Prioridad → ${val}`);
+    if(_oppCurrentId===oppId)openOppDetail(oppId); else filterOportunidades();
   }catch(e){alert('Error: '+e.message);}
 };
 window.oppUpdateConv=async function(oppId,cuentaId,val){
@@ -9138,99 +9180,253 @@ window.oppUpdateActividad=async function(oppId,cuentaId,contactoId,val){
   }catch(e){alert('Error: '+e.message);}
 };
 // ── Drawer de Oportunidad ──
+// ── Permisos / helpers del módulo Oportunidades ──
+// Gerente Comercial / Administrador = acceso completo (ve Origen/Suborigen/Probabilidad/Ingreso/Forecast).
+// Broker = ejecutivo comercial (esos campos NO se renderizan).
+function _oppEsGerente(){return _nexusRole()!=='ejecutivo';}
+function _userDivision(){return 'Brokerage';}   // por default (categorización de usuarios: pendiente)
+const OPP_OBJETIVO_ANUAL=1000000;                // USD, objetivo de producción (placeholder configurable)
+let _oppEditId=null,_oppCurrentId=null,_opdrCtos=[];
+// Ejecutivos comerciales de la oportunidad (multiselección, hasta 3; el 1º = usuario logueado).
+let _opeEjec=[],_opeOpts=[];
+function _opeRenderChips(){const c=document.getElementById('opdr-ejec-chips');if(!c)return;c.innerHTML=_opeEjec.map((k,i)=>`<span class="cdr-ms-chip">${esc(ejecDisplay(k))}<span class="cdr-ms-chip-x" onclick="opeEjecRemove(${i})" title="Quitar">✕</span></span>`).join('');const h=document.getElementById('opdr-ejecutivo');if(h)h.value=_opeEjec[0]||'';}
+window.opeEjecSearch=function(q){const drop=document.getElementById('opdr-ejec-drop');if(!drop)return;q=(q||'').toLowerCase().trim();if(_opeEjec.length>=3){drop.innerHTML='<div class="cdr-ms-empty">Máximo 3 ejecutivos.</div>';drop.style.display='block';return;}_opeOpts=CRM_EJECUTIVOS.filter(k=>!_opeEjec.includes(k)&&(k.toLowerCase().includes(q)||ejecDisplay(k).toLowerCase().includes(q))).sort((a,b)=>ejecDisplay(a).localeCompare(ejecDisplay(b),'es',{sensitivity:'base'}));drop.innerHTML=_opeOpts.length?_opeOpts.map((k,i)=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();opeEjecAdd(${i})">${esc(ejecDisplay(k))}</div>`).join(''):'<div class="cdr-ms-empty">Sin resultados</div>';drop.style.display='block';};
+window.opeEjecAdd=function(i){const k=_opeOpts[i];if(k==null||_opeEjec.length>=3)return;if(!_opeEjec.includes(k))_opeEjec.push(k);const q=document.getElementById('opdr-ejec-q');if(q)q.value='';const d=document.getElementById('opdr-ejec-drop');if(d)d.style.display='none';_opeRenderChips();};
+window.opeEjecRemove=function(i){if(i<0||i>=_opeEjec.length)return;_opeEjec.splice(i,1);_opeRenderChips();};
+window.opeEjecBlur=function(){setTimeout(()=>{const d=document.getElementById('opdr-ejec-drop');if(d)d.style.display='none';},150);};
+function _opeSet(keys){_opeEjec=(keys||[]).filter(Boolean).slice(0,3);_opeRenderChips();}
+// Contactos asociados (varios): {id,nombre,empresa,cargo,email,telefono,tipo:'Cliente'|'Colliers'}
+function _opdrRenderCtoChips(){const c=document.getElementById('opdr-cto-chips');if(!c)return;c.innerHTML=_opdrCtos.map((p,i)=>`<div style="display:flex;align-items:center;gap:.5rem;background:#F6F8FC;border:1px solid #E8EFF8;border-radius:8px;padding:.35rem .55rem"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#0A1B4D">${esc(p.nombre)}</div><div style="font-size:10.5px;color:#8898C0">${esc(p.empresa||'–')}${p.cargo?' · '+esc(p.cargo):''}</div></div><select onchange="_opdrCtos[${i}].tipo=this.value" style="font-size:10.5px;border:1px solid #DBE5FF;border-radius:6px;padding:2px 4px"><option${p.tipo==='Cliente'?' selected':''}>Cliente</option><option${p.tipo==='Colliers'?' selected':''}>Colliers</option></select><span class="cdr-ms-chip-x" style="cursor:pointer;color:#8898C0" onclick="opdrRemoveCtoAs(${i})" title="Quitar">✕</span></div>`).join('');const h=document.getElementById('opdr-contactoId');if(h)h.value=_opdrCtos[0]?.id||'';const hn=document.getElementById('opdr-contactoNombre');if(hn)hn.value=_opdrCtos[0]?.nombre||'';}
+window.opdrRemoveCtoAs=function(i){_opdrCtos.splice(i,1);_opdrRenderCtoChips();};
+window.opdrExclChange=function(){const v=document.getElementById('opdr-exclusividad')?.value||'';const ex=document.getElementById('opdr-excl-extra');if(ex)ex.style.display=(v==='Sí')?'grid':'none';};
+window.opdrSuborigenChange=function(){const v=document.getElementById('opdr-suborigen')?.value||'';const f=document.getElementById('opdr-suborigenOtro-field');if(f)f.style.display=(v==='Otro')?'':'none';};
+function _oppBuildGC(o){
+  o=o||{};const years=[];for(let y=2026;y<=2040;y++)years.push(y);
+  return `<div class="cdr-section-hd" style="margin-top:.4rem"><div class="cdr-section-num">3</div><div class="cdr-section-name">Gerencia Comercial</div><div class="cdr-section-line"></div></div>
+    <div class="cdr-row">
+      <div class="cdr-field"><div class="cdr-lbl">Origen</div><select id="opdr-origen" class="cdr-select">${['','Colliers Argentina','Otra Oficina Colliers','Broker'].map(x=>`<option value="${esc(x)}"${(o.origen||'')===x?' selected':''}>${x||'— Seleccionar —'}</option>`).join('')}</select></div>
+      <div class="cdr-field"><div class="cdr-lbl">Suborigen</div><select id="opdr-suborigen" class="cdr-select" onchange="opdrSuborigenChange()">${['','Zonaprop','Mercado Libre','Web Colliers','Director','Marketing','Otro'].map(x=>`<option value="${esc(x)}"${(o.suborigen||'')===x?' selected':''}>${x||'— Seleccionar —'}</option>`).join('')}</select></div>
+    </div>
+    <div class="cdr-field" id="opdr-suborigenOtro-field" style="display:${o.suborigen==='Otro'?'':'none'}"><div class="cdr-lbl">Especificar suborigen</div><input id="opdr-suborigenOtro" class="cdr-input" type="text" value="${esc(o.suborigenOtro||'')}"></div>
+    <div class="cdr-row">
+      <div class="cdr-field"><div class="cdr-lbl">Probabilidad</div><select id="opdr-probabilidad" class="cdr-select">${['Muy baja','Baja','Media','Alta'].map(x=>`<option${(o.probabilidad||'Muy baja')===x?' selected':''}>${x}</option>`).join('')}</select></div>
+      <div class="cdr-field"><div class="cdr-lbl">Ingreso estimado (USD)</div><input id="opdr-ingreso" class="cdr-input" type="number" min="0" placeholder="0" value="${o.ingresoEstimado||''}"></div>
+    </div>
+    <div class="cdr-row">
+      <div class="cdr-field"><div class="cdr-lbl">Cierre estimado (Quarter)</div><select id="opdr-cierreQ" class="cdr-select">${['','Q1','Q2','Q3','Q4'].map(x=>`<option value="${x}"${(o.fechaCierreQ||'')===x?' selected':''}>${x||'No definida'}</option>`).join('')}</select></div>
+      <div class="cdr-field"><div class="cdr-lbl">Año</div><select id="opdr-cierreAnio" class="cdr-select"><option value="">—</option>${years.map(y=>`<option${String(o.fechaCierreAnio||'')===String(y)?' selected':''}>${y}</option>`).join('')}</select></div>
+    </div>`;
+}
 window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
-  ['opdr-cuenta','opdr-cto-q','opdr-bld-q','opdr-nota'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  _oppEditId=null;
+  ['opdr-cuenta','opdr-cto-q','opdr-nota','opdr-proyecto','opdr-supCub','opdr-supTer'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['opdr-cuentaId','opdr-cuentaNombre','opdr-contactoId','opdr-contactoNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['opdr-cuenta-drop','opdr-cto-list','opdr-bld-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  ['opdr-cuenta','opdr-estado','opdr-conversion','opdr-ejecutivo'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
+  ['opdr-cuenta-drop','opdr-cto-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  ['opdr-cuenta','opdr-estado'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
   const ctag=document.getElementById('opdr-cuenta-tag');if(ctag)ctag.style.display='none';
-  _opdrBlds=[];_opdrRenderChips();
+  _opdrBlds=[];_opdrCtos=[];_opdrRenderCtoChips();
   const est=document.getElementById('opdr-estado');if(est)est.innerHTML=OPP_ESTADOS.map((s,i)=>`<option${i===0?' selected':''}>${s}</option>`).join('');
-  const eje=document.getElementById('opdr-ejecutivo');if(eje)eje.innerHTML='<option value="">— Seleccionar —</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
-  document.getElementById('opdr-conversion').value='';document.getElementById('opdr-un').value='';
+  ['opdr-un','opdr-tipoOp','opdr-tipoTx','opdr-conversion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   {const p=document.getElementById('opdr-prioridad');if(p)p.value='Media';}
+  {const c=document.getElementById('opdr-cliente');if(c)c.value='No';}
+  {const ex=document.getElementById('opdr-exclusividad');if(ex)ex.value='No';}opdrExclChange();
+  {const d=document.getElementById('opdr-division');if(d)d.value=_userDivision();}
   opdrEstadoChange();
+  _opeSet(_leadCurrentEjec()?[_leadCurrentEjec()]:[]);   // 1º ejecutivo = usuario logueado
   {const a=document.getElementById('opdr-actividad');if(a){a.innerHTML='<option value="">— Seleccionar —</option>'+OPP_ACTIVIDADES.map(o=>`<option>${esc(o)}</option>`).join('');a.value='';}}
-  loadClientesParaSelector();_loadBldDocsIfNeeded().catch(()=>{});
-  if(prefillCuentaId){document.getElementById('opdr-cuentaId').value=prefillCuentaId;document.getElementById('opdr-cuentaNombre').value=prefillCuentaNombre||'';document.getElementById('opdr-cuenta').value=prefillCuentaNombre||'';}
+  {const gc=document.getElementById('opdr-gc');if(gc)gc.innerHTML=_oppEsGerente()?_oppBuildGC({}):'';}
+  loadClientesParaSelector();
+  if(prefillCuentaId){document.getElementById('opdr-cuentaId').value=prefillCuentaId;document.getElementById('opdr-cuentaNombre').value=prefillCuentaNombre||'';document.getElementById('opdr-cuenta').value=prefillCuentaNombre||'';_oppAutoClienteColliers(prefillCuentaId);}
+  document.querySelector('#opdr-drawer .cdr-title').textContent='Nueva Oportunidad';
   const btn=document.getElementById('opdr-save-btn');if(btn){btn.textContent='Crear oportunidad';btn.disabled=false;}
   document.getElementById('opdr-overlay').classList.add('open');
   document.getElementById('opdr-drawer').classList.add('open');
-  setTimeout(()=>document.getElementById(prefillCuentaId?'opdr-cto-q':'opdr-cuenta')?.focus(),60);
+  setTimeout(()=>document.getElementById(prefillCuentaId?'opdr-proyecto':'opdr-cuenta')?.focus(),60);
 };
-window.opdrEstadoChange=function(){const e=document.getElementById('opdr-estado')?.value||'';const p=document.getElementById('opdr-prob');if(p)p.innerHTML=e?oppProbBadge(e):'<span style="color:#8898C0">–</span>';const h=document.getElementById('opdr-conversion');if(h)h.value=e?_oppConvFromEstado(e):'';};
+window.openOportunidadDrawer_edit=function(oppId){
+  const o=_oppDocs.find(x=>x._id===oppId);if(!o)return;
+  openOportunidadDrawer(o.cuentaId,o.cuentaNombre);
+  _oppEditId=oppId;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v==null?'':v;};
+  if(o.cuentaId)_ctaPickerSet('opdr',o.cuentaId,o.cuentaNombre||'');
+  set('opdr-proyecto',o.nombreProyecto);set('opdr-division',o.division||_userDivision());set('opdr-un',o.unidadNegocio);
+  set('opdr-tipoOp',o.tipoOportunidad);set('opdr-tipoTx',o.tipoTransaccion);set('opdr-supCub',o.superficieCubierta);set('opdr-supTer',o.superficieTerreno);
+  _opeSet(_oppEjecs(o));
+  _opdrCtos=Array.isArray(o.contactosAsociados)?o.contactosAsociados.slice():(o.contactoId?[{id:o.contactoId,nombre:o.contactoNombre,empresa:o.cuentaNombre,tipo:'Cliente'}]:[]);_opdrRenderCtoChips();
+  set('opdr-cliente',o.clienteColliers||'No');set('opdr-exclusividad',o.exclusividad||'No');opdrExclChange();
+  set('opdr-fechaAut',o.fechaAutorizacion);set('opdr-tipoExcl',o.tipoExclusividad);
+  set('opdr-estado',_oppNormEstado(o.estado));set('opdr-prioridad',_oppPrioridad(o));set('opdr-actividad',o.actividadComercial);set('opdr-nota',o.nota);
+  if(_oppEsGerente()){const gc=document.getElementById('opdr-gc');if(gc)gc.innerHTML=_oppBuildGC(o);}
+  document.querySelector('#opdr-drawer .cdr-title').textContent='Editar Oportunidad';
+  const btn=document.getElementById('opdr-save-btn');if(btn)btn.textContent='Guardar cambios';
+};
+function _oppAutoClienteColliers(cuentaId){const c=(_crmDocs||[]).find(x=>x._id===cuentaId);if(c&&c.clienteColliers){const el=document.getElementById('opdr-cliente');if(el)el.value=(c.clienteColliers==='Sí')?'Sí':'No';}}
+window.opdrEstadoChange=function(){const h=document.getElementById('opdr-conversion');const e=document.getElementById('opdr-estado')?.value||'';if(h)h.value=e?_oppConvFromEstado(e):'';};
 window.closeOportunidadDrawer=function(){
   document.getElementById('opdr-overlay').classList.remove('open');
   document.getElementById('opdr-drawer').classList.remove('open');
-  ['opdr-cto-list','opdr-bld-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  ['opdr-cto-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
 };
 window.opdrCtoSearch=function(q){
   const list=document.getElementById('opdr-cto-list');if(!list)return;
-  document.getElementById('opdr-contactoId').value='';document.getElementById('opdr-contactoNombre').value='';
   if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));if((document.getElementById('opdr-cto-q').value||'').trim())opdrCtoSearch(document.getElementById('opdr-cto-q').value);}).catch(()=>{});}
   if(!q.trim()){list.style.display='none';return;}
   const lq=q.toLowerCase();const cuentaId=document.getElementById('opdr-cuentaId').value||'';
-  let src=Array.isArray(_ctoDocs)?_ctoDocs:[];if(cuentaId)src=src.filter(c=>c.cuentaId===cuentaId);
-  const matches=src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')).toLowerCase().includes(lq)).slice(0,8);
+  let src=Array.isArray(_ctoDocs)?_ctoDocs:[];
+  const matches=src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')+' '+(c.cuentaNombre||'')).toLowerCase().includes(lq)&&!_opdrCtos.some(p=>p.id===c._id)).slice(0,8);
   if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
-  list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();opdrSelectCto('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}</div>`;}).join('');
+  list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();opdrSelectCto('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}${c.cuentaNombre?`<span style="display:block;font-weight:500;color:#8898C0;font-size:11px">${esc(c.cuentaNombre)}</span>`:''}</div>`;}).join('');
   list.style.display='block';
 };
-window.opdrSelectCto=function(id,nombre){document.getElementById('opdr-contactoId').value=id;document.getElementById('opdr-contactoNombre').value=nombre;document.getElementById('opdr-cto-q').value=nombre;document.getElementById('opdr-cto-list').style.display='none';};
-window.opdrBldSearch=function(q){
-  const list=document.getElementById('opdr-bld-list');if(!list)return;
-  if(!q.trim()){list.style.display='none';return;}
-  const lq=q.toLowerCase();const src=_bldDocs.length?_bldDocs:masterBuildings;
-  const matches=src.filter(d=>(d.nombre||'').toLowerCase().includes(lq)&&!_opdrBlds.some(b=>b.id===(d._id||d.id))).slice(0,8);
-  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
-  list.innerHTML=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();opdrAddBld('${(d._id||d.id||'')}','${(d.nombre||'').replace(/'/g,"\\'")}')">🏢 ${esc(d.nombre||'')}</div>`).join('');
-  list.style.display='block';
-};
-window.opdrAddBld=function(id,nombre){if(!_opdrBlds.some(b=>b.id===id))_opdrBlds.push({id,nombre});document.getElementById('opdr-bld-q').value='';document.getElementById('opdr-bld-list').style.display='none';_opdrRenderChips();};
-window.opdrRemoveBld=function(i){_opdrBlds.splice(i,1);_opdrRenderChips();};
-function _opdrRenderChips(){const c=document.getElementById('opdr-bld-chips');if(!c)return;c.innerHTML=_opdrBlds.map((b,i)=>`<span class="cdr-ms-chip">${esc(b.nombre)}<span class="cdr-ms-chip-x" onclick="opdrRemoveBld(${i})" title="Quitar">✕</span></span>`).join('');}
+window.opdrSelectCto=function(id,nombre){const c=(_ctoDocs||[]).find(x=>x._id===id)||{};if(!_opdrCtos.some(p=>p.id===id))_opdrCtos.push({id,nombre,empresa:c.cuentaNombre||'',cargo:c.cargo||c.puesto||'',email:c.email||'',telefono:c.telefono||'',tipo:'Cliente'});document.getElementById('opdr-cto-q').value='';document.getElementById('opdr-cto-list').style.display='none';_opdrRenderCtoChips();};
 window.saveOportunidadDrawer=async function(){
-  const cuentaId=document.getElementById('opdr-cuentaId').value||'';
-  const cuentaNombre=document.getElementById('opdr-cuentaNombre').value||'';
-  const estado=_oppNormEstado(document.getElementById('opdr-estado').value||'En gestión');
-  const conversion=_oppConvFromEstado(estado);  // compat interno (no se muestra)
-  const prioridad=(function(v){return OPP_PRIORIDADES.includes(v)?v:'Media';})(document.getElementById('opdr-prioridad')?.value||'Media');
-  const ejecutivo=document.getElementById('opdr-ejecutivo').value||'';
+  const gv=id=>document.getElementById(id)?.value||'';
+  const cuentaId=gv('opdr-cuentaId'),cuentaNombre=gv('opdr-cuentaNombre');
+  const estado=_oppNormEstado(gv('opdr-estado')||'En gestión');
+  const conversion=_oppConvFromEstado(estado);
+  const prioridad=OPP_PRIORIDADES.includes(gv('opdr-prioridad'))?gv('opdr-prioridad'):'Media';
+  const ejecutivos=_opeEjec.slice();const ejecutivo=ejecutivos[0]||'';
   let ok=true;const mark=(id,cond)=>{const el=document.getElementById(id);if(el)el.style.borderColor=cond?'':'#ED1B34';if(!cond)ok=false;};
-  mark('opdr-cuenta',!!cuentaId);mark('opdr-estado',!!estado);mark('opdr-ejecutivo',!!ejecutivo);
+  mark('opdr-cuenta',!!cuentaId);mark('opdr-estado',!!estado);
   if(!ok)return;
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('opdr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
   try{
     const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
-    const contactoId=document.getElementById('opdr-contactoId').value||'';
-    const contactoNombre=(document.getElementById('opdr-contactoNombre').value||'').trim();
-    const un=document.getElementById('opdr-un').value||'';const nota=(document.getElementById('opdr-nota').value||'').trim();
-    const actividadComercial=document.getElementById('opdr-actividad')?.value||'';
-    const opp={cuentaId,cuentaNombre,contactoId,contactoNombre,buildingIds:_opdrBlds.map(b=>b.id),buildingNames:_opdrBlds.map(b=>b.nombre),estado,conversion,prioridad,ejecutivo,unidadNegocio:un,nota,actividadComercial,tipoActividad:actividadComercial||'Oportunidad Comercial creada',usuario,userEmail:user?.email||'',fechaCreacion:now,ultimaActividad:now,ultimaActualizacion:now};
-    const ref=await db.collection('oportunidades').add(opp);
-    const desc=`Oportunidad creada — Estado: ${estado} · Prioridad: ${prioridad}`+(contactoNombre?`\nContacto: ${contactoNombre}`:'')+(nota?`\n${nota}`:'');
-    // Actividad Comercial automática en la Cuenta (mismo modelo que la solapa Actividades).
-    await db.collection('clientes').doc(cuentaId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id});
-    await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now});
-    const idx=_crmDocs.findIndex(x=>x._id===cuentaId);if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividad:now};
-    // Timeline de la Cuenta: registrar la creación de la oportunidad.
-    const tlDesc=`Oportunidad creada${nota?': '+nota:''} · Estado: ${estado}`+(actividadComercial?` · Origen: ${actividadComercial}`:'')+(contactoNombre?`\nContacto: ${contactoNombre}`:'');
-    if(typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'oportunidad_creada',descripcion:tlDesc,oportunidadId:ref.id});
-    // Actividad en el Contacto principal (si corresponde) + Timeline del Contacto.
-    if(contactoId){
-      db.collection('contactos').doc(contactoId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id}).catch(()=>{});
-      db.collection('contactos').doc(contactoId).update({ultimaActividad:now}).catch(()=>{});
-      db.collection('contactoTimeline').add({contactoId,tipo:'oportunidad_creada',descripcion:tlDesc,fecha:now,usuario,userEmail:user?.email||'',oportunidadId:ref.id}).catch(()=>{});
+    const actividadComercial=gv('opdr-actividad');const nota=(gv('opdr-nota')||'').trim();
+    const contactosAsociados=_opdrCtos.map(p=>({id:p.id,nombre:p.nombre,empresa:p.empresa||'',cargo:p.cargo||'',email:p.email||'',telefono:p.telefono||'',tipo:p.tipo||'Cliente'}));
+    const contactoId=contactosAsociados[0]?.id||'';const contactoNombre=contactosAsociados[0]?.nombre||'';
+    const base={cuentaId,cuentaNombre,contactoId,contactoNombre,contactosAsociados,
+      nombreProyecto:(gv('opdr-proyecto')||'').trim(),division:gv('opdr-division')||_userDivision(),
+      unidadNegocio:gv('opdr-un'),tipoOportunidad:gv('opdr-tipoOp'),tipoTransaccion:gv('opdr-tipoTx'),
+      superficieCubierta:parseFloat(gv('opdr-supCub'))||null,superficieTerreno:parseFloat(gv('opdr-supTer'))||null,
+      ejecutivos,ejecutivo,clienteColliers:gv('opdr-cliente')||'No',
+      exclusividad:gv('opdr-exclusividad')||'No',fechaAutorizacion:gv('opdr-fechaAut')||'',tipoExclusividad:gv('opdr-tipoExcl')||'',
+      estado,conversion,prioridad,actividadComercial,tipoActividad:actividadComercial||'Oportunidad Comercial creada',nota,
+      buildingIds:[],buildingNames:[],
+      ultimaActividad:now,ultimaActualizacion:now};
+    // Campos exclusivos de Gerencia (solo se escriben si el rol los renderizó).
+    if(_oppEsGerente()){Object.assign(base,{origen:gv('opdr-origen'),suborigen:gv('opdr-suborigen'),suborigenOtro:gv('opdr-suborigenOtro'),probabilidad:gv('opdr-probabilidad'),fechaCierreQ:gv('opdr-cierreQ'),fechaCierreAnio:gv('opdr-cierreAnio'),ingresoEstimado:parseFloat(gv('opdr-ingreso'))||null});}
+    if(_oppEditId){
+      const ev={tipo:'edicion',descripcion:'Oportunidad editada',fecha:now,usuario};
+      await db.collection('oportunidades').doc(_oppEditId).update({...base,eventos:firebase.firestore.FieldValue.arrayUnion(ev)});
+      const i=_oppDocs.findIndex(x=>x._id===_oppEditId);if(i>=0)_oppDocs[i]={..._oppDocs[i],...base,eventos:[...(_oppDocs[i].eventos||[]),ev]};
+      closeOportunidadDrawer();
+      if(_oppCurrentId===_oppEditId)openOppDetail(_oppEditId);
+      if(_crmActiveTab==='oportunidades')filterOportunidades();
+    }else{
+      const ev={tipo:'creacion',descripcion:`Oportunidad creada · Estado: ${estado} · Prioridad: ${prioridad}`,fecha:now,usuario};
+      const opp={...base,eventos:[ev],usuario,userEmail:user?.email||'',fechaCreacion:now};
+      const ref=await db.collection('oportunidades').add(opp);
+      const desc=`Oportunidad creada — Estado: ${estado} · Prioridad: ${prioridad}`+(nota?`\n${nota}`:'');
+      await db.collection('clientes').doc(cuentaId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id}).catch(()=>{});
+      db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now}).catch(()=>{});
+      const idx=_crmDocs.findIndex(x=>x._id===cuentaId);if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividad:now};
+      const tlDesc=`Oportunidad creada${base.nombreProyecto?': '+base.nombreProyecto:''} · Estado: ${estado}`;
+      if(typeof addClientTimeline==='function')addClientTimeline(cuentaId,{tipo:'oportunidad_creada',descripcion:tlDesc,oportunidadId:ref.id});
+      if(contactoId){db.collection('contactoTimeline').add({contactoId,tipo:'oportunidad_creada',descripcion:tlDesc,fecha:now,usuario,userEmail:user?.email||'',oportunidadId:ref.id}).catch(()=>{});}
+      if(actividadComercial)await _oppRegistrarActividadComercial(cuentaId,contactoId,actividadComercial);
+      _oppDocs.unshift({...opp,_id:ref.id});
+      closeOportunidadDrawer();
+      if(_crmActiveTab==='oportunidades')filterOportunidades();
     }
-    // Si se eligió una Actividad Comercial, se registra también como actividad (Cuenta + Contacto + Timeline).
-    if(actividadComercial)await _oppRegistrarActividadComercial(cuentaId,contactoId,actividadComercial);
-    _oppDocs.unshift({...opp,_id:ref.id});
-    closeOportunidadDrawer();
-    if(_crmActiveTab==='oportunidades')filterOportunidades();
-    console.log('[oportunidades] creada',ref.id,'cuenta',cuentaId);
-  }catch(e){console.error('saveOportunidadDrawer',e);alert('Error al crear la oportunidad: '+e.message);const b=document.getElementById('opdr-save-btn');b.textContent='Crear oportunidad';b.disabled=false;}
+  }catch(e){console.error('saveOportunidadDrawer',e);alert('Error al guardar la oportunidad: '+e.message);const b=document.getElementById('opdr-save-btn');b.textContent=_oppEditId?'Guardar cambios':'Crear oportunidad';b.disabled=false;}
 };
+// Ejecutivos de la oportunidad (array nuevo con compat al singular ejecutivo).
+function _oppEjecs(o){if(Array.isArray(o.ejecutivos)&&o.ejecutivos.length)return o.ejecutivos.filter(Boolean);return o.ejecutivo?[o.ejecutivo]:[];}
+// ── Ficha propia de la Oportunidad (vista independiente, reutiliza el layout crm-det) ──
+window.openOppDetail=function(oppId){
+  const o=_oppDocs.find(x=>x._id===oppId);if(!o)return;_oppCurrentId=oppId;
+  const en=_oppNormEstado(o.estado);const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
+  const titulo=o.nombreProyecto||o.cuentaNombre||cuenta?.nombre||o.cuentaId;
+  const cierrePend=en==='Ganada'&&!o.transaccionId;
+  const cb=document.getElementById('opp-cierre-btn');if(cb)cb.style.display=cierrePend?'inline-block':'none';
+  const eb=document.getElementById('opp-edit-btn');if(eb)eb.style.display=(_canEditFicha()||en!=='Ganada')?'':'';
+  const bg=crmAvatarBg(titulo);
+  document.getElementById('opp-det-left').innerHTML=`
+    <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:${bg};border-radius:12px">📈</div><div class="crm-det-av-name">${esc(titulo)}</div><div style="margin-top:.4rem">${oppEstadoBadge(o.estado)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem"><select class="crm-estado-sel" onchange="oppUpdateEstado('${oppId}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${en===s?' selected':''}>${s}</option>`).join('')}</select></div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Prioridad</div><div style="margin-top:.3rem">${oppPrioBadge(o)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta / Contacto</div><div class="crm-det-meta-val">${o.cuentaNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(o.cuentaId||'')}')">${esc(o.cuentaNombre)}</span>`:'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo(s)</div><div class="crm-det-meta-val" style="flex-wrap:wrap;gap:.3rem">${_oppEjecs(o).map(k=>`<span class="crm-tag">${esc(ejecDisplay(k))}</span>`).join('')||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Unidad de negocio</div><div class="crm-det-meta-val">${esc(o.unidadNegocio||'–')}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(o.fechaCreacion)}</div></div>
+    ${o.transaccionId?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cierre</div><div class="crm-det-meta-val" style="color:#16A34A;font-weight:700">✓ Transacción registrada</div></div>`:''}`;
+  document.getElementById('opp-det-right').innerHTML=`
+    <div class="crm-det-tabs">
+      <button class="crm-det-tab active" onclick="oppDetTab(this,'opd-info')">Información General</button>
+      <button class="crm-det-tab" onclick="oppDetTab(this,'opd-act');_oppLoadActividades('${oppId}')">Actividades</button>
+      <button class="crm-det-tab" onclick="oppDetTab(this,'opd-cto')">Contactos</button>
+      <button class="crm-det-tab" onclick="oppDetTab(this,'opd-tl')">Timeline</button>
+    </div>
+    <div class="crm-det-tab-body">
+      <div id="opd-info">${_oppRenderInfo(o)}</div>
+      <div id="opd-act" style="display:none"><div class="anc-empty">Cargando…</div></div>
+      <div id="opd-cto" style="display:none">${_oppRenderContactos(o)}</div>
+      <div id="opd-tl" style="display:none">${_oppRenderTimeline(o)}</div>
+    </div>`;
+  document.getElementById('opp-list-view').style.display='none';
+  const dv=document.getElementById('opp-detail-view');dv.style.display='flex';dv.style.flexDirection='column';
+};
+window.closeOppDetail=function(){document.getElementById('opp-detail-view').style.display='none';document.getElementById('opp-list-view').style.display='flex';filterOportunidades();};
+window.oppDetTab=function(el,tab){const r=document.getElementById('opp-det-right');r.querySelectorAll('.crm-det-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');['opd-info','opd-act','opd-cto','opd-tl'].forEach(id=>{const p=document.getElementById(id);if(p)p.style.display=id===tab?'':'none';});};
+function _oppRenderInfo(o){
+  const dash='<span style="color:#8898C0">–</span>';
+  const row=(l,v)=>`<div class="nx-row"><div class="nx-row-l">${l}</div><div class="nx-row-v">${(v==null||v==='')?dash:v}</div></div>`;
+  const sup=v=>v?an2N(v)+' m²':null;
+  let gc='';
+  if(_oppEsGerente()){
+    gc=`<div class="nx-card"><div class="nx-card-title">Gerencia Comercial</div>
+      ${row('Origen',esc(o.origen||''))}${row('Suborigen',esc(o.suborigen==='Otro'?(o.suborigenOtro||'Otro'):(o.suborigen||'')))}
+      ${row('Probabilidad',esc(o.probabilidad||''))}${row('Ingreso estimado',o.ingresoEstimado?('USD '+an2N(o.ingresoEstimado)):null)}
+      ${row('Cierre estimado',(o.fechaCierreQ||o.fechaCierreAnio)?esc((o.fechaCierreQ||'')+' '+(o.fechaCierreAnio||'')):null)}</div>`;
+  }
+  return `<div class="nx-grid"><div class="nx-col">
+      <div class="nx-card"><div class="nx-card-title">Información General</div>
+        ${row('Nombre del proyecto',esc(o.nombreProyecto||''))}${row('División',esc(o.division||''))}${row('Unidad de negocio',esc(o.unidadNegocio||''))}
+        ${row('Tipo de oportunidad',esc(o.tipoOportunidad||''))}${row('Tipo de transacción',esc(o.tipoTransaccion||''))}
+        ${row('Superficie cubierta',sup(o.superficieCubierta))}${row('Superficie de terreno',sup(o.superficieTerreno))}
+        ${row('Ejecutivos',_oppEjecs(o).map(k=>esc(ejecDisplay(k))).join(', ')||null)}</div>
+    </div><div class="nx-col">
+      <div class="nx-card"><div class="nx-card-title">Oportunidad</div>
+        ${row('Cuenta',esc(o.cuentaNombre||''))}${row('Cliente Colliers',esc(o.clienteColliers||''))}
+        ${row('Exclusividad',esc(o.exclusividad||''))}${o.exclusividad==='Sí'?row('Fecha de autorización',esc(o.fechaAutorizacion||''))+row('Tipo de exclusividad',esc(o.tipoExclusividad||'')):''}
+        ${row('Estado',oppEstadoBadge(o.estado))}${row('Prioridad',oppPrioBadge(o))}${row('Actividad de origen',esc(o.actividadComercial||''))}</div>
+      ${o.nota?`<div class="nx-card"><div class="nx-card-title">Comentarios</div><div style="font-size:12px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.2rem">${esc(o.nota)}</div></div>`:''}
+      ${gc}
+    </div></div>`;
+}
+function _oppRenderContactos(o){
+  const cts=Array.isArray(o.contactosAsociados)&&o.contactosAsociados.length?o.contactosAsociados:(o.contactoId?[{nombre:o.contactoNombre,empresa:o.cuentaNombre,tipo:'Cliente'}]:[]);
+  if(!cts.length)return '<div class="anc-empty">Sin contactos asociados.</div>';
+  let h='<div class="crm-tbl-wrap" style="overflow-x:auto"><table class="crm-table"><thead><tr>';
+  ['Nombre','Empresa','Cargo','Email','Teléfono','Tipo'].forEach(c=>h+=`<th>${c}</th>`);h+='</tr></thead><tbody>';
+  cts.forEach(c=>{h+=`<tr><td><div class="crm-client-name">${esc(c.nombre||'–')}</div></td><td>${esc(c.empresa||'–')}</td><td>${esc(c.cargo||'–')}</td><td>${esc(c.email||'–')}</td><td>${esc(c.telefono||'–')}</td><td><span class="crm-tag">${esc(c.tipo||'Cliente')}</span></td></tr>`;});
+  h+='</tbody></table></div>';return h;
+}
+function _oppRenderTimeline(o){
+  const ev=(o.eventos||[]).slice().sort((a,b)=>(_tsToDate(b.fecha)?.getTime()||0)-(_tsToDate(a.fecha)?.getTime()||0));
+  if(!ev.length)return '<div class="anc-empty">Sin eventos registrados.</div>';
+  const icon={creacion:'🟢',estado:'🔄',prioridad:'🎚️',actividad:'📌',edicion:'✏️',cierre:'✅',comentario:'💬'};
+  return '<div class="clt-timeline">'+ev.map(e=>{const t=_tsToDate(e.fecha);const f=t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'';return `<div class="clt-event"><div class="clt-event-dot"></div><div class="clt-event-inner"><div class="clt-event-meta"><span class="clt-event-date">${f}</span><span class="clt-event-user">${esc(e.usuario||'')}</span></div><div class="clt-event-desc">${icon[e.tipo]||'•'} ${esc(e.descripcion||'')}</div></div></div>`;}).join('')+'</div>';
+}
+async function _oppLoadActividades(oppId){
+  const el=document.getElementById('opd-act');if(!el)return;
+  const o=_oppDocs.find(x=>x._id===oppId);if(!o||!db){if(el)el.innerHTML='<div class="anc-empty">Sin actividades.</div>';return;}
+  try{
+    const snap=await db.collection('clientes').doc(o.cuentaId).collection('actividades').orderBy('fecha','desc').limit(200).get();
+    const acts=snap.docs.map(d=>d.data()).filter(a=>!a.oportunidadId||a.oportunidadId===oppId);
+    const com=acts.filter(a=>(a.cat||'C')==='C'),mkt=acts.filter(a=>a.cat==='M');
+    const list=(arr,color)=>arr.length?arr.map(a=>{const t=_tsToDate(a.fecha);return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div></div>`;}).join(''):'<div class="anc-empty">Sin registros.</div>';
+    el.innerHTML=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Actividades Comerciales</div>${list(com)}</div><div class="nx-card"><div class="nx-card-title">Marketing & Research</div>${list(mkt)}</div>`;
+  }catch(e){el.innerHTML='<div class="anc-empty">Error: '+esc(e.message)+'</div>';}
+}
+// Registra un evento en el Timeline propio de la oportunidad (eventos[]).
+async function _oppRegistrarEvento(oppId,tipo,descripcion){
+  if(!db)return;const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
+  const ev={tipo,descripcion,fecha:now,usuario};
+  try{await db.collection('oportunidades').doc(oppId).update({eventos:firebase.firestore.FieldValue.arrayUnion(ev)});const o=_oppDocs.find(x=>x._id===oppId);if(o)o.eventos=[...(o.eventos||[]),ev];}catch(e){}
+}
 
 window.ldrBldSearch=function(q){
   const list=document.getElementById('ldr-bld-list');
@@ -15195,7 +15391,8 @@ function saveTxDrawer(){
       const num='Transacción '+(data.comprador||data.inmueble||'');
       db.collection('oportunidades').doc(oppLink).update({transaccionId:ref.id,transaccionNumero:num,cierrePendiente:false,ultimaActualizacion:firebase.firestore.Timestamp.now()}).catch(()=>{});
       const o=_oppDocs.find(x=>x._id===oppLink);if(o){o.transaccionId=ref.id;o.transaccionNumero=num;o.cierrePendiente=false;}
-      try{addClientTimeline&&data&&_oppDocs.find(x=>x._id===oppLink)&&addClientTimeline((_oppDocs.find(x=>x._id===oppLink)||{}).cuentaId,{tipo:'cuenta_actualizada',descripcion:'Oportunidad ganada cerrada → Transacción registrada'});}catch(e){}
+      try{if(typeof _oppRegistrarEvento==='function')_oppRegistrarEvento(oppLink,'cierre','Cierre completado → Transacción registrada');}catch(e){}
+      try{addClientTimeline&&o&&addClientTimeline(o.cuentaId,{tipo:'cuenta_actualizada',descripcion:'Oportunidad ganada cerrada → Transacción registrada'});}catch(e){}
     }
     closeTxDrawer();
     loadTransacciones();

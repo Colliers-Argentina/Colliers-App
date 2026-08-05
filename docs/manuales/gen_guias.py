@@ -247,8 +247,8 @@ GUIAS["Guia_Componentes"] = Guia(
 
 # ─────────────────────────── OPORTUNIDADES ───────────────────────────
 GUIAS["Guia_Oportunidades"] = Guia(
-    "Oportunidades", "2.1", FECHA,
-    "Centro de seguimiento de la gestión comercial. Cada oportunidad es una gestión entre una "
+    "Oportunidades", "3.0", FECHA,
+    "Módulo independiente con ficha propia por oportunidad (vista, timeline, actividades y contactos propios), integrado con Cuentas, Contactos, Actividades, Transacciones y Analytics. Cada oportunidad es una gestión entre una "
     "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
     "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
     "automáticamente una actividad en la Cuenta (y en el Contacto asociado).",
