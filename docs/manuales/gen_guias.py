@@ -247,7 +247,7 @@ GUIAS["Guia_Componentes"] = Guia(
 
 # ─────────────────────────── OPORTUNIDADES ───────────────────────────
 GUIAS["Guia_Oportunidades"] = Guia(
-    "Oportunidades", "2.0", FECHA,
+    "Oportunidades", "2.1", FECHA,
     "Centro de seguimiento de la gestión comercial. Cada oportunidad es una gestión entre una "
     "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
     "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
@@ -257,7 +257,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
         ("Contacto principal", "Buscar y seleccionar el contacto de la cuenta (opcional). Si no hay, se continúa solo con la Cuenta."),
         ("Inmueble(s) asociado(s)", "Buscar y agregar uno o varios inmuebles relacionados (opcional)."),
         ("Estado", "Etapa de la gestión con cuatro estados: En gestión, En negociación, Ganada o Perdida."),
-        ("Probabilidad", "Ya NO se elige por separado: queda implícita según el estado. En gestión = 0–50%, En negociación = 51–80%, Ganada = 100%, Perdida = 0%."),
+        ("Prioridad", "Atributo independiente del estado, con tres niveles: 🟢 Alta, 🟡 Media o ⚪ Baja. Reemplaza a los porcentajes de probabilidad (ya no se usan). Se elige del desplegable y se puede cambiar desde la grilla; se muestra como etiqueta en la lista y en Analytics."),
         ("Ejecutivo Comercial", "Ejecutivo responsable de la oportunidad (obligatorio)."),
         ("Actividad Comercial", "Acción comercial más relevante en curso: Visita comercial, Informe de alternativas o Propuesta de servicios. Al elegirla o cambiarla se registra automáticamente esa actividad en la Cuenta y el Contacto. Convive con el Estado (no lo reemplaza)."),
         ("Unidad de negocio", "Oficinas, Retail o Industria & Logística (opcional)."),

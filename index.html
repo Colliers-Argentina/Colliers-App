@@ -2978,7 +2978,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <select id="opp-filter-ejecutivo" class="crm-sel" onchange="filterOportunidades()"><option value="">Ejecutivo</option></select>
           <select id="opp-filter-estado" class="crm-sel" onchange="filterOportunidades()"><option value="">Estado</option></select>
           <select id="opp-filter-actividad" class="crm-sel" onchange="filterOportunidades()"><option value="">Actividad comercial</option></select>
-          <select id="opp-filter-conversion" class="crm-sel" onchange="filterOportunidades()"><option value="">% Conversión</option><option value="0-50">0–50%</option><option value="50-80">50–80%</option><option value="80-100">80–100%</option></select>
+          <select id="opp-filter-prioridad" class="crm-sel" onchange="filterOportunidades()"><option value="">Prioridad</option><option>Alta</option><option>Media</option><option>Baja</option></select>
           <select id="opp-filter-un" class="crm-sel" onchange="filterOportunidades()"><option value="">Unidad de negocio</option><option>Oficinas</option><option>Retail</option><option>Industria &amp; Logística</option><option>SPS</option><option>Valuaciones</option></select>
           <button class="crm-new-btn" onclick="openOportunidadDrawer()">+ Nueva Oportunidad</button>
         </div>
@@ -3026,8 +3026,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div class="cdr-field"><div class="cdr-lbl">Estado <span class="cdr-req">*</span></div>
             <select id="opdr-estado" class="cdr-select" onchange="opdrEstadoChange()"></select>
           </div>
-          <div class="cdr-field"><div class="cdr-lbl">Probabilidad <span style="font-weight:400;color:#8898C0;font-size:11px">(según estado)</span></div>
-            <div id="opdr-prob" style="padding:.45rem 0;font-size:12.5px;font-weight:700">–</div>
+          <div class="cdr-field"><div class="cdr-lbl">Prioridad</div>
+            <select id="opdr-prioridad" class="cdr-select"><option>Baja</option><option selected>Media</option><option>Alta</option></select>
             <input id="opdr-conversion" type="hidden">
           </div>
         </div>
@@ -8957,6 +8957,12 @@ function oppProbBadge(e){const n=_oppNormEstado(e);const p=OPP_ESTADO_PROB[n]||{
 let _oppDocs=[],_oppWidget='',_opdrBlds=[],_oppFiltersReady=false,_txOppLink='';
 function oppEstadoBadge(e){e=_oppNormEstado(e);const m={'En gestión':'#F59E0B','En negociación':'#7C3AED','Ganada':'#16A34A','Perdida':'#EF3340'};const c=m[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'–')}</span>`;}
 function oppConvBadge(v){const m={'0-50':'#F59E0B','50-80':'#CA8A04','80-100':'#16A34A'};const c=m[v];return c?`<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${OPP_CONV_LBL[v]}</span>`:'<span style="color:#8898C0">–</span>';}
+// Prioridad de la oportunidad: atributo independiente (reemplaza los porcentajes de probabilidad).
+const OPP_PRIORIDADES=['Baja','Media','Alta'];
+const OPP_PRIO_META={'Alta':{dot:'🟢',color:'#16A34A'},'Media':{dot:'🟡',color:'#EAB308'},'Baja':{dot:'⚪',color:'#8898C0'}};
+// Prioridad guardada; si es legacy (sin prioridad), se deriva del bucket previo de conversión.
+function _oppPrioridad(o){if(o&&o.prioridad&&OPP_PRIORIDADES.includes(o.prioridad))return o.prioridad;const c=(o&&o.conversion)||_oppConvFromEstado(o&&o.estado);return c==='80-100'?'Alta':(c==='50-80'?'Media':'Baja');}
+function oppPrioBadge(o){const p=_oppPrioridad(o);const m=OPP_PRIO_META[p]||OPP_PRIO_META.Baja;return `<span class="estado-badge" style="background:${m.color}1a;color:${m.color};border:1px solid ${m.color}55">${m.dot} ${p}</span>`;}
 function _oppMatchWidget(o,w){
   const e=_oppNormEstado(o.estado);
   switch(w){
@@ -8998,13 +9004,13 @@ function _oppByCuenta(opps){
 function filterOportunidades(){
   const gv=id=>document.getElementById(id)?.value||'';
   const q=gv('opp-search').toLowerCase().trim();
-  const fEje=gv('opp-filter-ejecutivo'),fEst=gv('opp-filter-estado'),fConv=gv('opp-filter-conversion'),fUn=gv('opp-filter-un'),fAct=gv('opp-filter-actividad');
+  const fEje=gv('opp-filter-ejecutivo'),fEst=gv('opp-filter-estado'),fPrio=gv('opp-filter-prioridad'),fUn=gv('opp-filter-un'),fAct=gv('opp-filter-actividad');
   const opps=_oppDocs.filter(o=>{
     if(q&&!((o.cuentaNombre||'').toLowerCase().includes(q)))return false;
     if(fEje&&o.ejecutivo!==fEje)return false;
     if(fEst&&_oppNormEstado(o.estado)!==fEst)return false;
     if(fAct&&o.actividadComercial!==fAct)return false;
-    if(fConv&&_oppConvFromEstado(o.estado)!==fConv)return false;
+    if(fPrio&&_oppPrioridad(o)!==fPrio)return false;
     if(fUn&&o.unidadNegocio!==fUn)return false;
     if(_oppWidget&&!_oppMatchWidget(o,_oppWidget))return false;
     return true;
@@ -9025,7 +9031,7 @@ function renderOportunidadesTable(rows){
   const wrap=document.getElementById('opp-table-wrap');if(!wrap)return;
   if(!rows.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin oportunidades. Creá una con "+ Nueva Oportunidad".</div>';return;}
   let h='<table class="crm-table"><thead><tr>';
-  ['','Cuenta','Última actividad','Actividad Comercial','Estado','Probabilidad','Ejecutivo','Últ. actualización',''].forEach(c=>h+=`<th>${c}</th>`);
+  ['','Cuenta','Última actividad','Actividad Comercial','Estado','Prioridad','Ejecutivo','Últ. actualización',''].forEach(c=>h+=`<th>${c}</th>`);
   h+='</tr></thead><tbody>';
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
@@ -9034,6 +9040,8 @@ function renderOportunidadesTable(rows){
     const actSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateActividad('${o._id}','${o.cuentaId}','${o.contactoId||''}',this.value)"><option value="">–</option>${OPP_ACTIVIDADES.map(s=>`<option${o.actividadComercial===s?' selected':''}>${s}</option>`).join('')}</select>`;
     const enorm=_oppNormEstado(o.estado);
     const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${enorm===s?' selected':''}>${s}</option>`).join('')}</select>`;
+    const prio=_oppPrioridad(o);
+    const prioSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdatePrioridad('${o._id}',this.value)">${OPP_PRIORIDADES.map(s=>`<option value="${s}"${prio===s?' selected':''}>${OPP_PRIO_META[s].dot} ${s}</option>`).join('')}</select>`;
     const cierrePend=enorm==='Ganada'&&!o.transaccionId;
     const accion=cierrePend
       ?`<button class="crm-action-btn" style="background:#FEF2F2;color:#DC2626;border-color:#F5C2C7;font-weight:700" onclick="event.stopPropagation();oppCompletarCierre('${o._id}')">⚠ Completar cierre</button>`
@@ -9044,7 +9052,7 @@ function renderOportunidadesTable(rows){
       <td class="crm-date">${fmtDate(o.ultimaActividad)}</td>
       <td>${actSel}</td>
       <td>${estSel}</td>
-      <td>${oppProbBadge(o.estado)}</td>
+      <td>${prioSel}</td>
       <td><div class="crm-broker-cell">${esc(ejecDisplay(o.ejecutivo))||'–'}</div></td>
       <td class="crm-date">${fmtDate(o.ultimaActualizacion)}</td>
       <td>${accion}</td>
@@ -9087,6 +9095,15 @@ function _txPrefillFromOpp(o){
   const br=document.getElementById('txf-broker');if(br)br.value=o.ejecutivo?ejecDisplay(o.ejecutivo):'';
   const notas=document.getElementById('txf-notas');if(notas&&!notas.value)notas.value='Cierre de la oportunidad: '+(o.nota||o.cuentaNombre||'');
 }
+// Prioridad (Baja/Media/Alta): atributo independiente, editable desde la grilla.
+window.oppUpdatePrioridad=async function(oppId,val){
+  if(!OPP_PRIORIDADES.includes(val))return;
+  const now=firebase.firestore.Timestamp.now();
+  try{await db.collection('oportunidades').doc(oppId).update({prioridad:val,ultimaActualizacion:now});
+    const o=_oppDocs.find(x=>x._id===oppId);if(o){o.prioridad=val;o.ultimaActualizacion=now;}
+    filterOportunidades();
+  }catch(e){alert('Error: '+e.message);}
+};
 window.oppUpdateConv=async function(oppId,cuentaId,val){
   const now=firebase.firestore.Timestamp.now();
   try{await db.collection('oportunidades').doc(oppId).update({conversion:val,ultimaActualizacion:now});
@@ -9131,6 +9148,7 @@ window.openOportunidadDrawer=function(prefillCuentaId,prefillCuentaNombre){
   const est=document.getElementById('opdr-estado');if(est)est.innerHTML=OPP_ESTADOS.map((s,i)=>`<option${i===0?' selected':''}>${s}</option>`).join('');
   const eje=document.getElementById('opdr-ejecutivo');if(eje)eje.innerHTML='<option value="">— Seleccionar —</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
   document.getElementById('opdr-conversion').value='';document.getElementById('opdr-un').value='';
+  {const p=document.getElementById('opdr-prioridad');if(p)p.value='Media';}
   opdrEstadoChange();
   {const a=document.getElementById('opdr-actividad');if(a){a.innerHTML='<option value="">— Seleccionar —</option>'+OPP_ACTIVIDADES.map(o=>`<option>${esc(o)}</option>`).join('');a.value='';}}
   loadClientesParaSelector();_loadBldDocsIfNeeded().catch(()=>{});
@@ -9175,7 +9193,8 @@ window.saveOportunidadDrawer=async function(){
   const cuentaId=document.getElementById('opdr-cuentaId').value||'';
   const cuentaNombre=document.getElementById('opdr-cuentaNombre').value||'';
   const estado=_oppNormEstado(document.getElementById('opdr-estado').value||'En gestión');
-  const conversion=_oppConvFromEstado(estado);  // probabilidad implícita según el estado
+  const conversion=_oppConvFromEstado(estado);  // compat interno (no se muestra)
+  const prioridad=(function(v){return OPP_PRIORIDADES.includes(v)?v:'Media';})(document.getElementById('opdr-prioridad')?.value||'Media');
   const ejecutivo=document.getElementById('opdr-ejecutivo').value||'';
   let ok=true;const mark=(id,cond)=>{const el=document.getElementById(id);if(el)el.style.borderColor=cond?'':'#ED1B34';if(!cond)ok=false;};
   mark('opdr-cuenta',!!cuentaId);mark('opdr-estado',!!estado);mark('opdr-ejecutivo',!!ejecutivo);
@@ -9188,9 +9207,9 @@ window.saveOportunidadDrawer=async function(){
     const contactoNombre=(document.getElementById('opdr-contactoNombre').value||'').trim();
     const un=document.getElementById('opdr-un').value||'';const nota=(document.getElementById('opdr-nota').value||'').trim();
     const actividadComercial=document.getElementById('opdr-actividad')?.value||'';
-    const opp={cuentaId,cuentaNombre,contactoId,contactoNombre,buildingIds:_opdrBlds.map(b=>b.id),buildingNames:_opdrBlds.map(b=>b.nombre),estado,conversion,ejecutivo,unidadNegocio:un,nota,actividadComercial,tipoActividad:actividadComercial||'Oportunidad Comercial creada',usuario,userEmail:user?.email||'',fechaCreacion:now,ultimaActividad:now,ultimaActualizacion:now};
+    const opp={cuentaId,cuentaNombre,contactoId,contactoNombre,buildingIds:_opdrBlds.map(b=>b.id),buildingNames:_opdrBlds.map(b=>b.nombre),estado,conversion,prioridad,ejecutivo,unidadNegocio:un,nota,actividadComercial,tipoActividad:actividadComercial||'Oportunidad Comercial creada',usuario,userEmail:user?.email||'',fechaCreacion:now,ultimaActividad:now,ultimaActualizacion:now};
     const ref=await db.collection('oportunidades').add(opp);
-    const desc=`Oportunidad creada — Estado: ${estado} · Conversión: ${OPP_CONV_LBL[conversion]||conversion}`+(contactoNombre?`\nContacto: ${contactoNombre}`:'')+(nota?`\n${nota}`:'');
+    const desc=`Oportunidad creada — Estado: ${estado} · Prioridad: ${prioridad}`+(contactoNombre?`\nContacto: ${contactoNombre}`:'')+(nota?`\n${nota}`:'');
     // Actividad Comercial automática en la Cuenta (mismo modelo que la solapa Actividades).
     await db.collection('clientes').doc(cuentaId).collection('actividades').add({cat:'C',tipo:'Oportunidad Comercial creada',descripcion:desc,fecha:now,usuario,userEmail:user?.email||'',origen:'oportunidad',oportunidadId:ref.id});
     await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now});
@@ -15981,7 +16000,7 @@ const AN2_MODULES=[
   {key:'leads',label:'Leads',icon:'🎯',desc:'Conversión, origen, tiempos y ejecutivos'},
   {key:'cuentas',label:'Cuentas',icon:'💼',desc:'Rubros, categorías, ejecutivos y evolución'},
   {key:'contactos',label:'Contactos',icon:'👥',desc:'Cargos, inversores y estado de emails'},
-  {key:'oportunidades',label:'Oportunidades',icon:'📈',desc:'Estado, probabilidad y conversión'},
+  {key:'oportunidades',label:'Oportunidades',icon:'📈',desc:'Estado, prioridad y actividad'},
   {key:'visitas',label:'Visitas',icon:'📍',desc:'Inmuebles, cuentas y ejecutivos'},
   {key:'transacciones',label:'Transacciones',icon:'🔁',desc:'Operaciones, m², honorarios y zonas'},
   {key:'inmuebles',label:'Inmuebles',icon:'🏢',desc:'Oficinas, Retail e Industria y Logística'},
@@ -16084,7 +16103,7 @@ function an2RenderExec(){
     {name:'Transacciones',color:'#DC2626',data:an2Monthly(tx,'fecha',6).counts},
   ],lbls);
   const oppOpen=opp.filter(o=>!['Ganada','Perdida'].includes(_oppNormEstado(o.estado)));
-  const oppDist=_ancBars([['0–50 %',oppOpen.filter(o=>_oppConvFromEstado(o.estado)==='0-50').length],['51–80 %',oppOpen.filter(o=>_oppConvFromEstado(o.estado)==='50-80').length]],{order:['0–50 %','51–80 %']});
+  const oppDist=_ancBars([['🟢 Alta',oppOpen.filter(o=>_oppPrioridad(o)==='Alta').length],['🟡 Media',oppOpen.filter(o=>_oppPrioridad(o)==='Media').length],['⚪ Baja',oppOpen.filter(o=>_oppPrioridad(o)==='Baja').length]],{order:['🟢 Alta','🟡 Media','⚪ Baja']});
   const topBrk=_ancBars([..._ancCountBy(opp,o=>o.ejecutivo)].map(([k,v])=>[ejecDisplay(k),v]),{max:5});
   const al=an2Alerts();
   root.innerHTML=`
@@ -16189,12 +16208,12 @@ function an2ModOpp(){
   const ganadas=d.filter(o=>est(o)==='Ganada').length,perdidas=d.filter(o=>est(o)==='Perdida').length;
   const now=Date.now();const estanc=d.filter(o=>!['Ganada','Perdida'].includes(est(o))&&(()=>{const t=_tsToDate(o.ultimaActividad||o.fechaCreacion);return t&&(now-t.getTime())>30*864e5;})()).length;
   const open=d.filter(o=>!['Ganada','Perdida'].includes(est(o)));
-  const charts=_ancCard('Por Probabilidad',_ancBars([['0–50 %',open.filter(o=>_oppConvFromEstado(o.estado)==='0-50').length],['51–80 %',open.filter(o=>_oppConvFromEstado(o.estado)==='50-80').length]],{order:['0–50 %','51–80 %']}))
+  const charts=_ancCard('Por Prioridad',_ancBars([['🟢 Alta',d.filter(o=>_oppPrioridad(o)==='Alta').length],['🟡 Media',d.filter(o=>_oppPrioridad(o)==='Media').length],['⚪ Baja',d.filter(o=>_oppPrioridad(o)==='Baja').length]],{order:['🟢 Alta','🟡 Media','⚪ Baja']}))
     +_ancCard('Por Estado',_ancBars([..._ancCountBy(d,o=>_oppNormEstado(o.estado))],{order:OPP_ESTADOS}))
     +_ancCard('Actividades comerciales',_ancBars([..._ancCountBy(d,o=>o.actividadComercial||'Sin actividad')],{max:8}))
     +_ancCard('Por Ejecutivo',_ancBars([..._ancCountBy(d,o=>o.ejecutivo)].map(([k,v])=>[ejecDisplay(k),v]),{max:8}))
     +`<div class="anc-chart-card" style="grid-column:1/-1"><div class="anc-chart-title">Oportunidades por mes (12m)</div>${_ancMonthlyVbars(d,'fechaCreacion')}</div>`;
-  return an2ModuleShell(an2Icon('oportunidades')+' Oportunidades','Estado, probabilidad y conversión',{ejec:true},[['Abiertas',abiertas],['Ganadas',ganadas],['Perdidas',perdidas],['Estancadas',estanc]],charts);
+  return an2ModuleShell(an2Icon('oportunidades')+' Oportunidades','Estado, prioridad y actividad',{ejec:true},[['Abiertas',abiertas],['Ganadas',ganadas],['Perdidas',perdidas],['Estancadas',estanc]],charts);
 }
 function an2ModVisitas(){
   let d=(_an2Visitas||[]);if(_an2Flt.period!=='all')d=d.filter(x=>an2InPeriod(x.fecha));
