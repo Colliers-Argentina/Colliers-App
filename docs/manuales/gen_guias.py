@@ -247,7 +247,7 @@ GUIAS["Guia_Componentes"] = Guia(
 
 # ─────────────────────────── OPORTUNIDADES ───────────────────────────
 GUIAS["Guia_Oportunidades"] = Guia(
-    "Oportunidades", "3.2", FECHA,
+    "Oportunidades", "3.3", FECHA,
     "Módulo independiente con ficha propia por oportunidad (vista, timeline, actividades y contactos propios), integrado con Cuentas, Contactos, Actividades, Transacciones y Analytics. Cada oportunidad es una gestión entre una "
     "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
     "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
@@ -257,8 +257,8 @@ GUIAS["Guia_Oportunidades"] = Guia(
         ("Nombre del proyecto", "Título de la oportunidad. Ej: 'Búsqueda depósito Zona Norte' (obligatorio)."),
         ("División", "Área responsable: Brokerage, SPS o V&C. Sin valor por defecto: hay que elegirlo (obligatorio)."),
         ("Superficie cubierta (m²)", "Metros cubiertos de la búsqueda o inmueble (obligatorio)."),
-        ("Contactos asociados", "Se pueden agregar varios contactos a la misma oportunidad; todos quedan vinculados y visibles en la ficha."),
-        ("Cliente Colliers", "Sí / No. Si la Cuenta ya tiene este dato, se completa solo; si no, queda en '–' y hay que elegir Sí o No antes de guardar (obligatorio)."),
+        ("Contactos asociados", "Se pueden agregar varios contactos a la misma oportunidad; todos quedan vinculados y visibles en la ficha. Solo se elige el contacto: el sistema determina automáticamente si es Cliente o Colliers según sus datos (no se pide manualmente)."),
+        ("Cliente Colliers", "Campo informativo (no editable). Muestra el valor Sí / No de la Cuenta vinculada; si la Cuenta no lo tiene definido, aparece '–' hasta que un usuario autorizado lo complete en la ficha de la Cuenta."),
         ("Exclusividad", "Sí, No o Contacto directo. Sin valor por defecto: hay que elegirlo."),
         ("Inmueble(s) asociado(s)", "Buscar y agregar uno o varios inmuebles relacionados (opcional)."),
         ("Estado", "Etapa de la gestión con cuatro estados: En gestión, En negociación, Ganada o Perdida."),
@@ -266,7 +266,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
         ("Ejecutivo Comercial", "Ejecutivo responsable de la oportunidad (obligatorio)."),
         ("Actividad Comercial", "Acción comercial más relevante en curso: Visita comercial, Informe de alternativas o Propuesta de servicios. Al elegirla o cambiarla se registra automáticamente esa actividad en la Cuenta y el Contacto. Convive con el Estado (no lo reemplaza)."),
         ("Unidad de negocio", "Oficinas, Retail o Industria & Logística (opcional)."),
-        ("Gerencia Comercial", "Sección visible solo para Gerencia Comercial y Administrador (el Broker no la ve). Para esos usuarios son obligatorios Origen, Suborigen, Probabilidad y Fecha estimada de cierre (Quarter y Año); solo el Ingreso estimado es opcional."),
+        ("Gerencia Comercial", "Sección visible solo para Gerencia Comercial y Administrador (el Broker no la ve). Para esos usuarios son obligatorios Origen, Suborigen, Probabilidad y Fecha estimada de cierre (Quarter y Año); solo el Ingreso estimado es opcional. En Origen, al elegir 'Colliers International' se habilita el campo 'Ciudad de la oficina' (texto libre)."),
         ("Título / Nota", "Breve descripción de la oportunidad (opcional)."),
     ],
     [
