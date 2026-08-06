@@ -9353,9 +9353,16 @@ window.openOppDetail=function(oppId){
   const cierrePend=en==='Ganada'&&!o.transaccionId;
   const cb=document.getElementById('opp-cierre-btn');if(cb)cb.style.display=cierrePend?'inline-block':'none';
   const eb=document.getElementById('opp-edit-btn');if(eb)eb.style.display=(_canEditFicha()||en!=='Ganada')?'':'';
-  const bg=crmAvatarBg(titulo);
+  // Logo de la Cuenta asociada (identidad visual del cliente). Si la oportunidad se creó desde un
+  // Contacto, se resuelve la Cuenta a la que pertenece ese contacto. Sin logo → avatar corporativo.
+  let cuentaRef=cuenta;
+  if(!cuentaRef){const ctoId=(Array.isArray(o.contactosAsociados)&&o.contactosAsociados[0]&&o.contactosAsociados[0].id)||o.contactoId;const cto=ctoId&&(_ctoDocs||[]).find(x=>x._id===ctoId);const cId=(cto&&cto.cuentaId)||o.cuentaId;cuentaRef=cId&&_crmDocs.find(x=>x._id===cId);}
+  const logoNombre=(cuentaRef&&cuentaRef.nombre)||o.cuentaNombre||titulo;
+  const logoHtml=_logoValida(cuentaRef&&cuentaRef.logoUrl)
+    ?`<img class="cta-logo" src="${esc(cuentaRef.logoUrl)}" alt="" onerror="this.style.display='none';document.getElementById('opp-logo-fb').style.display='flex'"><div id="opp-logo-fb" class="crm-det-av" style="background:${crmAvatarBg(logoNombre)};display:none;margin:0 auto .5rem">${crmInitials(logoNombre)}</div>`
+    :`<div class="crm-det-av" style="background:${crmAvatarBg(logoNombre)};margin:0 auto .5rem">${crmInitials(logoNombre)}</div>`;
   document.getElementById('opp-det-left').innerHTML=`
-    <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:${bg};border-radius:12px">📈</div><div class="crm-det-av-name">${esc(titulo)}</div><div style="margin-top:.4rem">${oppEstadoBadge(o.estado)}</div></div>
+    <div class="crm-det-av-wrap">${logoHtml}<div class="crm-det-av-name">${esc(titulo)}</div><div style="margin-top:.4rem">${oppEstadoBadge(o.estado)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem"><select class="crm-estado-sel" onchange="oppUpdateEstado('${oppId}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${en===s?' selected':''}>${s}</option>`).join('')}</select></div></div>
     ${_oppEsGerente()?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Probabilidad</div><div style="margin-top:.3rem">${oppProbBadge(o)}</div></div>`:''}
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta / Contacto</div><div class="crm-det-meta-val">${o.cuentaNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(o.cuentaId||'')}')">${esc(o.cuentaNombre)}</span>`:'–'}</div></div>
