@@ -723,6 +723,12 @@ body.dark .crm-det-val{color:#C3E6FF}
 .crm-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.25rem}
 .crm-tag{background:#EEF3FF;color:#25408F;font-size:10px;padding:3px 10px;border-radius:999px;font-weight:600}
 body.dark .crm-tag{background:rgba(77,147,255,.12);color:#C3E6FF;border:1px solid rgba(77,147,255,.15)}
+/* Estándar Nexus: Ejecutivos Comerciales en lista vertical (uno debajo del otro, avatar + nombre a la izquierda). */
+.ejec-vlist{display:flex;flex-direction:column;align-items:flex-start;gap:.35rem}
+.ejec-vitem{display:flex;align-items:center;gap:.45rem;max-width:100%}
+.ejec-av{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-size:9px;font-weight:700;flex:0 0 auto;text-transform:uppercase;line-height:1}
+.ejec-nm{color:#25408F;font-weight:600;line-height:1.2;word-break:break-word}
+body.dark .ejec-nm{color:#C3E6FF}
 .crm-timeline{display:flex;flex-direction:column;gap:.6rem}
 .crm-tl-item{display:flex;gap:.6rem;align-items:flex-start}
 .crm-tl-dot{width:7px;height:7px;border-radius:50%;background:#1C54F4;flex-shrink:0;margin-top:4px}
@@ -6339,6 +6345,17 @@ const _EJEC_DISPLAY=Object.fromEntries(EJECUTIVOS_CATALOG.map(e=>[e.key,e.displa
 // (nombres libres/legacy) devuelve el valor tal cual, sin romper filtros ni relaciones.
 function ejecDisplay(v){return _EJEC_DISPLAY[v]||v;}
 window.ejecDisplay=ejecDisplay;
+// Estándar Nexus para visualizar Ejecutivos Comerciales: SIEMPRE lista vertical (uno debajo del otro),
+// alineados a la izquierda, con avatar de iniciales por defecto + nombre. El contenedor crece con la cantidad.
+// Acepta keys del catálogo o nombres libres/legacy (ejecDisplay es idempotente). No badges horizontales.
+function ejecVList(keys,opts){
+  keys=(Array.isArray(keys)?keys:[keys]).filter(Boolean);
+  opts=opts||{};
+  if(!keys.length)return opts.empty||'<span style="color:#8898C0">'+(opts.emptyText||'–')+'</span>';
+  const sz=opts.size||22,fs=opts.font||12;
+  return '<div class="ejec-vlist">'+keys.map(k=>{const n=ejecDisplay(k)||k;return `<div class="ejec-vitem"><span class="ejec-av" style="width:${sz}px;height:${sz}px;background:${crmAvatarBg(n)}">${crmInitials(n)}</span><span class="ejec-nm" style="font-size:${fs}px">${esc(n)}</span></div>`;}).join('')+'</div>';
+}
+window.ejecVList=ejecVList;
 function _efectivoTipoCuenta(d){const t=d.tipoCuenta||(d.esBroker==='Sí'?'Inmobiliaria':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');return t==='Broker'?'Inmobiliaria':t;}
 const _normBU=x=>String(x||'').toLowerCase().replace(/s$/,'');   // 'Oficina'/'Oficinas' equivalentes (legacy)
 const _docRubros=d=>Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[]);
@@ -7310,7 +7327,7 @@ function renderContactoInfoCards(d){
   const linkedin=d.linkedin?`<a href="${esc(d.linkedin)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600;word-break:break-all">${esc(d.linkedin)}</a>`:null;
   const cuenta=d.cuentaNombre?`<a href="javascript:void(0)" onclick="crmOpenCuenta('${esc(d.cuentaId||'')}')" style="color:#1C54F4;font-weight:600">${esc(d.cuentaNombre)}</a>`:null;
   const ejs=_ctoEjecutivos(d);
-  const ejecVal=ejs.length?ejs.map(k=>esc(ejecDisplay(k))).join('<br>'):'<span style="color:#8898C0">Sin asignar</span>';
+  const ejecVal=ejecVList(ejs,{emptyText:'Sin asignar'});
   return `
     <div class="nx-grid">
       <div class="nx-col">
@@ -7358,7 +7375,7 @@ window.contactoFichaEdit=function(docId){
   const cargoOpts=['','CEO','CFO','Compras','Real Estate','Otro'].map(o=>`<option value="${esc(o)}"${cargoSelV===o?' selected':''}>${o||'Seleccionar...'}</option>`).join('');
   const estOpts=[['sin_comprobar','🟡 Sin comprobar'],['funcional','🟢 Funcional'],['rebotado','🔴 Rebotado']].map(([v,l])=>`<option value="${v}"${(d.estadoCorreo||'sin_comprobar')===v?' selected':''}>${l}</option>`).join('');
   const ejs=_ctoEjecutivos(d);
-  const ejecRO=ejs.length?ejs.map(k=>esc(ejecDisplay(k))).join('<br>'):'<span style="color:#8898C0">Sin asignar</span>';
+  const ejecRO=ejecVList(ejs,{emptyText:'Sin asignar'});
   body.innerHTML=
     nxEditbar('Editando contacto',`openContactoDetail('${docId}')`,`contactoFichaSave('${docId}')`)+`
     <div class="nx-grid">
@@ -8317,7 +8334,7 @@ function renderLeadInfoCards(d){
           const mostrarInmueble=TIPOS_CON_INMUEBLE.includes(d.tipoInmueble||'');
           const tipoVal=d.tipoInmueble==='Otros'&&d.tipoConsultaOtro?`Otros — ${d.tipoConsultaOtro}`:d.tipoInmueble;
           const ejecs=_leadEjecs(d);
-          const ejecVal=ejecs.length?`<div style="display:flex;flex-direction:column;align-items:flex-start;gap:.3rem">${ejecs.map(k=>`<span class="crm-tag">${esc(ejecDisplay(k))}</span>`).join('')}</div>`:null;
+          const ejecVal=ejecs.length?ejecVList(ejecs):null;
           return `<div class="nx-card">
             <div class="nx-card-title">Información Comercial</div>
             ${row('Tipo de consulta',t(tipoVal))}
@@ -9093,7 +9110,7 @@ function renderOportunidadesTable(rows){
     const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${enorm===s?' selected':''}>${s}</option>`).join('')}</select>`;
     const prob=_oppProbabilidad(o);
     const probSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateProbabilidad('${o._id}',this.value)">${OPP_PROBABILIDADES.map(s=>`<option value="${s}"${prob===s?' selected':''}>${OPP_PROB_META[s].dot} ${s}</option>`).join('')}</select>`;
-    const ejec=_oppEjecs(o).map(k=>ejecDisplay(k)).join(', ')||'–';
+    const ejec=ejecVList(_oppEjecs(o),{size:20,font:11});
     const accion=cierrePend
       ?`<button class="crm-action-btn" style="background:#FEF2F2;color:#DC2626;border-color:#F5C2C7;font-weight:700" onclick="event.stopPropagation();oppCompletarCierre('${o._id}')">⚠ Completar cierre</button>`
       :`<button class="crm-action-btn" onclick="event.stopPropagation();openOppDetail('${o._id}')">Ver ficha →</button>`;
@@ -9101,9 +9118,9 @@ function renderOportunidadesTable(rows){
     const proyCell=`<td><div class="crm-broker-cell">${esc(o.nombreProyecto||'–')}</div></td>`;
     let body;
     if(gerente){
-      body=`${cuentaCell}${proyCell}<td><div class="crm-broker-cell">${esc(ejec)}</div></td><td>${estSel}</td><td>${probSel}</td><td><div class="crm-broker-cell">${esc(o.origen||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.suborigen==='Otro'?(o.suborigenOtro||'Otro'):(o.suborigen||'–'))}</div></td><td class="crm-date">${esc((o.fechaCierreQ||'')+' '+(o.fechaCierreAnio||'')).trim()||'–'}</td><td class="crm-date">${o.ingresoEstimado?('USD '+an2N(o.ingresoEstimado)):'–'}</td><td>${accion}</td>`;
+      body=`${cuentaCell}${proyCell}<td>${ejec}</td><td>${estSel}</td><td>${probSel}</td><td><div class="crm-broker-cell">${esc(o.origen||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.suborigen==='Otro'?(o.suborigenOtro||'Otro'):(o.suborigen||'–'))}</div></td><td class="crm-date">${esc((o.fechaCierreQ||'')+' '+(o.fechaCierreAnio||'')).trim()||'–'}</td><td class="crm-date">${o.ingresoEstimado?('USD '+an2N(o.ingresoEstimado)):'–'}</td><td>${accion}</td>`;
     }else{
-      body=`${cuentaCell}${proyCell}<td class="crm-date">${fmtDate(o.ultimaActividad)}</td><td><div class="crm-broker-cell">${esc(o.unidadNegocio||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoOportunidad||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoTransaccion||'–')}</div></td><td class="crm-date">${o.superficieCubierta?an2N(o.superficieCubierta)+' m²':'–'}</td><td>${estSel}</td><td><div class="crm-broker-cell">${esc(ejec)}</div></td><td>${accion}</td>`;
+      body=`${cuentaCell}${proyCell}<td class="crm-date">${fmtDate(o.ultimaActividad)}</td><td><div class="crm-broker-cell">${esc(o.unidadNegocio||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoOportunidad||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoTransaccion||'–')}</div></td><td class="crm-date">${o.superficieCubierta?an2N(o.superficieCubierta)+' m²':'–'}</td><td>${estSel}</td><td>${ejec}</td><td>${accion}</td>`;
     }
     h+=`<tr onclick="openOppDetail('${o._id}')"${cierrePend?' style="background:#FFF6F6"':''}><td>${logo}</td>${body}</tr>`;
   });
@@ -9383,7 +9400,7 @@ window.openOppDetail=function(oppId){
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cuenta / Contacto</div><div class="crm-det-meta-val">${o.cuentaNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="crmOpenCuenta('${esc(o.cuentaId||'')}')">${esc(o.cuentaNombre)}</span>`:'–'}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem"><select class="crm-estado-sel" onchange="oppUpdateEstado('${oppId}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${en===s?' selected':''}>${s}</option>`).join('')}</select></div></div>
     ${_oppEsGerente()?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Probabilidad</div><div style="margin-top:.3rem">${oppProbBadge(o)}</div></div>`:''}
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo(s)</div><div class="crm-det-meta-val" style="flex-direction:column;align-items:flex-start;gap:.3rem">${_oppEjecs(o).map(k=>`<span class="crm-tag">${esc(ejecDisplay(k))}</span>`).join('')||'–'}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Ejecutivo(s)</div><div class="crm-det-meta-val" style="align-items:flex-start">${ejecVList(_oppEjecs(o))}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Unidad de negocio</div><div class="crm-det-meta-val">${esc(o.unidadNegocio||'–')}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(o.fechaCreacion)}</div></div>
     ${o.transaccionId?`<div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Cierre</div><div class="crm-det-meta-val" style="color:#16A34A;font-weight:700">✓ Transacción registrada</div></div>`:''}`;
@@ -9421,7 +9438,7 @@ function _oppRenderInfo(o){
         ${row('Cuenta',esc(o.cuentaNombre||''))}${row('Nombre del proyecto',esc(o.nombreProyecto||''))}${row('División',esc(o.division||''))}${row('Unidad de negocio',esc(o.unidadNegocio||''))}
         ${row('Tipo de oportunidad',esc(o.tipoOportunidad||''))}${row('Tipo de transacción',esc(o.tipoTransaccion||''))}
         ${row('Superficie cubierta',sup(o.superficieCubierta))}${row('Superficie de terreno',sup(o.superficieTerreno))}
-        ${row('Ejecutivos',_oppEjecs(o).map(k=>esc(ejecDisplay(k))).join(', ')||null)}</div>
+        ${row('Ejecutivos',_oppEjecs(o).length?ejecVList(_oppEjecs(o)):null)}</div>
     </div><div class="nx-col">
       <div class="nx-card"><div class="nx-card-title">Oportunidad</div>
         ${row('Cliente Colliers',esc(o.clienteColliers||''))}
@@ -14976,7 +14993,7 @@ window.srOpenDetail=function(id){
   const entrega=data.fechaRequerimiento||'';
   const entregaFmt=entrega?new Date(entrega+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}):'–';
   const ejec=Array.isArray(data.ejecutivos)&&data.ejecutivos.length?data.ejecutivos:(data.ejecutivosCreador?[data.ejecutivosCreador]:[]);
-  const ejecHTML=ejec.length?ejec.map(e=>`<span class="crm-tag">${esc(e)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
+  const ejecHTML=ejecVList(ejec);
   document.getElementById('sr-det-left').innerHTML=`
     <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name" style="display:flex;align-items:center;justify-content:center;gap:.4rem">${srPrioDot(prioridad,11)}${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoBadge(d.estado)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem">${canEdit?`<select class="crm-estado-sel" onchange="srUpdateEstado('${id}',this.value)">${SR_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('')}</select>`:srEstadoBadge(d.estado)}</div></div>
@@ -15008,7 +15025,7 @@ function _srRenderData(d){
     if(f.type==='cuenta')return esc(d.cuentaNombre||'–');
     if(f.type==='contacto')return esc(d.propietarioNombre||'–');
     if(f.type==='inmueble')return d.inmuebleNombre?`<span style="color:#1C54F4;cursor:pointer" onclick="showModule('buildings');setTimeout(()=>{try{openBuildingEditor('${esc(d.inmuebleId||'')}')}catch(e){}},400)">${esc(d.inmuebleNombre)}</span>`:'<span style="color:#8898C0">–</span>';
-    if(f.type==='ejecutivos')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='ejecutivos')return (Array.isArray(v)&&v.length)?ejecVList(v):'<span style="color:#8898C0">–</span>';
     if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`<div style="font-size:12px"><b>${esc(k)}:</b> ${esc(v[k])}</div>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='docs')return (Array.isArray(v)&&v.length)?v.map(x=>`<div style="font-size:12px"><b>${esc(x.tipo)}:</b> <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(x.url)}</a></div>`).join(''):'<span style="color:#8898C0">–</span>';
