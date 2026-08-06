@@ -9114,7 +9114,9 @@ function renderOportunidadesTable(rows){
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
     const nombre=o.cuentaNombre||cuenta?.nombre||o.cuentaId;
-    const logo=(cuenta&&_logoValida(cuenta.logoUrl))?`<img src="${esc(cuenta.logoUrl)}" style="width:30px;height:30px;border-radius:7px;object-fit:cover" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'crm-avatar',style:'background:${crmAvatarBg(nombre)}',innerText:'${crmInitials(nombre)}'}))">`:`<div class="crm-avatar" style="background:${crmAvatarBg(nombre)}">${crmInitials(nombre)}</div>`;
+    // Logo de la Cuenta: contenedor uniforme 36×36, object-fit:contain (no recorta ni deforma),
+    // fondo blanco para logos transparentes, borde Nexus y padding para que el logo respire.
+    const logo=(cuenta&&_logoValida(cuenta.logoUrl))?`<img src="${esc(cuenta.logoUrl)}" style="width:36px;height:36px;border-radius:7px;object-fit:contain;background:#fff;border:1px solid #E7EDF7;padding:3px" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'crm-avatar',style:'background:${crmAvatarBg(nombre)};width:36px;height:36px',innerText:'${crmInitials(nombre)}'}))">`:`<div class="crm-avatar" style="background:${crmAvatarBg(nombre)};width:36px;height:36px">${crmInitials(nombre)}</div>`;
     const enorm=_oppNormEstado(o.estado);
     const cierrePend=enorm==='Ganada'&&!o.transaccionId;
     const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(s=>`<option${enorm===s?' selected':''}>${s}</option>`).join('')}</select>`;
