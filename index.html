@@ -6345,6 +6345,16 @@ const _EJEC_DISPLAY=Object.fromEntries(EJECUTIVOS_CATALOG.map(e=>[e.key,e.displa
 // (nombres libres/legacy) devuelve el valor tal cual, sin romper filtros ni relaciones.
 function ejecDisplay(v){return _EJEC_DISPLAY[v]||v;}
 window.ejecDisplay=ejecDisplay;
+// Iniciales de un Ejecutivo Comercial: SIEMPRE "Nombre + Apellido".
+// En el catálogo los ejecutivos se muestran como "Apellido Nombre" (ej: "Bartra Alejandro"),
+// por lo que la inicial del Nombre es la 2ª palabra y la del Apellido la 1ª → "Bartra Alejandro" → "AB".
+function ejecInitials(name){
+  const w=(name||'').trim().split(/\s+/).filter(Boolean);
+  if(!w.length)return '';
+  if(w.length===1)return w[0].slice(0,2).toUpperCase();
+  const apellido=w[0],nombre=w[1];   // display "Apellido Nombre[…]"
+  return ((nombre[0]||'')+(apellido[0]||'')).toUpperCase();
+}
 // Estándar Nexus para visualizar Ejecutivos Comerciales: SIEMPRE lista vertical (uno debajo del otro),
 // alineados a la izquierda, con avatar de iniciales por defecto + nombre. El contenedor crece con la cantidad.
 // Acepta keys del catálogo o nombres libres/legacy (ejecDisplay es idempotente). No badges horizontales.
@@ -6353,9 +6363,9 @@ function ejecVList(keys,opts){
   opts=opts||{};
   if(!keys.length)return opts.empty||'<span style="color:#8898C0">'+(opts.emptyText||'–')+'</span>';
   const sz=opts.size||22,fs=opts.font||12;
-  return '<div class="ejec-vlist">'+keys.map(k=>{const n=ejecDisplay(k)||k;return `<div class="ejec-vitem"><span class="ejec-av" style="width:${sz}px;height:${sz}px;background:${crmAvatarBg(n)}">${crmInitials(n)}</span><span class="ejec-nm" style="font-size:${fs}px">${esc(n)}</span></div>`;}).join('')+'</div>';
+  return '<div class="ejec-vlist">'+keys.map(k=>{const n=ejecDisplay(k)||k;return `<div class="ejec-vitem"><span class="ejec-av" style="width:${sz}px;height:${sz}px;background:${crmAvatarBg(n)}">${ejecInitials(n)}</span><span class="ejec-nm" style="font-size:${fs}px">${esc(n)}</span></div>`;}).join('')+'</div>';
 }
-window.ejecVList=ejecVList;
+window.ejecVList=ejecVList;window.ejecInitials=ejecInitials;
 function _efectivoTipoCuenta(d){const t=d.tipoCuenta||(d.esBroker==='Sí'?'Inmobiliaria':d.esDesarrollador==='Sí'?'Desarrollador':'Ninguno');return t==='Broker'?'Inmobiliaria':t;}
 const _normBU=x=>String(x||'').toLowerCase().replace(/s$/,'');   // 'Oficina'/'Oficinas' equivalentes (legacy)
 const _docRubros=d=>Array.isArray(d.rubros)&&d.rubros.length?d.rubros:(d.rubro?[d.rubro]:[]);
