@@ -2491,6 +2491,22 @@ body.dark .actm-lbl{color:#C3E6FF}
 .actm-yn button{font-family:inherit;font-size:12px;font-weight:700;padding:5px 16px;border:1px solid #DDE5F2;background:#fff;color:#56648F;border-radius:8px;cursor:pointer}
 .actm-yn button.on{background:#1C54F4;border-color:#1C54F4;color:#fff}
 body.dark .actm-yn button{background:#0D1733;color:#8FC0FF;border-color:rgba(77,147,255,.2)}
+/* Selección múltiple de Tipo de actividad (chips + lista de checkboxes), reutilizada por ambos modales */
+.act-msel{position:relative}
+.act-msel-box{min-height:38px;border:1px solid #DDE5F2;border-radius:8px;background:#fff;padding:.35rem .5rem;display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;cursor:pointer;color-scheme:light}
+body.dark .act-msel-box{background:#0D1733;border-color:rgba(77,147,255,.2)}
+.act-msel-ph{color:#8898C0;font-size:12px}
+.act-msel-chip{display:inline-flex;align-items:center;gap:.3rem;background:#EEF3FF;color:#25408F;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px}
+body.dark .act-msel-chip{background:rgba(77,147,255,.14);color:#C3E6FF}
+.act-msel-chip-x{cursor:pointer;color:#8898C0;font-weight:700}
+.act-msel-drop{margin-top:.35rem;max-height:220px;overflow-y:auto;background:#fff;border:1px solid #DBE5FF;border-radius:10px;box-shadow:0 6px 18px rgba(0,7,89,.1);padding:.35rem}
+body.dark .act-msel-drop{background:#0D1733;border-color:rgba(77,147,255,.25)}
+.act-msel-grp{font-size:9.5px;font-weight:700;color:#8898C0;text-transform:uppercase;letter-spacing:.06em;padding:.4rem .5rem .2rem}
+.act-msel-opt{display:flex;align-items:center;gap:.5rem;padding:.35rem .5rem;font-size:12px;color:#1F2937;cursor:pointer;border-radius:6px}
+.act-msel-opt:hover{background:#F1F5FF}
+body.dark .act-msel-opt{color:#C3E6FF}
+body.dark .act-msel-opt:hover{background:rgba(77,147,255,.12)}
+.act-msel-opt input{accent-color:#1C54F4}
 /* ===== Analytics · Cuentas (stat tiles + barras 1 serie) ===== */
 .anc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.65rem;margin-bottom:.9rem}
 .anc-tile{background:#fff;border:1px solid #E7EDF7;border-radius:12px;padding:.85rem 1rem}
@@ -7772,8 +7788,8 @@ function _actmEnsure(){
   ov.innerHTML=`<div class="actm-modal" onclick="event.stopPropagation()">
     <div class="actm-title">Registrar actividad</div>
     <div class="actm-sub" id="actm-ctx"></div>
-    <div class="actm-lbl">Actividad</div>
-    <select id="actm-tipo" class="cdr-select"></select>
+    <div class="actm-lbl">Tipo de actividad</div>
+    <div class="act-msel" id="actm-tipo-wrap"><div class="act-msel-box" id="actm-tipo-box" onclick="actSelToggle('actm')"></div><div class="act-msel-drop" id="actm-tipo-drop" style="display:none"></div></div>
     <div class="actm-lbl">¿Querés agregar un comentario?</div>
     <div class="actm-yn"><button type="button" id="actm-com-si" onclick="actmSetCom(true)">Sí</button><button type="button" id="actm-com-no" class="on" onclick="actmSetCom(false)">No</button></div>
     <div id="actm-com-wrap" style="display:none;margin-top:.5rem"><textarea id="actm-com" class="cdr-input" rows="3" placeholder="Comentario de la actividad..." style="resize:vertical;line-height:1.5"></textarea></div>
@@ -7791,16 +7807,23 @@ function _actmEnsure(){
 window.actmSetCom=function(v){_actm.wantCom=v;const a=document.getElementById('actm-com-si'),b=document.getElementById('actm-com-no'),w=document.getElementById('actm-com-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
 window.actmSetFile=function(v){_actm.wantFile=v;const a=document.getElementById('actm-file-si'),b=document.getElementById('actm-file-no'),w=document.getElementById('actm-file-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
 window.actmClose=function(){const ov=document.getElementById('actm-ov');if(ov)ov.classList.remove('open');};
+// ── Selector múltiple de Tipo de actividad (chips + checkboxes), compartido por ambos modales ──
+let _actSelState={};
+function actSelInit(prefix,groups){_actSelState[prefix]={groups,sel:[]};_actSelRenderBox(prefix);const drop=document.getElementById(prefix+'-tipo-drop');if(drop)drop.style.display='none';_actSelRenderDrop(prefix);}
+function _actSelRenderDrop(prefix){const st=_actSelState[prefix];const drop=document.getElementById(prefix+'-tipo-drop');if(!drop||!st)return;drop.innerHTML=st.groups.map(g=>`${st.groups.length>1?`<div class="act-msel-grp">${esc(g.label)}</div>`:''}${g.items.map(t=>`<label class="act-msel-opt"><input type="checkbox" value="${esc(t)}" ${st.sel.includes(t)?'checked':''} onchange="actSelCheck('${prefix}',this.value,this.checked)">${esc(t)}</label>`).join('')}`).join('');}
+function _actSelRenderBox(prefix){const st=_actSelState[prefix];const box=document.getElementById(prefix+'-tipo-box');if(!box||!st)return;box.innerHTML=(st.sel.length?st.sel.map((t,idx)=>`<span class="act-msel-chip">${esc(t)}<span class="act-msel-chip-x" onclick="event.stopPropagation();actSelRemoveIdx('${prefix}',${idx})">✕</span></span>`).join(''):'<span class="act-msel-ph">Seleccioná una o más actividades…</span>')+'<span style="margin-left:auto;color:#8898C0">▾</span>';}
+window.actSelToggle=function(prefix){const drop=document.getElementById(prefix+'-tipo-drop');if(!drop)return;drop.style.display=drop.style.display==='none'?'block':'none';};
+window.actSelCheck=function(prefix,value,checked){const st=_actSelState[prefix];if(!st)return;const i=st.sel.indexOf(value);if(checked&&i<0)st.sel.push(value);else if(!checked&&i>=0)st.sel.splice(i,1);_actSelRenderBox(prefix);};
+window.actSelRemoveIdx=function(prefix,idx){const st=_actSelState[prefix];if(!st)return;st.sel.splice(idx,1);_actSelRenderBox(prefix);_actSelRenderDrop(prefix);};
+function actSelGet(prefix){return (_actSelState[prefix]&&_actSelState[prefix].sel.slice())||[];}
 window.openActividadModal=function(cfg){
   _actmEnsure();
   // Categoría FIJA por columna: 'C' = Comerciales (OPP_ACTIVIDADES), 'M' = Marketing & Research (ACT_MARKETING).
   const cat=cfg.cat==='M'?'M':'C';
   if(cat==='M'&&_nexusRole()==='ejecutivo'){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
   _actm=Object.assign({wantCom:false,wantFile:false,oportunidadId:''},cfg,{cat});
-  const sel=document.getElementById('actm-tipo');
-  // El selector muestra ÚNICAMENTE el catálogo de la categoría elegida (sin mezclar categorías).
-  const lista=cat==='M'?ACT_MARKETING:OPP_ACTIVIDADES;
-  if(sel)sel.innerHTML=lista.map(t=>`<option>${esc(t)}</option>`).join('');
+  // Selección múltiple con ÚNICAMENTE el catálogo de la categoría elegida (sin mezclar categorías).
+  actSelInit('actm',[{label:cat==='M'?'Marketing & Research':'Comerciales',items:cat==='M'?ACT_MARKETING:OPP_ACTIVIDADES}]);
   const ttl=document.querySelector('#actm-ov .actm-title');if(ttl)ttl.textContent=cat==='M'?'Registrar actividad · Marketing & Research':'Registrar actividad · Comercial';
   const ctx=document.getElementById('actm-ctx');if(ctx)ctx.textContent=cfg.ctxLabel||'';
   actmSetCom(false);actmSetFile(false);
@@ -7831,8 +7854,8 @@ async function _actWrite({collection,id,cat,tipo,comentario,adjunto,oppId}){
   if(oppId){const d=tipo+(comentario?` — ${comentario}`:'')+(adjunto?` (📎 ${adjunto.nombre})`:'');await _oppRegistrarEvento(oppId,'actividad',`Actividad ${cat==='M'?'Marketing & Research':'comercial'}: ${d}`);}
 }
 window.actmRegister=async function(){
-  const sel=document.getElementById('actm-tipo');const tipo=sel?sel.value:'';
-  if(!tipo){alert('Elegí una actividad.');return;}
+  const tipos=actSelGet('actm');
+  if(!tipos.length){alert('Elegí al menos una actividad.');return;}
   const cat=_actm.cat==='M'?'M':'C';   // categoría fija según la columna desde la que se abrió
   if(cat==='M'&&_nexusRole()==='ejecutivo'){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
   const comentario=_actm.wantCom?((document.getElementById('actm-com')?.value)||'').trim():'';
@@ -7841,8 +7864,9 @@ window.actmRegister=async function(){
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('actm-save');if(btn){btn.disabled=true;btn.textContent='Registrando...';}
   try{
-    const adjunto=await _actUpload(file);
-    await _actWrite({collection:_actm.collection,id:_actm.id,cat,tipo,comentario,adjunto,oppId:_actm.scope==='oportunidad'?_actm.oportunidadId:''});
+    const adjunto=await _actUpload(file);   // se sube una vez y se reutiliza en cada actividad
+    const oppId=_actm.scope==='oportunidad'?_actm.oportunidadId:'';
+    for(const tipo of tipos){await _actWrite({collection:_actm.collection,id:_actm.id,cat,tipo,comentario,adjunto,oppId});}
     actmClose();
     if(typeof _actm.onDone==='function')_actm.onDone();
   }catch(e){alert('Error al registrar: '+e.message);const b=document.getElementById('actm-save');if(b){b.disabled=false;b.textContent='Registrar actividad';}}
@@ -7861,7 +7885,7 @@ function _qactEnsure(){
     <div class="actm-title">Registrar actividad</div>
     <div class="actm-sub">Vinculála con una Cuenta o Contacto y, opcionalmente, una Oportunidad vigente.</div>
     <div class="actm-lbl">Tipo de actividad</div>
-    <select id="qact-tipo" class="cdr-select"></select>
+    <div class="act-msel" id="qact-tipo-wrap"><div class="act-msel-box" id="qact-tipo-box" onclick="actSelToggle('qact')"></div><div class="act-msel-drop" id="qact-tipo-drop" style="display:none"></div></div>
     <div class="actm-lbl">Cuenta o contacto</div>
     <div style="position:relative">
       <input id="qact-cta" class="cdr-input" type="text" placeholder="Buscar cuenta o contacto..." autocomplete="off" oninput="ctaPickerInput('qact',this.value)" onfocus="ctaPickerInput('qact',this.value)" onblur="ctaPickerBlur('qact')">
@@ -7932,10 +7956,10 @@ window.qactCrearContacto=function(){const ov=document.getElementById('qact-ov');
 window.openQuickActividad=async function(){
   _qactEnsure();
   const esAdmin=_nexusRole()!=='ejecutivo';
-  const sel=document.getElementById('qact-tipo');
-  let h=`<optgroup label="Comerciales">${OPP_ACTIVIDADES.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
-  if(esAdmin)h+=`<optgroup label="Marketing & Research">${ACT_MARKETING.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
-  if(sel)sel.innerHTML=h;
+  // Selección múltiple con separación por categoría (MKT solo para admins).
+  const groups=[{label:'Comerciales',items:OPP_ACTIVIDADES}];
+  if(esAdmin)groups.push({label:'Marketing & Research',items:ACT_MARKETING});
+  actSelInit('qact',groups);
   ['qact-cta','qact-opp-q','qact-com'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['qact-cuentaId','qact-cuentaNombre','qact-contactoId','qact-contactoNombre','qact-targetKind','qact-oppId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['qact-cta-tag','qact-opp-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
@@ -7950,10 +7974,10 @@ window.openQuickActividad=async function(){
   await _crmLoadOppsIfNeeded();
 };
 window.qactRegister=async function(){
-  const tipo=document.getElementById('qact-tipo').value||'';
-  if(!tipo){alert('Elegí un tipo de actividad.');return;}
-  const cat=OPP_ACTIVIDADES.includes(tipo)?'C':'M';
-  if(cat==='M'&&_nexusRole()==='ejecutivo'){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
+  const tipos=actSelGet('qact');
+  if(!tipos.length){alert('Elegí al menos un tipo de actividad.');return;}
+  // Permiso: si hay alguna actividad de Marketing & Research (no está en el catálogo comercial), solo admins.
+  if(_nexusRole()==='ejecutivo'&&tipos.some(t=>!OPP_ACTIVIDADES.includes(t))){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
   const kind=document.getElementById('qact-targetKind').value;
   const cuentaId=document.getElementById('qact-cuentaId').value,contactoId=document.getElementById('qact-contactoId').value;
   if(!kind||(kind==='cuenta'&&!cuentaId)||(kind==='contacto'&&!contactoId)){alert('Seleccioná una Cuenta o Contacto.');return;}
@@ -7964,10 +7988,15 @@ window.qactRegister=async function(){
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('qact-save');if(btn){btn.disabled=true;btn.textContent='Registrando...';}
   try{
-    const adjunto=await _actUpload(file);
-    if(oppId){const o=(_oppDocs||[]).find(x=>x._id===oppId);const oppCuenta=(o&&o.cuentaId)||cuentaId;await _actWrite({collection:'clientes',id:oppCuenta,cat,tipo,comentario,adjunto,oppId});}
-    if(kind==='contacto')await _actWrite({collection:'contactos',id:contactoId,cat,tipo,comentario,adjunto});
-    else if(!oppId)await _actWrite({collection:'clientes',id:cuentaId,cat,tipo,comentario,adjunto});
+    const adjunto=await _actUpload(file);   // se sube una vez y se reutiliza en cada actividad
+    const oParaOpp=oppId?(_oppDocs||[]).find(x=>x._id===oppId):null;const oppCuenta=(oParaOpp&&oParaOpp.cuentaId)||cuentaId;
+    // Una actividad por cada tipo seleccionado; la categoría (C/M) se infiere por catálogo (listas disjuntas).
+    for(const tipo of tipos){
+      const cat=OPP_ACTIVIDADES.includes(tipo)?'C':'M';
+      if(oppId)await _actWrite({collection:'clientes',id:oppCuenta,cat,tipo,comentario,adjunto,oppId});
+      if(kind==='contacto')await _actWrite({collection:'contactos',id:contactoId,cat,tipo,comentario,adjunto});
+      else if(!oppId)await _actWrite({collection:'clientes',id:cuentaId,cat,tipo,comentario,adjunto});
+    }
     qactClose();
     // Refresca la ficha correspondiente si está abierta.
     if(kind==='cuenta'&&_fichaCuentaId===cuentaId&&typeof loadCuentaActividades==='function')loadCuentaActividades(cuentaId);
