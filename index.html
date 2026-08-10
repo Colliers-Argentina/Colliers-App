@@ -2459,6 +2459,38 @@ body.dark .nx-editbar{background:rgba(77,147,255,.1);border-color:rgba(77,147,25
 .act-btn{font-family:inherit;font-size:11px;font-weight:600;padding:5px 10px;border:1px solid #C7D7FF;background:#F4F8FF;color:#1C54F4;border-radius:14px;cursor:pointer;transition:all .12s;text-align:left}
 .act-btn:hover{background:#1C54F4;color:#fff}
 body.dark .act-btn{background:rgba(77,147,255,.12);border-color:rgba(77,147,255,.3);color:#8FC0FF}
+/* Adjunto en el ítem de actividad */
+.act-adj{display:inline-flex;align-items:center;gap:.3rem;margin-top:3px;font-size:11px;color:#1C54F4;font-weight:600;text-decoration:none}
+/* Filtros de Oportunidades con selección múltiple */
+.opp-msel{position:relative;display:inline-block}
+.opp-msel-btn{height:34px;padding:0 12px;border:1px solid #DDE5F2;border-radius:8px;background:#fff;font-family:inherit;font-size:12px;color:#1F2937;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;color-scheme:light}
+body.dark .opp-msel-btn{background:#0D1733;color:#C3E6FF;border-color:rgba(77,147,255,.2)}
+.opp-msel-cnt{background:#1C54F4;color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px}
+.opp-msel-drop{position:absolute;top:calc(100% + 4px);left:0;z-index:700;min-width:210px;max-height:280px;overflow-y:auto;background:#fff;border:1px solid #DBE5FF;border-radius:10px;box-shadow:0 10px 30px rgba(0,7,89,.14);padding:.35rem}
+body.dark .opp-msel-drop{background:#0D1733;border-color:rgba(77,147,255,.25)}
+.opp-msel-opt{display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;font-size:12px;color:#1F2937;cursor:pointer;border-radius:6px}
+.opp-msel-opt:hover{background:#F1F5FF}
+body.dark .opp-msel-opt{color:#C3E6FF}
+body.dark .opp-msel-opt:hover{background:rgba(77,147,255,.12)}
+.opp-msel-opt input{accent-color:#1C54F4}
+/* Encabezados de tabla ordenables */
+th.opp-sortable{cursor:pointer;user-select:none;white-space:nowrap}
+th.opp-sortable .opp-sort-ar{color:#B7C4DE;font-size:10px;margin-left:2px}
+th.opp-sortable.active .opp-sort-ar{color:#1C54F4}
+/* Modal genérico de registro de actividad (Cuenta / Contacto / Oportunidad) */
+.actm-ov{position:fixed;inset:0;background:rgba(6,12,40,.5);z-index:4000;display:none;align-items:center;justify-content:center;padding:1rem}
+.actm-ov.open{display:flex}
+.actm-modal{background:#fff;border-radius:14px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,7,89,.28);padding:1.3rem}
+body.dark .actm-modal{background:#0B142E}
+.actm-title{font-size:15px;font-weight:800;color:#0A1B4D;margin-bottom:.15rem}
+body.dark .actm-title{color:#fff}
+.actm-sub{font-size:11.5px;color:#8898C0;margin-bottom:.6rem}
+.actm-lbl{font-size:11px;font-weight:700;color:#0A1B4D;text-transform:uppercase;letter-spacing:.05em;margin:.9rem 0 .35rem}
+body.dark .actm-lbl{color:#C3E6FF}
+.actm-yn{display:inline-flex;gap:.4rem}
+.actm-yn button{font-family:inherit;font-size:12px;font-weight:700;padding:5px 16px;border:1px solid #DDE5F2;background:#fff;color:#56648F;border-radius:8px;cursor:pointer}
+.actm-yn button.on{background:#1C54F4;border-color:#1C54F4;color:#fff}
+body.dark .actm-yn button{background:#0D1733;color:#8FC0FF;border-color:rgba(77,147,255,.2)}
 /* ===== Analytics · Cuentas (stat tiles + barras 1 serie) ===== */
 .anc-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.65rem;margin-bottom:.9rem}
 .anc-tile{background:#fff;border:1px solid #E7EDF7;border-radius:12px;padding:.85rem 1rem}
@@ -3000,11 +3032,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <div class="crm-topbar-r">
           <input id="opp-search" type="text" placeholder="🔍 Buscar cuenta o proyecto..." class="crm-search-inp" oninput="filterOportunidades()">
-          <select id="opp-filter-ejecutivo" class="crm-sel" onchange="filterOportunidades()"><option value="">Ejecutivo</option></select>
-          <select id="opp-filter-estado" class="crm-sel" onchange="filterOportunidades()"><option value="">Estado</option></select>
-          <select id="opp-filter-actividad" class="crm-sel" onchange="filterOportunidades()"><option value="">Actividad comercial</option></select>
-          <select id="opp-filter-probabilidad" class="crm-sel" onchange="filterOportunidades()" style="display:none"><option value="">Probabilidad</option><option>Alta</option><option>Media</option><option>Baja</option><option>Muy baja</option></select>
-          <select id="opp-filter-un" class="crm-sel" onchange="filterOportunidades()"><option value="">Unidad de negocio</option><option>Oficinas</option><option>Industrial</option><option>Logística</option><option>Retail</option></select>
+          <div class="opp-msel" id="oppf-ejecutivo-wrap"><button type="button" class="opp-msel-btn" onclick="oppFltToggle(event,'ejecutivo')"><span id="oppf-ejecutivo-lbl">Ejecutivo</span><span class="opp-msel-cnt" id="oppf-ejecutivo-cnt" style="display:none">0</span><span style="color:#8898C0">▾</span></button><div class="opp-msel-drop" id="oppf-ejecutivo-drop" style="display:none"></div></div>
+          <div class="opp-msel" id="oppf-estado-wrap"><button type="button" class="opp-msel-btn" onclick="oppFltToggle(event,'estado')"><span id="oppf-estado-lbl">Estado</span><span class="opp-msel-cnt" id="oppf-estado-cnt" style="display:none">0</span><span style="color:#8898C0">▾</span></button><div class="opp-msel-drop" id="oppf-estado-drop" style="display:none"></div></div>
+          <div class="opp-msel" id="oppf-actividad-wrap"><button type="button" class="opp-msel-btn" onclick="oppFltToggle(event,'actividad')"><span id="oppf-actividad-lbl">Actividad comercial</span><span class="opp-msel-cnt" id="oppf-actividad-cnt" style="display:none">0</span><span style="color:#8898C0">▾</span></button><div class="opp-msel-drop" id="oppf-actividad-drop" style="display:none"></div></div>
+          <div class="opp-msel" id="oppf-probabilidad-wrap" style="display:none"><button type="button" class="opp-msel-btn" onclick="oppFltToggle(event,'probabilidad')"><span id="oppf-probabilidad-lbl">Probabilidad</span><span class="opp-msel-cnt" id="oppf-probabilidad-cnt" style="display:none">0</span><span style="color:#8898C0">▾</span></button><div class="opp-msel-drop" id="oppf-probabilidad-drop" style="display:none"></div></div>
+          <div class="opp-msel" id="oppf-un-wrap"><button type="button" class="opp-msel-btn" onclick="oppFltToggle(event,'un')"><span id="oppf-un-lbl">Unidad de negocio</span><span class="opp-msel-cnt" id="oppf-un-cnt" style="display:none">0</span><span style="color:#8898C0">▾</span></button><div class="opp-msel-drop" id="oppf-un-drop" style="display:none"></div></div>
           <button class="crm-new-btn" onclick="openOportunidadDrawer()">+ Nueva Oportunidad</button>
         </div>
       </div>
@@ -3083,8 +3115,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           </div>
           <div class="cdr-field"><div class="cdr-lbl">Estado <span class="cdr-req">*</span></div><select id="opdr-estado" class="cdr-select" onchange="opdrEstadoChange()"></select><input id="opdr-conversion" type="hidden"></div>
           <div class="cdr-field"><div class="cdr-lbl">Actividad que origina la Oportunidad</div><select id="opdr-actividad" class="cdr-select"><option value="">— Seleccionar —</option></select></div>
-          <div id="opdr-gc"></div>
           <div class="cdr-field"><div class="cdr-lbl">Comentarios</div><textarea id="opdr-nota" class="cdr-input" rows="2" placeholder="Comentarios..." style="resize:vertical;min-height:56px;line-height:1.5"></textarea></div>
+          <div id="opdr-gc"></div>
         </div>
        </div>
       </div>
@@ -7122,18 +7154,15 @@ const ACT_MARKETING=['Informe de alternativas solicitado','Informe de alternativ
 let _actDocs=[];
 async function loadCuentaActividades(cuentaId){
   const body=document.getElementById('crm-dt-actividades-body');if(!body)return;
-  const isAdmin=_nexusRole()!=='ejecutivo';
-  const btns=(cat,list)=>`<div class="act-btns">${list.map((t,i)=>`<button type="button" class="act-btn" onclick="regActIdx('${cat}',${i})">＋ ${esc(t)}</button>`).join('')}</div>`;
   body.innerHTML=`
+    <div style="margin-bottom:.9rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="openActividadModal({scope:'cuenta',collection:'clientes',id:'${cuentaId}',ctxLabel:'Cuenta',onDone:function(){loadCuentaActividades('${cuentaId}');}})">+ Registrar actividad</button></div>
     <div class="act-2col">
       <div>
         <div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>
-        ${btns('C',ACT_COMERCIALES)}
         <div id="act-list-C"><div class="anc-empty">Cargando…</div></div>
       </div>
       <div>
-        <div class="cta-sec-title" style="margin-top:0">Actividades Marketing & Research</div>
-        ${isAdmin?btns('M',ACT_MARKETING):'<div style="font-size:10.5px;color:#8898C0;margin-bottom:.6rem">Sólo los Administradores pueden registrar actividades de Marketing & Research.</div>'}
+        <div class="cta-sec-title" style="margin-top:0">Marketing & Research</div>
         <div id="act-list-M"><div class="anc-empty">Cargando…</div></div>
       </div>
     </div>`;
@@ -7159,6 +7188,7 @@ function _renderActLists(cuentaId){
         <div style="flex:1;min-width:0">
           <div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>
           ${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}
+          ${_actAdjHTML(a)}
           <div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):''}${a.usuario?' · '+esc(a.usuario):''}</div>
         </div>
         ${isAdmin?`<span style="display:flex;gap:.35rem;flex-shrink:0"><span class="cdr-ms-chip-x" title="Editar" onclick="editActIdx('${cuentaId}',${idx})">✏️</span><span class="cdr-ms-chip-x" title="Eliminar" onclick="delActIdx('${cuentaId}',${idx})">🗑</span></span>`:''}
@@ -7610,18 +7640,15 @@ let _ctoActDocs=[];
 async function loadContactoActividades(contactoId){
   const body=document.getElementById('cto-dt-actividades-body');if(!body)return;
   if(!db){body.innerHTML='<div class="anc-empty">Firebase no disponible.</div>';return;}
-  const isAdmin=_nexusRole()!=='ejecutivo';
-  const btns=(cat,list)=>`<div class="act-btns">${list.map((t,i)=>`<button type="button" class="act-btn" onclick="regActContactoIdx('${contactoId}','${cat}',${i})">＋ ${esc(t)}</button>`).join('')}</div>`;
   body.innerHTML=`
+    <div style="margin-bottom:.9rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="openActividadModal({scope:'contacto',collection:'contactos',id:'${contactoId}',ctxLabel:'Contacto',onDone:function(){loadContactoActividades('${contactoId}');}})">+ Registrar actividad</button></div>
     <div class="act-2col">
       <div>
         <div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>
-        ${btns('C',ACT_COMERCIALES)}
         <div id="cto-act-list-C"><div class="anc-empty">Cargando…</div></div>
       </div>
       <div>
-        <div class="cta-sec-title" style="margin-top:0">Actividades Marketing & Research</div>
-        ${isAdmin?btns('M',ACT_MARKETING):'<div style="font-size:10.5px;color:#8898C0;margin-bottom:.6rem">Sólo los Administradores pueden registrar actividades de Marketing & Research.</div>'}
+        <div class="cta-sec-title" style="margin-top:0">Marketing & Research</div>
         <div id="cto-act-list-M"><div class="anc-empty">Cargando…</div></div>
       </div>
     </div>`;
@@ -7638,7 +7665,7 @@ function _renderContactoActLists(contactoId){
     const items=_ctoActDocs.filter(a=>(a.cat||'C')===cat);
     if(!items.length){el.innerHTML=`<div class="anc-empty">Sin actividades ${cat==='C'?'comerciales':'de Marketing & Research'} registradas.</div>`;return;}
     el.innerHTML=items.map(a=>{const t=_tsToDate(a.fecha);const idx=_ctoActDocs.indexOf(a);
-      return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div>${isAdmin?`<span style="display:flex;gap:.35rem;flex-shrink:0"><span class="cdr-ms-chip-x" title="Eliminar" onclick="delActContactoIdx('${contactoId}',${idx})">🗑</span></span>`:''}</div>`;
+      return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}${_actAdjHTML(a)}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div>${isAdmin?`<span style="display:flex;gap:.35rem;flex-shrink:0"><span class="cdr-ms-chip-x" title="Eliminar" onclick="delActContactoIdx('${contactoId}',${idx})">🗑</span></span>`:''}</div>`;
     }).join('');
   });
 }
@@ -7664,6 +7691,83 @@ window.delActContactoIdx=async function(contactoId,i){
   try{await db.collection('contactos').doc(contactoId).collection('actividades').doc(a._id).delete();
     _ctoActDocs.splice(i,1);_renderContactoActLists(contactoId);
   }catch(e){alert('Error: '+e.message);}
+};
+
+// ═══ Registro de actividad UNIFICADO (Cuenta / Contacto / Oportunidad) ═══
+// Un solo modal/flujo y un solo catálogo: Comerciales = OPP_ACTIVIDADES (el mismo del alta de
+// Oportunidad); Marketing & Research = ACT_MARKETING. Flujo: actividad → ¿comentario? → ¿archivo? → registrar.
+// Adjuntos: se suben al Storage existente y quedan como reg.adjunto {nombre,url,storageRef,ext,tamaño}.
+function _actAdjHTML(a){if(!a||!a.adjunto||!a.adjunto.url)return '';const f=a.adjunto;const isImg=/^(png|jpe?g|webp|gif|bmp|svg)$/i.test(f.ext||'');return `<a class="act-adj" href="${esc(f.url)}" target="_blank" rel="noopener" title="Abrir / descargar">${isImg?'🖼️':'📎'} ${esc(f.nombre||'Adjunto')}</a>`;}
+let _actm={scope:'',collection:'',id:'',oportunidadId:'',onDone:null,wantCom:false,wantFile:false};
+function _actmEnsure(){
+  if(document.getElementById('actm-ov'))return;
+  const ov=document.createElement('div');ov.id='actm-ov';ov.className='actm-ov';
+  ov.innerHTML=`<div class="actm-modal" onclick="event.stopPropagation()">
+    <div class="actm-title">Registrar actividad</div>
+    <div class="actm-sub" id="actm-ctx"></div>
+    <div class="actm-lbl">Actividad</div>
+    <select id="actm-tipo" class="cdr-select"></select>
+    <div class="actm-lbl">¿Querés agregar un comentario?</div>
+    <div class="actm-yn"><button type="button" id="actm-com-si" onclick="actmSetCom(true)">Sí</button><button type="button" id="actm-com-no" class="on" onclick="actmSetCom(false)">No</button></div>
+    <div id="actm-com-wrap" style="display:none;margin-top:.5rem"><textarea id="actm-com" class="cdr-input" rows="3" placeholder="Comentario de la actividad..." style="resize:vertical;line-height:1.5"></textarea></div>
+    <div class="actm-lbl">¿Querés adjuntar un archivo?</div>
+    <div class="actm-yn"><button type="button" id="actm-file-si" onclick="actmSetFile(true)">Sí</button><button type="button" id="actm-file-no" class="on" onclick="actmSetFile(false)">No</button></div>
+    <div id="actm-file-wrap" style="display:none;margin-top:.5rem"><input type="file" id="actm-file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.webp,.gif"></div>
+    <div style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.3rem">
+      <button class="crm-action-btn" onclick="actmClose()">Cancelar</button>
+      <button class="crm-action-btn" id="actm-save" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="actmRegister()">Registrar actividad</button>
+    </div>
+  </div>`;
+  ov.onclick=()=>actmClose();
+  document.body.appendChild(ov);
+}
+window.actmSetCom=function(v){_actm.wantCom=v;const a=document.getElementById('actm-com-si'),b=document.getElementById('actm-com-no'),w=document.getElementById('actm-com-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
+window.actmSetFile=function(v){_actm.wantFile=v;const a=document.getElementById('actm-file-si'),b=document.getElementById('actm-file-no'),w=document.getElementById('actm-file-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
+window.actmClose=function(){const ov=document.getElementById('actm-ov');if(ov)ov.classList.remove('open');};
+window.openActividadModal=function(cfg){
+  _actmEnsure();
+  _actm=Object.assign({wantCom:false,wantFile:false,oportunidadId:''},cfg);
+  const esAdmin=_nexusRole()!=='ejecutivo';
+  const sel=document.getElementById('actm-tipo');
+  // Catálogo Comercial reutilizado del alta de Oportunidad (OPP_ACTIVIDADES). MKT solo para admins.
+  let h=`<optgroup label="Comerciales">${OPP_ACTIVIDADES.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
+  if(esAdmin)h+=`<optgroup label="Marketing & Research">${ACT_MARKETING.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
+  if(sel)sel.innerHTML=h;
+  const ctx=document.getElementById('actm-ctx');if(ctx)ctx.textContent=cfg.ctxLabel||'';
+  actmSetCom(false);actmSetFile(false);
+  const cm=document.getElementById('actm-com');if(cm)cm.value='';
+  const fi=document.getElementById('actm-file');if(fi)fi.value='';
+  const btn=document.getElementById('actm-save');if(btn){btn.disabled=false;btn.textContent='Registrar actividad';}
+  document.getElementById('actm-ov').classList.add('open');
+};
+window.actmRegister=async function(){
+  const sel=document.getElementById('actm-tipo');const tipo=sel?sel.value:'';
+  if(!tipo){alert('Elegí una actividad.');return;}
+  const cat=OPP_ACTIVIDADES.includes(tipo)?'C':'M';   // categoría inferida del catálogo (listas disjuntas)
+  if(cat==='M'&&_nexusRole()==='ejecutivo'){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
+  const comentario=_actm.wantCom?((document.getElementById('actm-com')?.value)||'').trim():'';
+  const fi=document.getElementById('actm-file');
+  const file=(_actm.wantFile&&fi&&fi.files&&fi.files[0])?fi.files[0]:null;
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('actm-save');if(btn){btn.disabled=true;btn.textContent='Registrando...';}
+  try{
+    let adjunto=null;
+    if(file&&storage){
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      const safeName=Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const ref=storage.ref(`${_actm.collection}/${_actm.id}/actividades/${safeName}`);
+      await ref.put(file);adjunto={nombre:file.name,url:await ref.getDownloadURL(),storageRef:ref.fullPath,ext,tamaño:file.size};
+    }
+    const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
+    const reg={cat,tipo,descripcion:comentario,fecha:now,usuario,userEmail:user?.email||''};
+    if(adjunto)reg.adjunto=adjunto;
+    if(_actm.scope==='oportunidad'){reg.origen='oportunidad';reg.oportunidadId=_actm.oportunidadId;}
+    await db.collection(_actm.collection).doc(_actm.id).collection('actividades').add(reg);
+    if(_actm.collection==='clientes'){await db.collection('clientes').doc(_actm.id).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now}).catch(()=>{});const ix=_crmDocs.findIndex(x=>x._id===_actm.id);if(ix>=0)_crmDocs[ix]={..._crmDocs[ix],ultimaActividadComercial:now,ultimaActividad:now};}
+    else if(_actm.collection==='contactos'){await db.collection('contactos').doc(_actm.id).update({ultimaActividad:now}).catch(()=>{});const ix=_ctoDocs.findIndex(x=>x._id===_actm.id);if(ix>=0)_ctoDocs[ix].ultimaActividad=now;}
+    actmClose();
+    if(typeof _actm.onDone==='function')_actm.onDone();
+  }catch(e){alert('Error al registrar: '+e.message);const b=document.getElementById('actm-save');if(b){b.disabled=false;b.textContent='Registrar actividad';}}
 };
 
 // ═══ Timeline del Contacto (auditoría completa: contactoTimeline + actividades) ═══
@@ -9068,6 +9172,9 @@ const OPP_ESTADO_PROB={'En gestión':{conv:'0-50',lbl:'0–50%',pct:25},'En nego
 function _oppNormEstado(e){return {'Prospectando':'En gestión','Calificando':'En gestión','Inicial':'En gestión','Nuevo':'En gestión','En gestión':'En gestión','En negociación':'En negociación','Ganada':'Ganada','Perdida':'Perdida'}[e]||'En gestión';}
 function _oppConvFromEstado(e){return (OPP_ESTADO_PROB[_oppNormEstado(e)]||{}).conv||'0-50';}
 let _oppDocs=[],_oppWidget='',_opdrBlds=[],_oppFiltersReady=false,_txOppLink='';
+// Filtros multi-selección y ordenamiento persistente de la vista general de Oportunidades.
+let _oppFlt={ejecutivo:[],estado:[],actividad:[],probabilidad:[],un:[]};
+let _oppSort={key:'',dir:'asc'};
 function oppEstadoBadge(e){e=_oppNormEstado(e);const m={'En gestión':'#F59E0B','En negociación':'#7C3AED','Ganada':'#16A34A','Perdida':'#EF3340'};const c=m[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'–')}</span>`;}
 function oppConvBadge(v){const m={'0-50':'#F59E0B','50-80':'#CA8A04','80-100':'#16A34A'};const c=m[v];return c?`<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${OPP_CONV_LBL[v]}</span>`:'<span style="color:#8898C0">–</span>';}
 // Probabilidad de cierre de la oportunidad: atributo independiente (reemplaza los porcentajes y la antigua "Prioridad").
@@ -9108,12 +9215,69 @@ async function loadOportunidades(){
     filterOportunidades();
   }catch(e){if(wrap)wrap.innerHTML=`<div class="crm-empty">Error al cargar: ${e.message}</div>`;}
 }
-function _oppInitFilters(){
-  if(_oppFiltersReady)return;_oppFiltersReady=true;
-  const est=document.getElementById('opp-filter-estado');if(est)est.innerHTML='<option value="">Estado</option>'+OPP_ESTADOS.map(s=>`<option>${s}</option>`).join('');
-  const act=document.getElementById('opp-filter-actividad');if(act)act.innerHTML='<option value="">Actividad comercial</option>'+OPP_ACTIVIDADES.map(s=>`<option>${esc(s)}</option>`).join('');
-  const eje=document.getElementById('opp-filter-ejecutivo');if(eje)eje.innerHTML='<option value="">Ejecutivo</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
+// ── Filtros de la vista general con SELECCIÓN MÚLTIPLE ──
+const _OPP_FLT_LABEL={ejecutivo:'Ejecutivo',estado:'Estado',actividad:'Actividad comercial',probabilidad:'Probabilidad',un:'Unidad de negocio'};
+function _oppFltOpts(key){
+  if(key==='ejecutivo')return CRM_EJECUTIVOS.map(k=>({v:k,label:ejecDisplay(k)}));
+  if(key==='estado')return OPP_ESTADOS.map(s=>({v:s,label:s}));
+  if(key==='actividad')return OPP_ACTIVIDADES.map(s=>({v:s,label:s}));
+  if(key==='probabilidad')return OPP_PROBABILIDADES.map(s=>({v:s,label:s}));
+  if(key==='un')return ['Oficinas','Industrial','Logística','Retail'].map(s=>({v:s,label:s}));
+  return [];
 }
+function _oppFltRenderDrop(key){
+  const drop=document.getElementById('oppf-'+key+'-drop');if(!drop)return;
+  const sel=_oppFlt[key]||[];
+  drop.innerHTML=_oppFltOpts(key).map(o=>`<label class="opp-msel-opt"><input type="checkbox" ${sel.includes(o.v)?'checked':''} onchange="oppFltCheck('${key}',this.value,this.checked)" value="${esc(o.v)}">${esc(o.label)}</label>`).join('');
+}
+function _oppFltSync(key){
+  const sel=_oppFlt[key]||[];const cnt=document.getElementById('oppf-'+key+'-cnt');
+  if(cnt){cnt.textContent=sel.length;cnt.style.display=sel.length?'':'none';}
+}
+window.oppFltToggle=function(ev,key){
+  if(ev)ev.stopPropagation();
+  const drop=document.getElementById('oppf-'+key+'-drop');if(!drop)return;
+  const isOpen=drop.style.display!=='none';
+  document.querySelectorAll('.opp-msel-drop').forEach(d=>d.style.display='none');
+  if(!isOpen){_oppFltRenderDrop(key);drop.style.display='block';}
+};
+window.oppFltCheck=function(key,value,checked){
+  const arr=_oppFlt[key]||(_oppFlt[key]=[]);
+  const i=arr.indexOf(value);
+  if(checked&&i<0)arr.push(value);else if(!checked&&i>=0)arr.splice(i,1);
+  _oppFltSync(key);filterOportunidades();
+};
+document.addEventListener('click',function(e){if(!e.target.closest('.opp-msel'))document.querySelectorAll('.opp-msel-drop').forEach(d=>d.style.display='none');});
+function _oppInitFilters(){
+  // Muestra el filtro Probabilidad solo para Gerente/Admin y sincroniza los contadores.
+  const pw=document.getElementById('oppf-probabilidad-wrap');if(pw)pw.style.display=_oppEsGerente()?'':'none';
+  ['ejecutivo','estado','actividad','probabilidad','un'].forEach(_oppFltSync);
+  _oppFiltersReady=true;
+}
+// ── Ordenamiento por columnas (persistente mientras se navega) ──
+const _oppColKey={'Cuenta / Contacto':'cuenta','Proyecto':'proyecto','Ejecutivo':'ejecutivo','Estado':'estado','Probabilidad':'probabilidad','Origen':'origen','Suborigen':'suborigen','Cierre est.':'cierre','Ingreso est.':'ingreso','Últ. actividad':'ultact','Unidad':'un','Tipo op.':'tipoOp','Tipo tx.':'tipoTx','Sup. cub.':'supCub'};
+function _oppSortVal(o,key){switch(key){
+  case 'cuenta':return (o.cuentaNombre||'').toLowerCase();
+  case 'proyecto':return (o.nombreProyecto||'').toLowerCase();
+  case 'ejecutivo':return (ejecDisplay(_oppEjecs(o)[0]||'')||'').toLowerCase();
+  case 'estado':return OPP_ESTADOS.indexOf(_oppNormEstado(o.estado));
+  case 'probabilidad':return OPP_PROBABILIDADES.indexOf(_oppProbabilidad(o));
+  case 'origen':return (o.origen||'').toLowerCase();
+  case 'suborigen':return (o.suborigen||'').toLowerCase();
+  case 'un':return (o.unidadNegocio||'').toLowerCase();
+  case 'tipoOp':return (o.tipoOportunidad||'').toLowerCase();
+  case 'tipoTx':return (o.tipoTransaccion||'').toLowerCase();
+  case 'supCub':return parseFloat(o.superficieCubierta)||0;
+  case 'ingreso':return parseFloat(o.ingresoEstimado)||0;
+  case 'ultact':return _tsToDate(o.ultimaActividad||o.fechaCreacion)?.getTime()||0;
+  case 'cierre':{const y=parseInt(o.fechaCierreAnio)||0;const q=parseInt(String(o.fechaCierreQ||'').replace('Q',''))||0;return y*10+q;}
+  default:return '';
+}}
+window.oppSort=function(key){
+  if(_oppSort.key===key)_oppSort.dir=_oppSort.dir==='asc'?'desc':'asc';
+  else{_oppSort.key=key;_oppSort.dir='asc';}
+  filterOportunidades();
+};
 function _oppByCuenta(opps){
   const map=new Map();
   opps.forEach(o=>{const t=(_tsToDate(o.ultimaActividad)||_tsToDate(o.fechaCreacion));const tm=t?t.getTime():0;const prev=map.get(o.cuentaId);if(!prev||tm>prev._t)map.set(o.cuentaId,{...o,_t:tm});});
@@ -9122,18 +9286,23 @@ function _oppByCuenta(opps){
 function filterOportunidades(){
   const gv=id=>document.getElementById(id)?.value||'';
   const q=gv('opp-search').toLowerCase().trim();
-  const fEje=gv('opp-filter-ejecutivo'),fEst=gv('opp-filter-estado'),fProb=gv('opp-filter-probabilidad'),fUn=gv('opp-filter-un'),fAct=gv('opp-filter-actividad');
-  // Cada oportunidad es su propia fila (ya NO se agrupa por cuenta).
+  const F=_oppFlt;
+  // Selección múltiple: OR dentro de cada filtro, AND entre filtros.
   const opps=_oppDocs.filter(o=>{
     if(q&&!(((o.cuentaNombre||'')+' '+(o.nombreProyecto||'')+' '+(o.contactoNombre||'')).toLowerCase().includes(q)))return false;
-    if(fEje&&!_oppEjecs(o).includes(fEje))return false;
-    if(fEst&&_oppNormEstado(o.estado)!==fEst)return false;
-    if(fAct&&o.actividadComercial!==fAct)return false;
-    if(fProb&&_oppEsGerente()&&_oppProbabilidad(o)!==fProb)return false;
-    if(fUn&&o.unidadNegocio!==fUn)return false;
+    if(F.ejecutivo.length&&!_oppEjecs(o).some(k=>F.ejecutivo.includes(k)))return false;
+    if(F.estado.length&&!F.estado.includes(_oppNormEstado(o.estado)))return false;
+    if(F.actividad.length&&!F.actividad.includes(o.actividadComercial))return false;
+    if(F.probabilidad.length&&_oppEsGerente()&&!F.probabilidad.includes(_oppProbabilidad(o)))return false;
+    if(F.un.length&&!F.un.includes(o.unidadNegocio))return false;
     if(_oppWidget&&!_oppMatchWidget(o,_oppWidget))return false;
     return true;
-  }).sort((a,b)=>(_tsToDate(b.ultimaActividad||b.fechaCreacion)?.getTime()||0)-(_tsToDate(a.ultimaActividad||a.fechaCreacion)?.getTime()||0));
+  });
+  if(_oppSort.key){
+    opps.sort((a,b)=>{const va=_oppSortVal(a,_oppSort.key),vb=_oppSortVal(b,_oppSort.key);let c=(typeof va==='number'&&typeof vb==='number')?va-vb:String(va).localeCompare(String(vb),'es');return _oppSort.dir==='asc'?c:-c;});
+  }else{
+    opps.sort((a,b)=>(_tsToDate(b.ultimaActividad||b.fechaCreacion)?.getTime()||0)-(_tsToDate(a.ultimaActividad||a.fechaCreacion)?.getTime()||0));
+  }
   _renderOppWidgets();
   renderOportunidadesTable(opps);
   const st=document.getElementById('opp-subtitle');if(st)st.textContent=`${opps.length} oportunidad${opps.length!==1?'es':''}`;
@@ -9150,16 +9319,17 @@ function _renderOppWidgets(){
   const prod=OPP_OBJETIVO_ANUAL?Math.round(cerrado/OPP_OBJETIVO_ANUAL*100):0;   // producción vs objetivo
   const pipeline=abiertas.reduce((s,o)=>s+(parseFloat(o.ingresoEstimado)||0),0);  // suma ingresos estimados abiertas
   // Widgets según perfil (una sola línea):
-  //  · Gerente Comercial: Activas, Ganadas, Perdidas, Producción, Pipeline abierto (sin "% Oportunidades"/Conversión).
-  //  · Ejecutivo Comercial: Activas, Ganadas, Perdidas, Conversión prom. (sin Producción ni Pipeline).
+  //  · Gerente Comercial: Activas, Ganadas, Perdidas (sin Producción ni Pipeline).
+  //  · Ejecutivo Comercial: Activas, Ganadas, Perdidas, Conversión prom.
   const base=[
     ['activas','Activas',String(activas),'#1C54F4'],
     ['ganadas','Ganadas',String(ganadas),'#16A34A'],
     ['perdidas','Perdidas',String(perdidas),'#EF3340'],
   ];
   const W=_oppEsGerente()
-    ?base.concat([['','Producción',prod+' %','#7C3AED'],['','Pipeline abierto',_oppMoneyShort(pipeline),'#B45309']])
+    ?base.slice()
     :base.concat([['','Conversión prom.',conv+' %','#0090C7']]);
+  void prod;void pipeline;   // se conservan cálculos; ya no se muestran como widgets en esta vista
   el.style.setProperty('--oppw',W.length);
   el.innerHTML=W.map(([k,lbl,val,col])=>`<div class="crm-kpi" style="${k?'cursor:pointer;':''}${k&&_oppWidget===k?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}"${k?` onclick="oppToggleWidget('${k}')"`:''}><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`).join('');
 }
@@ -9168,12 +9338,12 @@ function renderOportunidadesTable(rows){
   const wrap=document.getElementById('opp-table-wrap');if(!wrap)return;
   if(!rows.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin oportunidades. Creá una con "+ Nueva Oportunidad".</div>';return;}
   const gerente=_oppEsGerente();
-  {const pf=document.getElementById('opp-filter-probabilidad');if(pf)pf.style.display=gerente?'':'none';}
+  {const pf=document.getElementById('oppf-probabilidad-wrap');if(pf)pf.style.display=gerente?'':'none';}
   let h='<table class="crm-table"><thead><tr>';
   const cols=gerente
     ?['','Cuenta / Contacto','Proyecto','Ejecutivo','Estado','Probabilidad','Origen','Suborigen','Cierre est.','Ingreso est.','']
     :['','Cuenta / Contacto','Proyecto','Últ. actividad','Unidad','Tipo op.','Tipo tx.','Sup. cub.','Estado','Ejecutivo',''];
-  cols.forEach(c=>h+=`<th>${c}</th>`);
+  cols.forEach(c=>{const k=_oppColKey[c];if(k){const act=_oppSort.key===k;const ar=act?(_oppSort.dir==='asc'?'▲':'▼'):'↕';h+=`<th class="opp-sortable${act?' active':''}" onclick="oppSort('${k}')">${c}<span class="opp-sort-ar">${ar}</span></th>`;}else h+=`<th>${c}</th>`;});
   h+='</tr></thead><tbody>';
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
@@ -9545,8 +9715,12 @@ async function _oppLoadActividades(oppId){
     const snap=await db.collection('clientes').doc(o.cuentaId).collection('actividades').orderBy('fecha','desc').limit(200).get();
     const acts=snap.docs.map(d=>d.data()).filter(a=>!a.oportunidadId||a.oportunidadId===oppId);
     const com=acts.filter(a=>(a.cat||'C')==='C'),mkt=acts.filter(a=>a.cat==='M');
-    const list=(arr,color)=>arr.length?arr.map(a=>{const t=_tsToDate(a.fecha);return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div></div>`;}).join(''):'<div class="anc-empty">Sin registros.</div>';
-    el.innerHTML=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Actividades Comerciales</div>${list(com)}</div><div class="nx-card"><div class="nx-card-title">Marketing & Research</div>${list(mkt)}</div>`;
+    const list=(arr)=>arr.length?arr.map(a=>{const t=_tsToDate(a.fecha);return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}${_actAdjHTML(a)}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div></div>`;}).join(''):'<div class="anc-empty">Sin registros.</div>';
+    el.innerHTML=`<div style="margin-bottom:.9rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="openActividadModal({scope:'oportunidad',collection:'clientes',id:'${o.cuentaId}',oportunidadId:'${oppId}',ctxLabel:'Oportunidad',onDone:function(){_oppLoadActividades('${oppId}');}})">+ Registrar actividad</button></div>
+      <div class="act-2col">
+        <div><div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>${list(com)}</div>
+        <div><div class="cta-sec-title" style="margin-top:0">Marketing & Research</div>${list(mkt)}</div>
+      </div>`;
   }catch(e){el.innerHTML='<div class="anc-empty">Error: '+esc(e.message)+'</div>';}
 }
 // Registra un evento en el Timeline propio de la oportunidad (eventos[]).

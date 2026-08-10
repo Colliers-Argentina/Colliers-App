@@ -248,7 +248,7 @@ GUIAS["Guia_Componentes"] = Guia(
 
 # ─────────────────────────── OPORTUNIDADES ───────────────────────────
 GUIAS["Guia_Oportunidades"] = Guia(
-    "Oportunidades", "3.3", FECHA,
+    "Oportunidades", "3.4", FECHA,
     "Módulo independiente con ficha propia por oportunidad (vista, timeline, actividades y contactos propios), integrado con Cuentas, Contactos, Actividades, Transacciones y Analytics. Cada oportunidad es una gestión entre una "
     "Cuenta y Colliers. Al ingresar se ven las Cuentas ordenadas por la actividad más reciente; "
     "los widgets superiores filtran la grilla. Crear o cambiar una oportunidad registra "
@@ -277,6 +277,8 @@ GUIAS["Guia_Oportunidades"] = Guia(
         "Desde la grilla se puede cambiar el Estado (la Probabilidad se ajusta sola) y esos cambios quedan registrados.",
         "Al pasar el estado a 'Ganada', la oportunidad aún no está finalizada: aparece un aviso destacado y el botón 'Completar cierre', que abre el formulario de Cierre de Transacción precargado. La Transacción queda vinculada a la Oportunidad (trazabilidad completa): Lead → Cuenta/Contacto → Oportunidad → Ganada → Cierre → Transacción.",
         "También se puede crear una oportunidad desde la ficha de la Cuenta (botón '+ Nueva oportunidad').",
+        "En la vista general, los filtros permiten seleccionar varias opciones a la vez (ej. varias unidades de negocio) y las columnas se pueden ordenar ascendente/descendente haciendo clic en su encabezado.",
+        "En la ficha, la solapa Actividades muestra dos columnas (Comerciales y Marketing & Research). El botón '+ Registrar actividad' abre un paso a paso: elegir la actividad (mismo catálogo comercial que el alta de Oportunidad), decidir si se agrega un comentario (Sí/No) y si se adjunta un archivo (Sí/No), y registrar. La misma forma de registrar actividades está disponible en las fichas de Cuenta y Contacto.",
     ],
 )
 
