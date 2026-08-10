@@ -71,7 +71,7 @@ GUIAS["Guia_Contactos"] = Guia(
 
 # ─────────────────────────── LEADS ───────────────────────────
 GUIAS["Guia_Leads"] = Guia(
-    "Leads", "2.7", FECHA,
+    "Leads", "2.8", FECHA,
     "Permite registrar oportunidades entrantes (consultas de posibles interesados) y seguir su "
     "ciclo comercial: desde su creación hasta la conversión en Contacto o su cierre. El lead "
     "maneja tres conceptos independientes: Clasificación (calidad al ingresar), Resultado "
@@ -94,6 +94,7 @@ GUIAS["Guia_Leads"] = Guia(
         ("Link de origen", "Pegar el enlace del aviso o publicación de donde surgió la consulta (opcional). Si se completa, debe ser una URL válida."),
         ("Comentarios", "Observaciones: superficie buscada, urgencia, detalles de la consulta."),
         ("Resultado (en la ficha)", "Se crea como Pendiente. Luego se actualiza a Próspero o No Próspero. Cuando es Próspero aparece la acción \"Convertir a Contacto\"; No Próspero conserva el lead como registro histórico."),
+        ("Respuesta 24hs (en la ficha)", "Junto a Resultado, permite adjuntar evidencia del seguimiento (captura del mensaje enviado, foto, PDF, documento) con el botón \"+ Adjuntar\". El botón está disponible sólo durante los 2 días posteriores a la creación del lead; luego queda deshabilitado, pero los archivos ya cargados siguen visibles y se pueden abrir. La carga se registra en el Timeline del lead."),
     ],
     [
         "Se crea el Lead con Resultado Pendiente y Estado Activo, asignado al ejecutivo indicado.",

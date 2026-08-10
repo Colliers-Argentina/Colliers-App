@@ -729,6 +729,14 @@ body.dark .crm-tag{background:rgba(77,147,255,.12);color:#C3E6FF;border:1px soli
 .ejec-av{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-size:9px;font-weight:700;flex:0 0 auto;text-transform:uppercase;line-height:1}
 .ejec-nm{color:#25408F;font-weight:600;line-height:1.2;word-break:break-word}
 body.dark .ejec-nm{color:#C3E6FF}
+/* Lead · sección Resultado / Respuesta 24hs en dos columnas */
+.lead-estres-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+@media(max-width:640px){.lead-estres-grid{grid-template-columns:1fr}}
+.lead-resp24-files{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem}
+.lead-resp24-file{display:flex;align-items:center;gap:.5rem;font-size:11.5px}
+.lead-resp24-file a{color:#1C54F4;font-weight:600;text-decoration:none;word-break:break-all}
+.lead-resp24-thumb{width:34px;height:34px;border-radius:6px;object-fit:cover;border:1px solid #E7EDF7;background:#fff;cursor:pointer;flex:0 0 auto}
+.lead-resp24-ic{width:34px;height:34px;border-radius:6px;border:1px solid #E7EDF7;background:#F6F8FC;display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
 .crm-timeline{display:flex;flex-direction:column;gap:.6rem}
 .crm-tl-item{display:flex;gap:.6rem;align-items:flex-start}
 .crm-tl-dot{width:7px;height:7px;border-radius:50%;background:#1C54F4;flex-shrink:0;margin-top:4px}
@@ -8488,9 +8496,17 @@ function openLeadDetail(docId){
     <div class="crm-det-tab-body">
       <div id="ldt-info">
         <div class="nx-card" style="margin-bottom:.9rem">
-          <div class="nx-card-title">Estado</div>
-          <div class="crm-det-meta-lbl" style="margin:.2rem 0 .3rem">Resultado</div>
-          <select class="crm-estado-sel" onchange="updateLeadResultado('${docId}',this.value)">${LEAD_RESULTADOS.map(r=>`<option${(d.resultado||'Pendiente')===r?' selected':''}>${r}</option>`).join('')}</select>
+          <div class="lead-estres-grid">
+            <div>
+              <div class="nx-card-title">Resultado</div>
+              <select class="crm-estado-sel" style="margin-top:.4rem" onchange="updateLeadResultado('${docId}',this.value)">${LEAD_RESULTADOS.map(r=>`<option${(d.resultado||'Pendiente')===r?' selected':''}>${r}</option>`).join('')}</select>
+            </div>
+            <div>
+              <div class="nx-card-title">Respuesta 24hs</div>
+              <div id="lead-resp24" style="margin-top:.4rem">${_leadResp24Section(d)}</div>
+            </div>
+          </div>
+          <input type="file" id="lead-resp24-inp" style="display:none" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.webp,.gif" onchange="uploadLeadResp24('${docId}',this.files)">
         </div>
         ${renderLeadInfoCards(d)}
         ${!admin?`<div class="nx-card" style="margin-top:.9rem"><div class="nx-card-title">Comentarios</div><textarea id="lead-com-edit" class="cdr-input" style="min-height:64px;resize:vertical;line-height:1.5">${esc(d.comentarios||'')}</textarea><div style="text-align:right;margin-top:.5rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="updateLeadComentarios('${docId}')">Guardar comentario</button></div></div>`:''}
@@ -8694,7 +8710,7 @@ async function loadLeadTimeline(docId){
     const snap=await db.collection('leadTimeline').where('leadId','==',docId).get();
     const events=snap.docs.map(d=>d.data()).sort((a,b)=>_tsToDate(b.fecha)-_tsToDate(a.fecha));
     if(!events.length){body.innerHTML='<div class="crm-det-placeholder"><div class="crm-det-placeholder-icon">📋</div><div class="crm-det-placeholder-title">Sin eventos aún</div></div>';return;}
-    const iconMap={lead_creado:'🎯',broker_asignado:'👤',cambio_estado:'↗️',cambio_resultado:'🎚️',reactivado:'🔄',inactivo:'💤',no_prospero:'🚫',convertido:'✅',actualizado:'✏️',archivado:'📦'};
+    const iconMap={lead_creado:'🎯',broker_asignado:'👤',cambio_estado:'↗️',cambio_resultado:'🎚️',reactivado:'🔄',inactivo:'💤',no_prospero:'🚫',convertido:'✅',actualizado:'✏️',archivado:'📦',respuesta24hs:'📎'};
     body.innerHTML=`<div class="clt-timeline">${events.map(ev=>`
       <div class="clt-event">
         <div class="clt-event-dot" style="background:#1C54F4"></div>
@@ -8709,6 +8725,54 @@ async function loadLeadTimeline(docId){
   }catch(e){body.innerHTML=`<div class="crm-empty">Error: ${e.message}</div>`;}
 }
 
+// ── Respuesta 24hs (evidencia de seguimiento del Lead) ──
+// Permiso de gestión: Dirección/Marketing (edición completa) o el Ejecutivo asignado al Lead.
+function _leadPuedeGestionar(d){if(_canEditFicha())return true;const k=_leadCurrentEjec();return !!(k&&_leadEjecs(d).includes(k));}
+// Ventana temporal: el botón "+ Adjuntar" está disponible solo durante los 2 días (48 h) posteriores
+// a la fecha de CREACIÓN del Lead (no la última actividad ni la modificación).
+function _leadResp24Vigente(d){const c=_tsToDate(d&&d.fechaCreacion);if(!c)return false;return (Date.now()-c.getTime())<=2*864e5;}
+function _leadResp24Item(f){
+  const isImg=/^(png|jpe?g|webp|gif|bmp|svg)$/i.test(f.ext||'');
+  const ic=isImg?`<img class="lead-resp24-thumb" src="${esc(f.url)}" alt="" onclick="window.open('${esc(f.url)}','_blank','noopener')">`:`<span class="lead-resp24-ic">${/pdf/i.test(f.ext||'')?'📄':'📎'}</span>`;
+  return `<div class="lead-resp24-file">${ic}<a href="${esc(f.url)}" target="_blank" rel="noopener" title="Abrir / descargar">${esc(f.nombre||'Archivo')}</a></div>`;
+}
+function _leadResp24Section(d){
+  const files=Array.isArray(d.respuesta24hs)?d.respuesta24hs:[];
+  const list=files.length?`<div class="lead-resp24-files">${files.map(_leadResp24Item).join('')}</div>`:'<div style="font-size:11.5px;color:#8898C0;margin-bottom:.5rem">Sin respuesta adjunta.</div>';
+  if(!_leadPuedeGestionar(d))return list;   // sin permiso de gestión: solo lectura de lo ya cargado
+  const btn=_leadResp24Vigente(d)
+    ?`<button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="triggerLeadResp24Upload()">+ Adjuntar</button>`
+    :`<button class="crm-action-btn" disabled title="El período para adjuntar la respuesta ha finalizado." style="opacity:.5;cursor:not-allowed">+ Adjuntar</button>`;
+  return list+btn;
+}
+window.triggerLeadResp24Upload=function(){const inp=document.getElementById('lead-resp24-inp');if(inp)inp.click();};
+window.uploadLeadResp24=async function(docId,files){
+  if(!files||!files.length)return;
+  const idx=_leadDocs.findIndex(x=>x._id===docId);const d=idx>=0?_leadDocs[idx]:null;
+  if(!d)return;
+  // Validación de seguridad en la lógica de carga (no solo visual): permiso + período vigente.
+  if(!_leadPuedeGestionar(d)){alert('No tenés permisos para gestionar este Lead.');return;}
+  if(!_leadResp24Vigente(d)){alert('El período para adjuntar la respuesta ha finalizado.');const i0=document.getElementById('lead-resp24-inp');if(i0)i0.value='';return;}
+  if(!db||!storage){alert('Almacenamiento no disponible.');return;}
+  const cont=document.getElementById('lead-resp24');const prevHTML=cont?cont.innerHTML:'';
+  if(cont)cont.innerHTML='<div style="font-size:11.5px;color:#8898C0">Subiendo…</div>';
+  try{
+    const now=firebase.firestore.Timestamp.now();const nuevos=[];
+    for(const file of Array.from(files)){
+      const ext=(file.name.split('.').pop()||'').toLowerCase();
+      const safeName=Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const ref=storage.ref(`leads/${docId}/respuesta24hs/${safeName}`);
+      await ref.put(file);
+      const url=await ref.getDownloadURL();
+      nuevos.push({nombre:file.name,url,storageRef:ref.fullPath,ext,tamaño:file.size,usuario:user?.displayName||user?.email||'',userEmail:user?.email||'',fecha:now});
+    }
+    await db.collection('leads').doc(docId).update({respuesta24hs:firebase.firestore.FieldValue.arrayUnion(...nuevos)});
+    if(idx>=0)_leadDocs[idx]={..._leadDocs[idx],respuesta24hs:[...(Array.isArray(_leadDocs[idx].respuesta24hs)?_leadDocs[idx].respuesta24hs:[]),...nuevos]};
+    for(const m of nuevos)await addLeadTimeline(docId,{tipo:'respuesta24hs',descripcion:`Respuesta 24hs adjuntada: ${m.nombre}`});
+    if(cont)cont.innerHTML=_leadResp24Section(_leadDocs[idx]);
+  }catch(e){if(cont)cont.innerHTML=prevHTML;alert('Error al adjuntar: '+e.message);}
+  const inp=document.getElementById('lead-resp24-inp');if(inp)inp.value='';
+};
 // Cargo del Lead (mismo criterio que Contactos). "Otro" → especificar en Puesto.
 window.ldrCargoChange=function(){
   const sel=document.getElementById('ldr-cargo');const f=document.getElementById('ldr-puesto-field');
