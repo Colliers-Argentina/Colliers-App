@@ -2668,6 +2668,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span><span>Menú</span>
     </button>
 
+    <!-- Acceso rápido: registrar actividad desde cualquier sección -->
+    <button class="sb-item-solo" id="sbn-quickact" onclick="openQuickActividad()" title="Registrar actividad">
+      <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span><span>＋ Registrar actividad</span>
+    </button>
+
     <div class="sb-grp-sep"></div>
 
     <!-- Comercial -->
@@ -7808,6 +7813,27 @@ window.openActividadModal=function(cfg){
   const btn=document.getElementById('actm-save');if(btn){btn.disabled=false;btn.textContent='Registrar actividad';}
   document.getElementById('actm-ov').classList.add('open');
 };
+// ── Núcleo REUTILIZABLE de registro de actividad (usado por el modal por columna y el acceso rápido global) ──
+async function _actUpload(file){
+  if(!file||!storage)return null;
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  const safeName=Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const ref=storage.ref(`actividades-adjuntos/${safeName}`);
+  await ref.put(file);
+  return {nombre:file.name,url:await ref.getDownloadURL(),storageRef:ref.fullPath,ext,tamaño:file.size};
+}
+// Escribe UNA actividad en collection/{id}/actividades (misma lógica en toda la app):
+// manual:true, actualiza ultimaActividad de la Cuenta/Contacto y, si hay oportunidad, la registra en su Timeline.
+async function _actWrite({collection,id,cat,tipo,comentario,adjunto,oppId}){
+  const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
+  const reg={cat,tipo,descripcion:comentario||'',fecha:now,usuario,userEmail:user?.email||'',manual:true};
+  if(adjunto)reg.adjunto=adjunto;
+  if(oppId){reg.origen='oportunidad';reg.oportunidadId=oppId;}
+  await db.collection(collection).doc(id).collection('actividades').add(reg);
+  if(collection==='clientes'){await db.collection('clientes').doc(id).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now}).catch(()=>{});const ix=_crmDocs.findIndex(x=>x._id===id);if(ix>=0)_crmDocs[ix]={..._crmDocs[ix],ultimaActividadComercial:now,ultimaActividad:now};}
+  else if(collection==='contactos'){await db.collection('contactos').doc(id).update({ultimaActividad:now}).catch(()=>{});const ix=_ctoDocs.findIndex(x=>x._id===id);if(ix>=0)_ctoDocs[ix].ultimaActividad=now;}
+  if(oppId){const d=tipo+(comentario?` — ${comentario}`:'')+(adjunto?` (📎 ${adjunto.nombre})`:'');await _oppRegistrarEvento(oppId,'actividad',`Actividad ${cat==='M'?'Marketing & Research':'comercial'}: ${d}`);}
+}
 window.actmRegister=async function(){
   const sel=document.getElementById('actm-tipo');const tipo=sel?sel.value:'';
   if(!tipo){alert('Elegí una actividad.');return;}
@@ -7819,27 +7845,140 @@ window.actmRegister=async function(){
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('actm-save');if(btn){btn.disabled=true;btn.textContent='Registrando...';}
   try{
-    let adjunto=null;
-    if(file&&storage){
-      const ext=(file.name.split('.').pop()||'').toLowerCase();
-      const safeName=Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-      const ref=storage.ref(`${_actm.collection}/${_actm.id}/actividades/${safeName}`);
-      await ref.put(file);adjunto={nombre:file.name,url:await ref.getDownloadURL(),storageRef:ref.fullPath,ext,tamaño:file.size};
-    }
-    const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
-    // manual:true marca las actividades registradas por el usuario (vs. eventos automáticos del sistema).
-    // La solapa Actividades muestra SOLO manual:true; el Timeline muestra eventos del sistema + estas.
-    const reg={cat,tipo,descripcion:comentario,fecha:now,usuario,userEmail:user?.email||'',manual:true};
-    if(adjunto)reg.adjunto=adjunto;
-    if(_actm.scope==='oportunidad'){reg.origen='oportunidad';reg.oportunidadId=_actm.oportunidadId;}
-    await db.collection(_actm.collection).doc(_actm.id).collection('actividades').add(reg);
-    if(_actm.collection==='clientes'){await db.collection('clientes').doc(_actm.id).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now}).catch(()=>{});const ix=_crmDocs.findIndex(x=>x._id===_actm.id);if(ix>=0)_crmDocs[ix]={..._crmDocs[ix],ultimaActividadComercial:now,ultimaActividad:now};}
-    else if(_actm.collection==='contactos'){await db.collection('contactos').doc(_actm.id).update({ultimaActividad:now}).catch(()=>{});const ix=_ctoDocs.findIndex(x=>x._id===_actm.id);if(ix>=0)_ctoDocs[ix].ultimaActividad=now;}
-    // La actividad manual también se registra en el Timeline propio de la Oportunidad (eventos[]).
-    if(_actm.scope==='oportunidad'&&_actm.oportunidadId){const d=tipo+(comentario?` — ${comentario}`:'')+(adjunto?` (📎 ${adjunto.nombre})`:'');await _oppRegistrarEvento(_actm.oportunidadId,'actividad',`Actividad ${cat==='M'?'Marketing & Research':'comercial'}: ${d}`);}
+    const adjunto=await _actUpload(file);
+    await _actWrite({collection:_actm.collection,id:_actm.id,cat,tipo,comentario,adjunto,oppId:_actm.scope==='oportunidad'?_actm.oportunidadId:''});
     actmClose();
     if(typeof _actm.onDone==='function')_actm.onDone();
   }catch(e){alert('Error al registrar: '+e.message);const b=document.getElementById('actm-save');if(b){b.disabled=false;b.textContent='Registrar actividad';}}
+};
+
+// ═══ Acceso rápido GLOBAL "Registrar actividad" (menú lateral) ═══
+// Reutiliza el catálogo (OPP_ACTIVIDADES/ACT_MARKETING), el buscador predictivo Cuenta/Contacto
+// (ctaPicker con includeContactos), el selector de Oportunidades vigentes y el núcleo _actUpload/_actWrite.
+// "Vigente" = mismo criterio del módulo (no Ganada/Perdida, no archivada).
+function _oppEsVigente(o){return !!o&&(o.estadoRegistro||'activo')!=='archivado'&&!['Ganada','Perdida'].includes(_oppNormEstado(o.estado));}
+let _qact={wantOpp:false,wantCom:false,wantFile:false};
+function _qactEnsure(){
+  if(document.getElementById('qact-ov'))return;
+  const ov=document.createElement('div');ov.id='qact-ov';ov.className='actm-ov';
+  ov.innerHTML=`<div class="actm-modal" onclick="event.stopPropagation()">
+    <div class="actm-title">Registrar actividad</div>
+    <div class="actm-sub">Vinculála con una Cuenta o Contacto y, opcionalmente, una Oportunidad vigente.</div>
+    <div class="actm-lbl">Tipo de actividad</div>
+    <select id="qact-tipo" class="cdr-select"></select>
+    <div class="actm-lbl">Cuenta o contacto</div>
+    <div style="position:relative">
+      <input id="qact-cta" class="cdr-input" type="text" placeholder="Buscar cuenta o contacto..." autocomplete="off" oninput="ctaPickerInput('qact',this.value)" onfocus="ctaPickerInput('qact',this.value)" onblur="ctaPickerBlur('qact')">
+      <div id="qact-cta-drop" class="cdr-ms-drop" style="display:none"></div>
+      <div id="qact-cta-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
+      <input id="qact-cuentaId" type="hidden"><input id="qact-cuentaNombre" type="hidden"><input id="qact-contactoId" type="hidden"><input id="qact-contactoNombre" type="hidden"><input id="qact-targetKind" type="hidden">
+    </div>
+    <div style="margin-top:.4rem;display:flex;gap:.9rem;font-size:11px;align-items:center">
+      <span style="color:#8898C0">¿No lo encontrás?</span>
+      <a href="javascript:void(0)" style="color:#1C54F4;font-weight:700" onclick="qactCrearCuenta()">+ Crear cuenta</a>
+      <a href="javascript:void(0)" style="color:#1C54F4;font-weight:700" onclick="qactCrearContacto()">+ Crear contacto</a>
+    </div>
+    <div class="actm-lbl">¿Querés vincular esta actividad con una oportunidad vigente?</div>
+    <div class="actm-yn"><button type="button" id="qact-opp-si" onclick="qactSetOpp(true)">Sí</button><button type="button" id="qact-opp-no" class="on" onclick="qactSetOpp(false)">No</button></div>
+    <div id="qact-opp-wrap" style="display:none;margin-top:.5rem;position:relative">
+      <input id="qact-opp-q" class="cdr-input" type="text" placeholder="Buscar oportunidad por proyecto..." autocomplete="off" oninput="qactOppSearch(this.value)" onfocus="qactOppSearch(this.value)" onblur="qactOppBlur()">
+      <div id="qact-opp-drop" class="cdr-ms-drop" style="display:none"></div>
+      <div id="qact-opp-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
+      <input id="qact-oppId" type="hidden">
+    </div>
+    <div class="actm-lbl">¿Querés agregar un comentario?</div>
+    <div class="actm-yn"><button type="button" id="qact-com-si" onclick="qactSetCom(true)">Sí</button><button type="button" id="qact-com-no" class="on" onclick="qactSetCom(false)">No</button></div>
+    <div id="qact-com-wrap" style="display:none;margin-top:.5rem"><textarea id="qact-com" class="cdr-input" rows="3" placeholder="Comentario de la actividad..." style="resize:vertical;line-height:1.5"></textarea></div>
+    <div class="actm-lbl">¿Querés adjuntar un archivo?</div>
+    <div class="actm-yn"><button type="button" id="qact-file-si" onclick="qactSetFile(true)">Sí</button><button type="button" id="qact-file-no" class="on" onclick="qactSetFile(false)">No</button></div>
+    <div id="qact-file-wrap" style="display:none;margin-top:.5rem"><input type="file" id="qact-file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.webp,.gif"></div>
+    <div class="actm-lbl">Creado por</div>
+    <div id="qact-creadopor" class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none"></div>
+    <div style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.3rem">
+      <button class="crm-action-btn" onclick="qactClose()">Cancelar</button>
+      <button class="crm-action-btn" id="qact-save" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="qactRegister()">Registrar actividad</button>
+    </div>
+  </div>`;
+  ov.onclick=()=>qactClose();
+  document.body.appendChild(ov);
+  registerCuentaPicker('qact',{inputId:'qact-cta',dropId:'qact-cta-drop',tagId:'qact-cta-tag',hidId:'qact-cuentaId',hidNombreId:'qact-cuentaNombre',includeContactos:true,
+    onSelect:function(){const k=document.getElementById('qact-targetKind');if(k)k.value='cuenta';['qact-contactoId','qact-contactoNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});qactResetOpp();},
+    onPickContacto:function(cto){const nom=((cto.nombre||'')+' '+(cto.apellidos||'')).trim();
+      document.getElementById('qact-targetKind').value='contacto';
+      document.getElementById('qact-contactoId').value=cto._id;document.getElementById('qact-contactoNombre').value=nom;
+      document.getElementById('qact-cuentaId').value=cto.cuentaId||'';document.getElementById('qact-cuentaNombre').value=cto.cuentaNombre||'';
+      const inp=document.getElementById('qact-cta');if(inp)inp.value=nom;
+      const tag=document.getElementById('qact-cta-tag');if(tag){tag.innerHTML='✓ Contacto seleccionado'+(cto.cuentaNombre?` · ${esc(cto.cuentaNombre)}`:'');tag.style.display='inline-flex';}
+      const dr=document.getElementById('qact-cta-drop');if(dr)dr.style.display='none';qactResetOpp();}});
+}
+window.qactSetOpp=function(v){_qact.wantOpp=v;const a=document.getElementById('qact-opp-si'),b=document.getElementById('qact-opp-no'),w=document.getElementById('qact-opp-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';if(!v)qactResetOpp();};
+window.qactSetCom=function(v){_qact.wantCom=v;const a=document.getElementById('qact-com-si'),b=document.getElementById('qact-com-no'),w=document.getElementById('qact-com-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
+window.qactSetFile=function(v){_qact.wantFile=v;const a=document.getElementById('qact-file-si'),b=document.getElementById('qact-file-no'),w=document.getElementById('qact-file-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
+function qactResetOpp(){const el=document.getElementById('qact-oppId');if(el)el.value='';const q=document.getElementById('qact-opp-q');if(q)q.value='';const tag=document.getElementById('qact-opp-tag');if(tag)tag.style.display='none';}
+window.qactClose=function(){const ov=document.getElementById('qact-ov');if(ov)ov.classList.remove('open');};
+window.qactOppBlur=function(){setTimeout(()=>{const d=document.getElementById('qact-opp-drop');if(d)d.style.display='none';},150);};
+window.qactOppSearch=function(q){
+  const drop=document.getElementById('qact-opp-drop');if(!drop)return;
+  q=(q||'').toLowerCase().trim();
+  const ck=document.getElementById('qact-cuentaId').value,kk=document.getElementById('qact-contactoId').value,kind=document.getElementById('qact-targetKind').value;
+  let rows=(_oppDocs||[]).filter(_oppEsVigente);
+  if(kind==='contacto'&&kk)rows=rows.filter(o=>o.contactoId===kk||(Array.isArray(o.contactosAsociados)&&o.contactosAsociados.some(c=>c&&c.id===kk)));
+  else if(ck)rows=rows.filter(o=>o.cuentaId===ck);
+  else rows=[];   // sin Cuenta/Contacto seleccionado no se listan oportunidades
+  if(q)rows=rows.filter(o=>((o.nombreProyecto||'')+' '+(o.cuentaNombre||'')).toLowerCase().includes(q));
+  rows=_oppSortRecientes(rows).slice(0,10);
+  drop.innerHTML=rows.length?rows.map(o=>`<div class="cdr-ms-item" onmousedown="event.preventDefault();qactPickOpp('${o._id}')">📈 ${esc(o.nombreProyecto||o.cuentaNombre||o._id)} <span style="color:#8898C0;font-size:11px">· ${esc(_oppNormEstado(o.estado))}</span></div>`).join(''):'<div class="cdr-ms-empty">Sin oportunidades vigentes relacionadas.</div>';
+  drop.style.display='block';
+};
+window.qactPickOpp=function(oppId){const o=(_oppDocs||[]).find(x=>x._id===oppId);if(!o)return;document.getElementById('qact-oppId').value=oppId;document.getElementById('qact-opp-q').value=o.nombreProyecto||o.cuentaNombre||oppId;const d=document.getElementById('qact-opp-drop');if(d)d.style.display='none';const tag=document.getElementById('qact-opp-tag');if(tag){tag.innerHTML='✓ '+esc(o.nombreProyecto||'Oportunidad');tag.style.display='inline-flex';}};
+window.qactCrearCuenta=function(){const ov=document.getElementById('qact-ov');if(ov)ov.classList.remove('open');openClientDrawer((nombre,newId)=>{if(ov)ov.classList.add('open');_ctaPickerSet('qact',newId,nombre);},(document.getElementById('qact-cta').value||'').trim());};
+window.qactCrearContacto=function(){const ov=document.getElementById('qact-ov');if(ov)ov.classList.remove('open');openContactoDrawer('','',(fullname,newId,data)=>{if(ov)ov.classList.add('open');document.getElementById('qact-targetKind').value='contacto';document.getElementById('qact-contactoId').value=newId;document.getElementById('qact-contactoNombre').value=fullname;document.getElementById('qact-cuentaId').value=(data&&data.cuentaId)||'';document.getElementById('qact-cuentaNombre').value=(data&&data.cuentaNombre)||'';const inp=document.getElementById('qact-cta');if(inp)inp.value=fullname;const tag=document.getElementById('qact-cta-tag');if(tag){tag.innerHTML='✓ Contacto creado';tag.style.display='inline-flex';}qactResetOpp();});};
+window.openQuickActividad=async function(){
+  _qactEnsure();
+  const esAdmin=_nexusRole()!=='ejecutivo';
+  const sel=document.getElementById('qact-tipo');
+  let h=`<optgroup label="Comerciales">${OPP_ACTIVIDADES.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
+  if(esAdmin)h+=`<optgroup label="Marketing & Research">${ACT_MARKETING.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
+  if(sel)sel.innerHTML=h;
+  ['qact-cta','qact-opp-q','qact-com'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['qact-cuentaId','qact-cuentaNombre','qact-contactoId','qact-contactoNombre','qact-targetKind','qact-oppId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['qact-cta-tag','qact-opp-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  const fi=document.getElementById('qact-file');if(fi)fi.value='';
+  qactSetOpp(false);qactSetCom(false);qactSetFile(false);
+  document.getElementById('qact-creadopor').textContent=user?.displayName||user?.email||'—';
+  const btn=document.getElementById('qact-save');if(btn){btn.disabled=false;btn.textContent='Registrar actividad';}
+  document.getElementById('qact-ov').classList.add('open');
+  // Asegura datos para los buscadores predictivos (cuentas, contactos, oportunidades).
+  if(!_crmDocs.length){try{await loadCRM();}catch(e){}}
+  if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){try{const s=await db.collection('contactos').get();_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}catch(e){}}
+  await _crmLoadOppsIfNeeded();
+};
+window.qactRegister=async function(){
+  const tipo=document.getElementById('qact-tipo').value||'';
+  if(!tipo){alert('Elegí un tipo de actividad.');return;}
+  const cat=OPP_ACTIVIDADES.includes(tipo)?'C':'M';
+  if(cat==='M'&&_nexusRole()==='ejecutivo'){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
+  const kind=document.getElementById('qact-targetKind').value;
+  const cuentaId=document.getElementById('qact-cuentaId').value,contactoId=document.getElementById('qact-contactoId').value;
+  if(!kind||(kind==='cuenta'&&!cuentaId)||(kind==='contacto'&&!contactoId)){alert('Seleccioná una Cuenta o Contacto.');return;}
+  const oppId=_qact.wantOpp?document.getElementById('qact-oppId').value:'';
+  if(_qact.wantOpp&&!oppId){alert('Seleccioná una oportunidad o elegí "No".');return;}
+  const comentario=_qact.wantCom?((document.getElementById('qact-com').value)||'').trim():'';
+  const fi=document.getElementById('qact-file');const file=(_qact.wantFile&&fi&&fi.files&&fi.files[0])?fi.files[0]:null;
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('qact-save');if(btn){btn.disabled=true;btn.textContent='Registrando...';}
+  try{
+    const adjunto=await _actUpload(file);
+    if(oppId){const o=(_oppDocs||[]).find(x=>x._id===oppId);const oppCuenta=(o&&o.cuentaId)||cuentaId;await _actWrite({collection:'clientes',id:oppCuenta,cat,tipo,comentario,adjunto,oppId});}
+    if(kind==='contacto')await _actWrite({collection:'contactos',id:contactoId,cat,tipo,comentario,adjunto});
+    else if(!oppId)await _actWrite({collection:'clientes',id:cuentaId,cat,tipo,comentario,adjunto});
+    qactClose();
+    // Refresca la ficha correspondiente si está abierta.
+    if(kind==='cuenta'&&_fichaCuentaId===cuentaId&&typeof loadCuentaActividades==='function')loadCuentaActividades(cuentaId);
+    if(kind==='contacto'&&_fichaContactoId===contactoId&&typeof loadContactoActividades==='function')loadContactoActividades(contactoId);
+    if(oppId&&_oppCurrentId===oppId&&typeof _oppLoadActividades==='function')_oppLoadActividades(oppId);
+    alert('✓ Actividad registrada correctamente.');
+  }catch(e){alert('Error al registrar: '+e.message);const b=document.getElementById('qact-save');if(b){b.disabled=false;b.textContent='Registrar actividad';}}
 };
 
 // ═══ Timeline del Contacto (auditoría completa: contactoTimeline + actividades) ═══
@@ -8149,9 +8288,9 @@ function _ctdrSetCargo(cargo){
   else if(cargo){sel.value='Otro';if(otroInp)otroInp.value=cargo;if(otroField)otroField.style.display='';}
   else{sel.value='';if(otroInp)otroInp.value='';if(otroField)otroField.style.display='none';}
 }
-window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre){
+window.openContactoDrawer=function(prefillCuentaId,prefillCuentaNombre,onCreated){
   _puestoEnsureCat();
-  _ctdrEditId=null;_ctdrLeadConv=null;
+  _ctdrEditId=null;_ctdrLeadConv=null;_ctdrCallback=onCreated||null;
   _ctdrAccountSelected=false;
   ['ctdr-nombre','ctdr-apellidos','ctdr-puesto','ctdr-email','ctdr-telefono','ctdr-linkedin','ctdr-cuenta-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['ctdr-cargo','ctdr-estadoCorreo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='ctdr-estadoCorreo'?'sin_comprobar':''});
@@ -8315,8 +8454,11 @@ window.saveContactoDrawer=async function(){
       const ref=await db.collection('contactos').add(createData);
       if(newData.puesto)_puestoCatAdd(newData.puesto);
       if(newData.cuentaId){addClientTimeline(newData.cuentaId,{tipo:'alta_contacto',descripcion:`Contacto agregado: ${(nombre+' '+apellidos).trim()}`});delete _ctaQuickCache[newData.cuentaId];}
+      if(Array.isArray(_ctoDocs))_ctoDocs.unshift({...createData,_id:ref.id});
+      const cb=_ctdrCallback;_ctdrCallback=null;
       closeContactoDrawer();
-      if(_ctdrLeadConv){await _completeLeadConversionFromContact(ref.id,createData.cuentaId,createData.cuentaNombre);}
+      if(cb){cb((nombre+' '+apellidos).trim(),ref.id,createData);}
+      else if(_ctdrLeadConv){await _completeLeadConversionFromContact(ref.id,createData.cuentaId,createData.cuentaNombre);}
       else loadContactos();
     }
   }catch(e){
@@ -8336,7 +8478,7 @@ function _diffFields(oldD,newD,labels){
 
 // ===== LEADS =====
 let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente';
-let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null,_ctdrLeadConv=null;
+let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null,_ctdrLeadConv=null,_ctdrCallback=null;
 let _cdrRubros=[];        // rubros seleccionados (many-to-many) -> string[]
 let _cdrSubrubros=[];     // subrubros seleccionados -> [{r:rubro, s:subrubro}]
 let _cdrRubroOpts=[];     // opciones actuales del dropdown de rubro (para handlers por índice)
