@@ -2668,11 +2668,6 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span><span>Menú</span>
     </button>
 
-    <!-- Acceso rápido: registrar actividad desde cualquier sección -->
-    <button class="sb-item-solo" id="sbn-quickact" onclick="openQuickActividad()" title="Registrar actividad">
-      <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span><span>＋ Registrar actividad</span>
-    </button>
-
     <div class="sb-grp-sep"></div>
 
     <!-- Comercial -->
@@ -2686,8 +2681,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <button class="sb-item" data-mod="crm" data-submod="cuentas" onclick="_sbItemClick('crm','cuentas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></span><span>Cuentas</span></button>
         <button class="sb-item" data-mod="crm" data-submod="contactos" onclick="_sbItemClick('crm','contactos')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contactos</span></button>
         <button class="sb-item" data-mod="crm" data-submod="leads" onclick="_sbItemClick('crm','leads')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Leads</span></button>
-        <button class="sb-item" data-mod="crm" data-submod="visitas" onclick="_sbItemClick('crm','visitas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>Visitas</span></button>
         <button class="sb-item" data-mod="crm" data-submod="oportunidades" onclick="_sbItemClick('crm','oportunidades')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span>Oportunidades</span></button>
+        <button class="sb-item" id="sbn-quickact" onclick="openQuickActividad()" title="Registrar actividad"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></span><span>Registrar actividad</span></button>
+        <button class="sb-item" data-mod="crm" data-submod="visitas" onclick="_sbItemClick('crm','visitas')"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>Visitas</span></button>
         <button class="sb-item" data-mod="transacciones" onclick="_sbItemClick('transacciones',null)"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><polyline points="17 11 21 7 17 3"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 21 3 17 7 13"/><line x1="3" y1="17" x2="15" y2="17"/></svg></span><span>Transacciones</span></button>
       </div>
     </div>
@@ -14572,6 +14568,7 @@ function renderHubCards(){
     {iconKey:'cuentas',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'activas'}]},
     {iconKey:'contactos',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
     {iconKey:'leads',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
+    {icon:'<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',title:'Registrar actividad',action:'openQuickActividad()',btn:'Registrar'},
     {iconKey:'nuevaVisita',title:'Nueva Visita',action:'openVisitaDrawer()',btn:'Registrar'},
     {iconKey:'ppts',title:'PPTs',mod:'generator',btn:'Crear PPT',stats:[{id:'hc-ppt-30d',lbl:'últimos 30d'}]},
   ];
