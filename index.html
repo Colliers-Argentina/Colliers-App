@@ -7154,15 +7154,19 @@ const ACT_MARKETING=['Informe de alternativas solicitado','Informe de alternativ
 let _actDocs=[];
 async function loadCuentaActividades(cuentaId){
   const body=document.getElementById('crm-dt-actividades-body');if(!body)return;
+  const isAdmin=_nexusRole()!=='ejecutivo';
+  const btnAct=(cat)=>`<button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4;margin-bottom:.7rem" onclick="openActividadModal({scope:'cuenta',collection:'clientes',id:'${cuentaId}',cat:'${cat}',ctxLabel:'Cuenta',onDone:function(){loadCuentaActividades('${cuentaId}');}})">+ Registrar actividad</button>`;
+  const noteM='<div style="font-size:10.5px;color:#8898C0;margin-bottom:.7rem">Sólo los Administradores pueden registrar actividades de Marketing & Research.</div>';
   body.innerHTML=`
-    <div style="margin-bottom:.9rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="openActividadModal({scope:'cuenta',collection:'clientes',id:'${cuentaId}',ctxLabel:'Cuenta',onDone:function(){loadCuentaActividades('${cuentaId}');}})">+ Registrar actividad</button></div>
     <div class="act-2col">
       <div>
         <div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>
+        ${btnAct('C')}
         <div id="act-list-C"><div class="anc-empty">Cargando…</div></div>
       </div>
       <div>
         <div class="cta-sec-title" style="margin-top:0">Marketing & Research</div>
+        ${isAdmin?btnAct('M'):noteM}
         <div id="act-list-M"><div class="anc-empty">Cargando…</div></div>
       </div>
     </div>`;
@@ -7640,15 +7644,19 @@ let _ctoActDocs=[];
 async function loadContactoActividades(contactoId){
   const body=document.getElementById('cto-dt-actividades-body');if(!body)return;
   if(!db){body.innerHTML='<div class="anc-empty">Firebase no disponible.</div>';return;}
+  const isAdmin=_nexusRole()!=='ejecutivo';
+  const btnAct=(cat)=>`<button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4;margin-bottom:.7rem" onclick="openActividadModal({scope:'contacto',collection:'contactos',id:'${contactoId}',cat:'${cat}',ctxLabel:'Contacto',onDone:function(){loadContactoActividades('${contactoId}');}})">+ Registrar actividad</button>`;
+  const noteM='<div style="font-size:10.5px;color:#8898C0;margin-bottom:.7rem">Sólo los Administradores pueden registrar actividades de Marketing & Research.</div>';
   body.innerHTML=`
-    <div style="margin-bottom:.9rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="openActividadModal({scope:'contacto',collection:'contactos',id:'${contactoId}',ctxLabel:'Contacto',onDone:function(){loadContactoActividades('${contactoId}');}})">+ Registrar actividad</button></div>
     <div class="act-2col">
       <div>
         <div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>
+        ${btnAct('C')}
         <div id="cto-act-list-C"><div class="anc-empty">Cargando…</div></div>
       </div>
       <div>
         <div class="cta-sec-title" style="margin-top:0">Marketing & Research</div>
+        ${isAdmin?btnAct('M'):noteM}
         <div id="cto-act-list-M"><div class="anc-empty">Cargando…</div></div>
       </div>
     </div>`;
@@ -7726,13 +7734,15 @@ window.actmSetFile=function(v){_actm.wantFile=v;const a=document.getElementById(
 window.actmClose=function(){const ov=document.getElementById('actm-ov');if(ov)ov.classList.remove('open');};
 window.openActividadModal=function(cfg){
   _actmEnsure();
-  _actm=Object.assign({wantCom:false,wantFile:false,oportunidadId:''},cfg);
-  const esAdmin=_nexusRole()!=='ejecutivo';
+  // Categoría FIJA por columna: 'C' = Comerciales (OPP_ACTIVIDADES), 'M' = Marketing & Research (ACT_MARKETING).
+  const cat=cfg.cat==='M'?'M':'C';
+  if(cat==='M'&&_nexusRole()==='ejecutivo'){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
+  _actm=Object.assign({wantCom:false,wantFile:false,oportunidadId:''},cfg,{cat});
   const sel=document.getElementById('actm-tipo');
-  // Catálogo Comercial reutilizado del alta de Oportunidad (OPP_ACTIVIDADES). MKT solo para admins.
-  let h=`<optgroup label="Comerciales">${OPP_ACTIVIDADES.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
-  if(esAdmin)h+=`<optgroup label="Marketing & Research">${ACT_MARKETING.map(t=>`<option>${esc(t)}</option>`).join('')}</optgroup>`;
-  if(sel)sel.innerHTML=h;
+  // El selector muestra ÚNICAMENTE el catálogo de la categoría elegida (sin mezclar categorías).
+  const lista=cat==='M'?ACT_MARKETING:OPP_ACTIVIDADES;
+  if(sel)sel.innerHTML=lista.map(t=>`<option>${esc(t)}</option>`).join('');
+  const ttl=document.querySelector('#actm-ov .actm-title');if(ttl)ttl.textContent=cat==='M'?'Registrar actividad · Marketing & Research':'Registrar actividad · Comercial';
   const ctx=document.getElementById('actm-ctx');if(ctx)ctx.textContent=cfg.ctxLabel||'';
   actmSetCom(false);actmSetFile(false);
   const cm=document.getElementById('actm-com');if(cm)cm.value='';
@@ -7743,7 +7753,7 @@ window.openActividadModal=function(cfg){
 window.actmRegister=async function(){
   const sel=document.getElementById('actm-tipo');const tipo=sel?sel.value:'';
   if(!tipo){alert('Elegí una actividad.');return;}
-  const cat=OPP_ACTIVIDADES.includes(tipo)?'C':'M';   // categoría inferida del catálogo (listas disjuntas)
+  const cat=_actm.cat==='M'?'M':'C';   // categoría fija según la columna desde la que se abrió
   if(cat==='M'&&_nexusRole()==='ejecutivo'){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
   const comentario=_actm.wantCom?((document.getElementById('actm-com')?.value)||'').trim():'';
   const fi=document.getElementById('actm-file');
@@ -9716,10 +9726,12 @@ async function _oppLoadActividades(oppId){
     const acts=snap.docs.map(d=>d.data()).filter(a=>!a.oportunidadId||a.oportunidadId===oppId);
     const com=acts.filter(a=>(a.cat||'C')==='C'),mkt=acts.filter(a=>a.cat==='M');
     const list=(arr)=>arr.length?arr.map(a=>{const t=_tsToDate(a.fecha);return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}${_actAdjHTML(a)}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div></div>`;}).join(''):'<div class="anc-empty">Sin registros.</div>';
-    el.innerHTML=`<div style="margin-bottom:.9rem"><button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="openActividadModal({scope:'oportunidad',collection:'clientes',id:'${o.cuentaId}',oportunidadId:'${oppId}',ctxLabel:'Oportunidad',onDone:function(){_oppLoadActividades('${oppId}');}})">+ Registrar actividad</button></div>
-      <div class="act-2col">
-        <div><div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>${list(com)}</div>
-        <div><div class="cta-sec-title" style="margin-top:0">Marketing & Research</div>${list(mkt)}</div>
+    const isAdmin=_nexusRole()!=='ejecutivo';
+    const btnAct=(cat)=>`<button class="crm-action-btn" style="background:#1C54F4;color:#fff;border-color:#1C54F4;margin-bottom:.7rem" onclick="openActividadModal({scope:'oportunidad',collection:'clientes',id:'${o.cuentaId}',oportunidadId:'${oppId}',cat:'${cat}',ctxLabel:'Oportunidad',onDone:function(){_oppLoadActividades('${oppId}');}})">+ Registrar actividad</button>`;
+    const noteM='<div style="font-size:10.5px;color:#8898C0;margin-bottom:.7rem">Sólo los Administradores pueden registrar actividades de Marketing & Research.</div>';
+    el.innerHTML=`<div class="act-2col">
+        <div><div class="cta-sec-title" style="margin-top:0">Actividades Comerciales</div>${btnAct('C')}${list(com)}</div>
+        <div><div class="cta-sec-title" style="margin-top:0">Marketing & Research</div>${isAdmin?btnAct('M'):noteM}${list(mkt)}</div>
       </div>`;
   }catch(e){el.innerHTML='<div class="anc-empty">Error: '+esc(e.message)+'</div>';}
 }
