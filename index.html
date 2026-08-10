@@ -7769,12 +7769,16 @@ window.actmRegister=async function(){
       await ref.put(file);adjunto={nombre:file.name,url:await ref.getDownloadURL(),storageRef:ref.fullPath,ext,tamaño:file.size};
     }
     const now=firebase.firestore.Timestamp.now();const usuario=user?.displayName||user?.email||'';
-    const reg={cat,tipo,descripcion:comentario,fecha:now,usuario,userEmail:user?.email||''};
+    // manual:true marca las actividades registradas por el usuario (vs. eventos automáticos del sistema).
+    // La solapa Actividades muestra SOLO manual:true; el Timeline muestra eventos del sistema + estas.
+    const reg={cat,tipo,descripcion:comentario,fecha:now,usuario,userEmail:user?.email||'',manual:true};
     if(adjunto)reg.adjunto=adjunto;
     if(_actm.scope==='oportunidad'){reg.origen='oportunidad';reg.oportunidadId=_actm.oportunidadId;}
     await db.collection(_actm.collection).doc(_actm.id).collection('actividades').add(reg);
     if(_actm.collection==='clientes'){await db.collection('clientes').doc(_actm.id).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now}).catch(()=>{});const ix=_crmDocs.findIndex(x=>x._id===_actm.id);if(ix>=0)_crmDocs[ix]={..._crmDocs[ix],ultimaActividadComercial:now,ultimaActividad:now};}
     else if(_actm.collection==='contactos'){await db.collection('contactos').doc(_actm.id).update({ultimaActividad:now}).catch(()=>{});const ix=_ctoDocs.findIndex(x=>x._id===_actm.id);if(ix>=0)_ctoDocs[ix].ultimaActividad=now;}
+    // La actividad manual también se registra en el Timeline propio de la Oportunidad (eventos[]).
+    if(_actm.scope==='oportunidad'&&_actm.oportunidadId){const d=tipo+(comentario?` — ${comentario}`:'')+(adjunto?` (📎 ${adjunto.nombre})`:'');await _oppRegistrarEvento(_actm.oportunidadId,'actividad',`Actividad ${cat==='M'?'Marketing & Research':'comercial'}: ${d}`);}
     actmClose();
     if(typeof _actm.onDone==='function')_actm.onDone();
   }catch(e){alert('Error al registrar: '+e.message);const b=document.getElementById('actm-save');if(b){b.disabled=false;b.textContent='Registrar actividad';}}
@@ -9722,8 +9726,10 @@ async function _oppLoadActividades(oppId){
   const el=document.getElementById('opd-act');if(!el)return;
   const o=_oppDocs.find(x=>x._id===oppId);if(!o||!db){if(el)el.innerHTML='<div class="anc-empty">Sin actividades.</div>';return;}
   try{
-    const snap=await db.collection('clientes').doc(o.cuentaId).collection('actividades').orderBy('fecha','desc').limit(200).get();
-    const acts=snap.docs.map(d=>d.data()).filter(a=>!a.oportunidadId||a.oportunidadId===oppId);
+    const snap=await db.collection('clientes').doc(o.cuentaId).collection('actividades').orderBy('fecha','desc').limit(300).get();
+    // Solapa Actividades: SOLO actividades registradas manualmente para ESTA oportunidad (manual:true).
+    // Los eventos automáticos del sistema (cambios de estado, edición, etc.) viven en el Timeline.
+    const acts=snap.docs.map(d=>d.data()).filter(a=>a.manual===true&&a.oportunidadId===oppId);
     const com=acts.filter(a=>(a.cat||'C')==='C'),mkt=acts.filter(a=>a.cat==='M');
     const list=(arr)=>arr.length?arr.map(a=>{const t=_tsToDate(a.fecha);return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}${_actAdjHTML(a)}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):''}${a.usuario?' · '+esc(a.usuario):''}</div></div></div>`;}).join(''):'<div class="anc-empty">Sin registros.</div>';
     const isAdmin=_nexusRole()!=='ejecutivo';
