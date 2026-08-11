@@ -2484,6 +2484,21 @@ body.dark .opp-msel-drop{background:#0D1733;border-color:rgba(77,147,255,.25)}
 body.dark .opp-msel-opt{color:#C3E6FF}
 body.dark .opp-msel-opt:hover{background:rgba(77,147,255,.12)}
 .opp-msel-opt input{accent-color:#1C54F4}
+/* Componente general de filtro multiselección (mismo diseño que el de Oportunidades) */
+.nx-msel{position:relative;display:inline-block}
+.nx-msel-btn{height:34px;padding:0 12px;border:1px solid #DDE5F2;border-radius:8px;background:#fff;font-family:inherit;font-size:12px;color:#1F2937;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;max-width:230px;color-scheme:light}
+.nx-msel-btn span.nx-msel-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.dark .nx-msel-btn{background:#0D1733;color:#C3E6FF;border-color:rgba(77,147,255,.2)}
+.nx-msel-cnt{background:#1C54F4;color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px;flex:0 0 auto}
+.nx-msel-drop{position:absolute;top:calc(100% + 4px);left:0;z-index:700;min-width:220px;max-height:300px;overflow-y:auto;background:#fff;border:1px solid #DBE5FF;border-radius:10px;box-shadow:0 10px 30px rgba(0,7,89,.14);padding:.35rem}
+body.dark .nx-msel-drop{background:#0D1733;border-color:rgba(77,147,255,.25)}
+.nx-msel-acts{display:flex;gap:.5rem;padding:.3rem .5rem .45rem;border-bottom:1px solid #EEF2FA;margin-bottom:.25rem}
+.nx-msel-acts a{font-size:10.5px;font-weight:700;color:#1C54F4;cursor:pointer}
+.nx-msel-opt{display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;font-size:12px;color:#1F2937;cursor:pointer;border-radius:6px}
+.nx-msel-opt:hover{background:#F1F5FF}
+body.dark .nx-msel-opt{color:#C3E6FF}
+body.dark .nx-msel-opt:hover{background:rgba(77,147,255,.12)}
+.nx-msel-opt input{accent-color:#1C54F4}
 /* Encabezados de tabla ordenables */
 th.opp-sortable{cursor:pointer;user-select:none;white-space:nowrap}
 th.opp-sortable .opp-sort-ar{color:#B7C4DE;font-size:10px;margin-left:2px}
@@ -2932,17 +2947,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <div class="crm-topbar-r">
           <input id="cto-search" type="text" placeholder="🔍 Buscar contacto..." class="crm-search-inp" oninput="filterContactos()">
-          <select id="cto-filter-cargo" class="crm-sel" onchange="filterContactos()">
-            <option value="">Todos los cargos</option>
-            <option>CEO</option><option>CFO</option><option>Compras</option><option>Real Estate</option><option>Facilities</option>
-            <option>RRHH</option><option>Operaciones</option><option>IT</option><option>Administración</option><option>Marketing</option><option>Otro</option>
-          </select>
-          <select id="cto-filter-email" class="crm-sel" onchange="filterContactos()">
-            <option value="">Todos los emails</option>
-            <option value="funcional">🟢 Funcional</option>
-            <option value="sin_comprobar">🟡 Sin comprobar</option>
-            <option value="rebotado">🔴 Rebotado</option>
-          </select>
+          <div id="cto-filter-cargo"></div>
+          <div id="cto-filter-email"></div>
           <select id="cto-sort" class="crm-sel" onchange="filterContactos()">
             <option value="reciente">Más reciente</option>
             <option value="antiguo">Más antiguo</option>
@@ -2983,18 +2989,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <div class="crm-topbar-r">
           <input id="lead-search" type="text" placeholder="🔍 Buscar lead..." class="crm-search-inp" oninput="filterLeads()">
-          <select id="lead-filter-ejecutivo" class="crm-sel" onchange="filterLeads()"><option value="">Todos los ejecutivos</option></select>
-          <select id="lead-filter-origen" class="crm-sel" onchange="filterLeads()">
-            <option value="">Todos los orígenes</option>
-            <option>Zonaprop</option><option>Argenprop</option><option>Mercado Libre</option><option>Referido</option>
-            <option>LinkedIn</option><option>Web</option><option>Llamado</option>
-            <option>Email</option><option>Otro</option>
-          </select>
-          <select id="lead-filter-estado" class="crm-sel" onchange="filterLeads()">
-            <option value="">Todos los estados</option>
-            <option>Pendiente</option><option>Próspero</option><option>No Próspero</option>
-            <option>Inactivo</option>
-          </select>
+          <div id="lead-filter-ejecutivo"></div>
+          <div id="lead-filter-origen"></div>
+          <div id="lead-filter-estado"></div>
           <select id="lead-sort" class="crm-sel" onchange="filterLeads()">
             <option value="reciente">Más reciente</option>
             <option value="antiguo">Más antiguo</option>
@@ -6437,6 +6434,55 @@ function nxSortRows(scope,rows,valFn){
     return st.dir==='asc'?c:-c;
   });
 }
+// ── Componente GENERAL de filtro con selección múltiple (una sola lógica para todo Nexus) ──
+// Semántica: O lógico dentro de un mismo filtro · Y lógico entre filtros distintos.
+// Se monta sobre un contenedor y mantiene su selección en _nxMSel[id].sel (array de valores).
+// Uso: nxMSelInit(id,{label,opts,onChange}) con opts = [{v,label}] o strings.
+const _nxMSel={};
+function nxMSelGet(id){return (_nxMSel[id]&&_nxMSel[id].sel.slice())||[];}
+function nxMSelSet(id,vals){const c=_nxMSel[id];if(!c)return;c.sel=(vals||[]).slice();nxMSelSync(id);}
+function nxMSelClear(id){nxMSelSet(id,[]);}
+function _nxMSelOpts(id){const c=_nxMSel[id];if(!c)return[];const o=typeof c.opts==='function'?c.opts():c.opts;return (o||[]).map(x=>typeof x==='string'?{v:x,label:x}:x);}
+function nxMSelInit(id,cfg){
+  const host=document.getElementById(id);if(!host)return;
+  _nxMSel[id]=Object.assign({sel:[]},cfg);
+  host.className='nx-msel';
+  host.innerHTML=`<button type="button" class="nx-msel-btn" onclick="nxMSelToggle(event,'${id}')"><span class="nx-msel-lbl" id="${id}-lbl">${esc(cfg.label||'')}</span><span class="nx-msel-cnt" id="${id}-cnt" style="display:none">0</span><span style="color:#8898C0">▾</span></button><div class="nx-msel-drop" id="${id}-drop" style="display:none"></div>`;
+  nxMSelSync(id);
+}
+function nxMSelSync(id){
+  const c=_nxMSel[id];if(!c)return;
+  const cnt=document.getElementById(id+'-cnt'),lbl=document.getElementById(id+'-lbl');
+  if(cnt){cnt.textContent=c.sel.length;cnt.style.display=c.sel.length?'':'none';}
+  // Muestra los nombres si entran; si son muchos, sólo el título (el contador indica cuántos).
+  if(lbl){
+    const opts=_nxMSelOpts(id);
+    const names=c.sel.map(v=>{const o=opts.find(x=>x.v===v);return o?o.label:v;});
+    lbl.textContent=(c.sel.length&&c.sel.length<=2)?names.join(', '):(c.label||'');
+  }
+}
+function _nxMSelRenderDrop(id){
+  const c=_nxMSel[id],drop=document.getElementById(id+'-drop');if(!c||!drop)return;
+  const opts=_nxMSelOpts(id);
+  drop.innerHTML=`<div class="nx-msel-acts"><a onclick="nxMSelAll('${id}')">Seleccionar todos</a><a onclick="nxMSelNone('${id}')">Limpiar selección</a></div>`
+    +(opts.length?opts.map(o=>`<label class="nx-msel-opt"><input type="checkbox" value="${esc(o.v)}" ${c.sel.includes(o.v)?'checked':''} onchange="nxMSelCheck('${id}',this.value,this.checked)">${esc(o.label)}</label>`).join(''):'<div class="cdr-ms-empty">Sin opciones</div>');
+}
+window.nxMSelToggle=function(ev,id){
+  if(ev)ev.stopPropagation();
+  const drop=document.getElementById(id+'-drop');if(!drop)return;
+  const open=drop.style.display!=='none';
+  document.querySelectorAll('.nx-msel-drop,.opp-msel-drop').forEach(d=>d.style.display='none');
+  if(!open){_nxMSelRenderDrop(id);drop.style.display='block';}
+};
+window.nxMSelCheck=function(id,value,checked){
+  const c=_nxMSel[id];if(!c)return;
+  const i=c.sel.indexOf(value);
+  if(checked&&i<0)c.sel.push(value);else if(!checked&&i>=0)c.sel.splice(i,1);
+  nxMSelSync(id);if(typeof c.onChange==='function')c.onChange();
+};
+window.nxMSelAll=function(id){const c=_nxMSel[id];if(!c)return;c.sel=_nxMSelOpts(id).map(o=>o.v);nxMSelSync(id);_nxMSelRenderDrop(id);if(typeof c.onChange==='function')c.onChange();};
+window.nxMSelNone=function(id){const c=_nxMSel[id];if(!c)return;c.sel=[];nxMSelSync(id);_nxMSelRenderDrop(id);if(typeof c.onChange==='function')c.onChange();};
+document.addEventListener('click',function(e){if(!e.target.closest('.nx-msel'))document.querySelectorAll('.nx-msel-drop').forEach(d=>d.style.display='none');});
 const _NX_SORT_RERENDER={crm:'filterCRM',cto:'filterContactos',lead:'filterLeads'};
 window.nxSort=function(scope,key){
   const st=nxSortState(scope);
@@ -6476,9 +6522,9 @@ const CUENTAS_FILTER_DEFS=[
   {key:'text',label:'Texto',multi:false,noChip:true,test:(d,v)=>(d.nombre||'').toLowerCase().includes(v.toLowerCase())},
   {key:'rubros',label:'Rubro',multi:true,test:(d,v)=>{const dr=_docRubros(d);return v.some(r=>dr.includes(r));}},
   {key:'subrubros',label:'Subrubro',multi:true,test:(d,v)=>{const ds=_docSubNames(d);return v.some(s=>ds.includes(s));}},
-  {key:'clienteColliers',label:'Cliente',multi:false,test:(d,v)=>(d.clienteColliers||'')===v},
-  {key:'categoria',label:'Categoría',multi:false,test:(d,v)=>(d.categoria||'')===v},
-  {key:'tipoCuenta',label:'Tipo',multi:false,test:(d,v)=>_efectivoTipoCuenta(d)===v},
+  {key:'clienteColliers',label:'Cliente',multi:true,test:(d,v)=>v.includes(d.clienteColliers||'')},
+  {key:'categoria',label:'Categoría',multi:true,test:(d,v)=>v.includes(d.categoria||'')},
+  {key:'tipoCuenta',label:'Tipo',multi:true,test:(d,v)=>v.includes(_efectivoTipoCuenta(d))},
   {key:'bu',label:'Unidad',multi:true,test:(d,v)=>{const db=(Array.isArray(d.bu)?d.bu:(d.bu?[d.bu]:[])).map(_normBU);return v.some(u=>db.includes(_normBU(u)));}},
   {key:'gestionadoPor',label:'Gestionado por',multi:true,fmt:ejecDisplay,test:(d,v)=>{const g=_docGestion(d);return v.some(x=>g.includes(x));}},
   {key:'capturadoPor',label:'Creado por',multi:true,fmt:ejecDisplay,test:(d,v)=>v.includes(d.capturadoPor||d.brokerCreador||'')},
@@ -6504,13 +6550,14 @@ function renderCrmFilterPanel(){
   const ms=(key,label,ph)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div>
     <div id="crm-flt-${key}-chips" class="cdr-ms-chips"></div>
     <div class="cdr-ms-wrap"><input id="crm-flt-${key}-q" class="crm-flt-sel" type="text" placeholder="${ph}" autocomplete="off" oninput="crmFltMultiSearch('${key}',this.value)" onfocus="crmFltMultiSearch('${key}',this.value)" onblur="crmFltMultiBlur('${key}')"><div id="crm-flt-${key}-drop" class="cdr-ms-drop" style="display:none"></div></div></div>`;
-  const sel=(key,label,opts)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div><select id="crm-flt-${key}" class="crm-flt-sel" onchange="crmFltSelect('${key}',this.value)">${opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join('')}</select></div>`;
+  // Selección múltiple con el mismo patrón de chips que ya usa "Unidad de Negocio" en este panel.
+  const chips=(key,label,vals)=>`<div class="crm-flt-field"><div class="crm-flt-lbl">${label}</div><div class="crm-flt-unit" id="crm-flt-${key}">${vals.map(v=>`<button type="button" class="cto-pref-chip" data-val="${esc(v)}" onclick="crmFltToggleChip('${key}',this)">${esc(v)}</button>`).join('')}</div></div>`;
   p.innerHTML=
     ms('rubros','Rubro','Buscar rubro...')+
     ms('subrubros','Subrubro','Según rubros...')+
-    sel('clienteColliers','Cliente Colliers',[{v:'',t:'Todos'},{v:'Sí',t:'Sí'},{v:'No',t:'No'}])+
-    sel('categoria','Categoría',[{v:'',t:'Todas'},{v:'Top',t:'Top'},{v:'A',t:'A'},{v:'B',t:'B'},{v:'C',t:'C'},{v:'No aplica',t:'No aplica'}])+
-    sel('tipoCuenta','Tipo de Cuenta',[{v:'',t:'Todas'},{v:'Inmobiliaria',t:'Inmobiliaria'},{v:'Desarrollador',t:'Desarrollador'},{v:'Ninguno',t:'Ninguno'}])+
+    chips('clienteColliers','Cliente Colliers',['Sí','No'])+
+    chips('categoria','Categoría',['Top','A','B','C','No aplica'])+
+    chips('tipoCuenta','Tipo de Cuenta',['Inmobiliaria','Desarrollador','Ninguno'])+
     `<div class="crm-flt-field"><div class="crm-flt-lbl">Unidad de Negocio</div><div class="crm-flt-unit" id="crm-flt-bu">${BU_OPCIONES.map(u=>`<button type="button" class="cto-pref-chip" data-bu="${u}" onclick="crmFltToggleBU(this)">${u}</button>`).join('')}</div></div>`+
     ms('gestionadoPor','Gestionado por','Buscar ejecutivo...')+
     ms('capturadoPor','Creado por','Buscar usuario...');
@@ -6522,7 +6569,7 @@ function _crmFltRenderMultiChips(key){
 }
 function _crmSyncControls(){
   const st=_crmFilterEngine.state;
-  ['clienteColliers','categoria','tipoCuenta'].forEach(k=>{const el=document.getElementById('crm-flt-'+k);if(el)el.value=st[k]||'';});
+  ['clienteColliers','categoria','tipoCuenta'].forEach(k=>{document.querySelectorAll(`#crm-flt-${k} .cto-pref-chip`).forEach(b=>b.classList.toggle('active',(st[k]||[]).includes(b.dataset.val)));});
   ['rubros','subrubros','gestionadoPor','capturadoPor'].forEach(_crmFltRenderMultiChips);
   document.querySelectorAll('#crm-flt-bu .cto-pref-chip').forEach(b=>b.classList.toggle('active',st.bu.includes(b.dataset.bu)));
   const s=document.getElementById('crm-search');if(s)s.value=st.text||'';
@@ -6554,6 +6601,8 @@ window.crmFltMultiRemoveIdx=function(key,i){
 };
 window.crmFltMultiBlur=function(key){setTimeout(()=>{const d=document.getElementById('crm-flt-'+key+'-drop');if(d)d.style.display='none';},150);};
 window.crmFltSelect=function(key,val){_crmFilterEngine.state[key]=val;filterCRM();};
+// Filtros categóricos multiselección de Cuentas (Cliente Colliers / Categoría / Tipo de Cuenta).
+window.crmFltToggleChip=function(key,btn){const v=btn.dataset.val;const st=_crmFilterEngine.state[key];const i=st.indexOf(v);if(i>=0)st.splice(i,1);else st.push(v);btn.classList.toggle('active');filterCRM();};
 window.crmFltToggleBU=function(btn){const v=btn.dataset.bu;const st=_crmFilterEngine.state.bu;const i=st.indexOf(v);if(i>=0)st.splice(i,1);else st.push(v);btn.classList.toggle('active');filterCRM();};
 window.crmFltText=function(v){_crmFilterEngine.state.text=v;filterCRM();};
 window.crmToggleFilters=function(){const p=document.getElementById('crm-filter-panel');const open=p.style.display==='none'||!p.style.display;p.style.display=open?'grid':'none';};
@@ -7393,7 +7442,7 @@ window.closeCRMDetail=()=>{
 };
 
 // ===== CONTACTOS =====
-let _ctoDocs=[];
+let _ctoDocs=[],_ctoFltReady=false;
 
 async function loadContactos(){
   if(!db){document.getElementById('cto-table-wrap').innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
@@ -7421,16 +7470,27 @@ function _ctoSortVal(d,key){switch(key){
   case 'estcorreo':return (d.estadoCorreo||'').toLowerCase();
   default:return '';
 }}
+const CTO_CARGOS_FLT=['CEO','CFO','Compras','Real Estate','Facilities','RRHH','Operaciones','IT','Administración','Marketing','Otro'];
+const CTO_EMAIL_FLT=[{v:'funcional',label:'🟢 Funcional'},{v:'sin_comprobar',label:'🟡 Sin comprobar'},{v:'rebotado',label:'🔴 Rebotado'}];
+// Filtros multiselección de Contactos (se montan una sola vez).
+function _ctoInitFilters(){
+  if(_ctoFltReady)return;
+  if(!document.getElementById('cto-filter-cargo'))return;
+  nxMSelInit('cto-filter-cargo',{label:'Cargo',opts:CTO_CARGOS_FLT,onChange:filterContactos});
+  nxMSelInit('cto-filter-email',{label:'Estado correo',opts:CTO_EMAIL_FLT,onChange:filterContactos});
+  _ctoFltReady=true;
+}
 function filterContactos(){
+  _ctoInitFilters();
   const q=(document.getElementById('cto-search')?.value||'').toLowerCase();
-  const cargo=document.getElementById('cto-filter-cargo')?.value||'';
-  const emailF=document.getElementById('cto-filter-email')?.value||'';
+  // Selección múltiple: O dentro de cada filtro, Y entre filtros.
+  const cargos=nxMSelGet('cto-filter-cargo'),emails=nxMSelGet('cto-filter-email');
   const filtered=_ctoDocs.filter(d=>{
     if((d.estadoRegistro||'activo')==='archivado')return false;
     const fullname=((d.nombre||'')+' '+(d.apellidos||'')).toLowerCase();
     if(q&&!fullname.includes(q)&&!(d.email||'').toLowerCase().includes(q)&&!(d.cuentaNombre||'').toLowerCase().includes(q))return false;
-    if(cargo&&d.cargo!==cargo)return false;
-    if(emailF&&d.estadoCorreo!==emailF)return false;
+    if(cargos.length&&!cargos.includes(d.cargo))return false;
+    if(emails.length&&!emails.includes(d.estadoCorreo))return false;
     if(_ctoWidget==='funcional'&&d.estadoCorreo!=='funcional')return false;
     if(_ctoWidget==='rebotado'&&d.estadoCorreo!=='rebotado')return false;
     if(_ctoWidget==='inactivos'&&!_ctoInactivo(d))return false;
@@ -8578,7 +8638,7 @@ function _diffFields(oldD,newD,labels){
 }
 
 // ===== LEADS =====
-let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente';
+let _leadDocs=[], _currentLeadId=null, _ldrConvertOpt='existente', _leadFltReady=false;
 let _ldrEditId=null,_cdrEditId=null,_ctdrEditId=null,_ctdrLeadConv=null,_ctdrCallback=null;
 let _cdrRubros=[];        // rubros seleccionados (many-to-many) -> string[]
 let _cdrSubrubros=[];     // subrubros seleccionados -> [{r:rubro, s:subrubro}]
@@ -8672,14 +8732,22 @@ function _leadSortVal(d,key){switch(key){
   case 'countdown':{const n=_leadDiasRestantes(d);return n==null?Number.MAX_SAFE_INTEGER:n;}
   default:return '';
 }}
+const LEAD_ORIGENES=['Zonaprop','Argenprop','Mercado Libre','Referido','LinkedIn','Web','Llamado','Email','Otro'];
+const LEAD_ESTADOS_FLT=['Pendiente','Próspero','No Próspero','Inactivo'];
+// Filtros multiselección de Leads (se montan una sola vez).
+function _leadInitFilters(){
+  if(_leadFltReady)return;
+  if(!document.getElementById('lead-filter-ejecutivo'))return;
+  nxMSelInit('lead-filter-ejecutivo',{label:'Ejecutivo',opts:()=>CRM_EJECUTIVOS.map(k=>({v:k,label:ejecDisplay(k)})),onChange:filterLeads});
+  nxMSelInit('lead-filter-origen',{label:'Origen',opts:LEAD_ORIGENES,onChange:filterLeads});
+  nxMSelInit('lead-filter-estado',{label:'Estado',opts:LEAD_ESTADOS_FLT,onChange:filterLeads});
+  _leadFltReady=true;
+}
 function filterLeads(){
-  // Poblar filtro de ejecutivos una vez.
-  const esel=document.getElementById('lead-filter-ejecutivo');
-  if(esel&&esel.options.length<=1)esel.innerHTML='<option value="">Todos los ejecutivos</option>'+CRM_EJECUTIVOS.map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
+  _leadInitFilters();
   const q=(document.getElementById('lead-search')?.value||'').toLowerCase();
-  const estado=document.getElementById('lead-filter-estado')?.value||'';
-  const origen=document.getElementById('lead-filter-origen')?.value||'';
-  const fEjec=document.getElementById('lead-filter-ejecutivo')?.value||'';
+  // Selección múltiple: O dentro de cada filtro, Y entre filtros.
+  const estados=nxMSelGet('lead-filter-estado'),origenes=nxMSelGet('lead-filter-origen'),ejecs=nxMSelGet('lead-filter-ejecutivo');
   const sort=document.getElementById('lead-sort')?.value||'reciente';
   // Visibilidad: el Ejecutivo Comercial sólo ve sus leads asignados.
   const restrict=_nexusRole()==='ejecutivo';
@@ -8693,9 +8761,9 @@ function filterLeads(){
     else if(_leadConvertido(d))return false;
     const full=((d.nombre||'')+' '+(d.apellido||'')+' '+(d.empresa||'')+' '+(d.email||'')).toLowerCase();
     if(q&&!full.includes(q))return false;
-    if(estado&&_leadEstadoText(d)!==estado)return false;
-    if(origen&&d.origen!==origen)return false;
-    if(fEjec&&!_leadEjecs(d).includes(fEjec))return false;
+    if(estados.length&&!estados.includes(_leadEstadoText(d)))return false;
+    if(origenes.length&&!origenes.includes(d.origen))return false;
+    if(ejecs.length&&!_leadEjecs(d).some(k=>ejecs.includes(k)))return false;
     if(_leadWidget==='pendientes'&&_leadEstadoText(d)!=='Pendiente')return false;
     if(_leadWidget==='inactivos'&&_leadEstadoText(d)!=='Inactivo')return false;
     return true;
