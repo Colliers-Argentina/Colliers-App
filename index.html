@@ -1588,7 +1588,7 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 .hub-title{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.2}
 .hub-title span{background:linear-gradient(90deg,#4D93FF,#C3E6FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hub-subtitle{font-size:14px;color:rgba(163,193,255,.55);margin-top:.5rem}
-.hub-cards{display:grid;grid-template-columns:repeat(8,1fr);gap:1rem;margin-bottom:2rem}
+.hub-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:2rem}
 @media(max-width:1200px){.hub-cards{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:700px){.hub-cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:540px){.hub-cards{grid-template-columns:1fr}}
@@ -14678,18 +14678,16 @@ function renderHubCards(){
   const container=document.getElementById('hub-cards');
   if(!container)return;
   const isAdmin=ANALYTICS_ALLOWED.includes(user?.email);
+  // Accesos rápidos: + Visita → Registrar actividad → Leads → Cuentas → Contactos.
+  // Los demás módulos (Oficinas/Industrial/Retail/PPTs/Analytics) siguen accesibles desde el menú lateral.
+  void isAdmin;
   const cards=[
-    {iconKey:'oficinas',title:'Oficinas',mod:'office',btn:'Ver inventario',stats:[{id:'hc-off-total',lbl:'edif.'},{id:'hc-off-disp',lbl:'disp.'}]},
-    {iconKey:'industrial',title:'Industrial',mod:'industrial',btn:'Ver inventario',stats:[{id:'hc-ind-total',lbl:'activos'},{id:'hc-ind-disp',lbl:'disp.'}]},
-    {iconKey:'retail',title:'Retail',mod:'retail',btn:'Ver inventario',stats:[{id:'hc-ret-total',lbl:'locales'},{id:'hc-ret-disp',lbl:'disp.'}]},
+    {iconKey:'nuevaVisita',title:'+ Visita',action:'openVisitaDrawer()',btn:'Registrar'},
+    {icon:'<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',title:'Registrar actividad',action:'openQuickActividad()',btn:'Registrar'},
+    {iconKey:'leads',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
     {iconKey:'cuentas',title:'Cuentas',mod:'crm-cuentas',btn:'Ver cuentas',stats:[{id:'hc-cta-total',lbl:'activas'}]},
     {iconKey:'contactos',title:'Contactos',mod:'crm-contactos',btn:'Ver contactos',stats:[{id:'hc-cto-total',lbl:'contactos'}]},
-    {iconKey:'leads',title:'Leads',mod:'crm-leads',btn:'Gestionar',stats:[{id:'hc-leads-total',lbl:'totales'}]},
-    {icon:'<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',title:'Registrar actividad',action:'openQuickActividad()',btn:'Registrar'},
-    {iconKey:'nuevaVisita',title:'Nueva Visita',action:'openVisitaDrawer()',btn:'Registrar'},
-    {iconKey:'ppts',title:'PPTs',mod:'generator',btn:'Crear PPT',stats:[{id:'hc-ppt-30d',lbl:'últimos 30d'}]},
   ];
-  if(isAdmin)cards.push({iconKey:'analytics',title:'Analytics',mod:'analytics',btn:'Abrir',badge:'Admin',stats:[{id:'hc-an-total',lbl:'búsquedas'}]});
   container.innerHTML=cards.map(c=>_hubCardHTML(c)).join('');
   _loadHubDashboardData();
 }
