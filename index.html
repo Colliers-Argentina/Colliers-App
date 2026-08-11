@@ -6931,8 +6931,9 @@ function _oppsForContacto(contactoId){return _oppSortRecientes((_oppDocs||[]).fi
 // Ejecutivo(s) en lista vertical sin cortar los nombres. No afecta la vista general ni la ficha de la Opp.
 function _oppBrokerTableHTML(rows){
   if(!rows.length)return '';
-  // Sin encabezado para Cuenta/Contacto ni Proyecto (los datos siguen); el resto conserva su título.
-  const cols=['','','Últ. actividad','Unidad','Tipo op.','Tipo tx.','Sup. cub.','Estado','Ejecutivo(s)',''];
+  // Dentro de la ficha de Cuenta/Contacto la columna Cuenta/Contacto es redundante: se omite.
+  // Proyecto va sin encabezado (el dato sigue); el resto conserva su título.
+  const cols=['','Últ. actividad','Unidad','Tipo op.','Tipo tx.','Sup. cub.','Estado','Ejecutivo(s)',''];
   let h='<table class="crm-table opp-assoc"><thead><tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
@@ -6940,10 +6941,9 @@ function _oppBrokerTableHTML(rows){
     const enorm=_oppNormEstado(o.estado);
     const estSel=`<select class="crm-estado-sel" style="font-size:11px;padding:2px 4px" onclick="event.stopPropagation()" onchange="oppUpdateEstado('${o._id}','${o.cuentaId}',this.value)">${OPP_ESTADOS.map(sx=>`<option${enorm===sx?' selected':''}>${sx}</option>`).join('')}</select>`;
     const ejec=ejecVList(_oppEjecs(o),{size:22,font:12});
-    const cuentaCell=`<td><div class="opp-assoc-cta"><div class="crm-client-name">${esc(nombre)}</div>${o.contactoNombre?`<div class="crm-client-sub">👤 ${esc(o.contactoNombre)}</div>`:''}</div></td>`;
     const proyCell=`<td><div class="opp-assoc-proj" title="${esc(o.nombreProyecto||'')}">${esc(o.nombreProyecto||'–')}</div></td>`;
     const accion=`<button class="crm-action-btn" onclick="event.stopPropagation();crmOpenOportunidad('${o._id}')">Ver oportunidad →</button>`;
-    h+=`<tr onclick="crmOpenOportunidad('${o._id}')">${cuentaCell}${proyCell}<td class="crm-date">${fmtDate(o.ultimaActividad)}</td><td><div class="crm-broker-cell">${esc(o.unidadNegocio||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoOportunidad||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoTransaccion||'–')}</div></td><td class="crm-date">${o.superficieCubierta?an2N(o.superficieCubierta)+' m²':'–'}</td><td class="opp-assoc-estado">${estSel}</td><td class="opp-assoc-ejec">${ejec}</td><td>${accion}</td></tr>`;
+    h+=`<tr onclick="crmOpenOportunidad('${o._id}')">${proyCell}<td class="crm-date">${fmtDate(o.ultimaActividad)}</td><td><div class="crm-broker-cell">${esc(o.unidadNegocio||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoOportunidad||'–')}</div></td><td><div class="crm-broker-cell">${esc(o.tipoTransaccion||'–')}</div></td><td class="crm-date">${o.superficieCubierta?an2N(o.superficieCubierta)+' m²':'–'}</td><td class="opp-assoc-estado">${estSel}</td><td class="opp-assoc-ejec">${ejec}</td><td>${accion}</td></tr>`;
   });
   h+='</tbody></table>';
   return `<div style="overflow-x:auto">${h}</div>`;
