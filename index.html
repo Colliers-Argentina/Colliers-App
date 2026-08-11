@@ -736,7 +736,7 @@ body.dark .ejec-nm{color:#C3E6FF}
 .opp-assoc .crm-broker-cell,.opp-assoc .crm-date{white-space:nowrap}
 .opp-assoc-cta{max-width:150px}
 .opp-assoc-cta .crm-client-name{white-space:normal;word-break:break-word;line-height:1.25}
-.opp-assoc-proj{max-width:180px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;line-height:1.3}
+.opp-assoc-proj{min-width:190px;max-width:250px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;line-height:1.35}
 .opp-assoc td.opp-assoc-estado{min-width:132px}
 .opp-assoc-ejec{min-width:158px}
 .opp-assoc-ejec .ejec-nm{white-space:nowrap}   /* nombres completos, sin cortes por palabra */
@@ -6931,7 +6931,8 @@ function _oppsForContacto(contactoId){return _oppSortRecientes((_oppDocs||[]).fi
 // Ejecutivo(s) en lista vertical sin cortar los nombres. No afecta la vista general ni la ficha de la Opp.
 function _oppBrokerTableHTML(rows){
   if(!rows.length)return '';
-  const cols=['Cuenta / Contacto','Proyecto','Últ. actividad','Unidad','Tipo op.','Tipo tx.','Sup. cub.','Estado','Ejecutivo(s)',''];
+  // Sin encabezado para Cuenta/Contacto ni Proyecto (los datos siguen); el resto conserva su título.
+  const cols=['','','Últ. actividad','Unidad','Tipo op.','Tipo tx.','Sup. cub.','Estado','Ejecutivo(s)',''];
   let h='<table class="crm-table opp-assoc"><thead><tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
   rows.forEach(o=>{
     const cuenta=_crmDocs.find(x=>x._id===o.cuentaId);
