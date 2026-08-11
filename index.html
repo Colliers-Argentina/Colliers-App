@@ -6413,6 +6413,38 @@ const _EJEC_DISPLAY=Object.fromEntries(EJECUTIVOS_CATALOG.map(e=>[e.key,e.displa
 // (nombres libres/legacy) devuelve el valor tal cual, sin romper filtros ni relaciones.
 function ejecDisplay(v){return _EJEC_DISPLAY[v]||v;}
 window.ejecDisplay=ejecDisplay;
+// ── Ordenamiento por columnas reutilizable (misma lógica/visual que Oportunidades) ──
+// Se aplica DESPUÉS de los filtros y la búsqueda de cada módulo: datos → filtros → orden → render.
+// Los filtros y los selectores de orden existentes siguen funcionando sin cambios; el orden por
+// columna sólo toma precedencia cuando el usuario hizo clic en un encabezado.
+const _nxSort={};                                   // {scope:{key,dir}}
+function nxSortState(scope){return _nxSort[scope]||(_nxSort[scope]={key:'',dir:'asc'});}
+// Devuelve el <th>: ordenable si se pasa `key`; si no, un encabezado normal.
+function nxTh(scope,label,key){
+  if(!key)return `<th>${label}</th>`;
+  const st=nxSortState(scope),act=st.key===key;
+  return `<th class="opp-sortable${act?' active':''}" onclick="nxSort('${scope}','${key}')">${label}<span class="opp-sort-ar">${act?(st.dir==='asc'?'▲':'▼'):'↕'}</span></th>`;
+}
+// Ordena una copia de rows según el estado del scope. valFn(row,key) devuelve el valor comparable.
+function nxSortRows(scope,rows,valFn){
+  const st=nxSortState(scope);
+  if(!st.key)return rows;
+  return rows.slice().sort((a,b)=>{
+    const va=valFn(a,st.key),vb=valFn(b,st.key);
+    let c;
+    if(typeof va==='number'&&typeof vb==='number')c=va-vb;
+    else c=String(va??'').localeCompare(String(vb??''),'es',{sensitivity:'base',numeric:true});
+    return st.dir==='asc'?c:-c;
+  });
+}
+const _NX_SORT_RERENDER={crm:'filterCRM',cto:'filterContactos',lead:'filterLeads'};
+window.nxSort=function(scope,key){
+  const st=nxSortState(scope);
+  if(st.key===key)st.dir=st.dir==='asc'?'desc':'asc';
+  else{st.key=key;st.dir='asc';}
+  const fn=_NX_SORT_RERENDER[scope];
+  if(fn&&typeof window[fn]==='function')window[fn]();
+};
 // Iniciales de un Ejecutivo Comercial: SIEMPRE "Nombre + Apellido".
 // En el catálogo los ejecutivos se muestran como "Apellido Nombre" (ej: "Bartra Alejandro"),
 // por lo que la inicial del Nombre es la 2ª palabra y la del Apellido la 1ª → "Bartra Alejandro" → "AB".
@@ -6553,6 +6585,17 @@ function _crmEnsureSr(){if((_srDocs&&_srDocs.length)||!db||_crmSrLoading)return;
 // Cuenta con actividad comercial en los últimos 30 días (visitas, oportunidades, propuestas, etc. → ultimaActividad).
 function _crmActividad30(d){const t=_tsToDate(d.ultimaActividad);return t?(Date.now()-t.getTime())<=30*864e5:false;}
 window.crmToggleWidget=function(key){_crmWidget=_crmWidget===key?'':key;filterCRM();};
+// Valor comparable por columna para el orden de Cuentas (texto, número o fecha según el dato real).
+function _crmSortVal(d,key){switch(key){
+  case 'nombre':return (d.nombre||d._id||'').toLowerCase();
+  case 'broker':return (d.broker||'').toLowerCase();
+  case 'sup':return parseFloat(d.m2)||0;
+  case 'ultact':return _tsToDate(d.ultimaActividad)?.getTime()||0;
+  case 'sr':return _crmSrCount(d._id)||0;
+  case 'zonas':return ((d.zonasInteres||[])[0]||'').toLowerCase();
+  case 'estado':return cuentaEstadoAuto(d).activa?1:0;
+  default:return '';
+}}
 function filterCRM(){
   const base=_crmDocs.filter(d=>(d.estadoRegistro||'activo')!=='archivado');
   let filtered=_crmFilterEngine.apply(base);
@@ -6561,6 +6604,7 @@ function filterCRM(){
   else if(_crmWidget==='act30')filtered=filtered.filter(_crmActividad30);
   const _crmSortV=document.getElementById('crm-sort')?.value||'reciente';
   filtered=filtered.slice().sort((a,b)=>{const ta=_tsToDate(a.fechaCreacion)?.getTime()||0,tb=_tsToDate(b.fechaCreacion)?.getTime()||0;return _crmSortV==='antiguo'?ta-tb:tb-ta;});
+  filtered=nxSortRows('crm',filtered,_crmSortVal);   // orden por columna (si hay), sobre lo ya filtrado
   renderCrmFilterChips();
   renderCRMTable(filtered);
   const el=document.getElementById('crm-subtitle');
@@ -6794,7 +6838,8 @@ function renderCRMTable(docs){
     return;
   }
   let h='<table class="crm-table"><thead><tr>';
-  ['Cliente','Ejecutivo Comercial','Superficie','Última actividad','Solicitudes','Zonas de interés','Estado',''].forEach(col=>h+=`<th>${col}</th>`);
+  [['Cliente','nombre'],['Ejecutivo Comercial','broker'],['Superficie','sup'],['Última actividad','ultact'],['Solicitudes','sr'],['Zonas de interés','zonas'],['Estado','estado'],['',null]]
+    .forEach(([col,key])=>h+=nxTh('crm',col,key));
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const nombre=d.nombre||d._id;
@@ -7364,6 +7409,18 @@ async function loadContactos(){
   }
 }
 
+// Valor comparable por columna para el orden de Contactos.
+function _ctoSortVal(d,key){switch(key){
+  case 'contacto':return (((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id).toLowerCase();
+  case 'cargo':return (d.cargo||'').toLowerCase();
+  case 'cuenta':return (d.cuentaNombre||'').toLowerCase();
+  case 'email':return (d.email||'').toLowerCase();
+  case 'telefono':return (d.telefono||'').toLowerCase();
+  case 'creador':return (d.brokerResponsable||'').toLowerCase();
+  case 'fcreacion':return _tsToDate(d.fechaCreacion)?.getTime()||0;
+  case 'estcorreo':return (d.estadoCorreo||'').toLowerCase();
+  default:return '';
+}}
 function filterContactos(){
   const q=(document.getElementById('cto-search')?.value||'').toLowerCase();
   const cargo=document.getElementById('cto-filter-cargo')?.value||'';
@@ -7381,7 +7438,7 @@ function filterContactos(){
   });
   const _ctoSortV=document.getElementById('cto-sort')?.value||'reciente';
   filtered.sort((a,b)=>{const ta=_tsToDate(a.fechaCreacion)?.getTime()||0,tb=_tsToDate(b.fechaCreacion)?.getTime()||0;return _ctoSortV==='antiguo'?ta-tb:tb-ta;});
-  renderContactosTable(filtered);
+  renderContactosTable(nxSortRows('cto',filtered,_ctoSortVal));
 }
 // Inactividad de contacto: sin actividad comercial en los últimos 90 días.
 const CTO_INACTIVO_DIAS=90;
@@ -7417,7 +7474,11 @@ function renderContactosTable(docs,opts){
   if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin contactos registrados.</div>';return;}
   const fdmy=ts=>{const dt=_tsToDate(ts);return dt&&!isNaN(dt)?dt.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';};
   let h='<table class="crm-table"><thead><tr>';
-  ['Contacto','Cargo','Cuenta','Email','Teléfono','Creado por','Fecha de creación','Estado correo',''].forEach(col=>h+=`<th>${col}</th>`);
+  // Encabezados ordenables sólo en la lista principal de Contactos (no cuando se reutiliza
+  // la tabla dentro de otra ficha, donde el re-render corresponde a esa vista).
+  const sortable=targetId==='cto-table-wrap';
+  [['Contacto','contacto'],['Cargo','cargo'],['Cuenta','cuenta'],['Email','email'],['Teléfono','telefono'],['Creado por','creador'],['Fecha de creación','fcreacion'],['Estado correo','estcorreo'],['',null]]
+    .forEach(([col,key])=>h+=nxTh('cto',col,sortable?key:null));
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const fullname=((d.nombre||'')+' '+(d.apellidos||'')).trim()||d._id;
@@ -8600,6 +8661,17 @@ async function _leadNormalizarConvertidos(){
   }
   if(cambios&&_currentLeadId==null)filterLeads();
 }
+// Valor comparable por columna para el orden de Leads.
+// Vencimiento y Countdown usan el valor real (fecha/días), no el texto del semáforo.
+function _leadSortVal(d,key){switch(key){
+  case 'nombre':return (((d.nombre||'')+' '+(d.apellido||'')).trim()).toLowerCase();
+  case 'empresa':return (d.cuentaNombre||d.empresa||'').toLowerCase();
+  case 'estado':return (_leadEstadoText(d)||'').toLowerCase();
+  case 'tipo':return (d.tipoInmueble||'').toLowerCase();
+  case 'venc':{const v=_leadVenc(d);return v?v.getTime():Number.MAX_SAFE_INTEGER;}
+  case 'countdown':{const n=_leadDiasRestantes(d);return n==null?Number.MAX_SAFE_INTEGER:n;}
+  default:return '';
+}}
 function filterLeads(){
   // Poblar filtro de ejecutivos una vez.
   const esel=document.getElementById('lead-filter-ejecutivo');
@@ -8630,7 +8702,7 @@ function filterLeads(){
   });
   filtered.sort((a,b)=>{const ta=_tsToDate(a.fechaCreacion)?.getTime()||0,tb=_tsToDate(b.fechaCreacion)?.getTime()||0;return sort==='antiguo'?ta-tb:tb-ta;});
   const hb=document.getElementById('lead-hist-banner');if(hb)hb.style.display=verConvertidos?'flex':'none';
-  renderLeadsTable(filtered);
+  renderLeadsTable(nxSortRows('lead',filtered,_leadSortVal));
 }
 let _leadWidget='';
 window.leadToggleWidget=function(key){_leadWidget=_leadWidget===key?'':key;filterLeads();};
@@ -8655,7 +8727,8 @@ function renderLeadsTable(docs){
   const wrap=document.getElementById('lead-table-wrap');
   if(!docs.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin leads registrados.</div>';return;}
   let h='<table class="crm-table"><thead><tr>';
-  ['Nombre','Empresa','Estado','Tipo de consulta / Inmueble','Fecha de vencimiento','Countdown',''].forEach(c=>h+=`<th>${c}</th>`);
+  [['Nombre','nombre'],['Empresa','empresa'],['Estado','estado'],['Tipo de consulta / Inmueble','tipo'],['Fecha de vencimiento','venc'],['Countdown','countdown'],['',null]]
+    .forEach(([c,key])=>h+=nxTh('lead',c,key));
   h+='</tr></thead><tbody>';
   docs.forEach(d=>{
     const fullname=((d.nombre||'')+' '+(d.apellido||'')).trim();
