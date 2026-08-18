@@ -1739,8 +1739,11 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 #app-shell.active{display:flex;flex-direction:row}
 #main-content{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;height:100%}
 #main-content #as{flex:1;overflow-y:auto;min-width:0;height:100%}
-#main-content #analytics-panel,#main-content #crm-panel,#main-content #admin-panel,#main-content #buildings-panel,#main-content #transacciones-panel,#main-content #solicitudes-panel{flex:1;min-width:0;min-height:0}
+#main-content #analytics-panel,#main-content #crm-panel,#main-content #admin-panel,#main-content #buildings-panel,#main-content #transacciones-panel,#main-content #solicitudes-panel,#main-content #perfil-panel{flex:1;min-width:0;min-height:0}
 #solicitudes-panel{background:#F4F6FB;display:flex;flex-direction:column}
+/* Mi Perfil: mismo layout de columna que el resto de los paneles para que el contenido
+   scrollee dentro de .crm-list-body (sin esto el panel queda en flex-direction:row). */
+#perfil-panel{background:#F4F6FB;display:flex;flex-direction:column}
 body.dark #solicitudes-panel{background:#040A1C}
 .sr-zebra-row{background:#F6F8FC;border-radius:6px}
 body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
