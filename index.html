@@ -4714,6 +4714,19 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
     </div>
     <div class="crm-list-body">
       <div class="crm-kpi-row" id="perfil-kpis"></div>
+      <div class="nx-card" style="margin-bottom:.85rem">
+        <div class="nx-card-title">Accesos rápidos</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem;padding-top:.3rem">
+          <button class="crm-action-btn" onclick="openVisitaDrawer()">+ Visita</button>
+          <button class="crm-action-btn" onclick="openQuickActividad()">+ Registrar actividad</button>
+          <button class="crm-action-btn" onclick="openClientDrawer()">+ Nueva cuenta</button>
+          <button class="crm-action-btn" onclick="openContactoDrawer()">+ Nuevo contacto</button>
+        </div>
+      </div>
+      <div class="nx-card" style="margin-bottom:.85rem">
+        <div class="nx-card-title">¿Qué debería hacer hoy?</div>
+        <div id="perfil-hoy"><div class="anc-empty">Cargando…</div></div>
+      </div>
       <div class="nx-grid" id="perfil-grid">
         <div class="nx-col">
           <div class="nx-card">
@@ -11706,6 +11719,16 @@ function filterBuildings(){
       if(estado&&d.estado!==estado)return false;
       if(tos.size){const dt=d.tiposDisponibles||[];if(!dt.some(t=>tos.has(t)))return false;}
     }
+    // Filtros comunes a los tres tipos (la lógica por tipo de arriba no se modifica).
+    // Rubro/Subrubro: O dentro de cada filtro, Y entre filtros (misma regla del resto de Nexus).
+    const fRub=nxMSelGet('bld-f-rubro'),fSub=nxMSelGet('bld-f-subrubro');
+    if(fRub.length&&!_bldRubrosDe(d).some(r=>fRub.includes(r)))return false;
+    if(fSub.length&&!_bldSubrubrosDe(d).some(s=>fSub.includes(s)))return false;
+    const sMin=parseFloat(document.getElementById('bld-f-sup-min')?.value)||0;
+    const sMax=parseFloat(document.getElementById('bld-f-sup-max')?.value)||0;
+    if(sMin||sMax){const sup=_bldSuperficie(d);
+      if(sMin&&sup<sMin)return false;
+      if(sMax&&sup>sMax)return false;}
     return true;
   });
   _bldPage=0;
@@ -11716,7 +11739,9 @@ function filterBuildings(){
      document.getElementById('bld-f-alq-min')?.value||document.getElementById('bld-f-alq-max')?.value||
      document.getElementById('bld-f-disponible')?.value||
      document.getElementById('bld-filter-estado')?.value||document.getElementById('bld-filter-corredor')?.value||
-     document.getElementById('bld-filter-etapa')?.value||_bldCatSelSet.size||_bldToSelSet.size);
+     document.getElementById('bld-filter-etapa')?.value||_bldCatSelSet.size||_bldToSelSet.size||
+     document.getElementById('bld-f-sup-min')?.value||document.getElementById('bld-f-sup-max')?.value||
+     nxMSelGet('bld-f-rubro').length||nxMSelGet('bld-f-subrubro').length);
   const cb=document.getElementById('bld-filter-clear-btn');
   if(cb)cb.style.display=hasFilters?'inline-flex':'none';
   renderBldKPIs(_bldFiltered);
@@ -11728,9 +11753,11 @@ function filterBuildings(){
 function bldClearFilters(){
   ['bld-search','bld-filter-corredor','bld-filter-etapa','bld-filter-estado',
    'bld-f-localidad','bld-f-provincia','bld-f-m2-min','bld-f-m2-max',
-   'bld-f-corredor-ret','bld-f-ciudad','bld-f-alq-min','bld-f-alq-max','bld-f-disponible'].forEach(id=>{
+   'bld-f-corredor-ret','bld-f-ciudad','bld-f-alq-min','bld-f-alq-max','bld-f-disponible',
+   'bld-f-sup-min','bld-f-sup-max'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
+  nxMSelClear('bld-f-rubro');nxMSelClear('bld-f-subrubro');
   if(_bldAssetType==='office'){clearBldCat();clearBldTo();}
   filterBuildings();
 }
@@ -12818,6 +12845,58 @@ function _bldAdaptUI(){
   if(imp)imp.style.display=_bldAssetType==='office'?'':'none';
   _bldRenderFilterBar();
 }
+// ── Filtros de Inmuebles: Rubro / Subrubro / Superficie ──
+// Los edificios no guardan rubro: el dato vive en las CUENTAS ocupantes (units.occupierAccountId).
+// Se construye un índice edificio → rubros/subrubros una sola vez (lazy, al usar el filtro) y se
+// cachea en memoria. Reutiliza RUBROS_CATALOG y los helpers _docRubros/_docSubNames.
+let _bldRubroIdx=null,_bldRubroLoading=false;
+async function _bldLoadRubroIdx(){
+  if(_bldRubroIdx||_bldRubroLoading||!db)return;
+  _bldRubroLoading=true;
+  try{
+    if(!_crmDocs.length){try{await loadCRM();}catch(e){}}
+    const cuentaById=new Map(_crmDocs.map(c=>[c._id,c]));
+    const idx={};
+    await Promise.all(_bldDocs.map(async bld=>{
+      try{
+        const snap=await db.collection('buildings').doc(bld._id).collection('units').get();
+        const R=new Set(),S=new Set();
+        snap.docs.forEach(u=>{
+          const d=u.data();
+          [d.occupierAccountId,d.ownerAccountId].filter(Boolean).forEach(id=>{
+            const c=cuentaById.get(id);if(!c)return;
+            _docRubros(c).forEach(r=>R.add(r));
+            _docSubNames(c).filter(Boolean).forEach(s=>S.add(s));
+          });
+        });
+        idx[bld._id]={r:[...R],s:[...S]};
+      }catch(e){idx[bld._id]={r:[],s:[]};}
+    }));
+    _bldRubroIdx=idx;
+  }finally{_bldRubroLoading=false;filterBuildings();}
+}
+function _bldRubrosDe(d){return (_bldRubroIdx&&_bldRubroIdx[d._id]&&_bldRubroIdx[d._id].r)||[];}
+function _bldSubrubrosDe(d){return (_bldRubroIdx&&_bldRubroIdx[d._id]&&_bldRubroIdx[d._id].s)||[];}
+// Superficie comparable del inmueble según los campos existentes de cada tipo.
+function _bldSuperficie(d){
+  return Number(d.superficieDisponible)||Number(d.superficieCubierta)||Number(d.superficieTotal)||Number(d.superficie)||Number(d.m2)||0;
+}
+// Controles compartidos por los tres tipos (se mantiene la separación de la lógica por tipo).
+function _bldFiltrosComunesHTML(){
+  return `<span id="bld-f-rubro"></span><span id="bld-f-subrubro"></span>
+    <input id="bld-f-sup-min" type="number" min="0" placeholder="Sup. mín m²" class="bld-filter-inp" style="width:100px" oninput="filterBuildings()">
+    <input id="bld-f-sup-max" type="number" min="0" placeholder="Sup. máx m²" class="bld-filter-inp" style="width:100px" oninput="filterBuildings()">`;
+}
+function _bldInitFiltrosComunes(){
+  if(!document.getElementById('bld-f-rubro'))return;
+  nxMSelInit('bld-f-rubro',{label:'Rubro',opts:()=>Object.keys(RUBROS_CATALOG),onChange:()=>{_bldLoadRubroIdx();filterBuildings();}});
+  nxMSelInit('bld-f-subrubro',{label:'Subrubro',opts:()=>{
+    const sel=nxMSelGet('bld-f-rubro');
+    const base=sel.length?sel:Object.keys(RUBROS_CATALOG);   // respeta la relación Rubro → Subrubro
+    const out=new Set();base.forEach(r=>(RUBROS_CATALOG[r]||[]).forEach(s=>out.add(s)));
+    return [...out].sort();
+  },onChange:()=>{_bldLoadRubroIdx();filterBuildings();}});
+}
 function _bldRenderFilterBar(){
   const dyn=document.getElementById('bld-filter-dyn');
   if(!dyn)return;
@@ -12839,7 +12918,7 @@ function _bldRenderFilterBar(){
         <option value="">Disponibilidad</option>
         <option value="si">Disponible</option>
         <option value="no">No disponible</option>
-      </select>`;
+      </select>`+_bldFiltrosComunesHTML();
   } else if(_bldAssetType==='retail'){
     const corredores=[...new Set(_bldDocs.map(d=>d.corredor||d.zona).filter(Boolean))].sort();
     const ciudades=[...new Set(_bldDocs.map(d=>d.ciudad).filter(Boolean))].sort();
@@ -12858,7 +12937,7 @@ function _bldRenderFilterBar(){
         <option value="">Disponibilidad</option>
         <option value="si">Disponible</option>
         <option value="no">No disponible</option>
-      </select>`;
+      </select>`+_bldFiltrosComunesHTML();
   } else {
     dyn.innerHTML=`
       <select id="bld-filter-corredor" class="bld-filter-sel" onchange="filterBuildings()">
@@ -12899,10 +12978,11 @@ function _bldRenderFilterBar(){
       </select>
       <select id="bld-filter-estado" class="bld-filter-sel" onchange="filterBuildings()">
         <option value="">Todos los estados</option><option>Disponible</option><option>Reservado</option><option>Ocupado</option><option>Archivado</option>
-      </select>`;
+      </select>`+_bldFiltrosComunesHTML();
     _bldCatSelSet.clear();
     _bldToSelSet.clear();
   }
+  _bldInitFiltrosComunes();
 }
 
 // ─── INDUSTRIAL WIZARD ───────────────────────────────
@@ -15288,6 +15368,7 @@ window.loadMiPerfil=async function(){
     if((!Array.isArray(_leadDocs)||!_leadDocs.length)&&db){try{const s=await db.collection('leads').get();_leadDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}catch(e){}}
     const acts=await _perfilCargarActividades();
     _perfilRenderKPIs(acts);
+    _perfilRenderHoy(acts);
     _perfilRenderActividad(acts);
     _perfilRenderSeguimiento();
     _perfilRenderProximas();
@@ -15327,6 +15408,70 @@ function _perfilRenderKPIs(acts){
   const vis=_perfilMisVisitas().filter(v=>{const t=_tsToDate(v.fecha);return t&&t.getTime()>=desdeSem;}).length;
   const K=[['📌','Actividades este mes',actMes,'#1C54F4'],['💼','Cuentas gestionadas',cuentas,'#16A34A'],['📈','Oportunidades activas',opps,'#B45309'],['📍','Visitas esta semana',vis,'#7C3AED']];
   el.innerHTML=K.map(([ic,lbl,val,col])=>`<div class="crm-kpi"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">${ic}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`).join('');
+}
+// "¿Qué debería hacer hoy?" — acciones priorizadas SOLO con información que Nexus ya tiene.
+// No es un sistema de tareas: agrega señales existentes (cuentas sin actividad, leads por vencer,
+// oportunidades con cierre inminente y propuestas sin seguimiento) y ordena por urgencia.
+function _perfilRenderHoy(acts){
+  const el=document.getElementById('perfil-hoy');if(!el)return;
+  const items=[];const HOY=Date.now();
+  // 1) Cuentas gestionadas sin actividad comercial reciente (misma señal que "seguimiento pendiente").
+  _perfilMisCuentas().forEach(d=>{
+    const t=_tsToDate(d.ultimaActividadComercial)||_tsToDate(d.ultimaActividad)||_tsToDate(d.fechaCreacion);
+    const dias=t?Math.floor((HOY-t.getTime())/864e5):null;
+    if(dias!=null&&dias<60)return;
+    items.push({p:dias==null?0:(dias>90?0:1),tipo:'Seguimiento de cuenta',nombre:d.nombre||d._id,
+      ctx:dias==null?'Sin actividad comercial registrada':'Sin actividad hace '+dias+' días',
+      prio:(dias==null||dias>90)?['Urgente','#DC2626']:['Media','#EAB308'],
+      accion:'Ver cuenta',onclick:`crmOpenCuenta('${d._id}')`});
+  });
+  // 2) Leads propios cuyo seguimiento vence en los próximos 7 días.
+  const k=_perfilEjec();
+  (_leadDocs||[]).forEach(d=>{
+    if((d.estadoRegistro||'activo')==='archivado'||_leadConvertido(d))return;
+    if(k&&!_leadEjecs(d).includes(k))return;
+    const n=_leadDiasRestantes(d);if(n==null||n>7)return;
+    items.push({p:n<=0?0:1,tipo:'Seguimiento de lead',nombre:((d.nombre||'')+' '+(d.apellido||'')).trim()||d._id,
+      ctx:n<=0?'Vencido':'Vence en '+n+' día'+(n!==1?'s':''),
+      prio:n<=2?['Urgente','#DC2626']:['Media','#EAB308'],
+      accion:'Ver lead',onclick:`openLeadDetail('${d._id}')`});
+  });
+  // 3) Propuestas enviadas sin actividad posterior (>14 días) → requieren seguimiento.
+  const propuestas=(acts||[]).filter(a=>/propuesta/i.test(a.tipo||''));
+  const ultPorCuenta={};
+  (acts||[]).forEach(a=>{const c=a._cuentaId||'';const t=_tsToDate(a.fecha)?.getTime()||0;if(c&&t>(ultPorCuenta[c]||0))ultPorCuenta[c]=t;});
+  const vistas=new Set();
+  propuestas.forEach(a=>{
+    const cid=a._cuentaId||'';if(!cid||vistas.has(cid))return;
+    const t=_tsToDate(a.fecha)?.getTime()||0;const dias=Math.floor((HOY-t)/864e5);
+    if(dias<14||(ultPorCuenta[cid]||0)>t)return;
+    vistas.add(cid);
+    items.push({p:1,tipo:'Seguimiento de propuesta',nombre:a._cuentaNombre||cid,
+      ctx:'Propuesta enviada hace '+dias+' días — requiere seguimiento',prio:['Media','#EAB308'],
+      accion:'Ver cuenta',onclick:`crmOpenCuenta('${cid}')`});
+  });
+  // 4) Oportunidades propias cuyo cierre estimado termina este trimestre.
+  _perfilMisOpps().filter(_oppEsVigente).forEach(o=>{
+    const y=parseInt(o.fechaCierreAnio)||0,q=parseInt(String(o.fechaCierreQ||'').replace('Q',''))||0;
+    if(!y||!q)return;
+    const fin=new Date(y,q*3,0).getTime();const dias=Math.floor((fin-HOY)/864e5);
+    if(dias<0||dias>30)return;
+    items.push({p:0,tipo:'Cierre de oportunidad',nombre:o.nombreProyecto||o.cuentaNombre||o._id,
+      ctx:'Cierre estimado en '+dias+' día'+(dias!==1?'s':'')+' (Q'+q+' '+y+')',prio:['Urgente','#DC2626'],
+      accion:'Ver oportunidad',onclick:`crmOpenOportunidad('${o._id}')`});
+  });
+  items.sort((a,b)=>a.p-b.p);
+  const list=items.slice(0,6);
+  if(!list.length){el.innerHTML='<div class="anc-empty">No tenés acciones pendientes para hoy. ¡Todo al día!</div>';return;}
+  el.innerHTML=list.map(it=>`<div class="cta-act-item" style="align-items:center;cursor:pointer" onclick="${it.onclick}">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:#8898C0;text-transform:uppercase;letter-spacing:.04em">${esc(it.tipo)}</div>
+        <div style="font-size:12.5px;font-weight:700;color:#0A1B4D">${esc(it.nombre)}</div>
+        <div style="font-size:11px;color:#8898C0">${esc(it.ctx)}</div>
+      </div>
+      <span class="estado-badge" style="background:${it.prio[1]}1a;color:${it.prio[1]};border:1px solid ${it.prio[1]}55">${it.prio[0]}</span>
+      <button class="crm-action-btn" style="margin-left:.5rem" onclick="event.stopPropagation();${it.onclick}">${esc(it.accion)} →</button>
+    </div>`).join('');
 }
 function _perfilRenderActividad(acts){
   const el=document.getElementById('perfil-actividad');if(!el)return;
