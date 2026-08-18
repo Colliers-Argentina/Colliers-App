@@ -2710,6 +2710,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span><span>Menú</span>
     </button>
 
+    <!-- Mi Perfil: dashboard personal del usuario logueado -->
+    <button class="sb-item-solo" id="sbn-perfil" data-mod="perfil" onclick="_sbItemClick('perfil',null)">
+      <span class="sb-item-solo-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Mi Perfil</span>
+    </button>
+
     <div class="sb-grp-sep"></div>
 
     <!-- Comercial -->
@@ -4695,6 +4700,50 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 </div>
 
 <!-- ══════════ CENTRO DE SOLICITUDES ══════════ -->
+<!-- MI PERFIL — dashboard personal del usuario (vista agregadora de datos existentes) -->
+<div id="perfil-panel" style="display:none">
+  <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+    <div class="crm-topbar">
+      <div class="crm-topbar-l">
+        <div class="crm-page-title">Mi Perfil</div>
+        <div class="crm-page-sub" id="perfil-subtitle">Tu resumen comercial</div>
+      </div>
+      <div class="crm-topbar-r">
+        <button class="crm-new-btn" id="perfil-edit-btn" onclick="perfilEditar()">Editar perfil</button>
+      </div>
+    </div>
+    <div class="crm-list-body">
+      <div class="crm-kpi-row" id="perfil-kpis"></div>
+      <div class="nx-grid" id="perfil-grid">
+        <div class="nx-col">
+          <div class="nx-card">
+            <div class="nx-card-title" style="display:flex;justify-content:space-between;align-items:center">Actividad reciente<a href="javascript:void(0)" id="perfil-act-all" style="font-size:11px;font-weight:700;color:#1C54F4">Ver todas</a></div>
+            <div id="perfil-actividad"><div class="anc-empty">Cargando…</div></div>
+          </div>
+          <div class="nx-card">
+            <div class="nx-card-title" style="display:flex;justify-content:space-between;align-items:center">Mis cuentas con seguimiento pendiente<a href="javascript:void(0)" onclick="showModule('crm-cuentas')" style="font-size:11px;font-weight:700;color:#1C54F4">Ver todas</a></div>
+            <div id="perfil-seguimiento"><div class="anc-empty">Cargando…</div></div>
+          </div>
+          <div class="nx-card">
+            <div class="nx-card-title">Próximas actividades</div>
+            <div id="perfil-proximas"><div class="anc-empty">Cargando…</div></div>
+          </div>
+        </div>
+        <div class="nx-col">
+          <div class="nx-card">
+            <div class="nx-card-title">Información personal</div>
+            <div id="perfil-info"></div>
+          </div>
+          <div class="nx-card">
+            <div class="nx-card-title">Mis métricas del mes</div>
+            <div id="perfil-metricas"><div class="anc-empty">Cargando…</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="solicitudes-panel" style="display:none">
   <!-- LISTA -->
   <div id="sr-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
@@ -14552,12 +14601,12 @@ function renderTendencias(allDocs,dias){
 }
 
 function show(id){
-  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel","transacciones-panel","solicitudes-panel"].forEach(s=>{
+  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel","transacciones-panel","solicitudes-panel","perfil-panel"].forEach(s=>{
     const el=document.getElementById(s);
     if(!el)return;
     if(s==="ls")el.style.display=s===id?"grid":"none";
     else if(s==="ds")el.style.display=s===id?"flex":"none";
-    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel"||s==="transacciones-panel"||s==="solicitudes-panel")el.style.display=s===id?"flex":"none";
+    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel"||s==="transacciones-panel"||s==="solicitudes-panel"||s==="perfil-panel")el.style.display=s===id?"flex":"none";
     else el.style.display=s===id?"block":"none";
   });
   const isApp=id!=="ls"&&id!=="ds";
@@ -14650,7 +14699,7 @@ function _setSbActive(mod,submod){
 function showModule(mod){
   closeMobileSidebar();
   // Close all overlays (including CRM)
-  ['analytics-panel','buildings-panel','admin-panel','crm-panel','transacciones-panel'].forEach(id=>{
+  ['analytics-panel','buildings-panel','admin-panel','crm-panel','transacciones-panel','perfil-panel'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.style.display='none';
   });
@@ -14692,6 +14741,9 @@ function showModule(mod){
   } else if(mod==='transacciones'){
     show('transacciones-panel');
     loadTransacciones();
+  } else if(mod==='perfil'){
+    show('perfil-panel');
+    loadMiPerfil();
   }
 }
 // ─── HUB DASHBOARD V2 ───────────────────────────────────────────────────
@@ -15196,6 +15248,158 @@ let _srDocs=[],_srCurrentId=null,_srMias=false,_srFormService=null,_srDocList=[]
 let _srEjecExtra=[],_srEjecOpts=[],_srNewBldId='',_srNewContactId='';
 
 function srEstadoBadge(e){const c=SR_ESTADO_COLOR[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'Pendiente')}</span>`;}
+
+// ═══════════════════ MI PERFIL — dashboard personal del usuario ═══════════════════
+// Vista AGREGADORA: no crea colecciones ni duplica datos. Reutiliza la identidad del usuario
+// (_leadCurrentEjec / user), las cuentas (_crmDocs + _docGestion, misma lógica del filtro
+// "Gestionado por"), las oportunidades (_oppDocs + _oppEjecs/_oppEsVigente), las visitas
+// (_visDocs) y las actividades comerciales manuales (subcolección `actividades`).
+let _perfilLoading=false;
+function _perfilEjec(){return _leadCurrentEjec();}                 // clave de catálogo del usuario
+function _perfilEsMio(keys){const k=_perfilEjec();return !!k&&(keys||[]).includes(k);}
+function _perfilMisCuentas(){const k=_perfilEjec();if(!k)return[];return (_crmDocs||[]).filter(d=>(d.estadoRegistro||'activo')!=='archivado'&&_docGestion(d).includes(k));}
+function _perfilMisOpps(){const k=_perfilEjec();if(!k)return[];return (_oppDocs||[]).filter(o=>_oppEjecs(o).includes(k));}
+function _perfilMisVisitas(){const k=_perfilEjec(),em=(user?.email||'').toLowerCase();
+  return (_visDocs||[]).filter(v=>(k&&v.ejecutivo===k)||((v.userEmail||'').toLowerCase()===em));}
+function _perfilInicioMes(){const n=new Date();return new Date(n.getFullYear(),n.getMonth(),1).getTime();}
+function _perfilInicioSemana(){const n=new Date();const d=(n.getDay()+6)%7;const l=new Date(n.getFullYear(),n.getMonth(),n.getDate()-d);return l.getTime();}
+function _perfilDias(ts){const t=_tsToDate(ts);return t?Math.floor((Date.now()-t.getTime())/864e5):null;}
+// Carga las actividades manuales del usuario. Intenta collectionGroup (1 query) y, si el
+// entorno no lo permite (falta de índice), cae a las cuentas gestionadas (consultas acotadas).
+async function _perfilCargarActividades(){
+  const em=(user?.email||'').toLowerCase();if(!db||!em)return[];
+  try{
+    const snap=await db.collectionGroup('actividades').where('userEmail','==',user.email).limit(200).get();
+    return snap.docs.map(d=>({...d.data(),_id:d.id,_ref:d.ref?d.ref.path:''}));
+  }catch(e){
+    const cuentas=_perfilMisCuentas().slice(0,15);
+    const res=await Promise.all(cuentas.map(c=>db.collection('clientes').doc(c._id).collection('actividades').orderBy('fecha','desc').limit(20).get()
+      .then(s=>s.docs.map(d=>({...d.data(),_id:d.id,_cuentaId:c._id,_cuentaNombre:c.nombre}))).catch(()=>[])));
+    return res.flat().filter(a=>(a.userEmail||'').toLowerCase()===em);
+  }
+}
+window.loadMiPerfil=async function(){
+  if(_perfilLoading)return;_perfilLoading=true;
+  try{
+    _perfilRenderInfo();
+    // Reutiliza los datos ya cargados; sólo pide lo que falte.
+    if(!_crmDocs.length){try{await loadCRM();}catch(e){}}
+    await _crmLoadOppsIfNeeded();
+    if((!Array.isArray(_visDocs)||!_visDocs.length)&&db){try{const s=await db.collection('visitas').orderBy('fecha','desc').limit(300).get();_visDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}catch(e){}}
+    if((!Array.isArray(_leadDocs)||!_leadDocs.length)&&db){try{const s=await db.collection('leads').get();_leadDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}catch(e){}}
+    const acts=await _perfilCargarActividades();
+    _perfilRenderKPIs(acts);
+    _perfilRenderActividad(acts);
+    _perfilRenderSeguimiento();
+    _perfilRenderProximas();
+    _perfilRenderMetricas(acts);
+  }catch(e){
+    console.error('loadMiPerfil',e);
+    ['perfil-actividad','perfil-seguimiento','perfil-proximas','perfil-metricas'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=`<div class="anc-empty">Error al cargar: ${esc(e.message)}</div>`;});
+  }finally{_perfilLoading=false;}
+};
+function _perfilRenderInfo(){
+  const el=document.getElementById('perfil-info');if(!el)return;
+  const nombre=user?.displayName||user?.email||'—';
+  const em=(user?.email||'').toLowerCase();
+  const b=(typeof BROKERS!=='undefined'?BROKERS:[]).find(x=>(x.email||'').toLowerCase()===em);
+  const rolTxt={direccion:'Administrador',marketing:'Marketing & Research',ejecutivo:'Ejecutivo Comercial'}[_nexusRole()]||'Ejecutivo Comercial';
+  const foto=user?.picture||b?.foto||'';
+  const av=foto?`<img src="${esc(foto)}" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid #E7EDF7">`
+                :`<div class="crm-det-av" style="background:${crmAvatarBg(nombre)};width:56px;height:56px;border-radius:50%;font-size:18px">${crmInitials(nombre)}</div>`;
+  const row=(l,v)=>`<div class="nx-row"><div class="nx-row-l">${l}</div><div class="nx-row-v">${v||'<span style="color:#8898C0">–</span>'}</div></div>`;
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:.8rem;padding:.3rem 0 .7rem">
+      ${av}
+      <div style="min-width:0"><div style="font-size:14px;font-weight:800;color:#0A1B4D">${esc(nombre)}</div>
+      <div style="font-size:11.5px;color:#8898C0">${esc(rolTxt)}</div></div>
+    </div>
+    ${row('Email',esc(user?.email||''))}
+    ${row('Rol',esc(rolTxt))}
+    ${row('Ejecutivo (catálogo)',_perfilEjec()?esc(ejecDisplay(_perfilEjec())):'<span style="color:#8898C0">No asignado</span>')}`;
+  // "Editar perfil": los datos del usuario provienen de Google (GSI), no se editan en Nexus.
+  const btn=document.getElementById('perfil-edit-btn');
+  if(btn)btn.onclick=()=>alert('Tus datos personales provienen de tu cuenta de Google corporativa.\nPara modificarlos, actualizá tu perfil de Google o contactá al administrador de Nexus.');
+}
+function _perfilRenderKPIs(acts){
+  const el=document.getElementById('perfil-kpis');if(!el)return;
+  const desdeMes=_perfilInicioMes(),desdeSem=_perfilInicioSemana();
+  const actMes=(acts||[]).filter(a=>{const t=_tsToDate(a.fecha);return t&&t.getTime()>=desdeMes;}).length;
+  const cuentas=_perfilMisCuentas().length;
+  const opps=_perfilMisOpps().filter(_oppEsVigente).length;
+  const vis=_perfilMisVisitas().filter(v=>{const t=_tsToDate(v.fecha);return t&&t.getTime()>=desdeSem;}).length;
+  const K=[['📌','Actividades este mes',actMes,'#1C54F4'],['💼','Cuentas gestionadas',cuentas,'#16A34A'],['📈','Oportunidades activas',opps,'#B45309'],['📍','Visitas esta semana',vis,'#7C3AED']];
+  el.innerHTML=K.map(([ic,lbl,val,col])=>`<div class="crm-kpi"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">${ic}</div><div class="crm-kpi-data"><div class="crm-kpi-v">${val}</div><div class="crm-kpi-l">${lbl}</div></div></div>`).join('');
+}
+function _perfilRenderActividad(acts){
+  const el=document.getElementById('perfil-actividad');if(!el)return;
+  const list=(acts||[]).slice().sort((a,b)=>(_tsToDate(b.fecha)?.getTime()||0)-(_tsToDate(a.fecha)?.getTime()||0)).slice(0,5);
+  if(!list.length){el.innerHTML='<div class="anc-empty">No tenés actividades recientes.</div>';return;}
+  el.innerHTML=list.map(a=>{
+    const t=_tsToDate(a.fecha);
+    const fecha=t?t.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' · '+t.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'';
+    const icon=(a.cat==='M')?'📣':'📌';
+    const cta=a._cuentaNombre?`<div style="font-size:11px;color:#8898C0">${esc(a._cuentaNombre)}</div>`:'';
+    return `<div class="cta-act-item"><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${icon} ${esc(a.tipo||'Actividad')}</div>${a.descripcion?`<div style="font-size:12px;color:#56648F;line-height:1.45;white-space:pre-line">${esc(a.descripcion)}</div>`:''}${cta}<div style="font-size:10.5px;color:#8898C0;margin-top:2px">${fecha}</div></div></div>`;
+  }).join('');
+  const all=document.getElementById('perfil-act-all');
+  if(all)all.onclick=()=>showModule('crm-cuentas');
+}
+// Seguimiento pendiente: se basa en la última actividad COMERCIAL de la cuenta (mismo campo que
+// usa cuentaEstadoAuto). Prioridad por antigüedad: >90d Urgente · 60–90d Media · 30–60d Baja.
+function _perfilRenderSeguimiento(){
+  const el=document.getElementById('perfil-seguimiento');if(!el)return;
+  const rows=_perfilMisCuentas().map(d=>{
+    const t=_tsToDate(d.ultimaActividadComercial)||_tsToDate(d.ultimaActividad)||_tsToDate(d.fechaCreacion);
+    const dias=t?Math.floor((Date.now()-t.getTime())/864e5):null;
+    return {d,dias};
+  }).filter(x=>x.dias==null||x.dias>=30)
+    .sort((a,b)=>(b.dias??1e9)-(a.dias??1e9)).slice(0,5);
+  if(!rows.length){el.innerHTML='<div class="anc-empty">Todas tus cuentas están al día.</div>';return;}
+  const badge=n=>{const p=(n==null||n>90)?['Urgente','#DC2626']:(n>60?['Media','#EAB308']:['Baja','#16A34A']);
+    return `<span class="estado-badge" style="background:${p[1]}1a;color:${p[1]};border:1px solid ${p[1]}55">${p[0]}</span>`;};
+  el.innerHTML=rows.map(({d,dias})=>`<div class="cta-act-item" style="align-items:center;cursor:pointer" onclick="crmOpenCuenta('${d._id}')">
+      <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;color:#0A1B4D">${esc(d.nombre||d._id)}</div>
+      <div style="font-size:11px;color:#8898C0">${dias==null?'Sin actividad comercial registrada':'Última actividad: hace '+dias+' día'+(dias!==1?'s':'')}</div></div>
+      ${badge(dias)}</div>`).join('');
+}
+// Próximas actividades: Nexus no tiene agenda/calendario propio, así que se construyen con los
+// compromisos futuros que YA existen: vencimiento de Leads y cierre estimado de Oportunidades.
+function _perfilRenderProximas(){
+  const el=document.getElementById('perfil-proximas');if(!el)return;
+  const k=_perfilEjec();const items=[];
+  (_leadDocs||[]).forEach(d=>{
+    if((d.estadoRegistro||'activo')==='archivado'||_leadConvertido(d))return;
+    if(k&&!_leadEjecs(d).includes(k))return;
+    const v=_leadVenc(d);if(!v||v.getTime()<Date.now())return;
+    items.push({t:v.getTime(),icon:'🎯',titulo:'Vence seguimiento del lead: '+((d.nombre||'')+' '+(d.apellido||'')).trim(),sub:d.cuentaNombre||d.empresa||'',fecha:v,onclick:`openLeadDetail('${d._id}')`});
+  });
+  _perfilMisOpps().filter(_oppEsVigente).forEach(o=>{
+    const y=parseInt(o.fechaCierreAnio)||0,q=parseInt(String(o.fechaCierreQ||'').replace('Q',''))||0;
+    if(!y||!q)return;
+    const fin=new Date(y,q*3,0);if(fin.getTime()<Date.now())return;
+    items.push({t:fin.getTime(),icon:'📈',titulo:'Cierre estimado: '+(o.nombreProyecto||o.cuentaNombre||''),sub:o.cuentaNombre||'',fecha:fin,cierre:'Q'+q+' '+y,onclick:`crmOpenOportunidad('${o._id}')`});
+  });
+  items.sort((a,b)=>a.t-b.t);
+  const list=items.slice(0,5);
+  if(!list.length){el.innerHTML='<div class="anc-empty">No tenés próximas actividades.</div>';return;}
+  el.innerHTML=list.map(it=>`<div class="cta-act-item" style="cursor:pointer" onclick="${it.onclick}">
+      <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#1F2A4D">${it.icon} ${esc(it.titulo)}</div>
+      ${it.sub?`<div style="font-size:11px;color:#8898C0">${esc(it.sub)}</div>`:''}
+      <div style="font-size:10.5px;color:#8898C0;margin-top:2px">${it.cierre?esc(it.cierre):it.fecha.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})}</div></div></div>`).join('');
+}
+function _perfilRenderMetricas(acts){
+  const el=document.getElementById('perfil-metricas');if(!el)return;
+  const desde=_perfilInicioMes();
+  const delMes=(acts||[]).filter(a=>{const t=_tsToDate(a.fecha);return t&&t.getTime()>=desde;});
+  const visitas=_perfilMisVisitas().filter(v=>{const t=_tsToDate(v.fecha);return t&&t.getTime()>=desde;}).length;
+  const propuestas=delMes.filter(a=>/propuesta/i.test(a.tipo||'')).length;
+  const ganadas=_perfilMisOpps().filter(o=>{
+    if(_oppNormEstado(o.estado)!=='Ganada')return false;
+    const t=_tsToDate(o.ultimaActualizacion||o.ultimaActividad);return t&&t.getTime()>=desde;}).length;
+  const row=(l,v)=>`<div class="nx-row"><div class="nx-row-l">${l}</div><div class="nx-row-v" style="font-weight:700;color:#0A1B4D">${v}</div></div>`;
+  el.innerHTML=row('Actividades realizadas',delMes.length)+row('Visitas',visitas)+row('Propuestas enviadas',propuestas)+row('Oportunidades ganadas',ganadas);
+}
+window.perfilEditar=function(){const b=document.getElementById('perfil-edit-btn');if(b&&b.onclick)b.onclick();};
 
 async function loadSolicitudes(){
   const wrap=document.getElementById('sr-table-wrap');
