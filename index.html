@@ -1739,11 +1739,12 @@ body.dark .bld-lt-btn.del:hover{background:rgba(239,51,64,.1);color:#EF3340}
 #app-shell.active{display:flex;flex-direction:row}
 #main-content{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;height:100%}
 #main-content #as{flex:1;overflow-y:auto;min-width:0;height:100%}
-#main-content #analytics-panel,#main-content #crm-panel,#main-content #admin-panel,#main-content #buildings-panel,#main-content #transacciones-panel,#main-content #solicitudes-panel,#main-content #perfil-panel{flex:1;min-width:0;min-height:0}
+#main-content #analytics-panel,#main-content #crm-panel,#main-content #admin-panel,#main-content #buildings-panel,#main-content #transacciones-panel,#main-content #solicitudes-panel,#main-content #perfil-panel,#main-content #feedback-panel{flex:1;min-width:0;min-height:0}
 #solicitudes-panel{background:#F4F6FB;display:flex;flex-direction:column}
 /* Mi Perfil: mismo layout de columna que el resto de los paneles para que el contenido
    scrollee dentro de .crm-list-body (sin esto el panel queda en flex-direction:row). */
 #perfil-panel{background:#F4F6FB;display:flex;flex-direction:column}
+#feedback-panel{background:#F4F6FB;display:flex;flex-direction:column}
 body.dark #solicitudes-panel{background:#040A1C}
 .sr-zebra-row{background:#F6F8FC;border-radius:6px}
 body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
@@ -2781,6 +2782,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       </button>
       <div class="sb-grp-body sb-closed" id="sbb-adm">
         <button class="sb-item" data-mod="admin" onclick="_sbItemClick('admin',null)"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span>Usuarios</span></button>
+        <button class="sb-item" data-mod="feedback" onclick="_sbItemClick('feedback',null)"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></span><span>Feedback</span></button>
         <button class="sb-item" disabled><span>Configuración</span><span class="sb-soon-badge">Pronto</span></button>
         <button class="sb-item" disabled><span>Base de Datos</span><span class="sb-soon-badge">Pronto</span></button>
         <button class="sb-item" disabled><span>Logs</span><span class="sb-soon-badge">Pronto</span></button>
@@ -2792,7 +2794,8 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
   <!-- Footer -->
   <div class="sb-footer" style="display:flex;align-items:center;gap:8px">
     <button id="theme-toggle" onclick="toggleTheme()" style="background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.2);color:#C3E6FF;font-size:15px;padding:4px 9px;border-radius:6px;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0">🌙</button>
-    <span class="sb-footer-label" style="font-size:10px;color:rgba(163,193,255,.3)">Nexus v2</span>
+    <!-- Feedback: acción transversal, disponible desde cualquier módulo -->
+    <button id="fbk-open-btn" onclick="openFeedbackModal()" title="Enviar feedback" style="background:rgba(77,147,255,.1);border:1px solid rgba(77,147,255,.2);color:#C3E6FF;font-family:inherit;font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0;display:flex;align-items:center;gap:5px"><span style="font-size:13px;line-height:1">💬</span><span class="sb-footer-label">Feedback</span></button>
     <button class="sb-logout-btn" onclick="logout()" style="margin-left:auto;width:auto!important;padding:.4rem .8rem;display:flex;align-items:center;gap:6px">
       <span style="flex-shrink:0;display:flex;align-items:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span class="sb-footer-label">Salir</span>
     </button>
@@ -4703,6 +4706,40 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
 </div>
 
 <!-- ══════════ CENTRO DE SOLICITUDES ══════════ -->
+<!-- ADMINISTRACIÓN → FEEDBACK (solo administradores) -->
+<div id="feedback-panel" style="display:none">
+  <div id="fbk-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+    <div class="crm-topbar">
+      <div class="crm-topbar-l">
+        <div class="crm-page-title">Feedback</div>
+        <div class="crm-page-sub" id="fbk-subtitle">Cargando...</div>
+      </div>
+      <div class="crm-topbar-r">
+        <input id="fbk-search" type="text" placeholder="🔍 Buscar..." class="crm-search-inp" oninput="fbkFilter()">
+        <div id="fbk-f-modulo"></div>
+        <div id="fbk-f-tipo"></div>
+        <div id="fbk-f-estado"></div>
+        <div id="fbk-f-usuario"></div>
+        <input id="fbk-f-desde" type="date" class="crm-sel" title="Desde" onchange="fbkFilter()">
+        <input id="fbk-f-hasta" type="date" class="crm-sel" title="Hasta" onchange="fbkFilter()">
+      </div>
+    </div>
+    <div class="crm-list-body">
+      <div class="crm-tbl-wrap"><div id="fbk-table-wrap">Cargando...</div></div>
+    </div>
+  </div>
+  <div id="fbk-detail-view" style="display:none;flex:1;overflow:hidden;min-height:0">
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+      <div class="crm-topbar">
+        <div class="crm-topbar-l">
+          <button class="mod-back-btn" onclick="fbkCloseDetail()">← Volver</button>
+        </div>
+      </div>
+      <div class="crm-list-body"><div id="fbk-detail-body"></div></div>
+    </div>
+  </div>
+</div>
+
 <!-- MI PERFIL — dashboard personal del usuario (vista agregadora de datos existentes) -->
 <div id="perfil-panel" style="display:none">
   <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
@@ -14684,12 +14721,12 @@ function renderTendencias(allDocs,dias){
 }
 
 function show(id){
-  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel","transacciones-panel","solicitudes-panel","perfil-panel"].forEach(s=>{
+  ["ls","ds","as","home-hub","analytics-panel","crm-panel","admin-panel","buildings-panel","transacciones-panel","solicitudes-panel","perfil-panel","feedback-panel"].forEach(s=>{
     const el=document.getElementById(s);
     if(!el)return;
     if(s==="ls")el.style.display=s===id?"grid":"none";
     else if(s==="ds")el.style.display=s===id?"flex":"none";
-    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel"||s==="transacciones-panel"||s==="solicitudes-panel"||s==="perfil-panel")el.style.display=s===id?"flex":"none";
+    else if(s==="analytics-panel"||s==="crm-panel"||s==="admin-panel"||s==="buildings-panel"||s==="transacciones-panel"||s==="solicitudes-panel"||s==="perfil-panel"||s==="feedback-panel")el.style.display=s===id?"flex":"none";
     else el.style.display=s===id?"block":"none";
   });
   const isApp=id!=="ls"&&id!=="ds";
@@ -14782,7 +14819,7 @@ function _setSbActive(mod,submod){
 function showModule(mod){
   closeMobileSidebar();
   // Close all overlays (including CRM)
-  ['analytics-panel','buildings-panel','admin-panel','crm-panel','transacciones-panel','perfil-panel'].forEach(id=>{
+  ['analytics-panel','buildings-panel','admin-panel','crm-panel','transacciones-panel','perfil-panel','feedback-panel'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.style.display='none';
   });
@@ -14827,6 +14864,10 @@ function showModule(mod){
   } else if(mod==='perfil'){
     show('perfil-panel');
     loadMiPerfil();
+  } else if(mod==='feedback'){
+    if(!_fbkEsAdmin()){return;}          // bandeja administrativa: mismos permisos que Analytics/Admin
+    show('feedback-panel');
+    loadFeedbackAdmin();
   }
 }
 // ─── HUB DASHBOARD V2 ───────────────────────────────────────────────────
@@ -15331,6 +15372,246 @@ let _srDocs=[],_srCurrentId=null,_srMias=false,_srFormService=null,_srDocList=[]
 let _srEjecExtra=[],_srEjecOpts=[],_srNewBldId='',_srNewContactId='';
 
 function srEstadoBadge(e){const c=SR_ESTADO_COLOR[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'Pendiente')}</span>`;}
+
+// ═══════════════════ FEEDBACK — captura + bandeja administrativa ═══════════════════
+// Usa la colección `feedback` ya existente (donde también viven las encuestas de estrellas del
+// Generador de PPT, que se mantienen intactas). Permisos: los mismos de Analytics/Admin.
+const FBK_MODULOS=['Cuentas','Contactos','Leads','Transacciones','Inmuebles','Actividades','Mi Perfil','Otro'];
+const FBK_TIPOS=['Problema','Sugerencia de mejora','Duda / Consulta'];
+const FBK_ESTADOS=['Nuevo','Revisado','En desarrollo','Resuelto','Descartado'];
+function _fbkEsAdmin(){return ANALYTICS_ALLOWED.includes(user?.email);}
+// Detecta el módulo actual y el registro relacionado a partir de la vista abierta.
+function _fbkContexto(){
+  const vis=id=>{const el=document.getElementById(id);return !!el&&el.offsetParent!==null;};
+  let modulo='Otro',ruta='Nexus',relId='',relNombre='';
+  const panelVisible=id=>{const el=document.getElementById(id);return !!el&&el.style.display!=='none';};
+  if(panelVisible('crm-panel')){
+    const tab=typeof _crmActiveTab!=='undefined'?_crmActiveTab:'cuentas';
+    const map={cuentas:'Cuentas',contactos:'Contactos',leads:'Leads',visitas:'Actividades',oportunidades:'Actividades'};
+    modulo=map[tab]||'Cuentas';ruta='CRM → '+(tab.charAt(0).toUpperCase()+tab.slice(1));
+    if(tab==='cuentas'&&typeof _fichaCuentaId!=='undefined'&&_fichaCuentaId){
+      const c=(_crmDocs||[]).find(x=>x._id===_fichaCuentaId);
+      if(c){relId=c._id;relNombre=c.nombre||c._id;ruta+=' → '+relNombre;}
+    }else if(tab==='contactos'&&typeof _fichaContactoId!=='undefined'&&_fichaContactoId){
+      const c=(_ctoDocs||[]).find(x=>x._id===_fichaContactoId);
+      if(c){relId=c._id;relNombre=((c.nombre||'')+' '+(c.apellidos||'')).trim();ruta+=' → '+relNombre;}
+    }else if(tab==='leads'&&typeof _currentLeadId!=='undefined'&&_currentLeadId){
+      const d=(_leadDocs||[]).find(x=>x._id===_currentLeadId);
+      if(d){relId=d._id;relNombre=((d.nombre||'')+' '+(d.apellido||'')).trim();ruta+=' → '+relNombre;}
+    }else if(tab==='oportunidades'&&typeof _oppCurrentId!=='undefined'&&_oppCurrentId){
+      const o=(_oppDocs||[]).find(x=>x._id===_oppCurrentId);
+      if(o){relId=o._id;relNombre=o.nombreProyecto||o.cuentaNombre||o._id;ruta+=' → '+relNombre;}
+    }
+  }
+  else if(panelVisible('buildings-panel')){modulo='Inmuebles';ruta='Inmuebles';
+    if(typeof _bldEditId!=='undefined'&&_bldEditId){const b=(_bldDocs||[]).find(x=>x._id===_bldEditId);if(b){relId=b._id;relNombre=b.nombre||b._id;ruta+=' → '+relNombre;}}}
+  else if(panelVisible('transacciones-panel')){modulo='Transacciones';ruta='Transacciones';}
+  else if(panelVisible('perfil-panel')){modulo='Mi Perfil';ruta='Mi Perfil';}
+  else if(panelVisible('solicitudes-panel')){modulo='Otro';ruta='Centro de Solicitudes';}
+  else if(vis('home-hub')){modulo='Otro';ruta='Inicio';}
+  return {modulo,ruta,relId,relNombre};
+}
+function _fbkEnsureModal(){
+  if(document.getElementById('fbk-ov'))return;
+  const ov=document.createElement('div');ov.id='fbk-ov';ov.className='actm-ov';
+  ov.innerHTML=`<div class="actm-modal" onclick="event.stopPropagation()">
+    <div class="actm-title">¿Cómo podemos mejorar Nexus?</div>
+    <div class="actm-sub">Contanos si encontraste un problema, tenés una sugerencia o necesitás ayuda.</div>
+    <div class="actm-lbl">Módulo</div>
+    <select id="fbk-modulo" class="cdr-select">${FBK_MODULOS.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
+    <div id="fbk-ctx" style="font-size:11px;color:#8898C0;margin-top:.3rem"></div>
+    <div class="actm-lbl">Tipo de feedback</div>
+    <select id="fbk-tipo" class="cdr-select"><option value="">— Seleccionar —</option>${FBK_TIPOS.map(t=>`<option>${esc(t)}</option>`).join('')}</select>
+    <div class="actm-lbl">Contanos qué pasó o qué te gustaría mejorar <span class="cdr-req">*</span></div>
+    <textarea id="fbk-desc" class="cdr-input" rows="5" placeholder="Escribí acá tu comentario..." style="resize:vertical;line-height:1.5"></textarea>
+    <div style="display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.3rem">
+      <button class="crm-action-btn" onclick="closeFeedbackModal()">Cancelar</button>
+      <button class="crm-action-btn" id="fbk-send" style="background:#1C54F4;color:#fff;border-color:#1C54F4" onclick="enviarFeedbackNexus()">Enviar feedback</button>
+    </div>
+  </div>`;
+  ov.onclick=()=>closeFeedbackModal();
+  document.body.appendChild(ov);
+}
+window.closeFeedbackModal=function(){const ov=document.getElementById('fbk-ov');if(ov)ov.classList.remove('open');};
+window.openFeedbackModal=function(){
+  _fbkEnsureModal();
+  const c=_fbkContexto();_fbkCtxActual=c;
+  const m=document.getElementById('fbk-modulo');if(m)m.value=FBK_MODULOS.includes(c.modulo)?c.modulo:'Otro';
+  const ctx=document.getElementById('fbk-ctx');if(ctx)ctx.textContent=c.relNombre?`Detectado: ${c.ruta}`:`Detectado: ${c.ruta}`;
+  const t=document.getElementById('fbk-tipo');if(t)t.value='';          // sin tipo preseleccionado
+  const d=document.getElementById('fbk-desc');if(d){d.value='';d.style.borderColor='';}
+  const b=document.getElementById('fbk-send');if(b){b.disabled=false;b.textContent='Enviar feedback';}
+  document.getElementById('fbk-ov').classList.add('open');
+  setTimeout(()=>document.getElementById('fbk-desc')?.focus(),60);
+};
+let _fbkCtxActual={modulo:'Otro',ruta:'Nexus',relId:'',relNombre:''};
+window.enviarFeedbackNexus=async function(){
+  const desc=(document.getElementById('fbk-desc')?.value||'').trim();
+  const dEl=document.getElementById('fbk-desc');
+  if(!desc){if(dEl){dEl.style.borderColor='#ED1B34';dEl.focus();}alert('Contanos qué pasó o qué te gustaría mejorar.');return;}
+  if(dEl)dEl.style.borderColor='';
+  if(!db){alert('Firebase no disponible.');return;}
+  const btn=document.getElementById('fbk-send');if(btn){btn.disabled=true;btn.textContent='Enviando...';}
+  try{
+    const c=_fbkCtxActual||{};
+    await db.collection('feedback').add({
+      origen:'nexus',                                  // distingue el feedback del sistema (vs. encuesta PPT)
+      userId:user?.sub||user?.email||'',
+      userName:user?.displayName||user?.email||'',
+      userEmail:user?.email||'',
+      module:document.getElementById('fbk-modulo')?.value||'Otro',
+      type:document.getElementById('fbk-tipo')?.value||'',
+      description:desc,
+      relatedRecordId:c.relId||'',
+      relatedRecordName:c.relNombre||'',
+      route:c.ruta||'',
+      status:'Nuevo',                                  // estado inicial, no editable por quien envía
+      createdAt:firebase.firestore.Timestamp.now(),
+    });
+    closeFeedbackModal();
+    alert('✓ ¡Gracias por tu feedback! Lo revisamos y te contamos.');
+  }catch(e){alert('Error al enviar feedback: '+e.message);const b=document.getElementById('fbk-send');if(b){b.disabled=false;b.textContent='Enviar feedback';}}
+};
+// ── Bandeja administrativa ──
+let _fbkDocs=[],_fbkFltReady=false,_fbkCurrentId=null;
+function _fbkNorm(d){
+  // Normaliza para poder listar junto a las encuestas legacy (estrellas) sin perder historial.
+  const legacy=d.origen!=='nexus'&&(d.estrellas!=null||d.comentario!=null);
+  return {
+    _id:d._id,
+    fecha:_tsToDate(d.createdAt)||_tsToDate(d.fecha),
+    usuario:d.userName||d.usuario||d.userEmail||d.email||'—',
+    email:d.userEmail||d.email||'',
+    modulo:d.module||(legacy?'Otro':'Otro'),
+    tipo:d.type||(legacy?'Sugerencia de mejora':''),
+    estado:d.status||'Nuevo',
+    descripcion:d.description||d.comentario||'',
+    relId:d.relatedRecordId||'',relNombre:d.relatedRecordName||'',
+    ruta:d.route||(legacy?'Generador de Informes':''),
+    legacy,estrellas:d.estrellas||null,
+  };
+}
+window.loadFeedbackAdmin=async function(){
+  if(!_fbkEsAdmin())return;
+  const wrap=document.getElementById('fbk-table-wrap');
+  {const lv=document.getElementById('fbk-list-view');if(lv)lv.style.display='flex';
+   const dv=document.getElementById('fbk-detail-view');if(dv)dv.style.display='none';_fbkCurrentId=null;}
+  if(!db){if(wrap)wrap.innerHTML='<div class="crm-empty">Firebase no configurado.</div>';return;}
+  if(wrap)wrap.innerHTML='<div class="crm-empty">Cargando...</div>';
+  try{
+    const snap=await db.collection('feedback').get();
+    _fbkDocs=snap.docs.map(d=>_fbkNorm({...d.data(),_id:d.id}))
+      .sort((a,b)=>(b.fecha?.getTime()||0)-(a.fecha?.getTime()||0));
+    _fbkInitFiltros();
+    fbkFilter();
+  }catch(e){if(wrap)wrap.innerHTML=`<div class="crm-empty">Error al cargar: ${esc(e.message)}</div>`;}
+};
+function _fbkInitFiltros(){
+  if(_fbkFltReady)return;
+  if(!document.getElementById('fbk-f-modulo'))return;
+  nxMSelInit('fbk-f-modulo',{label:'Módulo',opts:FBK_MODULOS,onChange:fbkFilter});
+  nxMSelInit('fbk-f-tipo',{label:'Tipo',opts:FBK_TIPOS,onChange:fbkFilter});
+  nxMSelInit('fbk-f-estado',{label:'Estado',opts:FBK_ESTADOS,onChange:fbkFilter});
+  nxMSelInit('fbk-f-usuario',{label:'Usuario',opts:()=>[...new Set(_fbkDocs.map(d=>d.usuario).filter(Boolean))].sort(),onChange:fbkFilter});
+  _fbkFltReady=true;
+}
+window.fbkFilter=function(){
+  const q=(document.getElementById('fbk-search')?.value||'').toLowerCase().trim();
+  const fM=nxMSelGet('fbk-f-modulo'),fT=nxMSelGet('fbk-f-tipo'),fE=nxMSelGet('fbk-f-estado'),fU=nxMSelGet('fbk-f-usuario');
+  const desde=document.getElementById('fbk-f-desde')?.value||'',hasta=document.getElementById('fbk-f-hasta')?.value||'';
+  const rows=_fbkDocs.filter(d=>{
+    if(q&&!((d.usuario+' '+d.descripcion+' '+d.modulo+' '+d.relNombre).toLowerCase().includes(q)))return false;
+    if(fM.length&&!fM.includes(d.modulo))return false;
+    if(fT.length&&!fT.includes(d.tipo))return false;
+    if(fE.length&&!fE.includes(d.estado))return false;
+    if(fU.length&&!fU.includes(d.usuario))return false;
+    if(desde&&(!d.fecha||d.fecha.getTime()<new Date(desde+'T00:00:00').getTime()))return false;
+    if(hasta&&(!d.fecha||d.fecha.getTime()>new Date(hasta+'T23:59:59').getTime()))return false;
+    return true;
+  });
+  _fbkRenderTabla(rows);
+  const st=document.getElementById('fbk-subtitle');
+  if(st)st.textContent=`${rows.length} feedback${rows.length!==1?'s':''}`;
+};
+function _fbkEstadoBadge(e){
+  const C={'Nuevo':'#1C54F4','Revisado':'#0090C7','En desarrollo':'#B45309','Resuelto':'#16A34A','Descartado':'#8898C0'};
+  const c=C[e]||'#8898C0';
+  return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'Nuevo')}</span>`;
+}
+function _fbkRenderTabla(rows){
+  const wrap=document.getElementById('fbk-table-wrap');if(!wrap)return;
+  if(!rows.length){wrap.innerHTML='<div class="crm-empty" style="padding:3rem">Sin feedback registrado.</div>';return;}
+  // Columnas EXACTAS de la vista general: Fecha · Usuario · Módulo · Tipo · Estado.
+  let h='<table class="crm-table"><thead><tr>';
+  ['Fecha','Usuario','Módulo','Tipo','Estado'].forEach(c=>h+=`<th>${c}</th>`);
+  h+='</tr></thead><tbody>';
+  rows.forEach(d=>{
+    h+=`<tr onclick="fbkOpenDetail('${d._id}')">
+      <td class="crm-date">${d.fecha?d.fecha.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):'–'}</td>
+      <td><div class="crm-client-name">${esc(d.usuario)}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.modulo)}</div></td>
+      <td><div class="crm-broker-cell">${esc(d.tipo||'–')}</div></td>
+      <td>${_fbkEstadoBadge(d.estado)}</td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
+}
+window.fbkOpenDetail=function(id){
+  const d=_fbkDocs.find(x=>x._id===id);if(!d)return;_fbkCurrentId=id;
+  const row=(l,v)=>`<div class="nx-row"><div class="nx-row-l">${l}</div><div class="nx-row-v">${v||'<span style="color:#8898C0">–</span>'}</div></div>`;
+  const f=d.fecha?d.fecha.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.fecha.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'–';
+  const rel=d.relNombre?(d.relId?`<span style="color:#1C54F4;cursor:pointer" onclick="fbkAbrirRelacionado('${esc(d.modulo)}','${esc(d.relId)}')">${esc(d.relNombre)}</span>`:esc(d.relNombre)):'';
+  document.getElementById('fbk-detail-body').innerHTML=`
+    <div class="nx-grid">
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Feedback</div>
+          ${row('Fecha',esc(f))}
+          ${row('Usuario',esc(d.usuario)+(d.email?` <span style="color:#8898C0;font-size:11px">${esc(d.email)}</span>`:''))}
+          ${row('Módulo',esc(d.modulo))}
+          ${row('Tipo',esc(d.tipo||''))}
+          ${row('Estado',_fbkEstadoBadge(d.estado))}
+          ${row('Registro relacionado',rel)}
+          ${row('Ruta',esc(d.ruta||''))}
+          ${d.legacy&&d.estrellas?row('Calificación','★'.repeat(d.estrellas)):''}
+        </div>
+      </div>
+      <div class="nx-col">
+        <div class="nx-card">
+          <div class="nx-card-title">Descripción</div>
+          <div style="font-size:12.5px;color:#353E59;line-height:1.6;white-space:pre-wrap;padding-top:.3rem">${esc(d.descripcion||'—')}</div>
+        </div>
+        <div class="nx-card">
+          <div class="nx-card-title">Gestión</div>
+          <div class="crm-det-meta-lbl" style="margin:.2rem 0 .35rem">Estado</div>
+          <select class="crm-estado-sel" onchange="fbkUpdateEstado('${d._id}',this.value)">${FBK_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${esc(s)}</option>`).join('')}</select>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('fbk-list-view').style.display='none';
+  const dv=document.getElementById('fbk-detail-view');dv.style.display='flex';dv.style.flexDirection='column';
+};
+window.fbkCloseDetail=function(){
+  document.getElementById('fbk-detail-view').style.display='none';
+  const lv=document.getElementById('fbk-list-view');lv.style.display='flex';lv.style.flexDirection='column';
+  fbkFilter();
+};
+window.fbkAbrirRelacionado=function(modulo,id){
+  if(modulo==='Cuentas')crmOpenCuenta(id);
+  else if(modulo==='Contactos'&&typeof openContactoDetail==='function')openContactoDetail(id);
+  else if(modulo==='Leads'&&typeof openLeadDetail==='function')openLeadDetail(id);
+};
+window.fbkUpdateEstado=async function(id,val){
+  if(!_fbkEsAdmin()||!FBK_ESTADOS.includes(val))return;   // sólo administradores cambian el estado
+  if(!db)return;
+  try{
+    const now=firebase.firestore.Timestamp.now();
+    await db.collection('feedback').doc(id).update({status:val,statusUpdatedAt:now,statusUpdatedBy:user?.displayName||user?.email||''});
+    const i=_fbkDocs.findIndex(x=>x._id===id);if(i>=0)_fbkDocs[i].estado=val;
+    if(_fbkCurrentId===id)fbkOpenDetail(id);
+  }catch(e){alert('Error al actualizar el estado: '+e.message);}
+};
 
 // ═══════════════════ MI PERFIL — dashboard personal del usuario ═══════════════════
 // Vista AGREGADORA: no crea colecciones ni duplica datos. Reutiliza la identidad del usuario
