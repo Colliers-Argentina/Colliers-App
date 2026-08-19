@@ -107,18 +107,20 @@ GUIAS["Guia_Leads"] = Guia(
 
 # ─────────────────────────── VISITAS ───────────────────────────
 GUIAS["Guia_Visitas"] = Guia(
-    "Visitas", "1.1", FECHA,
-    "Permite registrar de forma rápida las visitas comerciales realizadas a un inmueble en "
-    "el marco de una cuenta. Cada visita queda asociada a la cuenta y al inmueble.",
+    "Visitas", "1.2", FECHA,
+    "Permite registrar de forma rápida las visitas comerciales realizadas a un inmueble. "
+    "La visita puede asociarse a una Cuenta, a un Contacto, a ambos o a ninguno (por ejemplo, "
+    "una visita con un particular). El inmueble es el único dato obligatorio.",
     [
-        ("Cuenta", "Buscar y seleccionar la empresa sobre la que se hizo la visita. Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin salir del formulario."),
-        ("Inmueble", "Buscar y seleccionar el inmueble visitado."),
-        ("Contacto", "Buscar y seleccionar la persona con la que se realizó la visita (opcional)."),
+        ("Tipo de inmueble", "Elegir Oficinas, Retail o Industria & Logística para acotar el listado de inmuebles. Si se deja en \"Todos los tipos\", el buscador muestra todos."),
+        ("Inmueble", "Buscar y seleccionar el inmueble visitado (obligatorio). Muestra los inmuebles del tipo elegido."),
+        ("Cuenta", "Buscar y seleccionar la empresa sobre la que se hizo la visita (opcional). Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin salir del formulario."),
+        ("Contacto", "Buscar y seleccionar la persona con la que se realizó la visita (opcional). No hace falta elegir una Cuenta primero: se pueden buscar contactos de cualquier empresa y también contactos sin cuenta asociada. Si ya se eligió una Cuenta, sus contactos aparecen primero. Al elegir un contacto se muestra a qué cuenta pertenece y, si el campo Cuenta estaba vacío, se completa solo."),
         ("Comentarios", "Observaciones de la visita: qué se habló, próximos pasos (opcional)."),
     ],
     [
         "Se registra la Visita.",
-        "Se genera automáticamente una actividad \"Visita Comercial\" en la cuenta.",
+        "Se genera automáticamente una actividad \"Visita Comercial\" en la cuenta; si la visita no tiene cuenta pero sí contacto, la actividad queda registrada en el contacto.",
         "La cuenta queda en estado Activa.",
         "La visita se puede ver en la cuenta y en la ficha del inmueble.",
     ],

@@ -3603,28 +3603,38 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
     <div class="cdr-body">
       <div class="cdr-section">
         <div class="cdr-section-hd"><div class="cdr-section-num">1</div><div class="cdr-section-name">Datos de la Visita</div><div class="cdr-section-line"></div></div>
+        <div class="cdr-field">
+          <div class="cdr-lbl">Tipo de inmueble</div>
+          <select id="visdr-tipo" class="cdr-select" onchange="visTipoChange()">
+            <option value="">Todos los tipos</option>
+            <option value="office">Oficinas</option>
+            <option value="retail">Retail</option>
+            <option value="industrial">Industria &amp; Logística</option>
+          </select>
+        </div>
         <div class="cdr-field" style="position:relative">
-          <div class="cdr-lbl">Cuenta <span class="cdr-req">*</span></div>
+          <div class="cdr-lbl">Inmueble <span class="cdr-req">*</span></div>
+          <input id="visdr-bld-q" class="cdr-input" type="text" placeholder="Buscar inmueble..." autocomplete="off" oninput="visBldSearch(this.value)" onfocus="visBldSearch(this.value)">
+          <div id="visdr-bld-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+          <input id="visdr-buildingId" type="hidden"><input id="visdr-buildingName" type="hidden">
+        </div>
+        <div class="cdr-field" style="position:relative">
+          <div class="cdr-lbl">Cuenta</div>
           <input id="visdr-cuenta" class="cdr-input" type="text" placeholder="Buscar cuenta en Cuentas..." autocomplete="off" oninput="ctaPickerInput('visdr',this.value)" onfocus="ctaPickerInput('visdr',this.value)" onblur="ctaPickerBlur('visdr')">
           <div id="visdr-cuenta-drop" class="cdr-ms-drop" style="display:none"></div>
           <div id="visdr-cuenta-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
           <input id="visdr-cuentaId" type="hidden"><input id="visdr-cuentaNombre" type="hidden">
         </div>
         <div class="cdr-field" style="position:relative">
-          <div class="cdr-lbl">Inmueble <span class="cdr-req">*</span></div>
-          <input id="visdr-bld-q" class="cdr-input" type="text" placeholder="Buscar inmueble..." autocomplete="off" oninput="visBldSearch(this.value)">
-          <div id="visdr-bld-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
-          <input id="visdr-buildingId" type="hidden"><input id="visdr-buildingName" type="hidden">
+          <div class="cdr-lbl">Contacto</div>
+          <input id="visdr-cto-q" class="cdr-input" type="text" placeholder="Buscar contacto..." autocomplete="off" oninput="visCtoSearch(this.value)" onfocus="visCtoSearch(this.value)">
+          <div id="visdr-cto-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+          <div id="visdr-cto-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
+          <input id="visdr-contactoId" type="hidden"><input id="visdr-contactoNombre" type="hidden">
         </div>
       </div>
       <div class="cdr-section">
         <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Opcional</div><div class="cdr-section-line"></div></div>
-        <div class="cdr-field" style="position:relative">
-          <div class="cdr-lbl">Contacto</div>
-          <input id="visdr-cto-q" class="cdr-input" type="text" placeholder="Buscar contacto..." autocomplete="off" oninput="visCtoSearch(this.value)">
-          <div id="visdr-cto-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
-          <input id="visdr-contactoId" type="hidden"><input id="visdr-contactoNombre" type="hidden">
-        </div>
         <div class="cdr-field">
           <div class="cdr-lbl">Comentarios</div>
           <textarea id="visdr-comentarios" class="cdr-input" rows="3" placeholder="Observaciones de la visita..." style="resize:vertical;min-height:72px;line-height:1.5"></textarea>
@@ -9521,16 +9531,15 @@ function renderVisitasTable(docs){
   h+='</tbody></table>';
   wrap.innerHTML=`<div style="overflow-x:auto">${h}</div>`;
 }
-function _visClearCto(){
-  ['visdr-contactoId','visdr-contactoNombre','visdr-cto-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const l=document.getElementById('visdr-cto-list');if(l)l.style.display='none';
-}
 window.openVisitaDrawer=function(prefillBuildingId,prefillBuildingName){
   ['visdr-cuenta','visdr-bld-q','visdr-cto-q','visdr-comentarios'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['visdr-cuentaId','visdr-cuentaNombre','visdr-buildingId','visdr-buildingName','visdr-contactoId','visdr-contactoNombre'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const ctag=document.getElementById('visdr-cuenta-tag');if(ctag)ctag.style.display='none';
-  ['visdr-cuenta-drop','visdr-bld-list','visdr-cto-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  {const t=document.getElementById('visdr-tipo');if(t)t.value='';}
+  ['visdr-cuenta-drop','visdr-bld-list','visdr-cto-list','visdr-cto-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   ['visdr-cuenta','visdr-bld-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
+  // Contactos disponibles para el buscador (independiente de la Cuenta).
+  if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});}
   loadClientesParaSelector();
   _loadBldDocsIfNeeded().catch(()=>{});
   if(prefillBuildingId){
@@ -9541,24 +9550,35 @@ window.openVisitaDrawer=function(prefillBuildingId,prefillBuildingName){
   const now=new Date();
   const uname=user?.displayName||user?.email||'—';
   const hint=document.getElementById('visdr-auto-hint');
-  if(hint)hint.innerHTML=`Se registran automáticamente: <b>${esc(uname)}</b> · ${now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})} ${now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}. Al guardar se genera la Actividad Comercial "Visita Comercial" en la Cuenta.`;
+  if(hint)hint.innerHTML=`Se registran automáticamente: <b>${esc(uname)}</b> · ${now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})} ${now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}. Al guardar, si hay Cuenta o Contacto se genera la Actividad Comercial "Visita Comercial".`;
   const btn=document.getElementById('visdr-save-btn');if(btn){btn.textContent='Registrar visita';btn.disabled=false;}
   document.getElementById('visdr-overlay').classList.add('open');
   document.getElementById('visdr-drawer').classList.add('open');
-  setTimeout(()=>document.getElementById('visdr-cuenta')?.focus(),60);
+  setTimeout(()=>document.getElementById('visdr-bld-q')?.focus(),60);
 };
 window.closeVisitaDrawer=function(){
   document.getElementById('visdr-overlay').classList.remove('open');
   document.getElementById('visdr-drawer').classList.remove('open');
   ['visdr-bld-list','visdr-cto-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
 };
+// Tipo de inmueble: usa la taxonomía existente (assetType office/retail/industrial, con
+// fallback legacy _tipo) — la misma que utiliza el módulo Inmuebles. No crea una clasificación nueva.
+function _visAssetType(d){return d?.assetType||(d?._tipo==='industrial'?'industrial':d?._tipo==='retail'?'retail':'office');}
+window.visTipoChange=function(){
+  // Al cambiar el tipo se limpia el inmueble elegido y se vuelve a ofrecer la lista filtrada.
+  ['visdr-buildingId','visdr-buildingName','visdr-bld-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const l=document.getElementById('visdr-bld-list');if(l)l.style.display='none';
+  visBldSearch('');
+};
 window.visBldSearch=function(q){
   const list=document.getElementById('visdr-bld-list');if(!list)return;
   document.getElementById('visdr-buildingId').value='';document.getElementById('visdr-buildingName').value='';
-  if(!q.trim()){list.style.display='none';return;}
-  const lq=q.toLowerCase();
-  const src=_bldDocs.length?_bldDocs:masterBuildings;
-  const matches=src.filter(d=>(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
+  const tipo=document.getElementById('visdr-tipo')?.value||'';
+  const lq=(q||'').trim().toLowerCase();
+  if(!lq&&!tipo){list.style.display='none';return;}
+  let src=_bldDocs.length?_bldDocs:masterBuildings;
+  if(tipo)src=src.filter(d=>_visAssetType(d)===tipo);        // el tipo acota las opciones de Inmueble
+  const matches=src.filter(d=>!lq||(d.nombre||'').toLowerCase().includes(lq)).slice(0,8);
   if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
   list.innerHTML=matches.map(d=>`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();visSelectBld('${(d._id||d.id||'')}','${(d.nombre||'').replace(/'/g,"\\'")}')">${esc(d.nombre||'')}</div>`).join('');
   list.style.display='block';
@@ -9575,14 +9595,20 @@ window.visCtoSearch=function(q){
   if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){
     db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));if((document.getElementById('visdr-cto-q').value||'').trim())visCtoSearch(document.getElementById('visdr-cto-q').value);}).catch(()=>{});
   }
-  if(!q.trim()){list.style.display='none';return;}
-  const lq=q.toLowerCase();
+  const tag=document.getElementById('visdr-cto-tag');if(tag)tag.style.display='none';
+  const lq=(q||'').trim().toLowerCase();
+  if(!lq){list.style.display='none';return;}
   const cuentaId=document.getElementById('visdr-cuentaId').value||'';
-  let src=Array.isArray(_ctoDocs)?_ctoDocs:[];
-  if(cuentaId)src=src.filter(c=>c.cuentaId===cuentaId);
-  const matches=src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')).toLowerCase().includes(lq)).slice(0,8);
+  const src=Array.isArray(_ctoDocs)?_ctoDocs:[];
+  let matches=src.filter(c=>((c.nombre||'')+' '+(c.apellidos||'')+' '+(c.cuentaNombre||'')).toLowerCase().includes(lq));
+  // Si hay Cuenta elegida se PRIORIZAN sus contactos, pero no se bloquean los demás
+  // (una visita puede ser con un particular o con un contacto aún sin cuenta).
+  if(cuentaId)matches.sort((a,b)=>((b.cuentaId===cuentaId)?1:0)-((a.cuentaId===cuentaId)?1:0));
+  matches=matches.slice(0,8);
   if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
-  list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();visSelectCto('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}</div>`;}).join('');
+  list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();
+    const sub=c.cuentaNombre?esc(c.cuentaNombre):'Sin cuenta asociada';
+    return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();visSelectCto('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}<span style="display:block;font-weight:500;color:#8898C0;font-size:11px">${sub}</span></div>`;}).join('');
   list.style.display='block';
 };
 window.visSelectCto=function(id,nombre){
@@ -9590,6 +9616,18 @@ window.visSelectCto=function(id,nombre){
   document.getElementById('visdr-contactoNombre').value=nombre;
   document.getElementById('visdr-cto-q').value=nombre;
   document.getElementById('visdr-cto-list').style.display='none';
+  // Cuenta del contacto: se muestra como información contextual y sólo se autocompleta si la
+  // Cuenta está vacía (nunca se pisa ni se altera una Cuenta ya elegida por el usuario).
+  const c=(Array.isArray(_ctoDocs)?_ctoDocs:[]).find(x=>x._id===id);
+  const tag=document.getElementById('visdr-cto-tag');
+  if(!c){if(tag)tag.style.display='none';return;}
+  const cId=document.getElementById('visdr-cuentaId');
+  if(c.cuentaId&&cId&&!cId.value){_ctaPickerSet('visdr',c.cuentaId,c.cuentaNombre||'');}
+  if(tag){
+    tag.textContent=c.cuentaNombre?('Cuenta del contacto: '+c.cuentaNombre):'Contacto sin cuenta asociada';
+    tag.style.color=c.cuentaNombre?'#16A34A':'#8898C0';
+    tag.style.display='block';
+  }
 };
 window.saveVisitaDrawer=async function(){
   const cuentaId=document.getElementById('visdr-cuentaId').value||'';
@@ -9598,7 +9636,8 @@ window.saveVisitaDrawer=async function(){
   const buildingName=document.getElementById('visdr-buildingName').value||'';
   let ok=true;
   const mark=(inputId,cond)=>{const el=document.getElementById(inputId);if(el)el.style.borderColor=cond?'':'#ED1B34';if(!cond)ok=false;};
-  mark('visdr-cuenta',!!cuentaId);
+  // Cuenta y Contacto son OPCIONALES: una visita puede ser con un particular o con un contacto
+  // todavía no vinculado a una empresa. Sólo el Inmueble sigue siendo obligatorio.
   mark('visdr-bld-q',!!buildingId);
   if(!ok)return;
   if(!db){alert('Firebase no disponible.');return;}
@@ -9632,16 +9671,24 @@ window.saveVisitaDrawer=async function(){
     if(contactoNombre)descParts.push('Contacto: '+contactoNombre);
     if(comentarios)descParts.push(comentarios);
     const reg={cat:'C',tipo:'Visita Comercial',descripcion:descParts.join('\n'),fecha:now,usuario,userEmail,origen:'visita',visitaId:ref.id};
-    await db.collection('clientes').doc(cuentaId).collection('actividades').add(reg);
-    // Reactivar la cuenta (estado Activa) — idéntico a _registrarActividad.
-    await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now});
-    const idx=_crmDocs.findIndex(x=>x._id===cuentaId);
-    if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now};
-    // Si la ficha de esa cuenta está abierta, refrescar Actividades + estado (sin regresiones).
-    if(typeof _fichaCuentaId!=='undefined'&&_fichaCuentaId===cuentaId){
-      if(typeof loadCuentaActividades==='function')loadCuentaActividades(cuentaId);
-      if(typeof renderCuentaLeftPanel==='function')renderCuentaLeftPanel(cuentaId);
-      if(typeof _loadCuentaQuickStats==='function')_loadCuentaQuickStats(cuentaId);
+    // La actividad se registra en la Cuenta sólo si la visita tiene una Cuenta asociada
+    // (ahora es opcional: puede ser con un particular o con un contacto sin cuenta).
+    if(cuentaId){
+      await db.collection('clientes').doc(cuentaId).collection('actividades').add(reg);
+      // Reactivar la cuenta (estado Activa) — idéntico a _registrarActividad.
+      await db.collection('clientes').doc(cuentaId).update({ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now});
+      const idx=_crmDocs.findIndex(x=>x._id===cuentaId);
+      if(idx>=0)_crmDocs[idx]={..._crmDocs[idx],ultimaActividadComercial:now,ultimaActividadComercialUsuario:usuario,ultimaActividad:now};
+      // Si la ficha de esa cuenta está abierta, refrescar Actividades + estado (sin regresiones).
+      if(typeof _fichaCuentaId!=='undefined'&&_fichaCuentaId===cuentaId){
+        if(typeof loadCuentaActividades==='function')loadCuentaActividades(cuentaId);
+        if(typeof renderCuentaLeftPanel==='function')renderCuentaLeftPanel(cuentaId);
+        if(typeof _loadCuentaQuickStats==='function')_loadCuentaQuickStats(cuentaId);
+      }
+    }else if(contactoId){
+      // Sin Cuenta: la actividad queda registrada en el Contacto.
+      await db.collection('contactos').doc(contactoId).collection('actividades').add(reg).catch(()=>{});
+      await db.collection('contactos').doc(contactoId).update({ultimaActividad:now}).catch(()=>{});
     }
     _visDocs.unshift({...visita,_id:ref.id});
     closeVisitaDrawer();
@@ -10449,7 +10496,8 @@ function _ctaPickerSet(key,id,nombre){
 window.ctaPickerClear=function(key){const c=_ctaPickers[key];if(!c)return;document.getElementById(c.hidId).value='';document.getElementById(c.hidNombreId).value='';const tag=document.getElementById(c.tagId);if(tag)tag.style.display='none';};
 window.ctaPickerCreate=function(key){const c=_ctaPickers[key];if(!c)return;const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';openClientDrawer((nombre,newId)=>_ctaPickerSet(key,newId,nombre),document.getElementById(c.inputId).value.trim());};
 registerCuentaPicker('ldr',{inputId:'ldr-empresa',dropId:'ldr-empresa-drop',tagId:'ldr-empresa-tag',hidId:'ldr-cuentaId',hidNombreId:'ldr-cuentaNombre'});
-registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre',onSelect:function(){ _visClearCto(); }});
+// El Contacto es independiente de la Cuenta: elegir una cuenta ya NO limpia el contacto elegido.
+registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre'});
 registerCuentaPicker('opdr',{inputId:'opdr-cuenta',dropId:'opdr-cuenta-drop',tagId:'opdr-cuenta-tag',hidId:'opdr-cuentaId',hidNombreId:'opdr-cuentaNombre',includeContactos:true,
   onSelect:function(id){_oppAutoClienteColliers(id);},
   onPickContacto:function(cto){
