@@ -2337,6 +2337,9 @@ body.dark .cdr-drawer{background:#101c3b;color:#e0eaff}
 /* La Cuenta se puede crear desde otros drawers (Leads/Visitas/Contactos): su drawer
    y backdrop deben quedar por encima del resto. */
 #cdr-drawer{z-index:901}
+/* Contacto abierto SOBRE otro drawer (ej. desde Registrar Visita): mismo patrón que #cdr-drawer. */
+body.ctdr-stacked #ctdr-drawer{z-index:901}
+body.ctdr-stacked #ctdr-overlay{z-index:900}
 #cdr-overlay{position:fixed;inset:0;z-index:900;background:rgba(10,27,77,.5);display:none}
 #cdr-overlay.open{display:block}
 .cdr-hd{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.5rem;border-bottom:1px solid #E8EFF8;flex-shrink:0}
@@ -8614,10 +8617,12 @@ window.openContactoDrawer_edit=function(docId){
 };
 
 window.closeContactoDrawer=function(){
-  _ctdrEditId=null;_ctdrLeadConv=null;
+  _ctdrEditId=null;_ctdrLeadConv=null;_ctdrCallback=null;
   document.getElementById('ctdr-overlay').classList.remove('open');
   document.getElementById('ctdr-drawer').classList.remove('open');
   document.getElementById('ctdr-cuenta-list').style.display='none';
+  // Al cerrarse (guardar o cancelar) deja de estar apilado sobre otro drawer.
+  document.body.classList.remove('ctdr-stacked');
 };
 
 window.ctdrCuentaSearch=function(q){
@@ -9599,11 +9604,37 @@ window.visCtoSearch=function(q){
   // (una visita puede ser con un particular o con un contacto aún sin cuenta).
   if(cuentaId)matches.sort((a,b)=>((b.cuentaId===cuentaId)?1:0)-((a.cuentaId===cuentaId)?1:0));
   matches=matches.slice(0,8);
-  if(!matches.length){list.innerHTML='<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';list.style.display='block';return;}
+  // Sin coincidencias: se ofrece crear el contacto conservando el texto buscado.
+  if(!matches.length){
+    list.innerHTML=`<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">No encontramos contactos para "${esc(q)}"</div>`
+      +`<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#1C54F4;border-top:1px solid #EEF3FF" onmousedown="event.preventDefault();visCrearContacto()">➕ Crear contacto "${esc(q)}"</div>`;
+    list.style.display='block';return;
+  }
   list.innerHTML=matches.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();
     const sub=c.cuentaNombre?esc(c.cuentaNombre):'Sin cuenta asociada';
     return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmouseover="this.style.background='#EEF3FF'" onmouseout="this.style.background=''" onmousedown="event.preventDefault();visSelectCto('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}<span style="display:block;font-weight:500;color:#8898C0;font-size:11px">${sub}</span></div>`;}).join('');
   list.style.display='block';
+};
+// Crear un Contacto sin abandonar Registrar Visita: reutiliza el drawer de Contactos existente.
+// El drawer de Visita NO se cierra, así que al guardar o cancelar se vuelve a él con todos sus datos.
+window.visCrearContacto=function(){
+  const q=(document.getElementById('visdr-cto-q')?.value||'').trim();
+  const l=document.getElementById('visdr-cto-list');if(l)l.style.display='none';
+  const cuentaId=document.getElementById('visdr-cuentaId')?.value||'';
+  const cuentaNombre=document.getElementById('visdr-cuentaNombre')?.value||'';
+  document.body.classList.add('ctdr-stacked');
+  // Si hay Cuenta elegida en la visita se preselecciona; si no, el contacto se crea sin cuenta
+  // (la Cuenta no es obligatoria en el alta de Contactos).
+  openContactoDrawer(cuentaId,cuentaNombre,function(fullname,newId){
+    visSelectCto(newId,fullname);
+  });
+  // Precarga del texto buscado: la 1ª palabra como Nombre y el resto como Apellidos.
+  if(q){
+    const parts=q.split(/\s+/);
+    const n=document.getElementById('ctdr-nombre'),a=document.getElementById('ctdr-apellidos');
+    if(n)n.value=parts[0]||'';
+    if(a&&parts.length>1)a.value=parts.slice(1).join(' ');
+  }
 };
 window.visSelectCto=function(id,nombre){
   document.getElementById('visdr-contactoId').value=id;
