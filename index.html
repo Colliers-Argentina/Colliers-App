@@ -3607,9 +3607,9 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
       <div class="cdr-section">
         <div class="cdr-section-hd"><div class="cdr-section-num">1</div><div class="cdr-section-name">Datos de la Visita</div><div class="cdr-section-line"></div></div>
         <div class="cdr-field">
-          <div class="cdr-lbl">Tipo de inmueble</div>
+          <div class="cdr-lbl">Tipo de inmueble <span class="cdr-req">*</span></div>
           <select id="visdr-tipo" class="cdr-select" onchange="visTipoChange()">
-            <option value="">Todos los tipos</option>
+            <option value="">Seleccionar</option>
             <option value="office">Oficinas</option>
             <option value="retail">Retail</option>
             <option value="industrial">Industria &amp; Logística</option>
@@ -9536,7 +9536,7 @@ window.openVisitaDrawer=function(prefillBuildingId,prefillBuildingName){
   const ctag=document.getElementById('visdr-cuenta-tag');if(ctag)ctag.style.display='none';
   {const t=document.getElementById('visdr-tipo');if(t)t.value='';}
   ['visdr-cuenta-drop','visdr-bld-list','visdr-cto-list','visdr-cto-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  ['visdr-cuenta','visdr-bld-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
+  ['visdr-cuenta','visdr-bld-q','visdr-tipo'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
   // Contactos disponibles para el buscador (independiente de la Cuenta).
   if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});}
   loadClientesParaSelector();
@@ -9662,7 +9662,8 @@ window.saveVisitaDrawer=async function(){
   let ok=true;
   const mark=(inputId,cond)=>{const el=document.getElementById(inputId);if(el)el.style.borderColor=cond?'':'#ED1B34';if(!cond)ok=false;};
   // Cuenta y Contacto son OPCIONALES: una visita puede ser con un particular o con un contacto
-  // todavía no vinculado a una empresa. Sólo el Inmueble sigue siendo obligatorio.
+  // todavía no vinculado a una empresa. Tipo de inmueble e Inmueble sí son obligatorios.
+  mark('visdr-tipo',!!(document.getElementById('visdr-tipo')||{}).value);
   mark('visdr-bld-q',!!buildingId);
   if(!ok)return;
   if(!db){alert('Firebase no disponible.');return;}
