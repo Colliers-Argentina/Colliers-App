@@ -4686,20 +4686,14 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             </select>
           </div>
         </div>
-        <!-- Estado / Fecha -->
-        <div class="tx-form-2col">
-          <div class="tx-form-row">
-            <label class="tx-form-label">Estado<span class="tx-form-req">*</span></label>
-            <select class="tx-form-sel" id="txf-estado">
-              <option value="En negociación">En negociación</option>
-              <option value="Cerrada">Cerrada</option>
-              <option value="Caída">Caída</option>
-            </select>
-          </div>
-          <div class="tx-form-row">
-            <label class="tx-form-label">Fecha</label>
-            <input class="tx-form-inp" id="txf-fecha" type="date">
-          </div>
+        <!-- Fecha -->
+        <!-- El Estado ya no se muestra ni se completa en el formulario, pero se conserva
+             internamente (input oculto) porque lo usan el listado, los filtros y los KPIs.
+             En alta toma el valor por defecto y en edición preserva el estado existente. -->
+        <input type="hidden" id="txf-estado" value="En negociación">
+        <div class="tx-form-row">
+          <label class="tx-form-label">Fecha</label>
+          <input class="tx-form-inp" id="txf-fecha" type="date">
         </div>
         <!-- Notas -->
         <div class="tx-form-row">
