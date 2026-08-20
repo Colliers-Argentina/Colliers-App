@@ -107,7 +107,7 @@ GUIAS["Guia_Leads"] = Guia(
 
 # ─────────────────────────── VISITAS ───────────────────────────
 GUIAS["Guia_Visitas"] = Guia(
-    "Visitas", "1.3", FECHA,
+    "Visitas", "1.4", FECHA,
     "Permite registrar de forma rápida las visitas comerciales realizadas a un inmueble. "
     "La visita puede asociarse a una Cuenta, a un Contacto, a ambos o a ninguno (por ejemplo, "
     "una visita con un particular). El inmueble es el único dato obligatorio.",
@@ -116,6 +116,7 @@ GUIAS["Guia_Visitas"] = Guia(
         ("Inmueble", "Buscar y seleccionar el inmueble visitado (obligatorio). Muestra los inmuebles del tipo elegido."),
         ("Cuenta", "Buscar y seleccionar la empresa sobre la que se hizo la visita (opcional). Si no existe, aparece la opción \"➕ Crear nueva cuenta\" para crearla en el momento sin salir del formulario."),
         ("Contacto", "Buscar y seleccionar la persona con la que se realizó la visita (opcional). No hace falta elegir una Cuenta primero: se pueden buscar contactos de cualquier empresa y también contactos sin cuenta asociada. Si ya se eligió una Cuenta, sus contactos aparecen primero. Al elegir un contacto se muestra a qué cuenta pertenece y, si el campo Cuenta estaba vacío, se completa solo."),
+        ("¿Querés asociar esta visita a una oportunidad?", "Aparece sólo si la Cuenta elegida tiene oportunidades abiertas. Si se responde Sí, se habilita el selector Oportunidad con las oportunidades de esa Cuenta (hay que elegir una; no viene ninguna preseleccionada). Si se responde No, la visita se registra sin oportunidad. Al cambiar de Cuenta la lista se actualiza y no se conserva una oportunidad de la cuenta anterior."),
         ("Comentarios", "Observaciones de la visita: qué se habló, próximos pasos (opcional)."),
     ],
     [

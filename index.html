@@ -3635,6 +3635,18 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           <div id="visdr-cto-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
           <input id="visdr-contactoId" type="hidden"><input id="visdr-contactoNombre" type="hidden">
         </div>
+        <!-- Asociar a Oportunidad: sólo aparece si la Cuenta elegida tiene oportunidades -->
+        <div class="cdr-field" id="visdr-opp-ask" style="display:none">
+          <div class="cdr-lbl">¿Querés asociar esta visita a una oportunidad?</div>
+          <select id="visdr-opp-si" class="cdr-select" onchange="visOppAskChange()">
+            <option value="no">No</option>
+            <option value="si">Sí</option>
+          </select>
+        </div>
+        <div class="cdr-field" id="visdr-opp-row" style="display:none">
+          <div class="cdr-lbl">Oportunidad <span class="cdr-req">*</span></div>
+          <select id="visdr-oportunidad" class="cdr-select"></select>
+        </div>
       </div>
       <div class="cdr-section">
         <div class="cdr-section-hd"><div class="cdr-section-num">2</div><div class="cdr-section-name">Opcional</div><div class="cdr-section-line"></div></div>
@@ -4662,9 +4674,23 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         </div>
         <!-- Broker -->
         <div class="tx-form-row">
-          <label class="tx-form-label">Broker responsable</label>
-          <input class="tx-form-inp" id="txf-broker" placeholder="Nombre del broker">
+          <label class="tx-form-label">Transacción Colliers<span class="tx-form-req">*</span></label>
+          <select class="tx-form-sel" id="txf-colliers" onchange="txColliersChange()">
+            <option value="">Seleccionar</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+          </select>
         </div>
+        <div class="tx-form-row" id="txf-brokerColliers-row" style="display:none">
+          <label class="tx-form-label">Broker de Colliers<span class="tx-form-req">*</span></label>
+          <select class="tx-form-sel" id="txf-brokerColliers"></select>
+        </div>
+        <div class="tx-form-row" id="txf-brokerExterno-row" style="display:none">
+          <label class="tx-form-label">Broker externo<span class="tx-form-req">*</span></label>
+          <input class="tx-form-inp" id="txf-brokerExterno" placeholder="Ingresar nombre del broker">
+        </div>
+        <!-- Nombre resuelto del broker (se mantiene el campo `broker` del modelo actual). -->
+        <input type="hidden" id="txf-broker">
         <!-- Superficie / Precio m² / Moneda -->
         <div class="tx-form-2col">
           <div class="tx-form-row">
@@ -9537,6 +9563,9 @@ window.openVisitaDrawer=function(prefillBuildingId,prefillBuildingName){
   {const t=document.getElementById('visdr-tipo');if(t)t.value='';}
   ['visdr-cuenta-drop','visdr-bld-list','visdr-cto-list','visdr-cto-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   ['visdr-cuenta','visdr-bld-q','visdr-tipo'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='';});
+  {const si=document.getElementById('visdr-opp-si');if(si)si.value='no';}
+  {const so=document.getElementById('visdr-oportunidad');if(so){so.value='';so.style.borderColor='';}}
+  _crmLoadOppsIfNeeded().then(()=>visRefreshOpps('')).catch(()=>{});
   // Contactos disponibles para el buscador (independiente de la Cuenta).
   if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});}
   loadClientesParaSelector();
@@ -9617,6 +9646,36 @@ window.visCtoSearch=function(q){
 };
 // Crear un Contacto sin abandonar Registrar Visita: reutiliza el drawer de Contactos existente.
 // El drawer de Visita NO se cierra, así que al guardar o cancelar se vuelve a él con todos sus datos.
+// Oportunidades de la Cuenta elegida: la pregunta sólo aparece si hay al menos una vigente.
+// Reutiliza _oppsForCuenta/_oppEsVigente (misma relación Cuenta→Oportunidad del resto de Nexus).
+window.visRefreshOpps=function(keepId){
+  const ask=document.getElementById('visdr-opp-ask'),row=document.getElementById('visdr-opp-row');
+  const sel=document.getElementById('visdr-oportunidad'),si=document.getElementById('visdr-opp-si');
+  const cuentaId=(document.getElementById('visdr-cuentaId')||{}).value||'';
+  const opps=cuentaId?_oppsForCuenta(cuentaId).filter(_oppEsVigente):[];
+  if(sel)sel.innerHTML='<option value="">Seleccionar</option>'
+    +opps.map(o=>`<option value="${esc(o._id)}">${esc(o.nombreProyecto||o.cuentaNombre||o._id)}</option>`).join('');
+  if(!opps.length){                      // sin oportunidades: no se pregunta nada
+    if(ask)ask.style.display='none';
+    if(row)row.style.display='none';
+    if(si)si.value='no';
+    if(sel)sel.value='';
+    return;
+  }
+  if(ask)ask.style.display='';
+  // Al cambiar de Cuenta no se conserva una oportunidad de la cuenta anterior.
+  const valida=keepId&&opps.some(o=>o._id===keepId);
+  if(si)si.value=valida?'si':'no';
+  if(sel)sel.value=valida?keepId:'';
+  if(row)row.style.display=valida?'':'none';
+  if(sel)sel.style.borderColor='';
+};
+window.visOppAskChange=function(){
+  const si=(document.getElementById('visdr-opp-si')||{}).value||'no';
+  const row=document.getElementById('visdr-opp-row'),sel=document.getElementById('visdr-oportunidad');
+  if(row)row.style.display=si==='si'?'':'none';
+  if(si!=='si'&&sel){sel.value='';sel.style.borderColor='';}   // no deja datos incompatibles
+};
 window.visCrearContacto=function(){
   const q=(document.getElementById('visdr-cto-q')?.value||'').trim();
   const l=document.getElementById('visdr-cto-list');if(l)l.style.display='none';
@@ -9665,6 +9724,8 @@ window.saveVisitaDrawer=async function(){
   // todavía no vinculado a una empresa. Tipo de inmueble e Inmueble sí son obligatorios.
   mark('visdr-tipo',!!(document.getElementById('visdr-tipo')||{}).value);
   mark('visdr-bld-q',!!buildingId);
+  // Si el usuario eligió asociar la visita a una oportunidad, debe seleccionar cuál.
+  if((document.getElementById('visdr-opp-si')||{}).value==='si')mark('visdr-oportunidad',!!(document.getElementById('visdr-oportunidad')||{}).value);
   if(!ok)return;
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('visdr-save-btn');btn.textContent='Guardando...';btn.disabled=true;
@@ -9684,9 +9745,13 @@ window.saveVisitaDrawer=async function(){
     else if(Array.isArray(cuenta?.gestionadoPor)&&cuenta.gestionadoPor.length)ejecutivo=cuenta.gestionadoPor[0];
     else if(cuenta?.gestionadoPor)ejecutivo=cuenta.gestionadoPor;
     else ejecutivo=usuario;
+    // Relación con la Oportunidad (opcional): se guarda sólo si el usuario la eligió.
+    const oppId=((document.getElementById('visdr-opp-si')||{}).value==='si')?((document.getElementById('visdr-oportunidad')||{}).value||''):'';
+    const oppDoc=oppId?(_oppDocs||[]).find(x=>x._id===oppId):null;
     const visita={
       cuentaId,cuentaNombre,buildingId,buildingName,
       contactoId,contactoNombre,comentarios,
+      oportunidadId:oppId,oportunidadNombre:oppDoc?(oppDoc.nombreProyecto||oppDoc.cuentaNombre||''):'',
       ejecutivo,usuario,userEmail,
       fecha:now,fechaCreacion:now,
     };
@@ -10523,7 +10588,7 @@ window.ctaPickerClear=function(key){const c=_ctaPickers[key];if(!c)return;docume
 window.ctaPickerCreate=function(key){const c=_ctaPickers[key];if(!c)return;const drop=document.getElementById(c.dropId);if(drop)drop.style.display='none';openClientDrawer((nombre,newId)=>_ctaPickerSet(key,newId,nombre),document.getElementById(c.inputId).value.trim());};
 registerCuentaPicker('ldr',{inputId:'ldr-empresa',dropId:'ldr-empresa-drop',tagId:'ldr-empresa-tag',hidId:'ldr-cuentaId',hidNombreId:'ldr-cuentaNombre'});
 // El Contacto es independiente de la Cuenta: elegir una cuenta ya NO limpia el contacto elegido.
-registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre'});
+registerCuentaPicker('visdr',{inputId:'visdr-cuenta',dropId:'visdr-cuenta-drop',tagId:'visdr-cuenta-tag',hidId:'visdr-cuentaId',hidNombreId:'visdr-cuentaNombre',onSelect:function(){visRefreshOpps('');}});
 registerCuentaPicker('opdr',{inputId:'opdr-cuenta',dropId:'opdr-cuenta-drop',tagId:'opdr-cuenta-tag',hidId:'opdr-cuentaId',hidNombreId:'opdr-cuentaNombre',includeContactos:true,
   onSelect:function(id){_oppAutoClienteColliers(id);},
   onPickContacto:function(cto){
@@ -16582,6 +16647,10 @@ function openNewTransaccion(){
   if(fe)fe.value=new Date().toISOString().slice(0,10);
   const est=document.getElementById('txf-estado');
   if(est)est.value='En negociación';
+  _txFillBrokersColliers('');
+  {const c=document.getElementById('txf-colliers');if(c)c.value='';}
+  {const be=document.getElementById('txf-brokerExterno');if(be)be.value='';}
+  txColliersChange();
   const mon=document.getElementById('txf-moneda');
   if(mon)mon.value='USD';
   document.querySelectorAll('.tx-form-inp,.tx-form-sel').forEach(el=>el.classList.remove('tx-err'));
@@ -16606,6 +16675,13 @@ function openEditTx(id){
   _txSetVal('txf-vendedorId',d.vendedorId||'');
   _txSetVal('txf-vendedorTipo',d.vendedorTipo||'');
   _txSetVal('txf-broker',d.broker||'');
+  // Compat: transacciones previas sólo tienen `broker` (texto). Si no hay dato nuevo, el campo
+  // queda en "Seleccionar" y el broker histórico se conserva hasta que se elija una opción.
+  {const esColl=d.transaccionColliers===true?'si':(d.transaccionColliers===false?'no':'');
+   const c=document.getElementById('txf-colliers');if(c)c.value=esColl;
+   _txFillBrokersColliers(d.brokerColliersId||'');
+   _txSetVal('txf-brokerExterno',d.brokerExterno||(esColl==='no'?(d.broker||''):''));
+   txColliersChange();}
   _txTipoChange();
   _txSetVal('txf-superficie',d.superficie||'');
   _txSetVal('txf-pm2',d.precioM2||'');
@@ -16622,6 +16698,25 @@ function openEditTx(id){
 }
 
 function _txSetVal(id,val){const el=document.getElementById(id);if(el)el.value=val;}
+// Transacción Colliers → Broker de Colliers (catálogo existente) | Broker externo (texto libre).
+// Al alternar se limpia el campo de la otra rama para no dejar datos incompatibles.
+window.txColliersChange=function(){
+  const v=(document.getElementById('txf-colliers')||{}).value||'';
+  const rowC=document.getElementById('txf-brokerColliers-row'),rowE=document.getElementById('txf-brokerExterno-row');
+  const selC=document.getElementById('txf-brokerColliers'),inpE=document.getElementById('txf-brokerExterno');
+  if(rowC)rowC.style.display=v==='si'?'':'none';
+  if(rowE)rowE.style.display=v==='no'?'':'none';
+  if(v!=='si'&&selC){selC.value='';selC.classList.remove('tx-err');}
+  if(v!=='no'&&inpE){inpE.value='';inpE.classList.remove('tx-err');}
+};
+// Opciones del broker Colliers: catálogo de Ejecutivos Comerciales ya existente en Nexus.
+function _txFillBrokersColliers(sel){
+  const el=document.getElementById('txf-brokerColliers');if(!el)return;
+  el.innerHTML='<option value="">Seleccionar broker</option>'
+    +CRM_EJECUTIVOS.slice().sort((a,b)=>ejecDisplay(a).localeCompare(ejecDisplay(b),'es',{sensitivity:'base'}))
+      .map(k=>`<option value="${esc(k)}">${esc(ejecDisplay(k))}</option>`).join('');
+  if(sel)el.value=sel;
+}
 
 function closeTxDrawer(){
   const ov=document.getElementById('tx-drawer-overlay');
@@ -16768,7 +16863,11 @@ function saveTxDrawer(){
   const tipo=(document.getElementById('txf-tipo')||{}).value||'';
   const inmueble=(document.getElementById('txf-inmueble')||{}).value||'';
   let valid=true;
-  const req=['txf-tipo'];
+  const req=['txf-tipo','txf-colliers'];
+  // Según "Transacción Colliers" se exige el broker de la rama correspondiente.
+  {const v=(document.getElementById('txf-colliers')||{}).value||'';
+   if(v==='si')req.push('txf-brokerColliers');
+   else if(v==='no')req.push('txf-brokerExterno');}
   req.forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
@@ -16791,7 +16890,15 @@ function saveTxDrawer(){
     compradorId:gv('txf-compradorId'),compradorTipo:gv('txf-compradorTipo'),
     vendedor:(document.getElementById('txf-vendedor')||{}).value||'',
     vendedorId:gv('txf-vendedorId'),vendedorTipo:gv('txf-vendedorTipo'),
-    broker:(document.getElementById('txf-broker')||{}).value||'',
+    ...(()=>{const v=(document.getElementById('txf-colliers')||{}).value||'';
+      const bc=(document.getElementById('txf-brokerColliers')||{}).value||'';
+      const be=((document.getElementById('txf-brokerExterno')||{}).value||'').trim();
+      const o={};
+      if(v)o.transaccionColliers=(v==='si');
+      if(v==='si'){o.brokerColliersId=bc;o.brokerExterno='';o.broker=ejecDisplay(bc)||'';}
+      else if(v==='no'){o.brokerExterno=be;o.brokerColliersId='';o.broker=be;}
+      else o.broker=(document.getElementById('txf-broker')||{}).value||'';
+      return o;})(),
     superficie:parseFloat((document.getElementById('txf-superficie')||{}).value)||null,
     precioM2:parseFloat((document.getElementById('txf-pm2')||{}).value)||null,
     precioTotal:parseFloat((document.getElementById('txf-total')||{}).value)||null,
