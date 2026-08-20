@@ -740,6 +740,41 @@ body.dark .ejec-nm{color:#C3E6FF}
 .opp-assoc td.opp-assoc-estado{min-width:132px}
 .opp-assoc-ejec{min-width:158px}
 .opp-assoc-ejec .ejec-nm{white-space:nowrap}   /* nombres completos, sin cortes por palabra */
+/* Mi Perfil → Actividades: calendario visual (usa cards/tipografía/colores de Nexus) */
+.pcal-bar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.6rem}
+.pcal-bar-l{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+.pcal-bar-r{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.pcal-seg{display:inline-flex;border:1px solid #DDE5F2;border-radius:8px;overflow:hidden;background:#fff}
+body.dark .pcal-seg{background:#0D1733;border-color:rgba(77,147,255,.2)}
+.pcal-seg-btn{font-family:inherit;font-size:12px;font-weight:600;padding:6px 14px;border:0;background:transparent;color:#56648F;cursor:pointer}
+.pcal-seg-btn.active{background:#1C54F4;color:#fff}
+.pcal-periodo{font-size:12.5px;font-weight:700;color:#0A1B4D;margin-bottom:.6rem;text-transform:capitalize}
+body.dark .pcal-periodo{color:#C3E6FF}
+.pcal-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.5rem;align-items:start}
+.pcal-col{background:#fff;border:1px solid #E7EDF7;border-radius:12px;padding:.5rem;min-height:120px}
+body.dark .pcal-col{background:rgba(10,18,60,.5);border-color:rgba(255,255,255,.07)}
+.pcal-col.today{border-color:#1C54F4;box-shadow:0 0 0 1px #1C54F455}
+.pcal-col-hd{font-size:10.5px;font-weight:700;color:#8898C0;text-transform:uppercase;letter-spacing:.05em;padding:.1rem .2rem .45rem}
+.pcal-col.today .pcal-col-hd{color:#1C54F4}
+.pcal-ev{border-left:3px solid #1C54F4;background:#F4F8FF;border-radius:6px;padding:.35rem .45rem;margin-bottom:.35rem;cursor:pointer;font-size:11px;line-height:1.35}
+body.dark .pcal-ev{background:rgba(77,147,255,.1)}
+.pcal-ev:hover{background:#E8F0FF}
+.pcal-ev-h{font-weight:700;color:#0A1B4D}
+body.dark .pcal-ev-h{color:#C3E6FF}
+.pcal-ev-s{color:#8898C0}
+.pcal-day{display:flex;gap:.7rem;padding:.6rem 0;border-bottom:1px solid #F0F4FB}
+.pcal-day-h{font-size:12px;font-weight:800;color:#1C54F4;min-width:52px}
+.pcal-month{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.35rem}
+.pcal-mday{background:#fff;border:1px solid #E7EDF7;border-radius:9px;min-height:64px;padding:.35rem;cursor:pointer}
+body.dark .pcal-mday{background:rgba(10,18,60,.5);border-color:rgba(255,255,255,.07)}
+.pcal-mday.today{border-color:#1C54F4}
+.pcal-mday.sel{box-shadow:0 0 0 2px #1C54F455}
+.pcal-mday.out{opacity:.4}
+.pcal-mday-n{font-size:11.5px;font-weight:700;color:#0A1B4D}
+body.dark .pcal-mday-n{color:#C3E6FF}
+.pcal-dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}
+.pcal-dot{width:6px;height:6px;border-radius:50%;background:#1C54F4}
+@media(max-width:900px){.pcal-week{grid-template-columns:1fr}.pcal-col{min-height:0}}
 /* Lead · sección Resultado / Respuesta 24hs en dos columnas */
 .lead-estres-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
 @media(max-width:640px){.lead-estres-grid{grid-template-columns:1fr}}
@@ -4785,7 +4820,11 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <button class="crm-new-btn" id="perfil-edit-btn" onclick="perfilEditar()">Editar perfil</button>
       </div>
     </div>
-    <div class="crm-list-body">
+    <div class="crm-det-tabs" style="padding:0 1.5rem">
+      <button class="crm-det-tab active" id="perfil-tab-resumen" onclick="perfilTab('resumen')">Resumen</button>
+      <button class="crm-det-tab" id="perfil-tab-actividades" onclick="perfilTab('actividades')">Actividades</button>
+    </div>
+    <div class="crm-list-body" id="perfil-view-resumen">
       <div class="crm-kpi-row" id="perfil-kpis"></div>
       <div class="nx-card" style="margin-bottom:.85rem">
         <div class="nx-card-title">Accesos rápidos</div>
@@ -4826,6 +4865,27 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
           </div>
         </div>
       </div>
+    </div>
+    <!-- Solapa Actividades: calendario visual sobre los registros reales del usuario -->
+    <div class="crm-list-body" id="perfil-view-actividades" style="display:none">
+      <div class="pcal-bar">
+        <div class="pcal-bar-l">
+          <div class="crm-page-title">Mis actividades</div>
+          <div class="pcal-seg" id="pcal-seg">
+            <button class="pcal-seg-btn" data-v="dia" onclick="pcalSetVista('dia')">Hoy</button>
+            <button class="pcal-seg-btn active" data-v="semana" onclick="pcalSetVista('semana')">Semana</button>
+            <button class="pcal-seg-btn" data-v="mes" onclick="pcalSetVista('mes')">Mes</button>
+          </div>
+        </div>
+        <div class="pcal-bar-r">
+          <button class="crm-action-btn" onclick="pcalNav(-1)">‹ Anterior</button>
+          <button class="crm-action-btn" onclick="pcalHoy()">Hoy</button>
+          <button class="crm-action-btn" onclick="pcalNav(1)">Siguiente ›</button>
+          <button class="crm-new-btn" onclick="openQuickActividad()">+ Registrar actividad</button>
+        </div>
+      </div>
+      <div class="pcal-periodo" id="pcal-periodo"></div>
+      <div id="pcal-body"><div class="anc-empty">Cargando…</div></div>
     </div>
   </div>
 </div>
@@ -15796,6 +15856,8 @@ window.loadMiPerfil=async function(){
     _perfilRenderSeguimiento();
     _perfilRenderProximas();
     _perfilRenderMetricas(acts);
+    _pcalEventos=_pcalBuild(acts);
+    if(document.getElementById('perfil-view-actividades')?.style.display!=='none')pcalRender();
   }catch(e){
     console.error('loadMiPerfil',e);
     ['perfil-actividad','perfil-seguimiento','perfil-proximas','perfil-metricas'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=`<div class="anc-empty">Error al cargar: ${esc(e.message)}</div>`;});
@@ -15965,6 +16027,128 @@ function _perfilRenderMetricas(acts){
   const row=(l,v)=>`<div class="nx-row"><div class="nx-row-l">${l}</div><div class="nx-row-v" style="font-weight:700;color:#0A1B4D">${v}</div></div>`;
   el.innerHTML=row('Actividades realizadas',delMes.length)+row('Visitas',visitas)+row('Propuestas enviadas',propuestas)+row('Oportunidades ganadas',ganadas);
 }
+// ── Mi Perfil → Actividades: calendario visual sobre registros REALES (sin colección nueva) ──
+// Fuentes: actividades manuales del usuario, sus visitas, y compromisos futuros ya existentes
+// (vencimiento de Leads y cierre estimado de Oportunidades). No se inventan eventos.
+let _pcalVista='semana',_pcalRef=new Date(),_pcalEventos=[],_pcalSelDia=null;
+function _pcalStartOfDay(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function _pcalLunes(d){const x=_pcalStartOfDay(d);const off=(x.getDay()+6)%7;x.setDate(x.getDate()-off);return x;}
+function _pcalMismoDia(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function _pcalHora(d){return d?d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):'';}
+// Construye los eventos del calendario a partir de los datos ya cargados en Mi Perfil.
+function _pcalBuild(acts){
+  const ev=[];
+  (acts||[]).forEach(a=>{const t=_tsToDate(a.fecha);if(!t)return;
+    ev.push({t,tipo:a.tipo||'Actividad',cat:a.cat==='M'?'M':'C',cuenta:a._cuentaNombre||'',
+      detalle:a.descripcion||'',estado:'registrada',cuentaId:a._cuentaId||'',oppId:a.oportunidadId||''});});
+  _perfilMisVisitas().forEach(v=>{const t=_tsToDate(v.fecha);if(!t)return;
+    ev.push({t,tipo:'Visita',cat:'C',cuenta:v.cuentaNombre||'',contacto:v.contactoNombre||'',
+      inmueble:v.buildingName||'',detalle:v.comentarios||'',estado:'registrada',
+      cuentaId:v.cuentaId||'',oppId:v.oportunidadId||''});});
+  const k=_perfilEjec();
+  (_leadDocs||[]).forEach(d=>{
+    if((d.estadoRegistro||'activo')==='archivado'||_leadConvertido(d))return;
+    if(k&&!_leadEjecs(d).includes(k))return;
+    const v=_leadVenc(d);if(!v)return;
+    ev.push({t:v,tipo:'Vence seguimiento de lead',cat:'C',cuenta:d.cuentaNombre||d.empresa||'',
+      contacto:((d.nombre||'')+' '+(d.apellido||'')).trim(),estado:'pendiente',leadId:d._id});});
+  _perfilMisOpps().filter(_oppEsVigente).forEach(o=>{
+    const y=parseInt(o.fechaCierreAnio)||0,q=parseInt(String(o.fechaCierreQ||'').replace('Q',''))||0;
+    if(!y||!q)return;
+    ev.push({t:new Date(y,q*3,0),tipo:'Cierre estimado de oportunidad',cat:'C',
+      cuenta:o.cuentaNombre||'',detalle:o.nombreProyecto||'',estado:'pendiente',oppId:o._id});});
+  return ev.sort((a,b)=>a.t-b.t);
+}
+function _pcalDelDia(d){return _pcalEventos.filter(e=>_pcalMismoDia(e.t,d));}
+function _pcalEvHTML(e,i){
+  const sub=[e.cuenta,e.contacto,e.inmueble].filter(Boolean).join(' · ');
+  return `<div class="pcal-ev" style="border-left-color:${e.estado==='pendiente'?'#B45309':(e.cat==='M'?'#7C3AED':'#1C54F4')}" onclick="pcalOpen(${i})">
+    <div class="pcal-ev-h">${e.estado==='pendiente'?'⏳ ':''}${esc(_pcalHora(e.t))} · ${esc(e.tipo)}</div>
+    ${sub?`<div class="pcal-ev-s">${esc(sub)}</div>`:''}</div>`;
+}
+window.pcalSetVista=function(v){_pcalVista=v;_pcalSelDia=null;
+  document.querySelectorAll('#pcal-seg .pcal-seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  if(v==='dia')_pcalRef=new Date();
+  pcalRender();};
+window.pcalNav=function(dir){
+  const d=new Date(_pcalRef);
+  if(_pcalVista==='dia')d.setDate(d.getDate()+dir);
+  else if(_pcalVista==='semana')d.setDate(d.getDate()+7*dir);
+  else d.setMonth(d.getMonth()+dir);
+  _pcalRef=d;_pcalSelDia=null;pcalRender();};
+window.pcalHoy=function(){_pcalRef=new Date();_pcalSelDia=null;pcalRender();};
+window.pcalOpen=function(i){
+  const e=_pcalEventos[i];if(!e)return;
+  const partes=[`${_pcalHora(e.t)} · ${e.tipo}`];
+  if(e.cuenta)partes.push('Cuenta: '+e.cuenta);
+  if(e.contacto)partes.push('Contacto: '+e.contacto);
+  if(e.inmueble)partes.push('Inmueble: '+e.inmueble);
+  if(e.detalle)partes.push('\n'+e.detalle);
+  partes.push('\n'+e.t.toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}));
+  // Acceso al registro relacionado usando las vistas existentes.
+  if(e.oppId&&confirm(partes.join('\n')+'\n\n¿Abrir la oportunidad relacionada?')){crmOpenOportunidad(e.oppId);return;}
+  if(e.leadId&&confirm(partes.join('\n')+'\n\n¿Abrir el lead relacionado?')){openLeadDetail(e.leadId);return;}
+  if(e.cuentaId&&confirm(partes.join('\n')+'\n\n¿Abrir la cuenta relacionada?')){crmOpenCuenta(e.cuentaId);return;}
+  if(!e.oppId&&!e.leadId&&!e.cuentaId)alert(partes.join('\n'));
+};
+function pcalRender(){
+  const body=document.getElementById('pcal-body'),per=document.getElementById('pcal-periodo');
+  if(!body)return;
+  const hoy=new Date();
+  if(_pcalVista==='dia'){
+    const d=_pcalRef;
+    if(per)per.textContent=d.toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    const evs=_pcalDelDia(d);
+    body.innerHTML=evs.length
+      ?'<div class="nx-card">'+evs.map(e=>{const i=_pcalEventos.indexOf(e);const sub=[e.cuenta,e.contacto,e.inmueble].filter(Boolean).join(' · ');
+        return `<div class="pcal-day"><div class="pcal-day-h">${esc(_pcalHora(e.t))}</div><div style="flex:1;min-width:0;cursor:pointer" onclick="pcalOpen(${i})"><div style="font-size:12.5px;font-weight:700;color:#0A1B4D">${e.estado==='pendiente'?'⏳ ':''}${esc(e.tipo)}</div>${sub?`<div style="font-size:11.5px;color:#8898C0">${esc(sub)}</div>`:''}</div></div>`;}).join('')+'</div>'
+      :'<div class="anc-empty">No tenés actividades registradas este día.</div>';
+    return;
+  }
+  if(_pcalVista==='semana'){
+    const ini=_pcalLunes(_pcalRef);const fin=new Date(ini);fin.setDate(fin.getDate()+6);
+    if(per)per.textContent=ini.toLocaleDateString('es-AR',{day:'2-digit',month:'short'})+' — '+fin.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});
+    let h='<div class="pcal-week">';
+    for(let i=0;i<7;i++){
+      const d=new Date(ini);d.setDate(ini.getDate()+i);
+      const evs=_pcalDelDia(d);
+      h+=`<div class="pcal-col${_pcalMismoDia(d,hoy)?' today':''}"><div class="pcal-col-hd">${d.toLocaleDateString('es-AR',{weekday:'short'})} ${d.getDate()}</div>`
+        +(evs.length?evs.map(e=>_pcalEvHTML(e,_pcalEventos.indexOf(e))).join(''):'<div style="font-size:11px;color:#C7D2E8;padding:.2rem">—</div>')+'</div>';
+    }
+    body.innerHTML=h+'</div>';
+    return;
+  }
+  // Mes
+  const ref=_pcalRef;
+  if(per)per.textContent=ref.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  const primero=new Date(ref.getFullYear(),ref.getMonth(),1);
+  const ini=_pcalLunes(primero);
+  let h='<div class="pcal-month">'+['lun','mar','mié','jue','vie','sáb','dom'].map(x=>`<div class="pcal-col-hd" style="text-align:center">${x}</div>`).join('');
+  for(let i=0;i<42;i++){
+    const d=new Date(ini);d.setDate(ini.getDate()+i);
+    const evs=_pcalDelDia(d);
+    const cls=[(d.getMonth()!==ref.getMonth()?'out':''),(_pcalMismoDia(d,hoy)?'today':''),(_pcalSelDia&&_pcalMismoDia(d,_pcalSelDia)?'sel':'')].filter(Boolean).join(' ');
+    h+=`<div class="pcal-mday ${cls}" onclick="pcalSelDia('${d.toISOString()}')"><div class="pcal-mday-n">${d.getDate()}</div>`
+      +(evs.length?`<div class="pcal-dots">${evs.slice(0,6).map(e=>`<span class="pcal-dot" style="background:${e.estado==='pendiente'?'#B45309':(e.cat==='M'?'#7C3AED':'#1C54F4')}"></span>`).join('')}</div>`:'')+'</div>';
+  }
+  h+='</div>';
+  if(_pcalSelDia){
+    const evs=_pcalDelDia(_pcalSelDia);
+    h+=`<div class="nx-card" style="margin-top:.8rem"><div class="nx-card-title">${_pcalSelDia.toLocaleDateString('es-AR',{weekday:'long',day:'2-digit',month:'long'})}</div>`
+      +(evs.length?evs.map(e=>_pcalEvHTML(e,_pcalEventos.indexOf(e))).join(''):'<div class="anc-empty">Sin actividades este día.</div>')+'</div>';
+  }
+  body.innerHTML=h;
+}
+window.pcalSelDia=function(iso){_pcalSelDia=new Date(iso);pcalRender();};
+window.perfilTab=function(t){
+  const r=document.getElementById('perfil-view-resumen'),a=document.getElementById('perfil-view-actividades');
+  if(r)r.style.display=t==='resumen'?'':'none';
+  if(a)a.style.display=t==='actividades'?'':'none';
+  const tr=document.getElementById('perfil-tab-resumen'),ta=document.getElementById('perfil-tab-actividades');
+  if(tr)tr.classList.toggle('active',t==='resumen');
+  if(ta)ta.classList.toggle('active',t==='actividades');
+  if(t==='actividades')pcalRender();
+};
 window.perfilEditar=function(){const b=document.getElementById('perfil-edit-btn');if(b&&b.onclick)b.onclick();};
 
 async function loadSolicitudes(){
