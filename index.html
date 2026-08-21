@@ -16342,7 +16342,7 @@ window.openSolicitudBase=function(){
       <div class="cdr-field"><div class="cdr-lbl">Solicitada por</div>
         <div class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">${esc(user?.displayName||user?.email||'—')}</div></div>
     </div></div>
-    <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Relaciones</div><div class="sr-grid2">
+    <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Relaciones</div><div style="font-size:11px;color:#8898C0;margin:-.35rem 0 .6rem">Indicá al menos una Cuenta o un Contacto (no hace falta cargar ambos).</div><div class="sr-grid2">
       <div class="cdr-field" style="position:relative"><div class="cdr-lbl">Cuenta</div>
         <input id="srb-cuenta" class="cdr-input" type="text" placeholder="Buscar cuenta o contacto..." autocomplete="off" oninput="ctaPickerInput('srb',this.value)" onfocus="ctaPickerInput('srb',this.value)" onblur="ctaPickerBlur('srb')">
         <div id="srb-cuenta-drop" class="cdr-ms-drop" style="display:none"></div>
@@ -16414,6 +16414,16 @@ window.srBaseContinuar=function(){
   let ok=true;
   [['srb-tipo',tipo],['srb-prioridad',prio],['srb-bu',bu]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.style.borderColor=v?'':'#ED1B34';if(!v)ok=false;});
   if(!ok){alert('Completá Tipo de actividad, Prioridad y Unidad de negocio.');return;}
+  // Cuenta y Contacto son opcionales por separado, pero debe haber AL MENOS UNO
+  // (un particular puede no tener cuenta asociada todavía).
+  const cid=gv('srb-cuentaId'),ctoId=gv('srb-contactoId');
+  ['srb-cuenta','srb-cto-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor=(cid||ctoId)?'':'#ED1B34';});
+  if(!cid&&!ctoId){
+    const el=document.getElementById('srb-cuenta');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});
+    const msg='Debés indicar una Cuenta o un Contacto.';
+    if(typeof showBldToast==='function')showBldToast('⚠ '+msg,4000); else alert(msg);
+    return;
+  }
   _srBase={
     servicio:tipo,prioridad:prio,unidadNegocio:bu,
     cuentaId:gv('srb-cuentaId'),cuentaNombre:gv('srb-cuentaNombre'),
@@ -16558,7 +16568,7 @@ function _srWizValidateStep(n){
 function _srWizRenderReview(){
   const svc=_srFormService;const el=document.getElementById('sr-wiz-review');if(!svc||!el)return;
   const data=_srReadForm(svc);
-  const pseudo={servicio:svc.key,data,cuentaNombre:data.cuentaNombre,inmuebleId:data.inmuebleId,inmuebleNombre:data.inmuebleNombre,propietarioNombre:data.propietarioNombre};
+  const pseudo={servicio:svc.key,data,cuentaNombre:data.cuentaNombre||(_srBase&&_srBase.cuentaNombre)||'',inmuebleId:data.inmuebleId,inmuebleNombre:data.inmuebleNombre,propietarioNombre:data.propietarioNombre||(_srBase&&_srBase.contactoNombre)||''};
   const jumps=SR_WIZ_STEPS.slice(0,5).map((l,i)=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${i+1})">✏️ ${esc(l)}</button>`).join('');
   el.innerHTML=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Revisión</div><div style="font-size:12.5px;color:#56648F;line-height:1.5">Revisá la información antes de enviar. Podés volver a cualquier paso para corregir.</div><div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem">${jumps}</div></div>${_srRenderData(pseudo)}`;
 }
@@ -16775,7 +16785,7 @@ window.submitSolicitud=async function(){
       ticketNum,ticket,servicio:svc.key,servicioLabel:svc.label,
       cuentaId:data.cuentaId||(_srBase&&_srBase.cuentaId)||'',cuentaNombre:data.cuentaNombre||(_srBase&&_srBase.cuentaNombre)||'',
       inmuebleId:data.inmuebleId||'',inmuebleNombre:data.inmuebleNombre||'',
-      propietarioId:data.propietarioId||'',propietarioNombre:data.propietarioNombre||'',
+      propietarioId:data.propietarioId||(_srBase&&_srBase.contactoId)||'',propietarioNombre:data.propietarioNombre||(_srBase&&_srBase.contactoNombre)||'',
       solicitante,solicitanteEmail:user?.email||'',broker:solicitante,
       responsable:svc.responsable,responsableEmail:svc.responsableEmail||'',
       estado:'Pendiente',alcance:_srAlcance,data,eventos:[evento],

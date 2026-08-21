@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "2.0", "21/08/2026",
+    "Actividades de Marketing & Research", "2.1", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -297,8 +297,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Formulario Base", "Toda solicitud arranca por el Formulario Base. Ahí se cargan los datos comunes a cualquier actividad; después se continúa al formulario específico, que ya no vuelve a pedirlos."),
         ("Tipo de actividad", "Qué ingresar: elegir la actividad de Marketing & Research que se necesita (por ejemplo, Ficha y Publicaciones – Oficinas). Arranca en 'Seleccionar' y define a qué formulario específico se continúa."),
         ("Prioridad", "Qué ingresar: la urgencia de la solicitud: Baja, Media o Alta."),
-        ("Cuenta", "Qué ingresar: buscar la cuenta con el buscador inteligente. Es opcional, pero conviene indicarla para que el equipo tenga contexto."),
-        ("Contacto", "Qué ingresar: buscar la persona de contacto. Si se elige un contacto que ya tiene cuenta, la cuenta se completa sola."),
+        ("Cuenta / Contacto", "Qué ingresar: al menos uno de los dos. Se puede indicar solo la Cuenta, solo el Contacto (útil para particulares que todavía no tienen cuenta) o ambos. Si se elige un contacto que ya tiene cuenta, la cuenta se completa sola. Si no se carga ninguno, el sistema avisa: 'Debés indicar una Cuenta o un Contacto' y no deja continuar. Estos datos se cargan una sola vez: el formulario específico no los vuelve a pedir."),
         ("Oportunidad", "Qué ingresar: si el pedido corresponde a una oportunidad vigente de esa cuenta, elegirla de la lista."),
         ("Unidad de negocio", "Qué ingresar: Oficinas, Industrias, Retail, Terrenos, SPS, Valuaciones, Consultorías o Desinversión. Si el usuario tiene una sola unidad, viene cargada; si tiene varias, aparecen primero las suyas para elegir."),
         ("Comentarios", "Qué ingresar: opcional. Cualquier comentario o información adicional para Marketing & Research."),
