@@ -286,33 +286,38 @@ GUIAS["Guia_Oportunidades"] = Guia(
 )
 
 
-# ─────────────────────────── CENTRO DE SOLICITUDES ───────────────────────────
+# ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Centro de Solicitudes", "1.7", FECHA,
-    "Centraliza las solicitudes internas de todas las áreas de Colliers. Cada servicio tiene su "
-    "propio formulario; el primero disponible es 'Ficha y Publicaciones – Oficinas'. Al enviar se "
-    "genera un Ticket, se puede descargar un PDF corporativo y se notifica al responsable.",
+    "Actividades de Marketing & Research", "2.0", "21/08/2026",
+    "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
+    "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
+    "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
+    "descargar un PDF corporativo y se notifica al responsable.",
     [
-        ("Nueva Solicitud", "El alta se hace en dos pasos: 1) elegir el Servicio (por ahora 'Ficha y Publicaciones'); 2) elegir el Tipo de inmueble (Oficinas, Retail o Industria y Logística). En esta etapa solo está disponible Oficinas; el resto figura como 'Próximamente'. Según la opción elegida se abre el formulario correspondiente."),
-        ("Carga guiada (wizard)", "El formulario de 'Ficha y Publicaciones – Oficinas' se completa en pasos, con la misma experiencia que el alta de Oficinas: 1) Información General, 2) Información Comercial, 3) Características, 4) Marketing, 5) Revisión y 6) Confirmación. Arriba se ve una barra de progreso; se avanza con 'Siguiente' y se puede volver con 'Atrás' sin perder datos. Cada paso valida solo sus campos obligatorios; no deja avanzar si faltan. En Revisión se ve el resumen y se puede volver a cualquier paso para corregir; al 'Finalizar' se genera la solicitud, el PDF, el historial y el aviso al responsable, y aparece la pantalla de confirmación con el número de solicitud."),
-        ("Datos automáticos", "Solicitante, Broker y Fecha se toman solos del usuario logueado; no hay que cargarlos."),
-        ("Cuenta", "Buscar la cuenta con el buscador inteligente. Si no existe, se puede crear en el momento (mismo flujo que en el resto de Nexus)."),
-        ("Propietario", "Obligatorio y siempre asociado a un Contacto de Nexus (no se admite texto libre). Buscar el contacto; si no existe, usar '+ Crear nuevo contacto' (pide datos mínimos) y queda vinculado como propietario. Al enviar, el sistema ofrece completar luego la ficha del contacto."),
-        ("Prioridad", "Definir la urgencia de la solicitud: Baja, Media, Alta o Urgente."),
-        ("Inmueble asociado", "Buscar el inmueble con el buscador inteligente. Si no existe, usar '+ Crear nuevo inmueble' (solo pide Dirección y Tipo). Al enviar la solicitud, el sistema ofrece continuar completando la ficha del inmueble."),
-        ("Tipo de transacción", "Alquiler, Venta o Ambas. Según lo elegido, en Condiciones Comerciales aparecen solo los precios que correspondan (alquiler y/o venta)."),
-        ("Equipamiento y Servicios", "Para cada servicio (aire acondicionado, ascensor, seguridad, etc.) marcar Sí o No, indicando si el edificio cuenta con él."),
-        ("Especificaciones de los equipos", "Campo de texto libre y opcional, debajo de Equipamiento y Servicios. Detallar características técnicas que no se representan con Sí/No (tipo de aire, capacidad del grupo electrógeno, cantidad de ascensores, certificaciones, etc.). Admite varias líneas y se incluye en el PDF."),
-        ("Ejecutivo(s) Comercial(es) a cargo", "El usuario que crea la solicitud queda asignado automáticamente como primer ejecutivo. Se pueden agregar hasta 2 ejecutivos adicionales con el selector predictivo."),
-        ("Superficies", "La Superficie Total debe ser mayor o igual a la Superficie Cubierta (pueden ser iguales). No se permiten valores negativos ni una superficie total en cero. Si no se cumple, el sistema resalta los campos y no deja enviar."),
-        ("Fecha de requerimiento / entrega", "La fecha comprometida que se ingresa en el formulario se muestra luego como 'Fecha de entrega' en el panel lateral de la solicitud."),
-        ("Descripción general", "Describir el edificio y el entorno. Este texto se usa para la publicación y la ficha."),
-        ("Documentación", "Agregar todos los elementos necesarios indicando el tipo: Fotografías, Planos, Brochure, Video, Tour Virtual, Render u Otro. Se pueden sumar varios."),
-        ("Acciones de Marketing", "Selección múltiple: Ficha técnica, Portales, Campaña Email, Redes Sociales, Cartelería, Video, Tour Virtual, Otro."),
-        ("Estado", "Cada ticket tiene un estado: Pendiente, En proceso o Finalizada. Se puede cambiar desde la ficha del ticket."),
+        ("Formulario Base", "Toda solicitud arranca por el Formulario Base. Ahí se cargan los datos comunes a cualquier actividad; después se continúa al formulario específico, que ya no vuelve a pedirlos."),
+        ("Tipo de actividad", "Qué ingresar: elegir la actividad de Marketing & Research que se necesita (por ejemplo, Ficha y Publicaciones – Oficinas). Arranca en 'Seleccionar' y define a qué formulario específico se continúa."),
+        ("Prioridad", "Qué ingresar: la urgencia de la solicitud: Baja, Media o Alta."),
+        ("Cuenta", "Qué ingresar: buscar la cuenta con el buscador inteligente. Es opcional, pero conviene indicarla para que el equipo tenga contexto."),
+        ("Contacto", "Qué ingresar: buscar la persona de contacto. Si se elige un contacto que ya tiene cuenta, la cuenta se completa sola."),
+        ("Oportunidad", "Qué ingresar: si el pedido corresponde a una oportunidad vigente de esa cuenta, elegirla de la lista."),
+        ("Unidad de negocio", "Qué ingresar: Oficinas, Industrias, Retail, Terrenos, SPS, Valuaciones, Consultorías o Desinversión. Si el usuario tiene una sola unidad, viene cargada; si tiene varias, aparecen primero las suyas para elegir."),
+        ("Comentarios", "Qué ingresar: opcional. Cualquier comentario o información adicional para Marketing & Research."),
+        ("Fecha de solicitud", "Se completa sola con la fecha del día. No hay que cargarla."),
+        ("Fecha de vencimiento", "Se calcula sola según el tipo de actividad, contando días hábiles (no cuenta sábados ni domingos). Para Ficha son 3 días hábiles: si se pide un lunes, vence el jueves. Si la actividad todavía no tiene plazo definido, queda sin fecha."),
+        ("Solicitada por", "Se completa sola con el usuario logueado y no se puede modificar."),
+        ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, en pasos: 1) Información General, 2) Información Comercial, 3) Contenido, 4) Características, 5) Comentarios y 6) Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Cada paso valida sus obligatorios. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
+        ("Solo Ficha o Ficha + Publicación", "En el paso 3 se puede enviar la solicitud solo como Ficha, o seguir completando para pedir también la Publicación."),
+        ("Cuenta / Propietario / Inmueble", "El propietario se asocia siempre a un Contacto de Nexus; si no existe se lo puede crear en el momento. Lo mismo con el inmueble ('+ Crear nuevo inmueble', pide Dirección y Tipo)."),
+        ("Tipo de transacción", "Qué ingresar: Alquiler, Venta o Ambas. Según lo elegido aparecen solo los precios que correspondan."),
+        ("Superficies", "La Superficie Total debe ser mayor o igual a la Superficie Cubierta. No se admiten valores negativos ni total en cero."),
+        ("Equipamiento y Servicios", "Para cada servicio (aire acondicionado, ascensor, seguridad, etc.) marcar Sí o No. Debajo, 'Especificaciones de los equipos' permite detallar lo que no se resuelve con Sí/No."),
+        ("Descripción, Documentación y Acciones de Marketing", "Describir el edificio y el entorno, adjuntar los materiales indicando su tipo (fotos, planos, brochure, video, tour virtual, render u otro) y elegir las acciones de marketing necesarias."),
+        ("Estado", "Cada ticket tiene un estado: Pendiente, En proceso o Finalizada. Si pasa la fecha de entrega sin finalizarse, se muestra como Vencida."),
+        ("Registrar actividad no es lo mismo", "El botón 'Registrar actividad' es solo para actividades comerciales (visitas, llamadas, reuniones, propuestas). Los trabajos de Marketing & Research se piden únicamente desde este módulo."),
     ],
     [
         "Se crea el Ticket (por ejemplo, Solicitud #000001) con estado Pendiente.",
+        "La solicitud guarda en un solo registro los datos del Formulario Base y los del formulario específico.",
         "Se puede descargar un PDF corporativo con el formulario completo (botón PDF en la ficha del ticket).",
         "Se notifica automáticamente al responsable del servicio (cuando el correo está configurado).",
         "La solicitud queda en el historial; con 'Mis Solicitudes' cada usuario ve las suyas. El Timeline registra creación, cambios de estado y comentarios.",

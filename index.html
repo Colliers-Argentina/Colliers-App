@@ -2799,7 +2799,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
         <svg class="sb-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <div class="sb-grp-body" id="sbb-ppt">
-        <button class="sb-item" id="sbn-solicitudes" data-mod="solicitudes" onclick="_sbItemClick('solicitudes',null)"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></span><span>Centro de Solicitudes</span></button>
+        <button class="sb-item" id="sbn-solicitudes" data-mod="solicitudes" onclick="_sbItemClick('solicitudes',null)"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg></span><span>Actividades de Marketing &amp; Research</span></button>
         <button class="sb-item" data-mod="generator" onclick="_sbItemClick('generator',null)"><span class="sb-item-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>Generar Informe de Alternativas</span></button>
       </div>
     </div>
@@ -4895,7 +4895,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
   <div id="sr-list-view" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0">
     <div class="crm-topbar">
       <div class="crm-topbar-l">
-        <div class="crm-page-title">Centro de Solicitudes</div>
+        <div class="crm-page-title">Actividades de Marketing &amp; Research</div>
         <div class="crm-page-sub" id="sr-subtitle">Cargando...</div>
       </div>
       <div class="crm-topbar-r">
@@ -4929,7 +4929,7 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
   </div>
   <div id="sr-form-view" style="display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0">
     <div class="crm-det-topbar">
-      <button class="crm-det-back-btn" onclick="srCloseForm()">← Volver al Centro de Solicitudes</button>
+      <button class="crm-det-back-btn" onclick="srCloseForm()">← Volver a Actividades de Marketing &amp; Research</button>
       <div style="flex:1"></div>
       <button class="cdr-save" id="sr-form-save" onclick="submitSolicitud()">Enviar solicitud</button>
     </div>
@@ -8229,8 +8229,8 @@ function _qactEnsure(){
   if(document.getElementById('qact-ov'))return;
   const ov=document.createElement('div');ov.id='qact-ov';ov.className='actm-ov';
   ov.innerHTML=`<div class="actm-modal" onclick="event.stopPropagation()">
-    <div class="actm-title">Registrar actividad</div>
-    <div class="actm-sub">Vinculála con una Cuenta o Contacto y, opcionalmente, una Oportunidad vigente.</div>
+    <div class="actm-title">Registrar actividad comercial</div>
+    <div class="actm-sub">Vinculála con una Cuenta o Contacto y, opcionalmente, una Oportunidad vigente. Para pedir trabajos a Marketing &amp; Research usá <a href="javascript:void(0)" style="color:#1C54F4;font-weight:700" onclick="qactIrAMkt()">Actividades de Marketing &amp; Research</a>.</div>
     <div class="actm-lbl">Tipo de actividad</div>
     <div class="act-msel" id="qact-tipo-wrap"><div class="act-msel-box" id="qact-tipo-box" onclick="actSelToggle('qact')"></div><div class="act-msel-drop" id="qact-tipo-drop" style="display:none"></div></div>
     <div class="actm-lbl">Cuenta o contacto</div>
@@ -8282,6 +8282,7 @@ window.qactSetOpp=function(v){_qact.wantOpp=v;const a=document.getElementById('q
 window.qactSetCom=function(v){_qact.wantCom=v;const a=document.getElementById('qact-com-si'),b=document.getElementById('qact-com-no'),w=document.getElementById('qact-com-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
 window.qactSetFile=function(v){_qact.wantFile=v;const a=document.getElementById('qact-file-si'),b=document.getElementById('qact-file-no'),w=document.getElementById('qact-file-wrap');if(a)a.classList.toggle('on',v);if(b)b.classList.toggle('on',!v);if(w)w.style.display=v?'':'none';};
 function qactResetOpp(){const el=document.getElementById('qact-oppId');if(el)el.value='';const q=document.getElementById('qact-opp-q');if(q)q.value='';const tag=document.getElementById('qact-opp-tag');if(tag)tag.style.display='none';}
+window.qactIrAMkt=function(){qactClose();showModule('solicitudes');openSolicitudBase();};
 window.qactClose=function(){const ov=document.getElementById('qact-ov');if(ov)ov.classList.remove('open');};
 window.qactOppBlur=function(){setTimeout(()=>{const d=document.getElementById('qact-opp-drop');if(d)d.style.display='none';},150);};
 window.qactOppSearch=function(q){
@@ -8302,11 +8303,9 @@ window.qactCrearCuenta=function(){const ov=document.getElementById('qact-ov');if
 window.qactCrearContacto=function(){const ov=document.getElementById('qact-ov');if(ov)ov.classList.remove('open');openContactoDrawer('','',(fullname,newId,data)=>{if(ov)ov.classList.add('open');document.getElementById('qact-targetKind').value='contacto';document.getElementById('qact-contactoId').value=newId;document.getElementById('qact-contactoNombre').value=fullname;document.getElementById('qact-cuentaId').value=(data&&data.cuentaId)||'';document.getElementById('qact-cuentaNombre').value=(data&&data.cuentaNombre)||'';const inp=document.getElementById('qact-cta');if(inp)inp.value=fullname;const tag=document.getElementById('qact-cta-tag');if(tag){tag.innerHTML='✓ Contacto creado';tag.style.display='inline-flex';}qactResetOpp();});};
 window.openQuickActividad=async function(){
   _qactEnsure();
-  const esAdmin=_nexusRole()!=='ejecutivo';
-  // Selección múltiple con separación por categoría (MKT solo para admins).
-  const groups=[{label:'Comerciales',items:OPP_ACTIVIDADES}];
-  if(esAdmin)groups.push({label:'Marketing & Research',items:ACT_MARKETING});
-  actSelInit('qact',groups);
+  // Registrar actividad = SOLO actividades comerciales. Los trabajos de Marketing & Research
+  // se piden desde el módulo "Actividades de Marketing & Research" (formulario base + específico).
+  actSelInit('qact',[{label:'Comerciales',items:OPP_ACTIVIDADES}]);
   ['qact-cta','qact-opp-q','qact-com'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['qact-cuentaId','qact-cuentaNombre','qact-contactoId','qact-contactoNombre','qact-targetKind','qact-oppId'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['qact-cta-tag','qact-opp-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
@@ -8323,8 +8322,8 @@ window.openQuickActividad=async function(){
 window.qactRegister=async function(){
   const tipos=actSelGet('qact');
   if(!tipos.length){alert('Elegí al menos un tipo de actividad.');return;}
-  // Permiso: si hay alguna actividad de Marketing & Research (no está en el catálogo comercial), solo admins.
-  if(_nexusRole()==='ejecutivo'&&tipos.some(t=>!OPP_ACTIVIDADES.includes(t))){alert('Sólo los Administradores pueden registrar actividades de Marketing & Research.');return;}
+  // Este formulario es exclusivamente comercial: cualquier tipo fuera del catálogo se rechaza.
+  if(tipos.some(t=>!OPP_ACTIVIDADES.includes(t))){alert('Registrar actividad es sólo para actividades comerciales. Pedí los trabajos de Marketing & Research desde "Actividades de Marketing & Research".');return;}
   const kind=document.getElementById('qact-targetKind').value;
   const cuentaId=document.getElementById('qact-cuentaId').value,contactoId=document.getElementById('qact-contactoId').value;
   if(!kind||(kind==='cuenta'&&!cuentaId)||(kind==='contacto'&&!contactoId)){alert('Seleccioná una Cuenta o Contacto.');return;}
@@ -15645,7 +15644,7 @@ function _fbkContexto(){
     if(typeof _bldEditId!=='undefined'&&_bldEditId){const b=(_bldDocs||[]).find(x=>x._id===_bldEditId);if(b){relId=b._id;relNombre=b.nombre||b._id;ruta+=' → '+relNombre;}}}
   else if(panelVisible('transacciones-panel')){modulo='Transacciones';ruta='Transacciones';}
   else if(panelVisible('perfil-panel')){modulo='Mi Perfil';ruta='Mi Perfil';}
-  else if(panelVisible('solicitudes-panel')){modulo='Otro';ruta='Centro de Solicitudes';}
+  else if(panelVisible('solicitudes-panel')){modulo='Otro';ruta='Actividades de Marketing & Research';}
   else if(vis('home-hub')){modulo='Otro';ruta='Inicio';}
   return {modulo,ruta,relId,relNombre};
 }
@@ -16284,14 +16283,34 @@ function _srAddHabiles(desde,n){
   return d;
 }
 function _srISO(d){return d.toISOString().slice(0,10);}
-// Unidad de negocio del usuario: se toma de los datos de usuario existentes si están definidos.
-// Hoy Nexus no guarda BU por usuario (BROKERS sólo tiene nombre/email), así que queda vacía
-// para que el usuario la elija; cuando exista el dato, este resolver la autocompleta.
-function _srUsuarioBU(){
+// Unidades de negocio del usuario, a partir de los datos que Nexus ya tiene:
+// 1) el padrón de usuarios (BROKERS), si algún día define unidadesNegocio/unidadNegocio/bu;
+// 2) en su defecto, las unidades de las oportunidades donde el usuario es ejecutivo o creador.
+// Una sola unidad → se preselecciona; varias → el usuario elige entre las suyas.
+function _srUsuarioBUs(){
   const em=(user?.email||'').toLowerCase();
   const b=(typeof BROKERS!=='undefined'?BROKERS:[]).find(x=>(x.email||'').toLowerCase()===em);
-  const bu=b&&(b.unidadNegocio||b.bu);
-  return (bu&&SR_BU_OPCIONES.includes(bu))?bu:'';
+  const decl=b&&(b.unidadesNegocio||b.unidadNegocio||b.bu);
+  let out=(Array.isArray(decl)?decl:(decl?[decl]:[])).filter(x=>SR_BU_OPCIONES.includes(x));
+  if(!out.length){
+    const nom=(user?.displayName||'').toLowerCase(),mio=new Set();
+    (typeof _oppDocs!=='undefined'?_oppDocs:[]||[]).forEach(o=>{
+      const un=o.unidadNegocio;if(!un||!SR_BU_OPCIONES.includes(un))return;
+      const quienes=(typeof _oppEjecs==='function'?_oppEjecs(o):[]).concat([o.brokerCreador||'',o.creadoPor||'']);
+      if(quienes.some(q=>{const s=(q||'').toLowerCase();return s&&(s===em||s===nom);}))mio.add(un);
+    });
+    out=[...mio];
+  }
+  return out;
+}
+function _srUsuarioBU(){const l=_srUsuarioBUs();return l.length===1?l[0]:'';}
+function _srBUOptionsHTML(){
+  const mias=_srUsuarioBUs(),sel=_srUsuarioBU();
+  const opt=b=>`<option${sel===b?' selected':''}>${esc(b)}</option>`;
+  if(mias.length>1)return '<option value="">Seleccionar</option>'
+    +`<optgroup label="Mis unidades">${mias.map(opt).join('')}</optgroup>`
+    +`<optgroup label="Todas">${SR_BU_OPCIONES.filter(b=>!mias.includes(b)).map(opt).join('')}</optgroup>`;
+  return (sel?'':'<option value="">Seleccionar</option>')+SR_BU_OPCIONES.map(opt).join('');
 }
 // Tipos de actividad disponibles: derivados del catálogo existente (extensible sin tocar el base).
 function _srTiposActividad(){
@@ -16313,7 +16332,7 @@ window.openSolicitudBase=function(){
       <div class="cdr-field"><div class="cdr-lbl">Prioridad <span class="cdr-req">*</span></div>
         <select id="srb-prioridad" class="cdr-select"><option value="">Seleccionar</option><option>Baja</option><option>Media</option><option>Alta</option></select></div>
       <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio <span class="cdr-req">*</span></div>
-        <select id="srb-bu" class="cdr-select"><option value="">Seleccionar</option>${SR_BU_OPCIONES.map(b=>`<option${_srUsuarioBU()===b?' selected':''}>${esc(b)}</option>`).join('')}</select></div>
+        <select id="srb-bu" class="cdr-select">${_srBUOptionsHTML()}</select></div>
       <div class="cdr-field"><div class="cdr-lbl">Fecha de solicitud</div>
         <div class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">${hoy.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
         <input id="srb-fecha" type="hidden" value="${_srISO(hoy)}"></div>
@@ -16347,7 +16366,9 @@ window.openSolicitudBase=function(){
       srbRefreshOpps();}});
   loadClientesParaSelector();
   if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s2=>{_ctoDocs=s2.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});}
-  _crmLoadOppsIfNeeded().then(srbRefreshOpps).catch(()=>{});
+  // Las unidades de negocio del usuario pueden inferirse de sus oportunidades: al llegar, se recalculan.
+  _crmLoadOppsIfNeeded().then(function(){srbRefreshOpps();
+    const bs=document.getElementById('srb-bu');if(bs&&!bs.value)bs.innerHTML=_srBUOptionsHTML();}).catch(()=>{});
   document.getElementById('sr-list-view').style.display='none';
   document.getElementById('sr-detail-view').style.display='none';
   document.getElementById('sr-form-view').style.display='none';
@@ -16752,7 +16773,7 @@ window.submitSolicitud=async function(){
     const evento={tipo:'creacion',descripcion:'Solicitud creada',fecha:now,usuario:solicitante};
     const doc={
       ticketNum,ticket,servicio:svc.key,servicioLabel:svc.label,
-      cuentaId:data.cuentaId||'',cuentaNombre:data.cuentaNombre||'',
+      cuentaId:data.cuentaId||(_srBase&&_srBase.cuentaId)||'',cuentaNombre:data.cuentaNombre||(_srBase&&_srBase.cuentaNombre)||'',
       inmuebleId:data.inmuebleId||'',inmuebleNombre:data.inmuebleNombre||'',
       propietarioId:data.propietarioId||'',propietarioNombre:data.propietarioNombre||'',
       solicitante,solicitanteEmail:user?.email||'',broker:solicitante,
@@ -16763,6 +16784,8 @@ window.submitSolicitud=async function(){
         oportunidadId:_srBase.oportunidadId||'',comentariosBase:_srBase.comentarios||'',
         fechaSolicitud:_srBase.fechaSolicitud||'',fechaVencimiento:_srBase.fechaVencimiento||'',
         solicitanteId:_srBase.solicitanteId||'',
+        contactoId:_srBase.contactoId||'',contactoNombre:_srBase.contactoNombre||'',
+        tipoActividad:_srBase.servicio||'',
       }:{}),
       fechaCreacion:now,ultimaActualizacion:now,
     };
@@ -16917,7 +16940,7 @@ function _srBuildHTML(d){
     .pdf-url{font-size:11.5px;color:#1C54F4;word-break:break-all;margin:2px 0 1px}
     .ft{padding:16px 40px;font-size:10px;color:#8898C0;border-top:1px solid #E8EFF8}
   </style></head><body>
-    <div class="hd"><div><div class="brand">COLLIERS</div><div class="sub">Centro de Solicitudes · Nexus</div></div><div class="tk">${esc(d.servicioLabel||'')}<b>${esc(d.ticket)}</b>${esc(d.estado||'')}</div></div>
+    <div class="hd"><div><div class="brand">COLLIERS</div><div class="sub">Actividades de Marketing &amp; Research · Nexus</div></div><div class="tk">${esc(d.servicioLabel||'')}<b>${esc(d.ticket)}</b>${esc(d.estado||'')}</div></div>
     <div class="meta"><span><b>Solicitante:</b> ${esc(d.solicitante||'')}</span><span><b>Cuenta:</b> ${esc(d.cuentaNombre||'–')}</span><span><b>Responsable:</b> ${esc(d.responsable||'')}</span><span><b>Fecha:</b> ${fecha}</span></div>
     <div class="body">${secciones}</div>
     <div class="ft">Documento generado automáticamente por Colliers Nexus · ${esc(d.ticket)}</div>
