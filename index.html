@@ -4911,6 +4911,22 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
     </div>
   </div>
   <!-- FORMULARIO DINÁMICO -->
+  <!-- Formulario BASE de Actividades de Marketing & Research -->
+  <div id="sr-base-view" style="display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0">
+    <div class="crm-topbar">
+      <div class="crm-topbar-l">
+        <div class="crm-page-title">Nueva solicitud · Marketing &amp; Research</div>
+        <div class="crm-page-sub">Completá los datos base y continuá al formulario de la actividad</div>
+      </div>
+      <div class="crm-topbar-r"><button class="mod-back-btn" onclick="srBaseCancelar()">← Volver</button></div>
+    </div>
+    <div class="crm-list-body">
+      <div class="sr-wiz"><div id="sr-base-body"></div>
+        <div class="sr-wiz-footer"><div style="flex:1"></div>
+          <button type="button" class="cdr-save" onclick="srBaseContinuar()">Continuar →</button></div>
+      </div>
+    </div>
+  </div>
   <div id="sr-form-view" style="display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0">
     <div class="crm-det-topbar">
       <button class="crm-det-back-btn" onclick="srCloseForm()">← Volver al Centro de Solicitudes</button>
@@ -16250,8 +16266,150 @@ const SR_CATALOG=[
   {key:'administracion',label:'Administración',icon:'🧾',responsable:'Administración',ready:false,categorias:[]},
   {key:'legales',label:'Legales',icon:'⚖️',responsable:'Legales',ready:false,categorias:[]},
 ];
+// ═══ Formulario BASE de Actividades de Marketing & Research ═══
+// Flujo: Formulario Base → Formulario específico → Solicitud. El base concentra los datos
+// comunes; el formulario específico no vuelve a pedirlos (ver SR_BASE_KEYS).
+const SR_BU_OPCIONES=['Oficinas','Industrias','Retail','Terrenos','SPS','Valuaciones','Consultorías','Desinversión'];
+// SLA por tipo de actividad, en DÍAS HÁBILES. Sólo se define lo que ya está acordado;
+// las actividades sin SLA definido quedan en null (no se inventa un plazo).
+const SR_SLA={'ficha-oficinas':3};
+// Claves que provee el formulario base: el formulario específico las oculta para no repetirlas.
+const SR_BASE_KEYS=['prioridad','cuenta','propietario','comentarios'];
+// Suma días hábiles (excluye sábados y domingos). Nexus no tiene calendario de feriados;
+// si en el futuro se agrega, este es el único punto a extender.
+function _srAddHabiles(desde,n){
+  const d=new Date(desde.getFullYear(),desde.getMonth(),desde.getDate());
+  let quedan=n;
+  while(quedan>0){d.setDate(d.getDate()+1);const w=d.getDay();if(w!==0&&w!==6)quedan--;}
+  return d;
+}
+function _srISO(d){return d.toISOString().slice(0,10);}
+// Unidad de negocio del usuario: se toma de los datos de usuario existentes si están definidos.
+// Hoy Nexus no guarda BU por usuario (BROKERS sólo tiene nombre/email), así que queda vacía
+// para que el usuario la elija; cuando exista el dato, este resolver la autocompleta.
+function _srUsuarioBU(){
+  const em=(user?.email||'').toLowerCase();
+  const b=(typeof BROKERS!=='undefined'?BROKERS:[]).find(x=>(x.email||'').toLowerCase()===em);
+  const bu=b&&(b.unidadNegocio||b.bu);
+  return (bu&&SR_BU_OPCIONES.includes(bu))?bu:'';
+}
+// Tipos de actividad disponibles: derivados del catálogo existente (extensible sin tocar el base).
+function _srTiposActividad(){
+  const out=[];
+  SR_CATALOG.forEach(s=>(s.categorias||[]).forEach(c=>{
+    if(_srService(c.serviceKey))out.push({key:c.serviceKey,label:s.label+' – '+c.label});
+  }));
+  return out;
+}
+let _srBase=null;
+window.openSolicitudBase=function(){
+  closeSrCatalog();
+  const hoy=new Date();
+  const tipos=_srTiposActividad();
+  document.getElementById('sr-base-body').innerHTML=`
+    <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Datos de la Solicitud</div><div class="sr-grid2">
+      <div class="cdr-field"><div class="cdr-lbl">Tipo de actividad <span class="cdr-req">*</span></div>
+        <select id="srb-tipo" class="cdr-select" onchange="srBaseTipoChange()"><option value="">Seleccionar</option>${tipos.map(t=>`<option value="${esc(t.key)}">${esc(t.label)}</option>`).join('')}</select></div>
+      <div class="cdr-field"><div class="cdr-lbl">Prioridad <span class="cdr-req">*</span></div>
+        <select id="srb-prioridad" class="cdr-select"><option value="">Seleccionar</option><option>Baja</option><option>Media</option><option>Alta</option></select></div>
+      <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio <span class="cdr-req">*</span></div>
+        <select id="srb-bu" class="cdr-select"><option value="">Seleccionar</option>${SR_BU_OPCIONES.map(b=>`<option${_srUsuarioBU()===b?' selected':''}>${esc(b)}</option>`).join('')}</select></div>
+      <div class="cdr-field"><div class="cdr-lbl">Fecha de solicitud</div>
+        <div class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">${hoy.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
+        <input id="srb-fecha" type="hidden" value="${_srISO(hoy)}"></div>
+      <div class="cdr-field"><div class="cdr-lbl">Fecha de vencimiento</div>
+        <div id="srb-venc-lbl" class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">Según el tipo de actividad</div>
+        <input id="srb-venc" type="hidden"></div>
+      <div class="cdr-field"><div class="cdr-lbl">Solicitada por</div>
+        <div class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">${esc(user?.displayName||user?.email||'—')}</div></div>
+    </div></div>
+    <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Relaciones</div><div class="sr-grid2">
+      <div class="cdr-field" style="position:relative"><div class="cdr-lbl">Cuenta</div>
+        <input id="srb-cuenta" class="cdr-input" type="text" placeholder="Buscar cuenta o contacto..." autocomplete="off" oninput="ctaPickerInput('srb',this.value)" onfocus="ctaPickerInput('srb',this.value)" onblur="ctaPickerBlur('srb')">
+        <div id="srb-cuenta-drop" class="cdr-ms-drop" style="display:none"></div>
+        <div id="srb-cuenta-tag" style="display:none;align-items:center;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div>
+        <input id="srb-cuentaId" type="hidden"><input id="srb-cuentaNombre" type="hidden"></div>
+      <div class="cdr-field" style="position:relative"><div class="cdr-lbl">Contacto</div>
+        <input id="srb-cto-q" class="cdr-input" type="text" placeholder="Buscar contacto..." autocomplete="off" oninput="srbCtoSearch(this.value)" onfocus="srbCtoSearch(this.value)">
+        <div id="srb-cto-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div>
+        <input id="srb-contactoId" type="hidden"><input id="srb-contactoNombre" type="hidden"></div>
+      <div class="cdr-field sr-col-full"><div class="cdr-lbl">Oportunidad</div>
+        <select id="srb-oportunidad" class="cdr-select"><option value="">Seleccionar</option></select></div>
+    </div></div>
+    <div class="nx-card"><div class="nx-card-title">Comentarios</div>
+      <textarea id="srb-comentarios" class="cdr-input" rows="3" style="resize:vertical;min-height:64px" placeholder="Agregá cualquier comentario o información adicional para Marketing & Research."></textarea></div>`;
+  registerCuentaPicker('srb',{inputId:'srb-cuenta',dropId:'srb-cuenta-drop',tagId:'srb-cuenta-tag',hidId:'srb-cuentaId',hidNombreId:'srb-cuentaNombre',includeContactos:true,
+    onSelect:function(){srbRefreshOpps();},
+    onPickContacto:function(c){const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();
+      document.getElementById('srb-contactoId').value=c._id;document.getElementById('srb-contactoNombre').value=n;
+      document.getElementById('srb-cto-q').value=n;
+      if(c.cuentaId)_ctaPickerSet('srb',c.cuentaId,c.cuentaNombre||'');
+      srbRefreshOpps();}});
+  loadClientesParaSelector();
+  if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){db.collection('contactos').get().then(s2=>{_ctoDocs=s2.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{});}
+  _crmLoadOppsIfNeeded().then(srbRefreshOpps).catch(()=>{});
+  document.getElementById('sr-list-view').style.display='none';
+  document.getElementById('sr-detail-view').style.display='none';
+  document.getElementById('sr-form-view').style.display='none';
+  const bv=document.getElementById('sr-base-view');bv.style.display='flex';bv.style.flexDirection='column';
+};
+window.srbCtoSearch=function(q){
+  const list=document.getElementById('srb-cto-list');if(!list)return;
+  document.getElementById('srb-contactoId').value='';document.getElementById('srb-contactoNombre').value='';
+  const lq=(q||'').trim().toLowerCase();if(!lq){list.style.display='none';return;}
+  const m=(Array.isArray(_ctoDocs)?_ctoDocs:[]).filter(c=>((c.nombre||'')+' '+(c.apellidos||'')+' '+(c.cuentaNombre||'')).toLowerCase().includes(lq)).slice(0,8);
+  list.innerHTML=m.length?m.map(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')).trim();
+    return `<div style="padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#0A1B4D;border-bottom:1px solid #EEF3FF" onmousedown="event.preventDefault();srbPickCto('${c._id}','${n.replace(/'/g,"\\'")}')">${esc(n)}<span style="display:block;font-weight:500;color:#8898C0;font-size:11px">${esc(c.cuentaNombre||'Sin cuenta asociada')}</span></div>`;}).join('')
+    :'<div style="padding:9px 12px;font-size:11px;color:#7B8BBD">Sin resultados</div>';
+  list.style.display='block';
+};
+window.srbPickCto=function(id,nombre){
+  const c=(_ctoDocs||[]).find(x=>x._id===id)||{};
+  document.getElementById('srb-contactoId').value=id;document.getElementById('srb-contactoNombre').value=nombre;
+  document.getElementById('srb-cto-q').value=nombre;document.getElementById('srb-cto-list').style.display='none';
+  const cid=document.getElementById('srb-cuentaId');
+  if(c.cuentaId&&cid&&!cid.value)_ctaPickerSet('srb',c.cuentaId,c.cuentaNombre||'');
+  srbRefreshOpps();
+};
+window.srbRefreshOpps=function(){
+  const sel=document.getElementById('srb-oportunidad');if(!sel)return;
+  const cid=(document.getElementById('srb-cuentaId')||{}).value||'';
+  const opps=cid?_oppsForCuenta(cid).filter(_oppEsVigente):[];
+  sel.innerHTML='<option value="">Seleccionar</option>'+opps.map(o=>`<option value="${esc(o._id)}">${esc(o.nombreProyecto||o.cuentaNombre||o._id)}</option>`).join('');
+};
+// La fecha de vencimiento se recalcula al elegir el tipo de actividad (SLA en días hábiles).
+window.srBaseTipoChange=function(){
+  const k=(document.getElementById('srb-tipo')||{}).value||'';
+  const sla=SR_SLA[k];
+  const lbl=document.getElementById('srb-venc-lbl'),hid=document.getElementById('srb-venc');
+  if(sla==null){if(lbl)lbl.textContent=k?'Sin plazo definido para esta actividad':'Según el tipo de actividad';if(hid)hid.value='';return;}
+  const d=_srAddHabiles(new Date(),sla);
+  if(hid)hid.value=_srISO(d);
+  if(lbl)lbl.textContent=d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+`  (${sla} días hábiles)`;
+};
+window.srBaseContinuar=function(){
+  const gv=id=>(document.getElementById(id)||{}).value||'';
+  const tipo=gv('srb-tipo'),prio=gv('srb-prioridad'),bu=gv('srb-bu');
+  let ok=true;
+  [['srb-tipo',tipo],['srb-prioridad',prio],['srb-bu',bu]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.style.borderColor=v?'':'#ED1B34';if(!v)ok=false;});
+  if(!ok){alert('Completá Tipo de actividad, Prioridad y Unidad de negocio.');return;}
+  _srBase={
+    servicio:tipo,prioridad:prio,unidadNegocio:bu,
+    cuentaId:gv('srb-cuentaId'),cuentaNombre:gv('srb-cuentaNombre'),
+    contactoId:gv('srb-contactoId'),contactoNombre:gv('srb-contactoNombre'),
+    oportunidadId:gv('srb-oportunidad'),
+    comentarios:(gv('srb-comentarios')||'').trim(),
+    fechaSolicitud:gv('srb-fecha'),fechaVencimiento:gv('srb-venc'),
+    solicitanteId:user?.sub||user?.email||'',solicitanteNombre:user?.displayName||user?.email||'',
+  };
+  document.getElementById('sr-base-view').style.display='none';
+  openSolicitudForm(tipo);
+};
 const _srCard=(icon,title,subtitle,onclick,disabled)=>`<div ${disabled?'':`onclick="${onclick}"`} style="display:flex;align-items:center;gap:.9rem;padding:.9rem 1rem;border:1px solid #E8EFF8;border-radius:12px;margin-bottom:.6rem;cursor:${disabled?'default':'pointer'};opacity:${disabled?'.55':'1'};transition:all .15s"${disabled?'':` onmouseover="this.style.borderColor='#1C54F4';this.style.background='#F8FAFF'" onmouseout="this.style.borderColor='#E8EFF8';this.style.background=''"`}><div style="font-size:22px">${icon}</div><div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:#0A1B4D">${esc(title)}</div><div style="font-size:11px;color:#8898C0">${subtitle}</div></div>${disabled?'<span style="font-size:10px;font-weight:700;color:#8898C0;background:#EEF1F8;padding:2px 8px;border-radius:10px">Próximamente</span>':'<span style="font-size:18px;color:#C7D2E8">›</span>'}</div>`;
-window.openSrCatalog=function(){srCatalogStep1();document.getElementById('sr-catalog-overlay').style.display='flex';};
+window.openSrCatalog=function(){openSolicitudBase();};
+window.srBaseCancelar=function(){_srBase=null;document.getElementById('sr-base-view').style.display='none';const lv=document.getElementById('sr-list-view');lv.style.display='flex';lv.style.flexDirection='column';};
+// El catálogo por servicio sigue disponible para abrir un formulario específico directamente.
+window.openSrCatalogServicios=function(){srCatalogStep1();document.getElementById('sr-catalog-overlay').style.display='flex';};
 window.closeSrCatalog=function(){document.getElementById('sr-catalog-overlay').style.display='none';};
 // Paso 1 — Selección del servicio
 function srCatalogStep1(){
@@ -16284,8 +16442,12 @@ function openSolicitudForm(key){
   // Layout de dos columnas (escritorio): todos los campos van a media columna,
   // salvo texto largo / listas / cargas de archivos, que ocupan el ancho completo.
   const SR_FULL_TYPES=['textarea','docs','multi','sino'];
+  // Si viene del formulario base, no se vuelven a pedir los datos ya cargados allí.
+  const omitir=k=>!!_srBase&&SR_BASE_KEYS.includes(k);
   const cardHTML=card=>{
-    const fields=card.fields.map(f=>{let html=_srFieldHTML(f);if(SR_FULL_TYPES.includes(f.type))html=html.replace('class="cdr-field"','class="cdr-field sr-col-full"');return html;}).join('');
+    const visibles=card.fields.filter(f=>!omitir(f.k));
+    if(!visibles.length)return '';
+    const fields=visibles.map(f=>{let html=_srFieldHTML(f);if(SR_FULL_TYPES.includes(f.type))html=html.replace('class="cdr-field"','class="cdr-field sr-col-full"');return html;}).join('');
     return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div><div class="sr-grid2">${fields}</div></div>`;
   };
   // Un contenedor por paso (1-5 con campos, 6 revisión, 7 confirmación). Todos los campos quedan
@@ -16350,6 +16512,7 @@ function _srWizValidateStep(n){
   const data=_srReadForm(svc);
   let ok=true,first=null;const faltan=[];
   svc.form.filter(c=>(c.step||1)===n).forEach(card=>card.fields.forEach(f=>{
+    if(_srBase&&SR_BASE_KEYS.includes(f.k))return;      // ya vino del formulario base
     if(!f.req||!_srFieldVisible(f,data))return;
     const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:!String(data[f.k]||'').trim());
     const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':'srf-'+f.k);
@@ -16358,7 +16521,7 @@ function _srWizValidateStep(n){
   }));
   if(n===2&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
   // Paso 1: Cuenta y Contacto son opcionales por separado, pero debe haber AL MENOS UNO.
-  if(n===1&&!data.cuentaId&&!data.propietarioId){
+  if(n===1&&!_srBase&&!data.cuentaId&&!data.propietarioId){
     ok=false;
     ['srf-cuenta','srf-propietario'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='#ED1B34';});
     if(!first)first=document.getElementById('srf-cuenta');
@@ -16595,6 +16758,12 @@ window.submitSolicitud=async function(){
       solicitante,solicitanteEmail:user?.email||'',broker:solicitante,
       responsable:svc.responsable,responsableEmail:svc.responsableEmail||'',
       estado:'Pendiente',alcance:_srAlcance,data,eventos:[evento],
+      ...(_srBase?{
+        prioridadBase:_srBase.prioridad,unidadNegocio:_srBase.unidadNegocio,
+        oportunidadId:_srBase.oportunidadId||'',comentariosBase:_srBase.comentarios||'',
+        fechaSolicitud:_srBase.fechaSolicitud||'',fechaVencimiento:_srBase.fechaVencimiento||'',
+        solicitanteId:_srBase.solicitanteId||'',
+      }:{}),
       fechaCreacion:now,ultimaActualizacion:now,
     };
     const ref=await db.collection('solicitudes').add(doc);
