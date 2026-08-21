@@ -15539,13 +15539,21 @@ const SR_SERVICES=[
        {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number',req:true},
        {k:'banos',label:'Baños',type:'number',req:true},
-       {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',ph:'Detallá cómo se distribuyen los m² por piso. Ej.: Piso 1: 800 m² / Piso 2: 750 m² / Piso 3: 700 m² / Piso 4: 750 m².'},
+       {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',req:true,ph:'Detallá cómo se distribuyen los m² por piso. Ej.: Piso 1: 800 m² / Piso 2: 750 m² / Piso 3: 700 m² / Piso 4: 750 m².'},
      ]},
      {step:2,title:'Especificaciones de los Equipos',fields:[
-       {k:'especificaciones',label:'Especificaciones de los equipos',type:'textarea',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+       {k:'especificaciones',label:'Especificaciones de los equipos',type:'textarea',req:true,ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
      ]},
-     // Paso 3 — Características (cierra la información necesaria para la Ficha)
-     {step:3,title:'Distribución de la Unidad',fields:[
+     // Paso 3 — Contenido (ex "Marketing")
+     {step:3,title:'Descripción General',fields:[
+       {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
+     ]},
+     {step:3,title:'Documentación y Difusión',fields:[
+       {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
+       {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
+     ]},
+     // Paso 4 — Características
+     {step:4,title:'Distribución de la Unidad',fields:[
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
        {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
@@ -15553,25 +15561,18 @@ const SR_SERVICES=[
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
        {k:'pisoDestacado',label:'¿Qué piso o cuántos m² querés destacar en la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
      ]},
-     {step:3,title:'Características Particulares',fields:[
+     {step:4,title:'Características Particulares',fields:[
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
        {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
-     {step:3,title:'Equipamiento y Servicios',fields:[
+     {step:4,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
-     // Paso 4 — Contenido (ex Marketing)
-     {step:4,title:'Descripción General',fields:[
-       {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
-     ]},
-     {step:4,title:'Documentación',fields:[
-       {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
-     ]},
-     // Paso 5 — Publicación
-     {step:5,title:'Publicación',fields:[
-       {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
+     // Paso 5 — Comentarios (opcional)
+     {step:5,title:'Comentarios',fields:[
+       {k:'comentarios',label:'Comentarios',type:'textarea',ph:'¿Querés agregar algún comentario o información adicional?'},
      ]},
    ]},
 ];
@@ -16258,7 +16259,7 @@ function srCatalogStep2(serviceKey){
 window.startSolicitud=function(serviceKey){if(!_srService(serviceKey))return;closeSrCatalog();openSolicitudForm(serviceKey);};
 // ── Formulario dinámico (schema-driven) ──
 // ── Wizard de carga (paso a paso, mismo patrón que el alta de Oficinas) ──
-const SR_WIZ_STEPS=['Información General','Información Comercial','Características','Contenido','Publicación','Revisión'];
+const SR_WIZ_STEPS=['Información General','Información Comercial','Contenido','Características','Comentarios','Revisión'];
 let _srWizStep=1,_srAlcance='publicacion';
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
@@ -16343,6 +16344,13 @@ function _srWizValidateStep(n){
     if(empty){ok=false;if(!first)first=el;faltan.push((f.label||f.k).replace(/\s*\(.*?\)\s*$/,''));}
   }));
   if(n===2&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
+  // Paso 1: Cuenta y Contacto son opcionales por separado, pero debe haber AL MENOS UNO.
+  if(n===1&&!data.cuentaId&&!data.propietarioId){
+    ok=false;
+    ['srf-cuenta','srf-propietario'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.borderColor='#ED1B34';});
+    if(!first)first=document.getElementById('srf-cuenta');
+    faltan.push('Debés indicar una Cuenta o un Contacto');
+  }
   if(!ok){
     if(first&&first.scrollIntoView)first.scrollIntoView({behavior:'smooth',block:'center'});
     const msg=faltan.length?('Faltan campos obligatorios: '+faltan.join(', ')):'Revisá los campos obligatorios (Superficie total).';
