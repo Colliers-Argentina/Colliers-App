@@ -15507,7 +15507,7 @@ const SR_SERVICES=[
    form:[
      // Paso 1 — Información General
      {step:1,title:'Datos de la Solicitud',fields:[
-       {k:'prioridad',label:'Prioridad',type:'select',opts:['Baja','Media','Alta','Urgente']},
+       {k:'prioridad',label:'Prioridad',type:'select',opts:['Baja','Media','Alta']},
        {k:'fechaRequerimiento',label:'Fecha de entrega (mín. 3 días de plazo)',type:'date'},
      ]},
      {step:1,title:'Inmueble Asociado',fields:[
@@ -15517,9 +15517,11 @@ const SR_SERVICES=[
        {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
        {k:'urlMaps',label:'URL Google Maps',type:'text'},
      ]},
+     // Cuenta y Contacto son independientes: puede haber Cuenta, Contacto, ambos o ninguno
+     // (p. ej. un particular que todavía no tiene Cuenta en Nexus).
      {step:1,title:'Cuenta y Responsables',fields:[
-       {k:'cuenta',label:'Cuenta / Cliente',type:'cuenta',req:true},
-       {k:'propietario',label:'Propietario',type:'contacto',req:true},
+       {k:'cuenta',label:'Cuenta / Cliente (opcional)',type:'cuenta'},
+       {k:'propietario',label:'Contacto (opcional)',type:'contacto'},
        {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
      ]},
      // Paso 2 — Información Comercial
@@ -15537,13 +15539,20 @@ const SR_SERVICES=[
        {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number',req:true},
        {k:'banos',label:'Baños',type:'number',req:true},
+       {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',ph:'Detallá cómo se distribuyen los m² por piso. Ej.: Piso 1: 800 m² / Piso 2: 750 m² / Piso 3: 700 m² / Piso 4: 750 m².'},
+     ]},
+     {step:2,title:'Especificaciones de los Equipos',fields:[
+       {k:'especificaciones',label:'Especificaciones de los equipos',type:'textarea',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+     ]},
+     // Paso 3 — Características (cierra la información necesaria para la Ficha)
+     {step:3,title:'Distribución de la Unidad',fields:[
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
        {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
        {k:'oficinasPorPiso',label:'Oficinas por piso',type:'number'},
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
+       {k:'pisoDestacado',label:'¿Qué piso o cuántos m² querés destacar en la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
      ]},
-     // Paso 3 — Características
      {step:3,title:'Características Particulares',fields:[
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
@@ -15553,15 +15562,15 @@ const SR_SERVICES=[
      {step:3,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
-     {step:3,title:'Especificaciones de los Equipos',fields:[
-       {k:'especificaciones',label:'Especificaciones de los equipos',type:'textarea',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
-     ]},
-     // Paso 4 — Marketing
+     // Paso 4 — Contenido (ex Marketing)
      {step:4,title:'Descripción General',fields:[
        {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
      ]},
-     {step:4,title:'Documentación y Marketing',fields:[
+     {step:4,title:'Documentación',fields:[
        {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
+     ]},
+     // Paso 5 — Publicación
+     {step:5,title:'Publicación',fields:[
        {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
      ]},
    ]},
@@ -16249,11 +16258,11 @@ function srCatalogStep2(serviceKey){
 window.startSolicitud=function(serviceKey){if(!_srService(serviceKey))return;closeSrCatalog();openSolicitudForm(serviceKey);};
 // ── Formulario dinámico (schema-driven) ──
 // ── Wizard de carga (paso a paso, mismo patrón que el alta de Oficinas) ──
-const SR_WIZ_STEPS=['Información General','Información Comercial','Características','Marketing','Revisión'];
-let _srWizStep=1;
+const SR_WIZ_STEPS=['Información General','Información Comercial','Características','Contenido','Publicación','Revisión'];
+let _srWizStep=1,_srAlcance='publicacion';
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
-  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;
+  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;_srAlcance='publicacion';
   document.getElementById('sr-form-title').textContent=svc.label;
   // El bloque "Automático" (Solicitante/Broker/Tipo/Fecha/Responsable) ya no se muestra en la
   // carga: esos datos se siguen generando y guardando automáticamente en submitSolicitud
@@ -16265,19 +16274,20 @@ function openSolicitudForm(key){
     const fields=card.fields.map(f=>{let html=_srFieldHTML(f);if(SR_FULL_TYPES.includes(f.type))html=html.replace('class="cdr-field"','class="cdr-field sr-col-full"');return html;}).join('');
     return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div><div class="sr-grid2">${fields}</div></div>`;
   };
-  // Un contenedor por paso (1-4 con campos, 5 revisión, 6 confirmación). Todos los campos quedan
+  // Un contenedor por paso (1-5 con campos, 6 revisión, 7 confirmación). Todos los campos quedan
   // siempre en el DOM (solo se ocultan) → no se pierde información al navegar y _srReadForm los lee.
   let steps='';
-  for(let n=1;n<=4;n++){
+  for(let n=1;n<=5;n++){
     const cards=svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
     steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${cards}</div>`;
   }
-  steps+=`<div class="sr-wiz-step" data-step="5" id="sr-wiz-review" style="display:none"></div>`;
-  steps+=`<div class="sr-wiz-step" data-step="6" id="sr-wiz-confirm" style="display:none"></div>`;
+  steps+=`<div class="sr-wiz-step" data-step="6" id="sr-wiz-review" style="display:none"></div>`;
+  steps+=`<div class="sr-wiz-step" data-step="7" id="sr-wiz-confirm" style="display:none"></div>`;
   const progress=`<div class="sr-wiz-progress" id="sr-wiz-progress">${SR_WIZ_STEPS.map((l,i)=>`<div class="sr-wiz-node" data-node="${i+1}"><div class="sr-wiz-dot">${i+1}</div><div class="sr-wiz-lbl">${esc(l)}</div></div>${i<SR_WIZ_STEPS.length-1?'<div class="sr-wiz-line"></div>':''}`).join('')}</div>`;
   const footer=`<div class="sr-wiz-footer" id="sr-wiz-footer">
     <button type="button" class="crm-action-btn" id="sr-wiz-back" onclick="srWizPrev()" style="visibility:hidden">← Atrás</button>
     <div style="flex:1"></div>
+    <button type="button" class="crm-action-btn" id="sr-wiz-ficha" onclick="srWizSoloFicha()" style="display:none;background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF">Generar solicitud de ficha</button>
     <button type="button" class="cdr-save" id="sr-wiz-next" onclick="srWizNext()">Siguiente →</button>
   </div>`;
   document.getElementById('sr-form-body').innerHTML=`<div class="sr-wiz">${progress}<div class="sr-wiz-panels">${steps}</div>${footer}</div>`;
@@ -16295,20 +16305,31 @@ function openSolicitudForm(key){
 function srWizGoto(n){
   _srWizStep=n;
   document.querySelectorAll('#sr-form-body .sr-wiz-step').forEach(el=>el.style.display=(+el.dataset.step===n)?'':'none');
-  if(n===5)_srWizRenderReview();
-  // Progreso (5 nodos visibles; el paso 6 es confirmación).
-  document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===6);});
+  if(n===6)_srWizRenderReview();
+  // Progreso (6 nodos visibles; el paso 7 es confirmación).
+  document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===7);});
   const back=document.getElementById('sr-wiz-back'),next=document.getElementById('sr-wiz-next'),foot=document.getElementById('sr-wiz-footer');
-  if(n===6){if(foot)foot.style.display='none';return;}
+  if(n===7){if(foot)foot.style.display='none';return;}
   if(foot)foot.style.display='flex';
   if(back)back.style.visibility=n>1?'visible':'hidden';
-  if(next)next.textContent=n===5?'Finalizar ✓':'Siguiente →';
+  if(next)next.textContent=n===6?'Finalizar ✓':'Siguiente →';
+  // Al cerrar el Paso 3 se completa toda la información de la Ficha: se ofrece terminar ahí
+  // (solicitud de ficha) o continuar con los pasos de Publicación.
+  const fich=document.getElementById('sr-wiz-ficha');
+  if(fich)fich.style.display=(n===3)?'':'none';
   const body=document.querySelector('#sr-form-view [class*="overflow-y"]')||document.getElementById('sr-form-view');if(body&&body.scrollTo)body.scrollTo({top:0,behavior:'smooth'});
 }
 window.srWizPrev=function(){if(_srWizStep>1)srWizGoto(_srWizStep-1);};
 window.srWizNext=function(){
-  if(_srWizStep<=4){if(!_srWizValidateStep(_srWizStep))return;srWizGoto(_srWizStep+1);}
-  else if(_srWizStep===5){submitSolicitud();}
+  if(_srWizStep<=5){if(!_srWizValidateStep(_srWizStep))return;srWizGoto(_srWizStep+1);}
+  else if(_srWizStep===6){submitSolicitud();}
+};
+// Solicitud de SOLO FICHA: valida hasta el paso 3 y va directo a la revisión, sin exigir
+// los pasos de Contenido/Publicación. Marca el alcance en la solicitud (sin campos nuevos por paso).
+window.srWizSoloFicha=function(){
+  for(let n=1;n<=3;n++){if(!_srWizValidateStep(n)){srWizGoto(n);return;}}
+  _srAlcance='ficha';
+  srWizGoto(6);
 };
 function _srWizValidateStep(n){
   const svc=_srFormService;if(!svc)return true;
@@ -16333,7 +16354,7 @@ function _srWizRenderReview(){
   const svc=_srFormService;const el=document.getElementById('sr-wiz-review');if(!svc||!el)return;
   const data=_srReadForm(svc);
   const pseudo={servicio:svc.key,data,cuentaNombre:data.cuentaNombre,inmuebleId:data.inmuebleId,inmuebleNombre:data.inmuebleNombre,propietarioNombre:data.propietarioNombre};
-  const jumps=SR_WIZ_STEPS.slice(0,4).map((l,i)=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${i+1})">✏️ ${esc(l)}</button>`).join('');
+  const jumps=SR_WIZ_STEPS.slice(0,5).map((l,i)=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${i+1})">✏️ ${esc(l)}</button>`).join('');
   el.innerHTML=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Revisión</div><div style="font-size:12.5px;color:#56648F;line-height:1.5">Revisá la información antes de enviar. Podés volver a cualquier paso para corregir.</div><div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem">${jumps}</div></div>${_srRenderData(pseudo)}`;
 }
 function _srFieldHTML(f){
@@ -16552,7 +16573,7 @@ window.submitSolicitud=async function(){
       propietarioId:data.propietarioId||'',propietarioNombre:data.propietarioNombre||'',
       solicitante,solicitanteEmail:user?.email||'',broker:solicitante,
       responsable:svc.responsable,responsableEmail:svc.responsableEmail||'',
-      estado:'Pendiente',data,eventos:[evento],
+      estado:'Pendiente',alcance:_srAlcance,data,eventos:[evento],
       fechaCreacion:now,ultimaActualizacion:now,
     };
     const ref=await db.collection('solicitudes').add(doc);
