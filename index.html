@@ -15501,7 +15501,7 @@ const SR_ESTADOS=['Pendiente','En proceso','Finalizada'];
 // Indicador de prioridad tipo semáforo (círculo sólido + tooltip). Reutilizable en todas las vistas.
 const SR_PRIO_COLOR={'Baja':'#16A34A','Media':'#EAB308','Alta':'#F97316','Urgente':'#DC2626'};
 function srPrioDot(p,size){const c=SR_PRIO_COLOR[p]||'#C7D2E8';const s=size||9;const t=p?('Prioridad: '+p):'Prioridad: sin definir';return `<span title="${esc(t)}" aria-label="${esc(t)}" style="display:inline-block;width:${s}px;height:${s}px;border-radius:50%;background:${c};flex:0 0 auto;vertical-align:middle"></span>`;}
-const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada':'#16A34A'};
+const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada':'#16A34A','Vencida':'#DC2626'};
 const SR_SERVICES=[
   {key:'ficha-oficinas',label:'Ficha y Publicaciones – Oficinas',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
    form:[
@@ -15581,6 +15581,19 @@ let _srDocs=[],_srCurrentId=null,_srMias=false,_srFormService=null,_srDocList=[]
 let _srEjecExtra=[],_srEjecOpts=[],_srNewBldId='',_srNewContactId='';
 
 function srEstadoBadge(e){const c=SR_ESTADO_COLOR[e]||'#8898C0';return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55">${esc(e||'Pendiente')}</span>`;}
+// Vencida: estado DERIVADO (no se guarda) — la solicitud pasó su fecha de entrega sin finalizarse.
+// Misma regla que ya usaba el alerta de Analytics. Al marcarla Finalizada deja de estar vencida.
+function _srVencida(d){
+  if(!d||d.estado==='Finalizada')return false;
+  const f=d.data&&d.data.fechaRequerimiento;if(!f)return false;
+  return new Date(f+'T23:59:59').getTime()<Date.now();
+}
+// Muestra "Vencida" cuando corresponde; debajo sigue existiendo el estado real de gestión.
+function srEstadoDisplay(d){
+  if(!_srVencida(d))return srEstadoBadge(d.estado);
+  const c=SR_ESTADO_COLOR['Vencida'];
+  return `<span class="estado-badge" style="background:${c}1a;color:${c};border:1px solid ${c}55" title="Venció el plazo de entrega (${esc((d.data&&d.data.fechaRequerimiento)||'')}) y la solicitud no está finalizada. Estado de gestión: ${esc(d.estado||'Pendiente')}.">⚠ Vencida</span>`;
+}
 
 // ═══════════════════ FEEDBACK — captura + bandeja administrativa ═══════════════════
 // Usa la colección `feedback` ya existente (donde también viven las encuestas de estrellas del
@@ -16181,7 +16194,7 @@ function filterSolicitudes(){
   let rows=_srDocs.filter(d=>{
     if(_srMias&&(d.solicitanteEmail||'').toLowerCase()!==me)return false;
     if(fSrv&&d.servicio!==fSrv)return false;
-    if(_srWidget&&d.estado!==_srWidget)return false;
+    if(_srWidget&&(_srWidget==='Vencida'?!_srVencida(d):d.estado!==_srWidget))return false;
     if(q&&!([d.ticket,d.cuentaNombre,d.solicitante,d.servicioLabel].some(v=>(v||'').toLowerCase().includes(q))))return false;
     return true;
   });
@@ -16194,8 +16207,8 @@ let _srWidget='';
 function _renderSrWidgets(){
   const el=document.getElementById('sr-widgets');if(!el)return;
   const base=_srMias?_srDocs.filter(d=>(d.solicitanteEmail||'').toLowerCase()===(user?.email||'').toLowerCase()):_srDocs;
-  const W=[['Pendiente','Pendientes'],['En proceso','En proceso'],['Finalizada','Finalizadas']];
-  el.innerHTML=W.map(([est,lbl])=>{const col=SR_ESTADO_COLOR[est];const n=base.filter(d=>d.estado===est).length;return `<div class="crm-kpi" style="cursor:pointer;${_srWidget===est?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="srToggleWidget('${est}')"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${n}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;}).join('');
+  const W=[['Pendiente','Pendientes'],['En proceso','En proceso'],['Finalizada','Finalizadas'],['Vencida','Vencidas']];
+  el.innerHTML=W.map(([est,lbl])=>{const col=SR_ESTADO_COLOR[est];const n=base.filter(d=>est==='Vencida'?_srVencida(d):d.estado===est).length;return `<div class="crm-kpi" style="cursor:pointer;${_srWidget===est?'border-color:'+col+';box-shadow:0 0 0 1px '+col+'55':''}" onclick="srToggleWidget('${est}')"><div class="crm-kpi-icon" style="background:${col}1a;color:${col}">●</div><div class="crm-kpi-data"><div class="crm-kpi-v">${n}</div><div class="crm-kpi-l">${lbl}</div></div></div>`;}).join('');
 }
 window.srToggleWidget=function(e){_srWidget=_srWidget===e?'':e;filterSolicitudes();};
 function renderSolicitudesTable(rows){
@@ -16210,7 +16223,7 @@ function renderSolicitudesTable(rows){
       <td><div class="crm-broker-cell">${esc(d.servicioLabel||d.servicio||'–')}</div></td>
       <td><div class="crm-broker-cell">${esc(d.cuentaNombre||'–')}</div></td>
       <td><div class="crm-broker-cell">${esc(d.solicitante||'–')}</div></td>
-      <td>${srEstadoBadge(d.estado)}</td>
+      <td>${srEstadoDisplay(d)}</td>
       <td><div class="crm-broker-cell">${esc(d.responsable||'–')}</div></td>
       <td class="crm-date">${fmtDate(d.fechaCreacion)}</td>
       <td class="crm-date">${fmtDate(d.ultimaActualizacion)}</td>
@@ -16626,8 +16639,8 @@ window.srOpenDetail=function(id){
   const ejec=Array.isArray(data.ejecutivos)&&data.ejecutivos.length?data.ejecutivos:(data.ejecutivosCreador?[data.ejecutivosCreador]:[]);
   const ejecHTML=ejecVList(ejec);
   document.getElementById('sr-det-left').innerHTML=`
-    <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name" style="display:flex;align-items:center;justify-content:center;gap:.4rem">${srPrioDot(prioridad,11)}${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoBadge(d.estado)}</div></div>
-    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem">${canEdit?`<select class="crm-estado-sel" onchange="srUpdateEstado('${id}',this.value)">${SR_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('')}</select>`:srEstadoBadge(d.estado)}</div></div>
+    <div class="crm-det-av-wrap"><div class="crm-det-av" style="background:#25408F;border-radius:12px">📋</div><div class="crm-det-av-name" style="display:flex;align-items:center;justify-content:center;gap:.4rem">${srPrioDot(prioridad,11)}${esc(d.ticket)}</div><div style="margin-top:.4rem">${srEstadoDisplay(d)}</div></div>
+    <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Estado</div><div style="margin-top:.3rem">${canEdit?`<select class="crm-estado-sel" onchange="srUpdateEstado('${id}',this.value)">${SR_ESTADOS.map(s=>`<option${d.estado===s?' selected':''}>${s}</option>`).join('')}</select>`:srEstadoBadge(d.estado)}${_srVencida(d)?`<div style="margin-top:.35rem">${srEstadoDisplay(d)}</div>`:''}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Prioridad</div><div style="margin-top:.3rem">${prioBadge}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de creación</div><div class="crm-det-meta-val">${fmtDate(d.fechaCreacion)}</div></div>
     <div class="crm-det-meta-item"><div class="crm-det-meta-lbl">Fecha de entrega</div><div class="crm-det-meta-val">${esc(entregaFmt)}</div></div>
