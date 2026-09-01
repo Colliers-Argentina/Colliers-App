@@ -15541,7 +15541,7 @@ const SR_SERVICES=[
      ]},
      {step:1,title:'Ubicación',fields:[
        {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
-       {k:'urlMaps',label:'URL Google Maps',type:'text'},
+       {k:'urlMaps',label:'Ubicación en Google Maps',type:'maps'},
      ]},
      // Cuenta y Contacto son independientes: puede haber Cuenta, Contacto, ambos o ninguno
      // (p. ej. un particular que todavía no tiene Cuenta en Nexus).
@@ -16594,6 +16594,7 @@ function _srFieldHTML(f){
   if(f.type==='cuenta')return w(`<input id="srf-cuenta" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('sr',this.value)" onfocus="ctaPickerInput('sr',this.value)" onblur="ctaPickerBlur('sr')"><div id="srf-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><div id="srf-cuenta-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-cuentaId" type="hidden"><input id="srf-cuentaNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='contacto')return w(`<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)" onblur="srPropBlur()"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-prop-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-prop-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='inmueble')return w(`<input id="srf-inmueble" class="cdr-input" placeholder="Buscar inmueble por nombre o dirección..." autocomplete="off" oninput="srInmSearch(this.value)" onblur="srInmBlur()"><div id="srf-inm-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-inm-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-inm-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-inmuebleId" type="hidden"><input id="srf-inmuebleNombre" type="hidden">`,' style="position:relative"');
+  if(f.type==='maps')return w(`<div id="srf-maps-view" style="font-size:12px;color:#8898C0">Se completa automáticamente al seleccionar el inmueble.</div><input id="${id}" type="hidden">`);
   if(f.type==='sino')return w(`<div id="${id}">${f.opts.map((o,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem .55rem;border:1px solid #E8EFF8;border-radius:8px;margin-bottom:.3rem"><span style="font-size:12.5px;color:#353E59">${esc(o)}</span><span style="display:flex;gap:1rem" data-item="${esc(o)}"><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="Sí"> Sí</label><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="No"> No</label></span></div>`).join('')}</div>`);
   if(f.type==='ejecutivos')return w(`<div id="srf-ejec-chips" class="cdr-ms-chips"></div><input id="srf-ejec-q" class="cdr-input" placeholder="Agregar ejecutivo (hasta 2 adicionales)..." autocomplete="off" oninput="srEjecSearch(this.value)" onblur="srEjecBlur()" style="margin-top:.4rem"><div id="srf-ejec-drop" class="cdr-ms-drop" style="display:none"></div>`,' style="position:relative"');
   if(f.type==='multi')return w(`<div id="${id}" class="cdr-toggle-group" style="flex-wrap:wrap;border-radius:8px">${f.opts.map(o=>`<button type="button" class="cto-pref-chip" data-v="${esc(o)}" onclick="this.classList.toggle('active')">${esc(o)}</button>`).join('')}</div>`);
@@ -16629,6 +16630,7 @@ function _srValidateSuperficies(){
 window.srInmSearch=function(q){
   const list=document.getElementById('srf-inm-list');if(!list)return;
   document.getElementById('srf-inmuebleId').value='';document.getElementById('srf-inmuebleNombre').value='';
+  _srSetMaps(null);
   document.getElementById('srf-inm-tag').style.display='none';_srNewBldId='';
   const create=document.getElementById('srf-inm-create');if(create){create.style.display='none';create.innerHTML='';}
   if((!Array.isArray(_bldDocs)||!_bldDocs.length)&&db){db.collection('buildings').get().then(s=>{_bldDocs=s.docs.map(d=>({...d.data(),_id:d.id}));const cur=document.getElementById('srf-inmueble');if(cur&&(cur.value||'').trim())srInmSearch(cur.value);}).catch(()=>{});}
@@ -16639,6 +16641,23 @@ window.srInmSearch=function(q){
   html+=`<div style="padding:10px 12px;cursor:pointer;font-size:12px;font-weight:700;color:#1C54F4;border-top:1px solid #E8EFF8" onmousedown="event.preventDefault();srInmCreateStart()">+ Crear nuevo inmueble</div>`;
   list.innerHTML=html;list.style.display='block';
 };
+function _mapsUrlFromBld(b){
+  if(!b)return '';
+  const propia=(b.googleMaps||'').trim();
+  if(/^https?:\/\//i.test(propia))return propia;              // el inmueble ya tiene su URL: se reutiliza
+  const a=_geocodeAddr(b);                                     // gMapsAddr → direccion (misma prioridad que el mapa)
+  return a?('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a.addr)):'';
+}
+// Refleja en el formulario la ubicación del inmueble elegido (sin tocar la ficha del inmueble).
+function _srSetMaps(b){
+  const hid=document.getElementById('srf-urlMaps'),view=document.getElementById('srf-maps-view');
+  const url=_mapsUrlFromBld(b);
+  if(hid)hid.value=url;
+  if(!view)return;
+  if(url)view.innerHTML=`<a href="${esc(url)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:700">📍 Ver ubicación en Google Maps</a>`;
+  else if(b)view.innerHTML='<span style="color:#B45309">No se pudo generar automáticamente la ubicación de Google Maps porque el inmueble no tiene una dirección completa.</span>';
+  else view.innerHTML='<span style="color:#8898C0">Se completa automáticamente al seleccionar el inmueble.</span>';
+}
 window.srInmBlur=function(){setTimeout(()=>{const l=document.getElementById('srf-inm-list');if(l)l.style.display='none';},180);};
 window.srInmPick=function(id,nombre){
   document.getElementById('srf-inmuebleId').value=id;document.getElementById('srf-inmuebleNombre').value=nombre;
@@ -16646,6 +16665,7 @@ window.srInmPick=function(id,nombre){
   _srNewBldId='';
   const b=(_bldDocs||[]).find(x=>x._id===id);
   if(b&&b.direccion){const dir=document.getElementById('srf-direccion');if(dir&&!dir.value.trim())dir.value=b.direccion;}
+  _srSetMaps(b);
 };
 window.srInmCreateStart=function(){
   const list=document.getElementById('srf-inm-list');if(list)list.style.display='none';
@@ -16886,6 +16906,7 @@ function _srRenderData(d){
     if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`<div style="font-size:12px"><b>${esc(k)}:</b> ${esc(v[k])}</div>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='docs')return (Array.isArray(v)&&v.length)?v.map(x=>`<div style="font-size:12px"><b>${esc(x.tipo)}:</b> <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(x.url)}</a></div>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='maps')return v?`<a href="${esc(v)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600">📍 Ver ubicación en Google Maps</a>`:'<span style="color:#8898C0">–</span>';
     if(f.type==='textarea')return v?`<div style="white-space:pre-wrap">${esc(v)}</div>`:'<span style="color:#8898C0">–</span>';
     return v?esc(v):'<span style="color:#8898C0">–</span>';};
   return `<div class="nx-grid"><div class="nx-col" style="grid-column:1/-1">${svc.form.map(card=>`<div class="nx-card"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>`<div class="nx-row"><div class="nx-row-l">${esc(f.label||card.title)}</div><div class="nx-row-v">${val(f)}</div></div>`).join('')}</div>`).join('')}</div></div>`;

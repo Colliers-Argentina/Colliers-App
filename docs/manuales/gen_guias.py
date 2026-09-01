@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "2.1", "21/08/2026",
+    "Actividades de Marketing & Research", "2.2", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -307,6 +307,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, en pasos: 1) Información General, 2) Información Comercial, 3) Contenido, 4) Características, 5) Comentarios y 6) Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Cada paso valida sus obligatorios. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
         ("Solo Ficha o Ficha + Publicación", "En el paso 3 se puede enviar la solicitud solo como Ficha, o seguir completando para pedir también la Publicación."),
         ("Cuenta / Propietario / Inmueble", "El propietario se asocia siempre a un Contacto de Nexus; si no existe se lo puede crear en el momento. Lo mismo con el inmueble ('+ Crear nuevo inmueble', pide Dirección y Tipo)."),
+        ("Ubicación en Google Maps", "No hay que cargarla: al seleccionar el inmueble, Nexus arma sola la ubicación y muestra el enlace 'Ver ubicación en Google Maps', que abre el mapa en una pestaña nueva. Si se cambia el inmueble, la ubicación se actualiza. Si el inmueble no tiene una dirección completa, se avisa y no se genera un enlace incorrecto."),
         ("Tipo de transacción", "Qué ingresar: Alquiler, Venta o Ambas. Según lo elegido aparecen solo los precios que correspondan."),
         ("Superficies", "La Superficie Total debe ser mayor o igual a la Superficie Cubierta. No se admiten valores negativos ni total en cero."),
         ("Equipamiento y Servicios", "Para cada servicio (aire acondicionado, ascensor, seguridad, etc.) marcar Sí o No. Debajo, 'Especificaciones de los equipos' permite detallar lo que no se resuelve con Sí/No."),
