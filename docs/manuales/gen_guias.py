@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "2.2", "21/08/2026",
+    "Actividades de Marketing & Research", "3.0", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -304,8 +304,15 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Fecha de solicitud", "Se completa sola con la fecha del día. No hay que cargarla."),
         ("Fecha de vencimiento", "Se calcula sola según el tipo de actividad, contando días hábiles (no cuenta sábados ni domingos). Para Ficha son 3 días hábiles: si se pide un lunes, vence el jueves. Si la actividad todavía no tiene plazo definido, queda sin fecha."),
         ("Solicitada por", "Se completa sola con el usuario logueado y no se puede modificar."),
-        ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, en pasos: 1) Información General, 2) Información Comercial, 3) Contenido, 4) Características, 5) Comentarios y 6) Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Cada paso valida sus obligatorios. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
-        ("Solo Ficha o Ficha + Publicación", "En el paso 3 se puede enviar la solicitud solo como Ficha, o seguir completando para pedir también la Publicación."),
+        ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, agrupado en dos etapas. FICHA: 1) Información General, 2) Información Comercial, 3) Características. PUBLICACIÓN: 4) Contenido, 5) Documentación y Difusión, 6) Comentarios. Al final hay una pantalla de Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Cada paso valida sus obligatorios. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
+        ("Solo Ficha o Ficha + Publicación", "Con los pasos 1 a 3 completos ya alcanza para pedir la Ficha: el botón 'Generar solicitud de ficha' lleva directo a la Revisión. Si además se necesita la Publicación, continuar con los pasos 4, 5 y 6."),
+        ("Inmueble", "Qué ingresar: buscar el inmueble. Es obligatorio: sin inmueble no se puede pedir una Ficha ni una Publicación. Si no existe, aparece un aviso con el botón 'Crear inmueble' para darlo de alta en el momento (pide Dirección y Tipo) y queda vinculado."),
+        ("Precio de alquiler y Precio por m²", "El precio de alquiler es opcional. El precio por m² es obligatorio: sin ese dato no se puede avanzar."),
+        ("Comentarios comerciales", "Qué ingresar: opcional. Cualquier información comercial adicional para el equipo."),
+        ("Superficies", "Superficie total incluye cubierta, descubierta y semicubierta. También se puede cargar la superficie cubierta y la superficie propia. La total debe ser mayor o igual a la cubierta."),
+        ("Baños", "Qué ingresar: la cantidad de inodoros."),
+        ("Características del equipo", "Se completa solo con los amenities del edificio al elegir el inmueble, y se puede editar libremente para corregir o completar la información. Es obligatorio."),
+        ("Especificaciones de la oficina", "Qué ingresar: opcional. Características propias de la unidad: distribución interna, estado, equipamiento específico u observaciones. No mezclar con las características del edificio."),
         ("Cuenta / Propietario / Inmueble", "El propietario se asocia siempre a un Contacto de Nexus; si no existe se lo puede crear en el momento. Lo mismo con el inmueble ('+ Crear nuevo inmueble', pide Dirección y Tipo)."),
         ("Ubicación en Google Maps", "No hay que cargarla: al seleccionar el inmueble, Nexus arma sola la ubicación y muestra el enlace 'Ver ubicación en Google Maps', que abre el mapa en una pestaña nueva. Si se cambia el inmueble, la ubicación se actualiza. Si el inmueble no tiene una dirección completa, se avisa y no se genera un enlace incorrecto."),
         ("Tipo de transacción", "Qué ingresar: Alquiler, Venta o Ambas. Según lo elegido aparecen solo los precios que correspondan."),

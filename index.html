@@ -1790,7 +1790,12 @@ body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 .sr-grid2>.cdr-field{margin-bottom:.85rem;min-width:0}
 .sr-grid2>.sr-col-full{grid-column:1/-1}
 @media(max-width:760px){.sr-grid2{grid-template-columns:1fr}}
-.sr-wiz-progress{display:flex;align-items:flex-start;justify-content:center;margin-bottom:1.4rem;padding:0 .2rem}
+.sr-wiz-progress{display:flex;align-items:flex-start;justify-content:center;margin-bottom:0;padding:0 .2rem}
+.sr-wiz-etapas{display:flex;align-items:flex-start;justify-content:center;flex-wrap:wrap;gap:.9rem;margin-bottom:1.4rem}
+.sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
+.sr-wiz-etapa-hd{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8898C0}
+.cdr-hint{font-size:10.5px;color:#8898C0;margin-top:.25rem;line-height:1.35}
+@media(max-width:720px){.sr-wiz-etapas{gap:.5rem}.sr-wiz-etapa{padding:.4rem .45rem}.sr-wiz-node{min-width:46px}}
 .sr-wiz-node{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px}
 .sr-wiz-dot{width:30px;height:30px;border-radius:50%;background:#EEF1F8;border:1px solid #DBE2F0;color:#8898C0;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .sr-wiz-node.active .sr-wiz-dot{background:#1C54F4;border-color:#1C54F4;color:#fff;box-shadow:0 0 0 4px rgba(28,84,244,.15)}
@@ -15529,15 +15534,15 @@ const SR_PRIO_COLOR={'Baja':'#16A34A','Media':'#EAB308','Alta':'#F97316','Urgent
 function srPrioDot(p,size){const c=SR_PRIO_COLOR[p]||'#C7D2E8';const s=size||9;const t=p?('Prioridad: '+p):'Prioridad: sin definir';return `<span title="${esc(t)}" aria-label="${esc(t)}" style="display:inline-block;width:${s}px;height:${s}px;border-radius:50%;background:${c};flex:0 0 auto;vertical-align:middle"></span>`;}
 const SR_ESTADO_COLOR={'Pendiente':'#B45309','En proceso':'#1C54F4','Finalizada':'#16A34A','Vencida':'#DC2626'};
 const SR_SERVICES=[
-  {key:'ficha-oficinas',label:'Ficha y Publicaciones – Oficinas',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
+  {key:'ficha-oficinas',label:'Ficha y Publicación',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
    form:[
-     // Paso 1 — Información General
+     // ══ FICHA · Paso 1 — Información General ══
      {step:1,title:'Datos de la Solicitud',fields:[
        {k:'prioridad',label:'Prioridad',type:'select',opts:['Baja','Media','Alta']},
        {k:'fechaRequerimiento',label:'Fecha de entrega (mín. 3 días de plazo)',type:'date'},
      ]},
      {step:1,title:'Inmueble Asociado',fields:[
-       {k:'inmueble',label:'Inmueble',type:'inmueble'},
+       {k:'inmueble',label:'Inmueble',type:'inmueble',req:true},
      ]},
      {step:1,title:'Ubicación',fields:[
        {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
@@ -15550,36 +15555,32 @@ const SR_SERVICES=[
        {k:'propietario',label:'Contacto (opcional)',type:'contacto'},
        {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
      ]},
-     // Paso 2 — Información Comercial
+     // ══ FICHA · Paso 2 — Información Comercial ══
      {step:2,title:'Datos Generales',fields:[
        {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
      ]},
      {step:2,title:'Condiciones Comerciales',fields:[
-       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
+       {k:'precioAlquiler',label:'Precio de alquiler (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
        {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
-       {k:'precioVenta',label:'Precio de venta',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
+       {k:'precioVenta',label:'Precio de venta (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
        {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
+       {k:'comentariosComerciales',label:'Comentarios (opcional)',type:'textarea',ph:'Agregá comentarios o información comercial adicional.'},
      ]},
      {step:2,title:'Superficies y Dimensiones',fields:[
-       {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true},
+       {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true,hint:'Esto incluye sup. cubierta, descubierta y semicubierta.'},
        {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
+       {k:'supPropia',label:'Superficie propia (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number',req:true},
-       {k:'banos',label:'Baños',type:'number',req:true},
+       {k:'banos',label:'Baños',type:'number',req:true,hint:'¿Cuántos inodoros?'},
        {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',req:true,ph:'Detallá cómo se distribuyen los m² por piso. Ej.: Piso 1: 800 m² / Piso 2: 750 m² / Piso 3: 700 m² / Piso 4: 750 m².'},
      ]},
-     {step:2,title:'Especificaciones de los Equipos',fields:[
-       {k:'especificaciones',label:'Especificaciones de los equipos',type:'textarea',req:true,ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+     // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
+     {step:2,title:'Equipamiento',fields:[
+       {k:'especificaciones',label:'Características del equipo',type:'textarea',req:true,hint:'Se completa con los amenities del edificio; podés editarlo o completarlo.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+       {k:'especificacionesOficina',label:'Especificaciones de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución interna, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
      ]},
-     // Paso 3 — Contenido (ex "Marketing")
-     {step:3,title:'Descripción General',fields:[
-       {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
-     ]},
-     {step:3,title:'Documentación y Difusión',fields:[
-       {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
-       {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
-     ]},
-     // Paso 4 — Características
-     {step:4,title:'Distribución de la Unidad',fields:[
+     // ══ FICHA · Paso 3 — Características ══
+     {step:3,title:'Distribución de la Unidad',fields:[
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
        {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
@@ -15587,17 +15588,26 @@ const SR_SERVICES=[
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
        {k:'pisoDestacado',label:'¿De qué piso o de cuántos m² querés que sea la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
      ]},
-     {step:4,title:'Características Particulares',fields:[
+     {step:3,title:'Características Particulares',fields:[
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
        {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
-     {step:4,title:'Equipamiento y Servicios',fields:[
+     {step:3,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
-     // Paso 5 — Comentarios (opcional)
-     {step:5,title:'Comentarios',fields:[
+     // ══ PUBLICACIÓN · Paso 4 — Contenido ══
+     {step:4,title:'Descripción General',fields:[
+       {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
+     ]},
+     // ══ PUBLICACIÓN · Paso 5 — Documentación y Difusión ══
+     {step:5,title:'Documentación y Difusión',fields:[
+       {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
+       {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
+     ]},
+     // ══ PUBLICACIÓN · Paso 6 — Comentarios (opcional) ══
+     {step:6,title:'Comentarios',fields:[
        {k:'comentarios',label:'Comentarios',type:'textarea',ph:'¿Querés agregar algún comentario o información adicional?'},
      ]},
    ]},
@@ -16324,10 +16334,16 @@ function _srBUOptionsHTML(){
   return (sel?'':'<option value="">Seleccionar</option>')+SR_BU_OPCIONES.map(opt).join('');
 }
 // Tipos de actividad disponibles: derivados del catálogo existente (extensible sin tocar el base).
+// Etiquetas visibles del dropdown. Ficha y Publicación comparten el mismo formulario
+// (la Publicación son los pasos 4-6); el identificador interno del servicio no cambia.
+const SR_TIPO_LABELS={'ficha-oficinas':['Ficha','Publicación']};
 function _srTiposActividad(){
   const out=[];
   SR_CATALOG.forEach(s=>(s.categorias||[]).forEach(c=>{
-    if(_srService(c.serviceKey))out.push({key:c.serviceKey,label:s.label+' – '+c.label});
+    if(!_srService(c.serviceKey))return;
+    const labels=SR_TIPO_LABELS[c.serviceKey];
+    if(labels){labels.forEach((l,i)=>out.push({key:c.serviceKey,label:l,alcance:i===0?'ficha':'publicacion'}));return;}
+    out.push({key:c.serviceKey,label:s.label});
   }));
   return out;
 }
@@ -16339,7 +16355,7 @@ window.openSolicitudBase=function(){
   document.getElementById('sr-base-body').innerHTML=`
     <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Datos de la Solicitud</div><div class="sr-grid2">
       <div class="cdr-field"><div class="cdr-lbl">Tipo de actividad <span class="cdr-req">*</span></div>
-        <select id="srb-tipo" class="cdr-select" onchange="srBaseTipoChange()"><option value="">Seleccionar</option>${tipos.map(t=>`<option value="${esc(t.key)}">${esc(t.label)}</option>`).join('')}</select></div>
+        <select id="srb-tipo" class="cdr-select" onchange="srBaseTipoChange()"><option value="">Seleccionar</option>${tipos.map(t=>`<option value="${esc(t.key)}::${esc(t.alcance||'')}">${esc(t.label)}</option>`).join('')}</select></div>
       <div class="cdr-field"><div class="cdr-lbl">Prioridad <span class="cdr-req">*</span></div>
         <select id="srb-prioridad" class="cdr-select"><option value="">Seleccionar</option><option>Baja</option><option>Media</option><option>Alta</option></select></div>
       <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio <span class="cdr-req">*</span></div>
@@ -16411,7 +16427,7 @@ window.srbRefreshOpps=function(){
 };
 // La fecha de vencimiento se recalcula al elegir el tipo de actividad (SLA en días hábiles).
 window.srBaseTipoChange=function(){
-  const k=(document.getElementById('srb-tipo')||{}).value||'';
+  const k=((document.getElementById('srb-tipo')||{}).value||'').split('::')[0];
   const sla=SR_SLA[k];
   const lbl=document.getElementById('srb-venc-lbl'),hid=document.getElementById('srb-venc');
   if(sla==null){if(lbl)lbl.textContent=k?'Sin plazo definido para esta actividad':'Según el tipo de actividad';if(hid)hid.value='';return;}
@@ -16421,7 +16437,8 @@ window.srBaseTipoChange=function(){
 };
 window.srBaseContinuar=function(){
   const gv=id=>(document.getElementById(id)||{}).value||'';
-  const tipo=gv('srb-tipo'),prio=gv('srb-prioridad'),bu=gv('srb-bu');
+  const tipoRaw=gv('srb-tipo'),tipo=tipoRaw.split('::')[0],alcance=tipoRaw.split('::')[1]||'publicacion';
+  const prio=gv('srb-prioridad'),bu=gv('srb-bu');
   let ok=true;
   [['srb-tipo',tipo],['srb-prioridad',prio],['srb-bu',bu]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.style.borderColor=v?'':'#ED1B34';if(!v)ok=false;});
   if(!ok){alert('Completá Tipo de actividad, Prioridad y Unidad de negocio.');return;}
@@ -16436,7 +16453,8 @@ window.srBaseContinuar=function(){
     return;
   }
   _srBase={
-    servicio:tipo,prioridad:prio,unidadNegocio:bu,
+    servicio:tipo,tipoLabel:(_srTiposActividad().find(t=>t.key===tipo&&(t.alcance||'')===alcance)||{}).label||'',
+    prioridad:prio,unidadNegocio:bu,
     cuentaId:gv('srb-cuentaId'),cuentaNombre:gv('srb-cuentaNombre'),
     contactoId:gv('srb-contactoId'),contactoNombre:gv('srb-contactoNombre'),
     oportunidadId:gv('srb-oportunidad'),
@@ -16446,6 +16464,7 @@ window.srBaseContinuar=function(){
   };
   document.getElementById('sr-base-view').style.display='none';
   openSolicitudForm(tipo);
+  _srAlcance=alcance;   // la elección del tipo marca la intención; el usuario puede cambiarla en el paso 3
 };
 const _srCard=(icon,title,subtitle,onclick,disabled)=>`<div ${disabled?'':`onclick="${onclick}"`} style="display:flex;align-items:center;gap:.9rem;padding:.9rem 1rem;border:1px solid #E8EFF8;border-radius:12px;margin-bottom:.6rem;cursor:${disabled?'default':'pointer'};opacity:${disabled?'.55':'1'};transition:all .15s"${disabled?'':` onmouseover="this.style.borderColor='#1C54F4';this.style.background='#F8FAFF'" onmouseout="this.style.borderColor='#E8EFF8';this.style.background=''"`}><div style="font-size:22px">${icon}</div><div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:#0A1B4D">${esc(title)}</div><div style="font-size:11px;color:#8898C0">${subtitle}</div></div>${disabled?'<span style="font-size:10px;font-weight:700;color:#8898C0;background:#EEF1F8;padding:2px 8px;border-radius:10px">Próximamente</span>':'<span style="font-size:18px;color:#C7D2E8">›</span>'}</div>`;
 window.openSrCatalog=function(){openSolicitudBase();};
@@ -16472,7 +16491,16 @@ function srCatalogStep2(serviceKey){
 window.startSolicitud=function(serviceKey){if(!_srService(serviceKey))return;closeSrCatalog();openSolicitudForm(serviceKey);};
 // ── Formulario dinámico (schema-driven) ──
 // ── Wizard de carga (paso a paso, mismo patrón que el alta de Oficinas) ──
-const SR_WIZ_STEPS=['Información General','Información Comercial','Contenido','Características','Comentarios','Revisión'];
+const SR_WIZ_STEPS=[
+  {n:1,label:'Información General',etapa:'FICHA'},
+  {n:2,label:'Información Comercial',etapa:'FICHA'},
+  {n:3,label:'Características',etapa:'FICHA'},
+  {n:4,label:'Contenido',etapa:'PUBLICACIÓN'},
+  {n:5,label:'Documentación y Difusión',etapa:'PUBLICACIÓN'},
+  {n:6,label:'Comentarios',etapa:'PUBLICACIÓN'},
+  {n:7,label:'Revisión',etapa:''},
+];
+const SR_WIZ_LAST=6, SR_WIZ_REVIEW=7, SR_WIZ_CONFIRM=8;
 let _srWizStep=1,_srAlcance='publicacion';
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
@@ -16495,13 +16523,18 @@ function openSolicitudForm(key){
   // Un contenedor por paso (1-5 con campos, 6 revisión, 7 confirmación). Todos los campos quedan
   // siempre en el DOM (solo se ocultan) → no se pierde información al navegar y _srReadForm los lee.
   let steps='';
-  for(let n=1;n<=5;n++){
+  for(let n=1;n<=SR_WIZ_LAST;n++){
     const cards=svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
     steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${cards}</div>`;
   }
-  steps+=`<div class="sr-wiz-step" data-step="6" id="sr-wiz-review" style="display:none"></div>`;
-  steps+=`<div class="sr-wiz-step" data-step="7" id="sr-wiz-confirm" style="display:none"></div>`;
-  const progress=`<div class="sr-wiz-progress" id="sr-wiz-progress">${SR_WIZ_STEPS.map((l,i)=>`<div class="sr-wiz-node" data-node="${i+1}"><div class="sr-wiz-dot">${i+1}</div><div class="sr-wiz-lbl">${esc(l)}</div></div>${i<SR_WIZ_STEPS.length-1?'<div class="sr-wiz-line"></div>':''}`).join('')}</div>`;
+  steps+=`<div class="sr-wiz-step" data-step="${SR_WIZ_REVIEW}" id="sr-wiz-review" style="display:none"></div>`;
+  steps+=`<div class="sr-wiz-step" data-step="${SR_WIZ_CONFIRM}" id="sr-wiz-confirm" style="display:none"></div>`;
+  const nodo=st=>`<div class="sr-wiz-node" data-node="${st.n}"><div class="sr-wiz-dot">${st.n}</div><div class="sr-wiz-lbl">${esc(st.label)}</div></div>`;
+  const etapa=(nombre,pasos)=>`<div class="sr-wiz-etapa"><div class="sr-wiz-etapa-hd">${esc(nombre)}</div><div class="sr-wiz-progress">${pasos.map((st,i)=>nodo(st)+(i<pasos.length-1?'<div class="sr-wiz-line"></div>':'')).join('')}</div></div>`;
+  const progress=`<div id="sr-wiz-progress" class="sr-wiz-etapas">`
+    +etapa('Ficha',SR_WIZ_STEPS.filter(x=>x.etapa==='FICHA'))
+    +etapa('Publicación',SR_WIZ_STEPS.filter(x=>x.etapa==='PUBLICACIÓN'))
+    +`<div class="sr-wiz-etapa"><div class="sr-wiz-etapa-hd">&nbsp;</div><div class="sr-wiz-progress">${nodo(SR_WIZ_STEPS[6])}</div></div></div>`;
   const footer=`<div class="sr-wiz-footer" id="sr-wiz-footer">
     <button type="button" class="crm-action-btn" id="sr-wiz-back" onclick="srWizPrev()" style="visibility:hidden">← Atrás</button>
     <div style="flex:1"></div>
@@ -16523,14 +16556,14 @@ function openSolicitudForm(key){
 function srWizGoto(n){
   _srWizStep=n;
   document.querySelectorAll('#sr-form-body .sr-wiz-step').forEach(el=>el.style.display=(+el.dataset.step===n)?'':'none');
-  if(n===6)_srWizRenderReview();
+  if(n===SR_WIZ_REVIEW)_srWizRenderReview();
   // Progreso (6 nodos visibles; el paso 7 es confirmación).
-  document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===7);});
+  document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===SR_WIZ_CONFIRM);});
   const back=document.getElementById('sr-wiz-back'),next=document.getElementById('sr-wiz-next'),foot=document.getElementById('sr-wiz-footer');
-  if(n===7){if(foot)foot.style.display='none';return;}
+  if(n===SR_WIZ_CONFIRM){if(foot)foot.style.display='none';return;}
   if(foot)foot.style.display='flex';
   if(back)back.style.visibility=n>1?'visible':'hidden';
-  if(next)next.textContent=n===6?'Finalizar ✓':'Siguiente →';
+  if(next)next.textContent=n===SR_WIZ_REVIEW?'Finalizar ✓':'Siguiente →';
   // Al cerrar el Paso 3 se completa toda la información de la Ficha: se ofrece terminar ahí
   // (solicitud de ficha) o continuar con los pasos de Publicación.
   const fich=document.getElementById('sr-wiz-ficha');
@@ -16539,15 +16572,19 @@ function srWizGoto(n){
 }
 window.srWizPrev=function(){if(_srWizStep>1)srWizGoto(_srWizStep-1);};
 window.srWizNext=function(){
-  if(_srWizStep<=5){if(!_srWizValidateStep(_srWizStep))return;srWizGoto(_srWizStep+1);}
-  else if(_srWizStep===6){submitSolicitud();}
+  if(_srWizStep<=SR_WIZ_LAST){
+    if(!_srWizValidateStep(_srWizStep))return;
+    if(_srWizStep===3)_srAlcance='publicacion';   // pasar del paso 3 = seguir con la Publicación
+    srWizGoto(_srWizStep+1);
+  }
+  else if(_srWizStep===SR_WIZ_REVIEW){submitSolicitud();}
 };
 // Solicitud de SOLO FICHA: valida hasta el paso 3 y va directo a la revisión, sin exigir
 // los pasos de Contenido/Publicación. Marca el alcance en la solicitud (sin campos nuevos por paso).
 window.srWizSoloFicha=function(){
   for(let n=1;n<=3;n++){if(!_srWizValidateStep(n)){srWizGoto(n);return;}}
   _srAlcance='ficha';
-  srWizGoto(6);
+  srWizGoto(SR_WIZ_REVIEW);
 };
 function _srWizValidateStep(n){
   const svc=_srFormService;if(!svc)return true;
@@ -16556,12 +16593,19 @@ function _srWizValidateStep(n){
   svc.form.filter(c=>(c.step||1)===n).forEach(card=>card.fields.forEach(f=>{
     if(_srBase&&SR_BASE_KEYS.includes(f.k))return;      // ya vino del formulario base
     if(!f.req||!_srFieldVisible(f,data))return;
-    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:!String(data[f.k]||'').trim());
-    const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':'srf-'+f.k);
+    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:(f.type==='inmueble'?!data.inmuebleId:!String(data[f.k]||'').trim()));
+    const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':(f.type==='inmueble'?'srf-inmueble':'srf-'+f.k));
     const el=document.getElementById(elId);if(el)el.style.borderColor=empty?'#ED1B34':'';
     if(empty){ok=false;if(!first)first=el;faltan.push((f.label||f.k).replace(/\s*\(.*?\)\s*$/,''));}
   }));
   if(n===2&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
+  // Paso 1: sin inmueble no se puede generar una Ficha/Publicación → cartel con acción para crearlo.
+  if(n===1&&!data.inmuebleId){
+    ok=false;
+    const el=document.getElementById('srf-inmueble');if(el){el.style.borderColor='#ED1B34';if(!first)first=el;}
+    srInmFaltaModal();
+    return false;
+  }
   // Paso 1: Cuenta y Contacto son opcionales por separado, pero debe haber AL MENOS UNO.
   if(n===1&&!_srBase&&!data.cuentaId&&!data.propietarioId){
     ok=false;
@@ -16580,13 +16624,14 @@ function _srWizRenderReview(){
   const svc=_srFormService;const el=document.getElementById('sr-wiz-review');if(!svc||!el)return;
   const data=_srReadForm(svc);
   const pseudo={servicio:svc.key,data,cuentaNombre:data.cuentaNombre||(_srBase&&_srBase.cuentaNombre)||'',inmuebleId:data.inmuebleId,inmuebleNombre:data.inmuebleNombre,propietarioNombre:data.propietarioNombre||(_srBase&&_srBase.contactoNombre)||''};
-  const jumps=SR_WIZ_STEPS.slice(0,5).map((l,i)=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${i+1})">✏️ ${esc(l)}</button>`).join('');
+  const jumps=SR_WIZ_STEPS.slice(0,SR_WIZ_LAST).map(st=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${st.n})">✏️ ${esc(st.label)}</button>`).join('');
   el.innerHTML=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Revisión</div><div style="font-size:12.5px;color:#56648F;line-height:1.5">Revisá la información antes de enviar. Podés volver a cualquier paso para corregir.</div><div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem">${jumps}</div></div>${_srRenderData(pseudo)}`;
 }
 function _srFieldHTML(f){
   const id='srf-'+f.k;const req=f.req?' <span class="cdr-req">*</span>':'';
   const lbl=f.label?`<div class="cdr-lbl">${esc(f.label)}${req}</div>`:'';
-  const w=(inner,extra)=>`<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}${extra||''}>${lbl}${inner}</div>`;
+  const hint=f.hint?`<div class="cdr-hint">${esc(f.hint)}</div>`:'';
+  const w=(inner,extra)=>`<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}${extra||''}>${lbl}${inner}${hint}</div>`;
   if(f.type==='text'||f.type==='number')return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}">`);
   if(f.type==='textarea')return w(`<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"${f.ph?` placeholder="${esc(f.ph)}"`:''}></textarea>`);
   if(f.type==='date')return w(`<input id="${id}" class="cdr-input" type="date">`);
@@ -16666,7 +16711,36 @@ window.srInmPick=function(id,nombre){
   const b=(_bldDocs||[]).find(x=>x._id===id);
   if(b&&b.direccion){const dir=document.getElementById('srf-direccion');if(dir&&!dir.value.trim())dir.value=b.direccion;}
   _srSetMaps(b);
+  _srSetEquipoDesdeAmenities(b);
 };
+// Precarga "Características del equipo" con los amenities del edificio. Queda editable:
+// solo se sobrescribe lo que vino de otro edificio, nunca lo que escribió el broker.
+let _srEquipoAuto='';
+function _srSetEquipoDesdeAmenities(b){
+  const el=document.getElementById('srf-especificaciones');if(!el)return;
+  const am=((b&&b.amenities)||'').trim();
+  const actual=(el.value||'').trim();
+  if(actual&&actual!==_srEquipoAuto)return;      // el broker lo editó: no se pisa
+  el.value=am;_srEquipoAuto=am;
+}
+window.srInmFaltaModal=function(){
+  let ov=document.getElementById('sr-inm-falta-ov');
+  if(!ov){
+    ov=document.createElement('div');ov.id='sr-inm-falta-ov';ov.className='actm-ov';
+    ov.innerHTML=`<div class="actm-modal" onclick="event.stopPropagation()">
+      <div class="actm-title">Falta el inmueble</div>
+      <div class="actm-sub">Para crear una solicitud de Ficha o Publicación primero debés crear el inmueble.</div>
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem">
+        <button type="button" class="crm-action-btn" onclick="srInmFaltaClose()">Cancelar</button>
+        <button type="button" class="cdr-save" onclick="srInmFaltaCrear()">Crear inmueble</button>
+      </div></div>`;
+    ov.onclick=function(){srInmFaltaClose();};
+    document.body.appendChild(ov);
+  }
+  ov.classList.add('open');
+};
+window.srInmFaltaClose=function(){const ov=document.getElementById('sr-inm-falta-ov');if(ov)ov.classList.remove('open');};
+window.srInmFaltaCrear=function(){srInmFaltaClose();srInmCreateStart();};
 window.srInmCreateStart=function(){
   const list=document.getElementById('srf-inm-list');if(list)list.style.display='none';
   const box=document.getElementById('srf-inm-create');if(!box)return;
@@ -16795,9 +16869,11 @@ window.submitSolicitud=async function(){
   let ok=true,first=null;
   svc.form.forEach(card=>card.fields.forEach(f=>{
     if(!f.req)return;
+    if(_srAlcance==='ficha'&&(card.step||1)>3)return;   // la solicitud de Ficha no exige los pasos de Publicación
+    if(_srBase&&SR_BASE_KEYS.includes(f.k))return;
     if(!_srFieldVisible(f,data))return;
-    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:!String(data[f.k]||'').trim());
-    const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':'srf-'+f.k);
+    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:(f.type==='inmueble'?!data.inmuebleId:!String(data[f.k]||'').trim()));
+    const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':(f.type==='inmueble'?'srf-inmueble':'srf-'+f.k));
     const el=document.getElementById(elId);
     if(el)el.style.borderColor=empty?'#ED1B34':'';
     if(empty){ok=false;if(!first)first=el;}
@@ -16826,7 +16902,7 @@ window.submitSolicitud=async function(){
         fechaSolicitud:_srBase.fechaSolicitud||'',fechaVencimiento:_srBase.fechaVencimiento||'',
         solicitanteId:_srBase.solicitanteId||'',
         contactoId:_srBase.contactoId||'',contactoNombre:_srBase.contactoNombre||'',
-        tipoActividad:_srBase.servicio||'',
+        tipoActividad:_srBase.servicio||'',tipoActividadLabel:_srBase.tipoLabel||'',
       }:{}),
       fechaCreacion:now,ultimaActualizacion:now,
     };
