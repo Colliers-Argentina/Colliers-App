@@ -1795,6 +1795,9 @@ body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 .sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
 .sr-wiz-etapa-hd{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8898C0}
 .cdr-hint{font-size:10.5px;color:#8898C0;margin-top:.25rem;line-height:1.35}
+.sr-etapa-banner{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;padding:.55rem .9rem;margin-bottom:.9rem;border-left:3px solid #1C54F4;background:#F4F7FF;border-radius:0 10px 10px 0}
+.sr-etapa-banner-t{font-size:12px;font-weight:800;letter-spacing:.08em;color:#0A1B4D}
+.sr-etapa-banner-s{font-size:11px;color:#56648F}
 @media(max-width:720px){.sr-wiz-etapas{gap:.5rem}.sr-wiz-etapa{padding:.4rem .45rem}.sr-wiz-node{min-width:46px}}
 .sr-wiz-node{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px}
 .sr-wiz-dot{width:30px;height:30px;border-radius:50%;background:#EEF1F8;border:1px solid #DBE2F0;color:#8898C0;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:all .2s}
@@ -16334,16 +16337,13 @@ function _srBUOptionsHTML(){
   return (sel?'':'<option value="">Seleccionar</option>')+SR_BU_OPCIONES.map(opt).join('');
 }
 // Tipos de actividad disponibles: derivados del catálogo existente (extensible sin tocar el base).
-// Etiquetas visibles del dropdown. Ficha y Publicación comparten el mismo formulario
-// (la Publicación son los pasos 4-6); el identificador interno del servicio no cambia.
-const SR_TIPO_LABELS={'ficha-oficinas':['Ficha','Publicación']};
+// Una entrada por actividad del catálogo. "Ficha y Publicación" es UNA actividad:
+// la separación Ficha / Publicación es visual dentro del formulario, no del catálogo.
 function _srTiposActividad(){
   const out=[];
   SR_CATALOG.forEach(s=>(s.categorias||[]).forEach(c=>{
     if(!_srService(c.serviceKey))return;
-    const labels=SR_TIPO_LABELS[c.serviceKey];
-    if(labels){labels.forEach((l,i)=>out.push({key:c.serviceKey,label:l,alcance:i===0?'ficha':'publicacion'}));return;}
-    out.push({key:c.serviceKey,label:s.label});
+    out.push({key:c.serviceKey,label:_srService(c.serviceKey).label});
   }));
   return out;
 }
@@ -16355,7 +16355,7 @@ window.openSolicitudBase=function(){
   document.getElementById('sr-base-body').innerHTML=`
     <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Datos de la Solicitud</div><div class="sr-grid2">
       <div class="cdr-field"><div class="cdr-lbl">Tipo de actividad <span class="cdr-req">*</span></div>
-        <select id="srb-tipo" class="cdr-select" onchange="srBaseTipoChange()"><option value="">Seleccionar</option>${tipos.map(t=>`<option value="${esc(t.key)}::${esc(t.alcance||'')}">${esc(t.label)}</option>`).join('')}</select></div>
+        <select id="srb-tipo" class="cdr-select" onchange="srBaseTipoChange()"><option value="">Seleccionar</option>${tipos.map(t=>`<option value="${esc(t.key)}">${esc(t.label)}</option>`).join('')}</select></div>
       <div class="cdr-field"><div class="cdr-lbl">Prioridad <span class="cdr-req">*</span></div>
         <select id="srb-prioridad" class="cdr-select"><option value="">Seleccionar</option><option>Baja</option><option>Media</option><option>Alta</option></select></div>
       <div class="cdr-field"><div class="cdr-lbl">Unidad de negocio <span class="cdr-req">*</span></div>
@@ -16427,7 +16427,7 @@ window.srbRefreshOpps=function(){
 };
 // La fecha de vencimiento se recalcula al elegir el tipo de actividad (SLA en días hábiles).
 window.srBaseTipoChange=function(){
-  const k=((document.getElementById('srb-tipo')||{}).value||'').split('::')[0];
+  const k=(document.getElementById('srb-tipo')||{}).value||'';
   const sla=SR_SLA[k];
   const lbl=document.getElementById('srb-venc-lbl'),hid=document.getElementById('srb-venc');
   if(sla==null){if(lbl)lbl.textContent=k?'Sin plazo definido para esta actividad':'Según el tipo de actividad';if(hid)hid.value='';return;}
@@ -16437,8 +16437,7 @@ window.srBaseTipoChange=function(){
 };
 window.srBaseContinuar=function(){
   const gv=id=>(document.getElementById(id)||{}).value||'';
-  const tipoRaw=gv('srb-tipo'),tipo=tipoRaw.split('::')[0],alcance=tipoRaw.split('::')[1]||'publicacion';
-  const prio=gv('srb-prioridad'),bu=gv('srb-bu');
+  const tipo=gv('srb-tipo'),prio=gv('srb-prioridad'),bu=gv('srb-bu');
   let ok=true;
   [['srb-tipo',tipo],['srb-prioridad',prio],['srb-bu',bu]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.style.borderColor=v?'':'#ED1B34';if(!v)ok=false;});
   if(!ok){alert('Completá Tipo de actividad, Prioridad y Unidad de negocio.');return;}
@@ -16453,7 +16452,7 @@ window.srBaseContinuar=function(){
     return;
   }
   _srBase={
-    servicio:tipo,tipoLabel:(_srTiposActividad().find(t=>t.key===tipo&&(t.alcance||'')===alcance)||{}).label||'',
+    servicio:tipo,tipoLabel:(_srTiposActividad().find(t=>t.key===tipo)||{}).label||'',
     prioridad:prio,unidadNegocio:bu,
     cuentaId:gv('srb-cuentaId'),cuentaNombre:gv('srb-cuentaNombre'),
     contactoId:gv('srb-contactoId'),contactoNombre:gv('srb-contactoNombre'),
@@ -16464,7 +16463,6 @@ window.srBaseContinuar=function(){
   };
   document.getElementById('sr-base-view').style.display='none';
   openSolicitudForm(tipo);
-  _srAlcance=alcance;   // la elección del tipo marca la intención; el usuario puede cambiarla en el paso 3
 };
 const _srCard=(icon,title,subtitle,onclick,disabled)=>`<div ${disabled?'':`onclick="${onclick}"`} style="display:flex;align-items:center;gap:.9rem;padding:.9rem 1rem;border:1px solid #E8EFF8;border-radius:12px;margin-bottom:.6rem;cursor:${disabled?'default':'pointer'};opacity:${disabled?'.55':'1'};transition:all .15s"${disabled?'':` onmouseover="this.style.borderColor='#1C54F4';this.style.background='#F8FAFF'" onmouseout="this.style.borderColor='#E8EFF8';this.style.background=''"`}><div style="font-size:22px">${icon}</div><div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:#0A1B4D">${esc(title)}</div><div style="font-size:11px;color:#8898C0">${subtitle}</div></div>${disabled?'<span style="font-size:10px;font-weight:700;color:#8898C0;background:#EEF1F8;padding:2px 8px;border-radius:10px">Próximamente</span>':'<span style="font-size:18px;color:#C7D2E8">›</span>'}</div>`;
 window.openSrCatalog=function(){openSolicitudBase();};
@@ -16523,9 +16521,19 @@ function openSolicitudForm(key){
   // Un contenedor por paso (1-5 con campos, 6 revisión, 7 confirmación). Todos los campos quedan
   // siempre en el DOM (solo se ocultan) → no se pierde información al navegar y _srReadForm los lee.
   let steps='';
+  // Marcador visual de etapa dentro del formulario: hasta dónde completar según lo que se pida.
+  const etapaHd=n=>{
+    const st=SR_WIZ_STEPS.find(x=>x.n===n);
+    if(!st||!st.etapa)return '';
+    const primero=SR_WIZ_STEPS.filter(x=>x.etapa===st.etapa)[0].n===n;
+    if(!primero)return '';
+    const sub=st.etapa==='FICHA'?'Pasos 1 a 3 — con esto alcanza para solicitar la Ficha'
+                                :'Pasos 4 a 6 — información adicional para solicitar también la Publicación';
+    return `<div class="sr-etapa-banner"><span class="sr-etapa-banner-t">${esc(st.etapa)}</span><span class="sr-etapa-banner-s">${esc(sub)}</span></div>`;
+  };
   for(let n=1;n<=SR_WIZ_LAST;n++){
     const cards=svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
-    steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${cards}</div>`;
+    steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${etapaHd(n)}${cards}</div>`;
   }
   steps+=`<div class="sr-wiz-step" data-step="${SR_WIZ_REVIEW}" id="sr-wiz-review" style="display:none"></div>`;
   steps+=`<div class="sr-wiz-step" data-step="${SR_WIZ_CONFIRM}" id="sr-wiz-confirm" style="display:none"></div>`;
