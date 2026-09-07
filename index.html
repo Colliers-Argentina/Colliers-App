@@ -15582,8 +15582,8 @@ const SR_SERVICES=[
        {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Se completa con los amenities del edificio; podés editarlo o completarlo.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
        {k:'especificacionesOficina',label:'Especificaciones de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución interna, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
      ]},
-     // ══ FICHA · Paso 3 — Características ══
-     {step:3,title:'Distribución de la Unidad',fields:[
+     // ══ PUBLICACIÓN · Paso 4 — Características ══
+     {step:4,title:'Distribución de la Unidad',fields:[
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
        {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
@@ -15591,17 +15591,17 @@ const SR_SERVICES=[
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
        {k:'pisoDestacado',label:'¿De qué piso o de cuántos m² querés que sea la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
      ]},
-     {step:3,title:'Características Particulares',fields:[
+     {step:4,title:'Características Particulares',fields:[
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
        {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
-     {step:3,title:'Equipamiento y Servicios',fields:[
+     {step:4,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
-     // ══ PUBLICACIÓN · Paso 4 — Contenido ══
-     {step:4,title:'Descripción General',fields:[
+     // ══ FICHA · Paso 3 — Contenido ══
+     {step:3,title:'Descripción General',fields:[
        {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
      ]},
      // ══ PUBLICACIÓN · Paso 5 — Documentación y Difusión ══
@@ -16492,8 +16492,8 @@ window.startSolicitud=function(serviceKey){if(!_srService(serviceKey))return;clo
 const SR_WIZ_STEPS=[
   {n:1,label:'Información General',etapa:'FICHA'},
   {n:2,label:'Información Comercial',etapa:'FICHA'},
-  {n:3,label:'Características',etapa:'FICHA'},
-  {n:4,label:'Contenido',etapa:'PUBLICACIÓN'},
+  {n:3,label:'Contenido',etapa:'FICHA'},
+  {n:4,label:'Características',etapa:'PUBLICACIÓN'},
   {n:5,label:'Documentación y Difusión',etapa:'PUBLICACIÓN'},
   {n:6,label:'Comentarios',etapa:'PUBLICACIÓN'},
   {n:7,label:'Revisión',etapa:''},

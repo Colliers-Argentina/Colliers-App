@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "3.2", "21/08/2026",
+    "Actividades de Marketing & Research", "3.3", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -304,7 +304,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Fecha de solicitud", "Se completa sola con la fecha del día. No hay que cargarla."),
         ("Fecha de vencimiento", "Se calcula sola según el tipo de actividad, contando días hábiles (no cuenta sábados ni domingos). Para Ficha son 3 días hábiles: si se pide un lunes, vence el jueves. Si la actividad todavía no tiene plazo definido, queda sin fecha."),
         ("Solicitada por", "Se completa sola con el usuario logueado y no se puede modificar."),
-        ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, agrupado en dos etapas. FICHA: 1) Información General, 2) Información Comercial, 3) Características. PUBLICACIÓN: 4) Contenido, 5) Documentación y Difusión, 6) Comentarios. Al final hay una pantalla de Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Cada paso valida sus obligatorios. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
+        ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, agrupado en dos etapas. FICHA: 1) Información General, 2) Información Comercial, 3) Contenido. PUBLICACIÓN: 4) Características, 5) Documentación y Difusión, 6) Comentarios. Al final hay una pantalla de Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Cada paso valida sus obligatorios. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
         ("Solo Ficha o Ficha + Publicación", "Con los pasos 1 a 3 completos ya alcanza para pedir la Ficha: el botón 'Generar solicitud de ficha' lleva directo a la Revisión. Si además se necesita la Publicación, continuar con los pasos 4, 5 y 6."),
         ("Inmueble", "Qué ingresar: buscar el inmueble. Es obligatorio: sin inmueble no se puede pedir una Ficha ni una Publicación. Si no existe, aparece un aviso con el botón 'Crear inmueble' para darlo de alta en el momento (pide Dirección y Tipo) y queda vinculado."),
         ("Precio de alquiler y Precio por m²", "El precio de alquiler es opcional. El precio por m² es obligatorio: sin ese dato no se puede avanzar."),
