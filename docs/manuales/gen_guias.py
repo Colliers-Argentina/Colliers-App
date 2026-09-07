@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "3.1", "21/08/2026",
+    "Actividades de Marketing & Research", "3.2", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -311,7 +311,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Comentarios comerciales", "Qué ingresar: opcional. Cualquier información comercial adicional para el equipo."),
         ("Superficies", "Superficie total incluye cubierta, descubierta y semicubierta. También se puede cargar la superficie cubierta y la superficie propia. La total debe ser mayor o igual a la cubierta."),
         ("Baños", "Qué ingresar: la cantidad de inodoros."),
-        ("Características del equipo", "Se completa solo con los amenities del edificio al elegir el inmueble, y se puede editar libremente para corregir o completar la información. Es obligatorio."),
+        ("Características del edificio", "Se completa solo con los amenities del edificio al elegir el inmueble, y se puede editar libremente para corregir o completar la información. Es obligatorio."),
         ("Especificaciones de la oficina", "Qué ingresar: opcional. Características propias de la unidad: distribución interna, estado, equipamiento específico u observaciones. No mezclar con las características del edificio."),
         ("Cuenta / Propietario / Inmueble", "El propietario se asocia siempre a un Contacto de Nexus; si no existe se lo puede crear en el momento. Lo mismo con el inmueble ('+ Crear nuevo inmueble', pide Dirección y Tipo)."),
         ("Ubicación en Google Maps", "No hay que cargarla: al seleccionar el inmueble, Nexus arma sola la ubicación y muestra el enlace 'Ver ubicación en Google Maps', que abre el mapa en una pestaña nueva. Si se cambia el inmueble, la ubicación se actualiza. Si el inmueble no tiene una dirección completa, se avisa y no se genera un enlace incorrecto."),
