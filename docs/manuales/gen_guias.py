@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "4.2", "21/08/2026",
+    "Actividades de Marketing & Research", "4.3", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -314,7 +314,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Cuerpo", "Descripción del entorno y del complejo. Se completa con la descripción del inmueble cuando existe y se puede editar; si el inmueble no tiene descripción, queda vacío para escribirla. Editarlo acá no modifica la ficha del inmueble."),
         ("Características del edificio", "Se completa con los amenities del edificio y se puede editar libremente. Es obligatorio. Editarlo acá no modifica la ficha del inmueble."),
         ("Información de la oficina", "Qué ingresar: opcional. Distribución, estado, particularidades o equipamiento propios de la unidad. No mezclar con las características del edificio."),
-        ("Comentarios (Información General)", "Qué ingresar: opcional. Cualquier aclaración adicional para Marketing & Research."),
+        ("Comentarios (Información General)", "Qué ingresar: opcional. Cualquier aclaración adicional para Marketing & Research. En el paso 5 hay además una caja de comentarios finales, también opcional."),
         ("Tipo de operación", "Qué ingresar: Alquiler, Venta o Alquiler y Venta."),
         ("Precios", "Los precios que se piden dependen del tipo de operación. Con Alquiler aparecen el precio total de alquiler y el precio por m² de alquiler; con Venta, los de venta; y con 'Alquiler y Venta' se abren los dos juegos de campos. En todos los casos el precio total es opcional y el precio por m² es obligatorio."),
         ("Disponibilidad", "Agregar una fila por piso que se quiera incluir en la Ficha, indicando Piso, m² y Cocheras. Se pueden agregar y quitar filas. Este detalle reemplaza al texto de especificación de pisos: no hay que cargarlo dos veces."),
@@ -324,7 +324,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Baños", "Qué ingresar: la cantidad de inodoros."),
         ("Link para multimedia", "Qué ingresar: obligatorio. El link al material multimedia (fotos, video, tour virtual). Tiene que ser una dirección web válida (empieza con http:// o https://)."),
         ("Plano", "Qué ingresar: opcional. Pegar el link del plano o adjuntar el archivo."),
-        ("Equipamiento y Servicios", "Es obligatorio: hay que responder Sí o No en cada uno de los servicios de la lista para poder avanzar."),
+        ("Equipamiento y Servicios", "Es obligatorio: hay que responder Sí o No en cada uno de los servicios de la lista para poder avanzar. Cada servicio ya respondido se marca en verde con una tilde, así se ve de un vistazo qué falta."),
         ("Estado", "Cada ticket tiene un estado: Pendiente, En proceso o Finalizada. Si pasa la fecha de entrega sin finalizarse, se muestra como Vencida."),
         ("Registrar actividad no es lo mismo", "El botón 'Registrar actividad' es solo para actividades comerciales (visitas, llamadas, reuniones, propuestas). Los trabajos de Marketing & Research se piden únicamente desde este módulo."),
     ],

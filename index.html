@@ -1795,6 +1795,10 @@ body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 .sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
 .sr-wiz-etapa-hd{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8898C0}
 .cdr-hint{font-size:10.5px;color:#8898C0;margin-top:.25rem;line-height:1.35}
+.sr-sino-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem .55rem;border:1px solid #E8EFF8;border-radius:8px;margin-bottom:.3rem;transition:background .15s,border-color .15s}
+.sr-sino-row.answered{background:#F0FDF4;border-color:#16A34A}
+.sr-sino-lbl{display:flex;align-items:center;gap:.4rem}
+.sr-sino-tick{color:#16A34A;font-weight:800;font-size:12px;opacity:0;transition:opacity .15s}
 .sr-etapa-banner{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;padding:.55rem .9rem;margin-bottom:.9rem;border-left:3px solid #1C54F4;background:#F4F7FF;border-radius:0 10px 10px 0}
 .sr-etapa-banner-t{font-size:12px;font-weight:800;letter-spacing:.08em;color:#0A1B4D}
 .sr-etapa-banner-s{font-size:11px;color:#56648F}
@@ -16313,7 +16317,7 @@ const SR_BU_OPCIONES=['Oficinas','Industrias','Retail','Terrenos','SPS','Valuaci
 // las actividades sin SLA definido quedan en null (no se inventa un plazo).
 const SR_SLA={'ficha-oficinas':3};
 // Claves que provee el formulario base: el formulario específico las oculta para no repetirlas.
-const SR_BASE_KEYS=['prioridad','cuenta','propietario','comentarios'];
+const SR_BASE_KEYS=['prioridad','cuenta','propietario'];
 // Suma días hábiles (excluye sábados y domingos). Nexus no tiene calendario de feriados;
 // si en el futuro se agrega, este es el único punto a extender.
 function _srAddHabiles(desde,n){
@@ -16682,7 +16686,7 @@ function _srFieldHTML(f){
   if(f.type==='contacto')return w(`<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)" onblur="srPropBlur()"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-prop-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-prop-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='inmueble')return w(`<input id="srf-inmueble" class="cdr-input" placeholder="Buscar inmueble por nombre o dirección..." autocomplete="off" oninput="srInmSearch(this.value)" onblur="srInmBlur()"><div id="srf-inm-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-inm-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-inm-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-inmuebleId" type="hidden"><input id="srf-inmuebleNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='maps')return w(`<div id="srf-maps-view" style="font-size:12px;color:#8898C0">Se completa automáticamente al seleccionar el inmueble.</div><input id="${id}" type="hidden">`);
-  if(f.type==='sino')return w(`<div id="${id}">${f.opts.map((o,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem .55rem;border:1px solid #E8EFF8;border-radius:8px;margin-bottom:.3rem"><span style="font-size:12.5px;color:#353E59">${esc(o)}</span><span style="display:flex;gap:1rem" data-item="${esc(o)}"><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="Sí"> Sí</label><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="No"> No</label></span></div>`).join('')}</div>`);
+  if(f.type==='sino')return w(`<div id="${id}">${f.opts.map((o,i)=>`<div class="sr-sino-row" id="${id}-row-${i}"><span class="sr-sino-lbl"><span class="sr-sino-tick" id="${id}-tick-${i}">✓</span><span style="font-size:12.5px;color:#353E59">${esc(o)}</span></span><span style="display:flex;gap:1rem" data-item="${esc(o)}"><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="Sí" onchange="srSinoMark('${id}',${i})"> Sí</label><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="No" onchange="srSinoMark('${id}',${i})"> No</label></span></div>`).join('')}</div>`);
   if(f.type==='ejecutivos')return w(`<div id="srf-ejec-chips" class="cdr-ms-chips"></div><input id="srf-ejec-q" class="cdr-input" placeholder="Agregar ejecutivo (hasta 2 adicionales)..." autocomplete="off" oninput="srEjecSearch(this.value)" onblur="srEjecBlur()" style="margin-top:.4rem"><div id="srf-ejec-drop" class="cdr-ms-drop" style="display:none"></div>`,' style="position:relative"');
   if(f.type==='multi')return w(`<div id="${id}" class="cdr-toggle-group" style="flex-wrap:wrap;border-radius:8px">${f.opts.map(o=>`<button type="button" class="cto-pref-chip" data-v="${esc(o)}" onclick="this.classList.toggle('active')">${esc(o)}</button>`).join('')}</div>`);
   if(f.type==='docs'){const tipos=f.opts||['Foto','PDF','Plano','DWG','URL SharePoint'];return w(`<div style="display:flex;gap:.4rem;flex-wrap:wrap"><select id="srf-doc-tipo" class="cdr-select" style="max-width:160px">${tipos.map(t=>`<option>${esc(t)}</option>`).join('')}</select><input id="srf-doc-url" class="cdr-input" placeholder="URL o ruta del archivo..." style="flex:1;min-width:180px"><button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srAddDoc()">Agregar</button></div><div id="srf-doc-list" class="cdr-ms-chips" style="margin-top:.4rem"></div>`);}
@@ -16926,6 +16930,11 @@ function _srDispRender(){
     <button type="button" class="crm-action-btn" style="padding:.3rem .5rem" onclick="srDispDel(${i})">✕</button></div>`).join('')
     :'<div style="font-size:11px;color:#8898C0">Sin pisos cargados.</div>';
 }
+// Marca en verde (con tilde) cada servicio ya respondido, así se ve qué falta completar.
+window.srSinoMark=function(id,i){
+  const row=document.getElementById(id+'-row-'+i);if(row)row.classList.add('answered');
+  const tick=document.getElementById(id+'-tick-'+i);if(tick)tick.style.opacity='1';
+};
 window.srCharCount=function(k,max){const el=document.getElementById('srf-'+k),c=document.getElementById('srf-'+k+'-cnt');if(el&&c)c.textContent=(el.value||'').length+'/'+max;};
 window.srAddDoc=function(){const t=document.getElementById('srf-doc-tipo').value;const u=(document.getElementById('srf-doc-url').value||'').trim();if(!u)return;_srDocList.push({tipo:t,url:u});document.getElementById('srf-doc-url').value='';_srRenderDocs();};
 window.srRemoveDoc=function(i){_srDocList.splice(i,1);_srRenderDocs();};
@@ -17149,6 +17158,7 @@ function _srBuildHTML(d){
     .hd{background:#00285A;color:#fff;padding:26px 40px;display:flex;justify-content:space-between;align-items:center}
     .hd .brand{font-size:22px;font-weight:800;letter-spacing:1px}.hd .sub{font-size:12px;opacity:.8;margin-top:2px}
     .hd .tk{text-align:right;font-size:13px}.hd .tk b{font-size:18px;display:block}
+    .hd .hd-logo{display:block;height:26px;margin:0 0 8px auto;object-fit:contain}
     .meta{padding:16px 40px;background:#EEF3FF;font-size:12px;color:#25408F;display:flex;gap:28px;flex-wrap:wrap}
     .body{padding:20px 40px 40px}h3{color:#00285A;font-size:14px;border-bottom:2px solid #E2EAF4;padding-bottom:5px;margin:22px 0 8px}
     table{width:100%;border-collapse:collapse;margin-bottom:6px}td{padding:6px 8px;font-size:12.5px;vertical-align:top;border-bottom:1px solid #F1F5FE}
@@ -17157,7 +17167,7 @@ function _srBuildHTML(d){
     .pdf-url{font-size:11.5px;color:#1C54F4;word-break:break-all;margin:2px 0 1px}
     .ft{padding:16px 40px;font-size:10px;color:#8898C0;border-top:1px solid #E8EFF8}
   </style></head><body>
-    <div class="hd"><div><div class="brand">COLLIERS</div><div class="sub">Actividades de Marketing &amp; Research · Nexus</div></div><div class="tk">${esc(d.servicioLabel||'')}<b>${esc(d.ticket)}</b>${esc(d.estado||'')}</div></div>
+    <div class="hd"><div><div class="brand">COLLIERS</div><div class="sub">Actividades de Marketing &amp; Research · Nexus</div></div><div class="tk"><img class="hd-logo" src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers">${esc(d.servicioLabel||'')}<b>${esc(d.ticket)}</b>${esc(d.estado||'')}</div></div>
     <div class="meta"><span><b>Solicitante:</b> ${esc(d.solicitante||'')}</span><span><b>Cuenta:</b> ${esc(d.cuentaNombre||'–')}</span><span><b>Responsable:</b> ${esc(d.responsable||'')}</span><span><b>Fecha:</b> ${fecha}</span></div>
     <div class="body">${secciones}</div>
     <div class="ft">Documento generado automáticamente por Colliers Nexus · ${esc(d.ticket)}</div>
