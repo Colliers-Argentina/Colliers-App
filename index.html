@@ -15540,19 +15540,29 @@ const SR_SERVICES=[
   {key:'ficha-oficinas',label:'Ficha y Publicación',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
    form:[
      // ══ FICHA · Paso 1 — Información General ══
-     {step:1,title:'Datos de la Solicitud',fields:[
-       {k:'prioridad',label:'Prioridad',type:'select',opts:['Baja','Media','Alta']},
+     {step:1,title:'Fecha de entrega',fields:[
        {k:'fechaRequerimiento',label:'Fecha de entrega (mín. 3 días de plazo)',type:'date'},
      ]},
      {step:1,title:'Inmueble Asociado',fields:[
-       {k:'inmueble',label:'Inmueble',type:'inmueble',req:true},
+       {k:'inmueble',label:'Inmueble asociado',type:'inmueble',req:true},
      ]},
      {step:1,title:'Ubicación',fields:[
-       {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true},
+       {k:'direccion',label:'Dirección (calle – número – provincia)',type:'text',req:true,hint:'Se completa con la dirección del inmueble; podés ajustarla.'},
        {k:'urlMaps',label:'Ubicación en Google Maps',type:'maps'},
      ]},
-     // Cuenta y Contacto son independientes: puede haber Cuenta, Contacto, ambos o ninguno
-     // (p. ej. un particular que todavía no tiene Cuenta en Nexus).
+     {step:1,title:'Textos de la Ficha',fields:[
+       {k:'titulo',label:'Título',type:'text',req:true,hint:'Se arma con el nombre del edificio y la dirección; podés editarlo.'},
+       {k:'subtitulo',label:'Subtítulo',type:'text',max:80,hint:'Sugerencia comercial breve; podés editarla.'},
+       {k:'descripcion',label:'Cuerpo (descripción del entorno y del complejo)',type:'textarea',req:true,hint:'Se completa con la descripción del inmueble; podés editarla. No modifica la ficha del inmueble.'},
+     ]},
+     // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
+     {step:1,title:'Características del edificio',fields:[
+       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Se completa con los amenities del edificio; podés editarlo. No modifica la ficha del inmueble.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+       {k:'especificacionesOficina',label:'Información de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
+     ]},
+     {step:1,title:'Comentarios',fields:[
+       {k:'comentariosComerciales',label:'Comentarios (opcional)',type:'textarea',ph:'Agregá cualquier aclaración adicional para Marketing & Research.'},
+     ]},
      {step:1,title:'Cuenta y Responsables',fields:[
        {k:'cuenta',label:'Cuenta / Cliente (opcional)',type:'cuenta'},
        {k:'propietario',label:'Contacto (opcional)',type:'contacto'},
@@ -15563,11 +15573,18 @@ const SR_SERVICES=[
        {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
      ]},
      {step:2,title:'Condiciones Comerciales',fields:[
-       {k:'precioAlquiler',label:'Precio de alquiler (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
-       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
-       {k:'precioVenta',label:'Precio de venta (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
-       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
-       {k:'comentariosComerciales',label:'Comentarios (opcional)',type:'textarea',ph:'Agregá comentarios o información comercial adicional.'},
+       {k:'precioTotal',label:'Precio total (opcional)',type:'text'},
+       {k:'precioM2',label:'Precio por m²',type:'text',req:true},
+       // Precios anteriores: no se piden más, pero se siguen mostrando en las solicitudes históricas.
+       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',legacy:true},
+       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',legacy:true},
+       {k:'precioVenta',label:'Precio de venta',type:'text',legacy:true},
+       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',legacy:true},
+     ]},
+     {step:2,title:'Disponibilidad',fields:[
+       {k:'disponibilidad',label:'Pisos que querés incluir en la Ficha',type:'disponibilidad',hint:'Agregá una fila por piso, con sus m² y cocheras.'},
+       {k:'minimoDivisible',label:'Mínimo divisible (m²)',type:'text',hint:'Se completa con el dato del inmueble si está cargado; podés editarlo.'},
+       {k:'resumenDisponibilidad',label:'Resumen de disponibilidad',type:'text',ph:'Ej.: 300 - 1.000 m²',hint:'Rango de m² que se muestra en la Ficha.'},
      ]},
      {step:2,title:'Superficies y Dimensiones',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true,hint:'Esto incluye sup. cubierta, descubierta y semicubierta.'},
@@ -15577,10 +15594,10 @@ const SR_SERVICES=[
        {k:'banos',label:'Baños',type:'number',req:true,hint:'¿Cuántos inodoros?'},
        {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',req:true,ph:'Detallá cómo se distribuyen los m² por piso. Ej.: Piso 1: 800 m² / Piso 2: 750 m² / Piso 3: 700 m² / Piso 4: 750 m².'},
      ]},
-     // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
-     {step:2,title:'Características del edificio',fields:[
-       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Se completa con los amenities del edificio; podés editarlo o completarlo.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
-       {k:'especificacionesOficina',label:'Especificaciones de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución interna, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
+     // ══ FICHA · Paso 3 — Contenido (material multimedia) ══
+     {step:3,title:'Contenido',fields:[
+       {k:'linkMultimedia',label:'Link para multimedia',type:'url',req:true,ph:'https://...',hint:'Link al material multimedia (fotos, video, tour virtual).'},
+       {k:'plano',label:'Plano (opcional)',type:'linkfile',hint:'Pegá el link del plano o adjuntá el archivo.'},
      ]},
      // ══ PUBLICACIÓN · Paso 4 — Características ══
      {step:4,title:'Distribución de la Unidad',fields:[
@@ -15599,10 +15616,6 @@ const SR_SERVICES=[
      ]},
      {step:4,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
-     ]},
-     // ══ FICHA · Paso 3 — Contenido ══
-     {step:3,title:'Descripción General',fields:[
-       {k:'descripcion',label:'Descripción general (Descripción del edificio y del entorno. Este texto será utilizado para la publicación y la ficha.)',type:'textarea',req:true},
      ]},
      // ══ PUBLICACIÓN · Paso 5 — Documentación y Difusión ══
      {step:5,title:'Documentación y Difusión',fields:[
@@ -16502,7 +16515,7 @@ const SR_WIZ_LAST=6, SR_WIZ_REVIEW=7, SR_WIZ_CONFIRM=8;
 let _srWizStep=1,_srAlcance='publicacion';
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
-  _srFormService=svc;_srDocList=[];_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;_srAlcance='publicacion';
+  _srFormService=svc;_srDocList=[];_srDispList=[];Object.keys(_srAuto).forEach(k=>delete _srAuto[k]);_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;_srAlcance='publicacion';
   document.getElementById('sr-form-title').textContent=svc.label;
   // El bloque "Automático" (Solicitante/Broker/Tipo/Fecha/Responsable) ya no se muestra en la
   // carga: esos datos se siguen generando y guardando automáticamente en submitSolicitud
@@ -16513,7 +16526,7 @@ function openSolicitudForm(key){
   // Si viene del formulario base, no se vuelven a pedir los datos ya cargados allí.
   const omitir=k=>!!_srBase&&SR_BASE_KEYS.includes(k);
   const cardHTML=card=>{
-    const visibles=card.fields.filter(f=>!omitir(f.k));
+    const visibles=card.fields.filter(f=>!omitir(f.k)&&!f.legacy);
     if(!visibles.length)return '';
     const fields=visibles.map(f=>{let html=_srFieldHTML(f);if(SR_FULL_TYPES.includes(f.type))html=html.replace('class="cdr-field"','class="cdr-field sr-col-full"');return html;}).join('');
     return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div><div class="sr-grid2">${fields}</div></div>`;
@@ -16553,6 +16566,7 @@ function openSolicitudForm(key){
   if(document.getElementById('srf-cuenta')&&typeof registerCuentaPicker==='function'){registerCuentaPicker('sr',{inputId:'srf-cuenta',dropId:'srf-cuenta-drop',tagId:'srf-cuenta-tag',hidId:'srf-cuentaId',hidNombreId:'srf-cuentaNombre'});_srPickerReady=true;}
   loadClientesParaSelector();
   _srRenderEjecChips();
+  _srDispRender();
   _srApplyConditionals();
   ['srf-supTotal','srf-supCubierta'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',_srValidateSuperficies);});
   const btn=document.getElementById('sr-form-save');if(btn)btn.style.display='none';
@@ -16599,6 +16613,7 @@ function _srWizValidateStep(n){
   const data=_srReadForm(svc);
   let ok=true,first=null;const faltan=[];
   svc.form.filter(c=>(c.step||1)===n).forEach(card=>card.fields.forEach(f=>{
+    if(f.legacy)return;                                 // campo histórico: ya no se pide
     if(_srBase&&SR_BASE_KEYS.includes(f.k))return;      // ya vino del formulario base
     if(!f.req||!_srFieldVisible(f,data))return;
     const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:(f.type==='inmueble'?!data.inmuebleId:!String(data[f.k]||'').trim()));
@@ -16606,6 +16621,16 @@ function _srWizValidateStep(n){
     const el=document.getElementById(elId);if(el)el.style.borderColor=empty?'#ED1B34':'';
     if(empty){ok=false;if(!first)first=el;faltan.push((f.label||f.k).replace(/\s*\(.*?\)\s*$/,''));}
   }));
+  // El link de multimedia debe ser una URL válida.
+  const lm=svc.form.filter(c=>(c.step||1)===n).flatMap(c=>c.fields).find(f=>f.type==='url'&&f.req);
+  if(lm){
+    const v=String(data[lm.k]||'').trim();
+    if(v&&!/^https?:\/\/\S+$/i.test(v)){
+      ok=false;const el=document.getElementById('srf-'+lm.k);
+      if(el){el.style.borderColor='#ED1B34';if(!first)first=el;}
+      faltan.push('Link para multimedia (debe ser una URL válida)');
+    }
+  }
   if(n===2&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
   // Paso 1: sin inmueble no se puede generar una Ficha/Publicación → cartel con acción para crearlo.
   if(n===1&&!data.inmuebleId){
@@ -16640,7 +16665,14 @@ function _srFieldHTML(f){
   const lbl=f.label?`<div class="cdr-lbl">${esc(f.label)}${req}</div>`:'';
   const hint=f.hint?`<div class="cdr-hint">${esc(f.hint)}</div>`:'';
   const w=(inner,extra)=>`<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}${extra||''}>${lbl}${inner}${hint}</div>`;
-  if(f.type==='text'||f.type==='number')return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}">`);
+  if(f.type==='text'||f.type==='number'||f.type==='url'){
+    const cnt=f.max?`<div class="cdr-hint" id="${id}-cnt">0/${f.max}</div>`:'';
+    return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"${f.max?` maxlength="${f.max}" oninput="srCharCount('${f.k}',${f.max})"`:''}${f.ph?` placeholder="${esc(f.ph)}"`:''}>${cnt}`);
+  }
+  // Disponibilidad: una fila por piso (piso · m² · cocheras), reutilizando el estilo de chips/inputs.
+  if(f.type==='disponibilidad')return w(`<div id="${id}-rows"></div><button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF;margin-top:.4rem" onclick="srDispAdd()">＋ Agregar piso</button>`);
+  // Link o archivo adjunto (reutiliza el mismo uploader que las actividades).
+  if(f.type==='linkfile')return w(`<input id="${id}" class="cdr-input" type="text" placeholder="https://... (link del plano)"><input id="${id}-file" type="file" class="cdr-input" style="margin-top:.4rem;padding:.35rem">`);
   if(f.type==='textarea')return w(`<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"${f.ph?` placeholder="${esc(f.ph)}"`:''}></textarea>`);
   if(f.type==='date')return w(`<input id="${id}" class="cdr-input" type="date">`);
   if(f.type==='select')return w(`<select id="${id}" class="cdr-select" onchange="_srApplyConditionals()"><option value="">— Seleccionar —</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`);
@@ -16664,6 +16696,10 @@ function _srApplyConditionals(){
     const wrap=document.getElementById('srfw-'+f.k);
     if(wrap)wrap.style.display=f.showIf.vals.includes(cur)?'':'none';
   }));
+}
+function _srFieldConValor(f,data){
+  if(!f.legacy)return true;
+  const v=data[f.k];return !(v===undefined||v===null||String(v).trim()==='');
 }
 function _srFieldVisible(f,data){
   if(!f.showIf)return true;
@@ -16719,17 +16755,34 @@ window.srInmPick=function(id,nombre){
   const b=(_bldDocs||[]).find(x=>x._id===id);
   if(b&&b.direccion){const dir=document.getElementById('srf-direccion');if(dir&&!dir.value.trim())dir.value=b.direccion;}
   _srSetMaps(b);
-  _srSetEquipoDesdeAmenities(b);
+  _srAutoFromBld(b);
 };
-// Precarga "Características del equipo" con los amenities del edificio. Queda editable:
-// solo se sobrescribe lo que vino de otro edificio, nunca lo que escribió el broker.
-let _srEquipoAuto='';
-function _srSetEquipoDesdeAmenities(b){
-  const el=document.getElementById('srf-especificaciones');if(!el)return;
-  const am=((b&&b.amenities)||'').trim();
+// Precarga editable: sólo se pisa lo que quedó del inmueble anterior, nunca lo que escribió el broker.
+const _srAuto={};
+function _srAutoSet(k,valor){
+  const el=document.getElementById('srf-'+k);if(!el)return;
   const actual=(el.value||'').trim();
-  if(actual&&actual!==_srEquipoAuto)return;      // el broker lo editó: no se pisa
-  el.value=am;_srEquipoAuto=am;
+  if(actual&&actual!==(_srAuto[k]||''))return;
+  el.value=valor;_srAuto[k]=valor;
+  if(k==='subtitulo')srCharCount('subtitulo',80);
+}
+// Subtítulo comercial breve, armado con lo que ya sabemos del inmueble.
+function _srSubtituloSugerido(b){
+  if(!b)return '';
+  const op=(document.getElementById('srf-tipoTransaccion')||{}).value||'';
+  const acc=op==='Venta'?'Venta':(op==='Alquiler y Venta'?'Alquiler y venta':'Alquiler');
+  const tipo={oficina:'de oficinas',retail:'de locales',industria:'de naves industriales',deposito:'de depósitos',terreno:'de terrenos'}[(b.assetType||b._tipo||b.tipo||'').toLowerCase()]||'de oficinas';
+  const zona=(b.submercado||b.zona||'').trim();
+  return (acc+' '+tipo+(zona?(' en '+zona):' en complejo corporativo')).slice(0,80);
+}
+function _srAutoFromBld(b){
+  _srAutoSet('especificaciones',((b&&b.amenities)||'').trim());          // amenities → Características del edificio
+  _srAutoSet('descripcion',((b&&b.descripcion)||'').trim());             // descripción del inmueble → Cuerpo
+  const nom=((b&&(b.nombre||''))||'').trim(),dir=((b&&(b.direccion||''))||'').trim();
+  _srAutoSet('titulo',[nom,dir].filter(Boolean).join(' — '));            // nombre del edificio + dirección
+  _srAutoSet('subtitulo',_srSubtituloSugerido(b));
+  const min=b&&(b.superficieMinima||b.supMinima);
+  _srAutoSet('minimoDivisible',min?String(min):'');
 }
 window.srInmFaltaModal=function(){
   let ov=document.getElementById('sr-inm-falta-ov');
@@ -16850,6 +16903,20 @@ window.srPropCreateSave=async function(){
     const tag=document.getElementById('srf-prop-tag');if(tag){tag.textContent='✓ Contacto creado y vinculado';tag.style.display='block';}
   }catch(e){alert('Error al crear el contacto: '+e.message);}
 };
+let _srDispList=[];
+window.srDispAdd=function(piso,m2,coch){_srDispList.push({piso:piso||'',m2:m2||'',cocheras:coch||''});_srDispRender();};
+window.srDispDel=function(i){_srDispList.splice(i,1);_srDispRender();};
+window.srDispSet=function(i,campo,v){if(_srDispList[i])_srDispList[i][campo]=v;};
+function _srDispRender(){
+  const c=document.getElementById('srf-disponibilidad-rows');if(!c)return;
+  c.innerHTML=_srDispList.length?_srDispList.map((d,i)=>`<div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.35rem">
+    <input class="cdr-input" style="flex:1" placeholder="Piso" value="${esc(d.piso)}" oninput="srDispSet(${i},'piso',this.value)">
+    <input class="cdr-input" style="flex:1" placeholder="m²" value="${esc(d.m2)}" oninput="srDispSet(${i},'m2',this.value)">
+    <input class="cdr-input" style="flex:1" placeholder="Cocheras" value="${esc(d.cocheras)}" oninput="srDispSet(${i},'cocheras',this.value)">
+    <button type="button" class="crm-action-btn" style="padding:.3rem .5rem" onclick="srDispDel(${i})">✕</button></div>`).join('')
+    :'<div style="font-size:11px;color:#8898C0">Sin pisos cargados.</div>';
+}
+window.srCharCount=function(k,max){const el=document.getElementById('srf-'+k),c=document.getElementById('srf-'+k+'-cnt');if(el&&c)c.textContent=(el.value||'').length+'/'+max;};
 window.srAddDoc=function(){const t=document.getElementById('srf-doc-tipo').value;const u=(document.getElementById('srf-doc-url').value||'').trim();if(!u)return;_srDocList.push({tipo:t,url:u});document.getElementById('srf-doc-url').value='';_srRenderDocs();};
 window.srRemoveDoc=function(i){_srDocList.splice(i,1);_srRenderDocs();};
 function _srRenderDocs(){const c=document.getElementById('srf-doc-list');if(!c)return;c.innerHTML=_srDocList.map((d,i)=>`<span class="cdr-ms-chip">${esc(d.tipo)}: ${esc(d.url.length>40?d.url.slice(0,40)+'…':d.url)}<span class="cdr-ms-chip-x" onclick="srRemoveDoc(${i})">✕</span></span>`).join('');}
@@ -16860,6 +16927,8 @@ function _srReadForm(svc){
     if(f.type==='cuenta'){data.cuentaId=gv('srf-cuentaId');data.cuentaNombre=gv('srf-cuentaNombre');}
     else if(f.type==='contacto'){data.propietarioId=gv('srf-propId');data.propietarioNombre=gv('srf-propNombre');}
     else if(f.type==='inmueble'){data.inmuebleId=gv('srf-inmuebleId');data.inmuebleNombre=gv('srf-inmuebleNombre');}
+    else if(f.type==='disponibilidad')data[f.k]=_srDispList.slice();
+    else if(f.type==='linkfile')data[f.k]={link:gv('srf-'+f.k),archivo:(data[f.k]&&data[f.k].archivo)||''};
     else if(f.type==='ejecutivos'){data.ejecutivosCreador=_srCreadorNombre();data.ejecutivosExtra=_srEjecExtra.slice();data[f.k]=[_srCreadorNombre(),..._srEjecExtra.map(ejecDisplay)];}
     else if(f.type==='checks'){data[f.k]=[...document.querySelectorAll('#'+id+' input:checked')].map(x=>x.value);}
     else if(f.type==='sino'){const o={};f.opts.forEach((opt,i)=>{const sel=document.querySelector('#'+id+' input[name="'+id+'-'+i+'"]:checked');if(sel)o[opt]=sel.value;});data[f.k]=o;}
@@ -16877,6 +16946,7 @@ window.submitSolicitud=async function(){
   let ok=true,first=null;
   svc.form.forEach(card=>card.fields.forEach(f=>{
     if(!f.req)return;
+    if(f.legacy)return;
     if(_srAlcance==='ficha'&&(card.step||1)>3)return;   // la solicitud de Ficha no exige los pasos de Publicación
     if(_srBase&&SR_BASE_KEYS.includes(f.k))return;
     if(!_srFieldVisible(f,data))return;
@@ -16891,6 +16961,11 @@ window.submitSolicitud=async function(){
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('sr-wiz-next')||document.getElementById('sr-form-save');if(btn){btn.textContent='Enviando...';btn.disabled=true;}
   try{
+    const planoFile=(document.getElementById('srf-plano-file')||{}).files;
+    if(planoFile&&planoFile[0]&&typeof _actUpload==='function'){
+      const up=await _actUpload(planoFile[0]);
+      if(up)data.plano={link:(data.plano&&data.plano.link)||'',archivo:up.url||up};
+    }
     const now=firebase.firestore.Timestamp.now();
     const ticketNum=(_srDocs.reduce((m,d)=>Math.max(m,d.ticketNum||0),0))+1;
     const ticket='Solicitud #'+String(ticketNum).padStart(6,'0');
@@ -16990,10 +17065,14 @@ function _srRenderData(d){
     if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`<div style="font-size:12px"><b>${esc(k)}:</b> ${esc(v[k])}</div>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='docs')return (Array.isArray(v)&&v.length)?v.map(x=>`<div style="font-size:12px"><b>${esc(x.tipo)}:</b> <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(x.url)}</a></div>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='disponibilidad')return (Array.isArray(v)&&v.length)?v.map(d=>`<div style="font-size:12px">Piso <b>${esc(d.piso||'–')}</b> · ${esc(d.m2||'–')} m² · ${esc(d.cocheras||'0')} cocheras</div>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='linkfile'){const l=(v&&v.link)||'',a=(v&&v.archivo)||'';if(!l&&!a)return '<span style="color:#8898C0">–</span>';
+      return [l?`<a href="${esc(l)}" target="_blank" rel="noopener" style="color:#1C54F4">Link</a>`:'',a?`<a href="${esc(a)}" target="_blank" rel="noopener" style="color:#1C54F4">Archivo adjunto</a>`:''].filter(Boolean).join(' · ');}
+    if(f.type==='url')return v?`<a href="${esc(v)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(v)}</a>`:'<span style="color:#8898C0">–</span>';
     if(f.type==='maps')return v?`<a href="${esc(v)}" target="_blank" rel="noopener" style="color:#1C54F4;font-weight:600">📍 Ver ubicación en Google Maps</a>`:'<span style="color:#8898C0">–</span>';
     if(f.type==='textarea')return v?`<div style="white-space:pre-wrap">${esc(v)}</div>`:'<span style="color:#8898C0">–</span>';
     return v?esc(v):'<span style="color:#8898C0">–</span>';};
-  return `<div class="nx-grid"><div class="nx-col" style="grid-column:1/-1">${svc.form.map(card=>`<div class="nx-card"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>`<div class="nx-row"><div class="nx-row-l">${esc(f.label||card.title)}</div><div class="nx-row-v">${val(f)}</div></div>`).join('')}</div>`).join('')}</div></div>`;
+  return `<div class="nx-grid"><div class="nx-col" style="grid-column:1/-1">${svc.form.map(card=>`<div class="nx-card"><div class="nx-card-title">${esc(card.title)}</div>${card.fields.filter(f=>_srFieldVisible(f,data)&&_srFieldConValor(f,data)).map(f=>`<div class="nx-row"><div class="nx-row-l">${esc(f.label||card.title)}</div><div class="nx-row-v">${val(f)}</div></div>`).join('')}</div>`).join('')}</div></div>`;
 }
 function _srRenderTimeline(d){
   const ev=(d.eventos||[]).slice().sort((a,b)=>(_tsToDate(b.fecha)?.getTime()||0)-(_tsToDate(a.fecha)?.getTime()||0));
@@ -17041,6 +17120,8 @@ function _srBuildHTML(d){
   const cell=(f)=>{const v=data[f.k];
     if(f.type==='cuenta')return e(d.cuentaNombre||'');if(f.type==='contacto')return e(d.propietarioNombre||'');
     if(f.type==='inmueble')return e(d.inmuebleNombre||'');
+    if(f.type==='disponibilidad')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>Piso ${e(x.piso||'–')}: ${e(x.m2||'–')} m² · ${e(x.cocheras||'0')} cocheras</li>`).join('')}</ul>`:'';
+    if(f.type==='linkfile')return [e((v&&v.link)||''),e((v&&v.archivo)||'')].filter(Boolean).join(' · ');
     if(f.type==='sino'){if(!v||!Object.keys(v).length)return '';return `<ul class="pdf-list">${Object.keys(v).map(k=>`<li>${e(k)}: <b>${e(v[k])}</b></li>`).join('')}</ul>`;}
     if(f.type==='ejecutivos')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:'';
     if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:'';
@@ -17051,7 +17132,7 @@ function _srBuildHTML(d){
     if(f.type==='text'){const m=miles(v);return m!=null?e(m):e(v||'');}
     if(f.type==='textarea')return v?`<div style="white-space:pre-wrap">${e(v).replace(/\n/g,'<br>')}</div>`:'';
     return e(v||'');};
-  const secciones=(svc?svc.form:[]).map(card=>`<h3>${e(card.title)}</h3><table>${card.fields.filter(f=>_srFieldVisible(f,data)).map(f=>row(f.label||card.title,cell(f))).join('')}</table>`).join('');
+  const secciones=(svc?svc.form:[]).map(card=>`<h3>${e(card.title)}</h3><table>${card.fields.filter(f=>_srFieldVisible(f,data)&&_srFieldConValor(f,data)).map(f=>row(f.label||card.title,cell(f))).join('')}</table>`).join('');
   const fecha=(_tsToDate(d.fechaCreacion)||new Date()).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
   return `<!doctype html><html><head><meta charset="utf-8"><title>${d.ticket}</title><style>
     *{font-family:'Segoe UI',Arial,sans-serif;box-sizing:border-box}body{margin:0;color:#222A40}
