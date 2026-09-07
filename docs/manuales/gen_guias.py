@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "4.0", "21/08/2026",
+    "Actividades de Marketing & Research", "4.1", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -316,8 +316,8 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Información de la oficina", "Qué ingresar: opcional. Distribución, estado, particularidades o equipamiento propios de la unidad. No mezclar con las características del edificio."),
         ("Comentarios (Información General)", "Qué ingresar: opcional. Cualquier aclaración adicional para Marketing & Research."),
         ("Tipo de operación", "Qué ingresar: Alquiler, Venta o Alquiler y Venta."),
-        ("Precio total y Precio por m²", "El precio total es opcional. El precio por m² es obligatorio: sin ese dato no se puede avanzar."),
-        ("Disponibilidad", "Agregar una fila por piso que se quiera incluir en la Ficha, indicando Piso, m² y Cocheras. Se pueden agregar y quitar filas."),
+        ("Precios", "Los precios que se piden dependen del tipo de operación. Con Alquiler aparecen el precio total de alquiler y el precio por m² de alquiler; con Venta, los de venta; y con 'Alquiler y Venta' se abren los dos juegos de campos. En todos los casos el precio total es opcional y el precio por m² es obligatorio."),
+        ("Disponibilidad", "Agregar una fila por piso que se quiera incluir en la Ficha, indicando Piso, m² y Cocheras. Se pueden agregar y quitar filas. Este detalle reemplaza al texto de especificación de pisos: no hay que cargarlo dos veces."),
         ("Mínimo divisible", "Se completa con el dato del inmueble cuando está cargado; si no, se completa a mano. Siempre editable."),
         ("Resumen de disponibilidad", "Qué ingresar: el rango de m² que se quiere mostrar en la Ficha. Ej.: 300 - 1.000 m²."),
         ("Superficies", "Superficie total incluye cubierta, descubierta y semicubierta. También se cargan la cubierta y la propia. La total debe ser mayor o igual a la cubierta."),

@@ -15572,19 +15572,23 @@ const SR_SERVICES=[
      {step:2,title:'Datos Generales',fields:[
        {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
      ]},
+     // Según el tipo de operación se piden los precios que correspondan; con "Alquiler y Venta"
+     // se abren los dos juegos de campos. Precio total opcional, precio por m² obligatorio.
      {step:2,title:'Condiciones Comerciales',fields:[
-       {k:'precioTotal',label:'Precio total (opcional)',type:'text'},
-       {k:'precioM2',label:'Precio por m²',type:'text',req:true},
-       // Precios anteriores: no se piden más, pero se siguen mostrando en las solicitudes históricas.
-       {k:'precioAlquiler',label:'Precio de alquiler',type:'text',legacy:true},
-       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',legacy:true},
-       {k:'precioVenta',label:'Precio de venta',type:'text',legacy:true},
-       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',legacy:true},
+       {k:'precioAlquiler',label:'Precio total de alquiler (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
+       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
+       {k:'precioVenta',label:'Precio total de venta (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
+       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
+       // Precios genéricos anteriores: ya no se piden, se siguen mostrando si la solicitud los tiene.
+       {k:'precioTotal',label:'Precio total',type:'text',legacy:true},
+       {k:'precioM2',label:'Precio por m²',type:'text',legacy:true},
      ]},
      {step:2,title:'Disponibilidad',fields:[
        {k:'disponibilidad',label:'Pisos que querés incluir en la Ficha',type:'disponibilidad',hint:'Agregá una fila por piso, con sus m² y cocheras.'},
        {k:'minimoDivisible',label:'Mínimo divisible (m²)',type:'text',hint:'Se completa con el dato del inmueble si está cargado; podés editarlo.'},
        {k:'resumenDisponibilidad',label:'Resumen de disponibilidad',type:'text',ph:'Ej.: 300 - 1.000 m²',hint:'Rango de m² que se muestra en la Ficha.'},
+       // El detalle por piso reemplaza a este texto; se conserva para las solicitudes que ya lo tienen.
+       {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',legacy:true},
      ]},
      {step:2,title:'Superficies y Dimensiones',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true,hint:'Esto incluye sup. cubierta, descubierta y semicubierta.'},
@@ -15592,7 +15596,6 @@ const SR_SERVICES=[
        {k:'supPropia',label:'Superficie propia (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number',req:true},
        {k:'banos',label:'Baños',type:'number',req:true,hint:'¿Cuántos inodoros?'},
-       {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',req:true,ph:'Detallá cómo se distribuyen los m² por piso. Ej.: Piso 1: 800 m² / Piso 2: 750 m² / Piso 3: 700 m² / Piso 4: 750 m².'},
      ]},
      // ══ FICHA · Paso 3 — Contenido (material multimedia) ══
      {step:3,title:'Contenido',fields:[
