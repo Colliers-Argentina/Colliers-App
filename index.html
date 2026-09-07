@@ -15618,15 +15618,15 @@ const SR_SERVICES=[
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
      {step:4,title:'Equipamiento y Servicios',fields:[
-       {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
+       {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',req:true,opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
-     // ══ PUBLICACIÓN · Paso 5 — Documentación y Difusión ══
-     {step:5,title:'Documentación y Difusión',fields:[
-       {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
-       {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
+     // Documentación y acciones de marketing: ya no se piden; se conservan para el histórico.
+     {step:4,title:'Documentación y Difusión',fields:[
+       {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',legacy:true,opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
+       {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',legacy:true,opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
      ]},
-     // ══ PUBLICACIÓN · Paso 6 — Comentarios (opcional) ══
-     {step:6,title:'Comentarios',fields:[
+     // ══ PUBLICACIÓN · Paso 5 — Comentarios (opcional) ══
+     {step:5,title:'Comentarios',fields:[
        {k:'comentarios',label:'Comentarios',type:'textarea',ph:'¿Querés agregar algún comentario o información adicional?'},
      ]},
    ]},
@@ -16510,11 +16510,10 @@ const SR_WIZ_STEPS=[
   {n:2,label:'Información Comercial',etapa:'FICHA'},
   {n:3,label:'Contenido',etapa:'FICHA'},
   {n:4,label:'Características',etapa:'PUBLICACIÓN'},
-  {n:5,label:'Documentación y Difusión',etapa:'PUBLICACIÓN'},
-  {n:6,label:'Comentarios',etapa:'PUBLICACIÓN'},
-  {n:7,label:'Revisión',etapa:''},
+  {n:5,label:'Comentarios',etapa:'PUBLICACIÓN'},
+  {n:6,label:'Revisión',etapa:''},
 ];
-const SR_WIZ_LAST=6, SR_WIZ_REVIEW=7, SR_WIZ_CONFIRM=8;
+const SR_WIZ_LAST=5, SR_WIZ_REVIEW=6, SR_WIZ_CONFIRM=7;
 let _srWizStep=1,_srAlcance='publicacion';
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
@@ -16558,7 +16557,7 @@ function openSolicitudForm(key){
   const progress=`<div id="sr-wiz-progress" class="sr-wiz-etapas">`
     +etapa('Ficha',SR_WIZ_STEPS.filter(x=>x.etapa==='FICHA'))
     +etapa('Publicación',SR_WIZ_STEPS.filter(x=>x.etapa==='PUBLICACIÓN'))
-    +`<div class="sr-wiz-etapa"><div class="sr-wiz-etapa-hd">&nbsp;</div><div class="sr-wiz-progress">${nodo(SR_WIZ_STEPS[6])}</div></div></div>`;
+    +`<div class="sr-wiz-etapa"><div class="sr-wiz-etapa-hd">&nbsp;</div><div class="sr-wiz-progress">${nodo(SR_WIZ_STEPS[SR_WIZ_REVIEW-1])}</div></div></div>`;
   const footer=`<div class="sr-wiz-footer" id="sr-wiz-footer">
     <button type="button" class="crm-action-btn" id="sr-wiz-back" onclick="srWizPrev()" style="visibility:hidden">← Atrás</button>
     <div style="flex:1"></div>
@@ -16619,7 +16618,7 @@ function _srWizValidateStep(n){
     if(f.legacy)return;                                 // campo histórico: ya no se pide
     if(_srBase&&SR_BASE_KEYS.includes(f.k))return;      // ya vino del formulario base
     if(!f.req||!_srFieldVisible(f,data))return;
-    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:(f.type==='inmueble'?!data.inmuebleId:!String(data[f.k]||'').trim()));
+    const empty=_srCampoVacio(f,data);
     const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':(f.type==='inmueble'?'srf-inmueble':'srf-'+f.k));
     const el=document.getElementById(elId);if(el)el.style.borderColor=empty?'#ED1B34':'';
     if(empty){ok=false;if(!first)first=el;faltan.push((f.label||f.k).replace(/\s*\(.*?\)\s*$/,''));}
@@ -16699,6 +16698,14 @@ function _srApplyConditionals(){
     const wrap=document.getElementById('srfw-'+f.k);
     if(wrap)wrap.style.display=f.showIf.vals.includes(cur)?'':'none';
   }));
+}
+// Un campo obligatorio está vacío según su tipo; en 'sino' hay que responder TODOS los ítems.
+function _srCampoVacio(f,data){
+  if(f.type==='cuenta')return !data.cuentaId;
+  if(f.type==='contacto')return !data.propietarioId;
+  if(f.type==='inmueble')return !data.inmuebleId;
+  if(f.type==='sino'){const v=data[f.k]||{};return (f.opts||[]).some(o=>!v[o]);}
+  return !String(data[f.k]||'').trim();
 }
 function _srFieldConValor(f,data){
   if(!f.legacy)return true;
@@ -16953,7 +16960,7 @@ window.submitSolicitud=async function(){
     if(_srAlcance==='ficha'&&(card.step||1)>3)return;   // la solicitud de Ficha no exige los pasos de Publicación
     if(_srBase&&SR_BASE_KEYS.includes(f.k))return;
     if(!_srFieldVisible(f,data))return;
-    const empty=f.type==='cuenta'?!data.cuentaId:(f.type==='contacto'?!data.propietarioId:(f.type==='inmueble'?!data.inmuebleId:!String(data[f.k]||'').trim()));
+    const empty=_srCampoVacio(f,data);
     const elId=f.type==='cuenta'?'srf-cuenta':(f.type==='contacto'?'srf-propietario':(f.type==='inmueble'?'srf-inmueble':'srf-'+f.k));
     const el=document.getElementById(elId);
     if(el)el.style.borderColor=empty?'#ED1B34':'';

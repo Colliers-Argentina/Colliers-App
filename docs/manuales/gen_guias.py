@@ -288,7 +288,7 @@ GUIAS["Guia_Oportunidades"] = Guia(
 
 # ─────────────────── ACTIVIDADES DE MARKETING & RESEARCH ───────────────────
 GUIAS["Guia_Solicitudes"] = Guia(
-    "Actividades de Marketing & Research", "4.1", "21/08/2026",
+    "Actividades de Marketing & Research", "4.2", "21/08/2026",
     "Es el lugar desde donde se piden los trabajos a Marketing & Research (fichas, publicaciones "
     "y demás actividades del área). Se completa primero un Formulario Base con los datos comunes y "
     "luego el formulario específico de la actividad elegida. Al enviar se genera un Ticket, se puede "
@@ -304,8 +304,8 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Fecha de solicitud", "Se completa sola con la fecha del día. No hay que cargarla."),
         ("Fecha de vencimiento", "Se calcula sola según el tipo de actividad, contando días hábiles (no cuenta sábados ni domingos). Para Ficha son 3 días hábiles: si se pide un lunes, vence el jueves. Si la actividad todavía no tiene plazo definido, queda sin fecha."),
         ("Solicitada por", "Se completa sola con el usuario logueado y no se puede modificar."),
-        ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, agrupado en dos etapas. FICHA: 1) Información General, 2) Información Comercial, 3) Contenido. PUBLICACIÓN: 4) Características, 5) Documentación y Difusión, 6) Comentarios. Al final hay una pantalla de Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
-        ("Solo Ficha o Ficha + Publicación", "Con los pasos 1 a 3 completos ya alcanza para pedir la Ficha: el botón 'Generar solicitud de ficha' lleva directo a la Revisión. Si además se necesita la Publicación, continuar con los pasos 4, 5 y 6."),
+        ("Formulario específico (carga guiada)", "Al continuar se abre el formulario de la actividad elegida, agrupado en dos etapas. FICHA: 1) Información General, 2) Información Comercial, 3) Contenido. PUBLICACIÓN: 4) Características, 5) Comentarios. Al final hay una pantalla de Revisión. Se avanza con 'Siguiente' y se vuelve con 'Atrás' sin perder datos. Los datos ya cargados en el Formulario Base no se vuelven a pedir."),
+        ("Solo Ficha o Ficha + Publicación", "Con los pasos 1 a 3 completos ya alcanza para pedir la Ficha: el botón 'Generar solicitud de ficha' lleva directo a la Revisión. Si además se necesita la Publicación, continuar con los pasos 4 y 5."),
         ("Fecha de entrega", "Qué ingresar: la fecha comprometida de entrega. Es el primer campo del formulario."),
         ("Inmueble asociado", "Qué ingresar: buscar el inmueble. Es obligatorio: sin inmueble no se puede pedir una Ficha ni una Publicación. Si no existe, aparece un aviso con el botón 'Crear inmueble' para darlo de alta en el momento y queda vinculado."),
         ("Dirección y Ubicación en Google Maps", "No hay que cargarlas: se completan solas con los datos del inmueble y el enlace 'Ver ubicación en Google Maps' abre el mapa en una pestaña nueva. Si se cambia el inmueble, se actualizan."),
@@ -324,6 +324,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
         ("Baños", "Qué ingresar: la cantidad de inodoros."),
         ("Link para multimedia", "Qué ingresar: obligatorio. El link al material multimedia (fotos, video, tour virtual). Tiene que ser una dirección web válida (empieza con http:// o https://)."),
         ("Plano", "Qué ingresar: opcional. Pegar el link del plano o adjuntar el archivo."),
+        ("Equipamiento y Servicios", "Es obligatorio: hay que responder Sí o No en cada uno de los servicios de la lista para poder avanzar."),
         ("Estado", "Cada ticket tiene un estado: Pendiente, En proceso o Finalizada. Si pasa la fecha de entrega sin finalizarse, se muestra como Vencida."),
         ("Registrar actividad no es lo mismo", "El botón 'Registrar actividad' es solo para actividades comerciales (visitas, llamadas, reuniones, propuestas). Los trabajos de Marketing & Research se piden únicamente desde este módulo."),
     ],
