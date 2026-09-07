@@ -1795,6 +1795,20 @@ body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 .sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
 .sr-wiz-etapa-hd{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8898C0}
 .cdr-hint{font-size:10.5px;color:#8898C0;margin-top:.25rem;line-height:1.35}
+.du-ci-cell{display:flex;align-items:center;gap:3px;flex-wrap:wrap;min-width:120px;min-height:24px;cursor:pointer;padding:2px 3px;border:1px solid transparent;border-radius:6px}
+.du-ci-cell:hover{border-color:#C7D7FF;background:#F8FAFF}
+.du-ci-chip{display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;font-weight:700;color:#1C54F4;background:#EEF3FF;border:1px solid #DBE5FF;border-radius:999px;padding:1px 7px}
+.du-ci-chip.cto{color:#0F766E;background:#ECFDF5;border-color:#A7F3D0}
+.du-ci-mas{font-size:10.5px;font-weight:800;color:#56648F;background:#EEF1F8;border-radius:999px;padding:1px 6px}
+.du-ci-ph{font-size:11px;color:#A8B4D4}
+.du-ci-panel{padding:.5rem;max-height:320px;overflow-y:auto}
+.du-ci-grp{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8898C0;margin:.5rem 0 .25rem}
+.du-ci-opt{display:flex;align-items:center;gap:.45rem;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:12px;color:#1F2A4D}
+.du-ci-opt:hover{background:#F4F7FF}
+.du-ci-sub{display:block;font-size:10px;color:#8898C0;font-weight:500}
+.du-ci-vacio{font-size:11px;color:#8898C0;padding:3px 6px}
+.du-ci-pie{display:flex;justify-content:space-between;gap:.5rem;border-top:1px solid #EEF1F8;margin-top:.5rem;padding-top:.45rem;font-size:11px;font-weight:700}
+.du-ci-pie a{color:#1C54F4;text-decoration:none}
 .sr-sino-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.4rem .55rem;border:1px solid #E8EFF8;border-radius:8px;margin-bottom:.3rem;transition:background .15s,border-color .15s}
 .sr-sino-row.answered{background:#F0FDF4;border-color:#16A34A}
 .sr-sino-lbl{display:flex;align-items:center;gap:.4rem}
@@ -8443,10 +8457,10 @@ function _renderInvTable(units,bodyId,showBldCount){
   if(showBldCount)html+=`<div class="crm-inv-kpi"><div class="crm-inv-kpi-v">${bldIds.length}</div><div class="crm-inv-kpi-l">Edificios</div></div>`;
   html+=`<div class="crm-inv-kpi"><div class="crm-inv-kpi-v">${units.length}</div><div class="crm-inv-kpi-l">Disponibilidades</div></div>`;
   html+=`<div class="crm-inv-kpi"><div class="crm-inv-kpi-v">${totalM2.toLocaleString('es-AR')} m²</div><div class="crm-inv-kpi-l">Total m²</div></div></div>`;
-  html+=`<div style="overflow-x:auto"><table class="crm-inv-table"><thead><tr><th>Edificio</th><th>Piso</th><th>Unidad</th><th>Rol</th><th>m²</th><th>Estado</th><th>Asking Rent</th><th>Ejecutivo Comercial</th><th></th></tr></thead><tbody>`;
+  html+=`<div style="overflow-x:auto"><table class="crm-inv-table"><thead><tr><th>Edificio</th><th>Piso</th><th>Unidad</th><th>Rol</th><th>m²</th><th>Estado</th><th>Asking Rent</th><th>Contacto de información</th><th></th></tr></thead><tbody>`;
   units.forEach(u=>{
     const rolCls=u._rol==='Ocupante'?'crm-inv-badge-occ':'crm-inv-badge-own';
-    html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td><span class="crm-inv-badge ${rolCls}">${u._rol}</span></td><td>${u.m2?Number(u.m2).toLocaleString('es-AR'):'–'}</td><td>${esc(u.estado||'–')}</td><td>${esc(u.askingRent||'–')}</td><td>${esc(ejecDisplay(u.brokerAsignado||u._bldEjec)||'–')}</td><td><button class="crm-inv-nav-btn" onclick="navToBuilding('${u._bldId}')">Ver edificio →</button></td></tr>`;
+    html+=`<tr><td style="font-weight:600">${esc(u._bldNombre)}</td><td>${esc(u.piso||'–')}</td><td>${esc(u.unidad||'–')}</td><td><span class="crm-inv-badge ${rolCls}">${u._rol}</span></td><td>${u.m2?Number(u.m2).toLocaleString('es-AR'):'–'}</td><td>${esc(u.estado||'–')}</td><td>${esc(u.askingRent||'–')}</td><td>${(function(){const l=_unitCiList(u);if(!l.length)return esc(ejecDisplay(u._bldEjec)||'–');return l.map(r=>{const p=_ciPersona(r);return `<div title="${esc(p.sub)}">${esc(p.nombre)}</div>`;}).join('');})()}</td><td><button class="crm-inv-nav-btn" onclick="navToBuilding('${u._bldId}')">Ver edificio →</button></td></tr>`;
   });
   html+='</tbody></table></div>';
   body.innerHTML=html;
@@ -11453,43 +11467,100 @@ function duAcCreateNew(tipo){
   }
 }
 
-// ===== Autocomplete de Ejecutivo Comercial por COMPONENTE (catálogo, no texto libre) =====
-// Guarda la CLAVE (apellido) en brokerAsignado; muestra "Apellido Nombre". Cada unidad
-// tiene su propio ejecutivo, independiente del responsable del edificio (panel izquierdo).
-function duEjecSearch(inputEl){
-  const bld=inputEl.dataset.bld,uid=inputEl.dataset.uid;
-  const q=(inputEl.value||'').trim().toLowerCase();
+// ===== Contacto de información por COMPONENTE =====
+// Personas a contactar para actualizar la info de la unidad. Admite varias y de dos orígenes:
+// ejecutivos internos (EJECUTIVOS_CATALOG, por clave) y contactos de Nexus (colección contactos, por id).
+// Se guarda en el mismo campo del componente, ahora como lista de referencias; brokerAsignado
+// se sigue escribiendo con el primer ejecutivo para no romper las vistas que ya lo leen.
+function _unitCiList(u){
+  if(Array.isArray(u&&u.contactoInformacion))return u.contactoInformacion.filter(x=>x&&x.id);
+  return (u&&u.brokerAsignado)?[{tipo:'ejecutivo',id:u.brokerAsignado}]:[];   // dato histórico
+}
+function _ciPersona(ref){
+  if(!ref)return null;
+  if(ref.tipo==='contacto'){
+    const c=(Array.isArray(_ctoDocs)?_ctoDocs:[]).find(x=>x._id===ref.id);
+    if(!c)return {nombre:'Contacto',sub:'Contacto',falta:true};
+    return {nombre:((c.nombre||'')+' '+(c.apellidos||'')).trim()||'Contacto',sub:'Contacto'+(c.cuentaNombre?' · '+c.cuentaNombre:'')};
+  }
+  return {nombre:ejecDisplay(ref.id)||ref.id,sub:'Ejecutivo comercial'};
+}
+function _ciCellHTML(bld,u){
+  const list=_unitCiList(u);
+  const chips=list.map(r=>{const p=_ciPersona(r);
+    return `<span class="du-ci-chip${r.tipo==='contacto'?' cto':''}" title="${esc(p?(p.nombre+' — '+p.sub):'')}">${esc(p?p.nombre:'')}</span>`;}).join('');
+  const visible=list.length>1?`<span class="du-ci-chip">${esc(_ciPersona(list[0]).nombre)}</span><span class="du-ci-mas" title="${esc(list.map(r=>{const p=_ciPersona(r);return p.nombre+' — '+p.sub;}).join('\n'))}">+${list.length-1}</span>`:chips;
+  return `<td><div class="du-ci-cell" data-bld="${bld}" data-uid="${u._id}" onclick="duCiOpen(event,'${bld}','${u._id}')">${visible||'<span class="du-ci-ph">Asignar…</span>'}</div></td>`;
+}
+let _duCiCtx=null;
+window.duCiOpen=function(ev,bld,uid){
+  ev.stopPropagation();
+  _duCiCtx={bld,uid,q:''};
+  if((!Array.isArray(_ctoDocs)||!_ctoDocs.length)&&db){
+    db.collection('contactos').get().then(s=>{_ctoDocs=s.docs.map(d=>({...d.data(),_id:d.id}));_duCiRender();}).catch(()=>{});
+  }
   const drop=document.getElementById('du-ac-dropdown');if(!drop)return;
-  const opts=EJECUTIVOS_CATALOG.filter(e=>!q||e.display.toLowerCase().includes(q)||e.key.toLowerCase().includes(q));
-  const r=inputEl.getBoundingClientRect();
-  drop.style.top=(r.bottom+3)+'px';drop.style.left=r.left+'px';drop.style.width=Math.max(r.width,200)+'px';
-  let html=opts.map(e=>`<div class="du-ac-item" onmousedown="event.preventDefault();_duAcBlurGuard=true;duEjecPick('${bld}','${uid}','${e.key}')">${esc(e.display)}</div>`).join('');
-  if(!opts.length)html=`<div style="padding:7px 10px;font-size:11px;color:#7B8BBD">Sin resultados</div>`;
-  if(inputEl.value.trim())html+=`<div class="du-ac-item" style="color:#8898C0" onmousedown="event.preventDefault();_duAcBlurGuard=true;duEjecPick('${bld}','${uid}','')">— Quitar asignación —</div>`;
-  drop.innerHTML=html;drop.style.display='block';
+  const r=ev.currentTarget.getBoundingClientRect();
+  drop.style.top=(r.bottom+3)+'px';drop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-300))+'px';drop.style.width='280px';
+  drop.style.display='block';
+  _duCiRender();
+  setTimeout(()=>{const i=document.getElementById('du-ci-q');if(i)i.focus();},30);
+};
+window.duCiSearch=function(v){if(_duCiCtx){_duCiCtx.q=v;_duCiRender();}};
+function _duCiRender(){
+  const drop=document.getElementById('du-ac-dropdown');if(!drop||!_duCiCtx)return;
+  const u=(_unitDocs||[]).find(x=>x._id===_duCiCtx.uid)||{};
+  const sel=_unitCiList(u);
+  const marcado=(tipo,id)=>sel.some(r=>r.tipo===tipo&&r.id===id);
+  const q=(_duCiCtx.q||'').trim().toLowerCase();
+  const ejecs=EJECUTIVOS_CATALOG.filter(e=>!q||e.display.toLowerCase().includes(q));
+  const ctos=(Array.isArray(_ctoDocs)?_ctoDocs:[]).filter(c=>(c.estadoRegistro||'activo')!=='archivado')
+    .filter(c=>{const n=((c.nombre||'')+' '+(c.apellidos||'')+' '+(c.cuentaNombre||'')).toLowerCase();return !q||n.includes(q);}).slice(0,30);
+  const item=(tipo,id,nombre,sub)=>`<div class="du-ci-opt" onmousedown="event.preventDefault();duCiToggle('${tipo}','${String(id).replace(/'/g,"\\'")}')"><input type="checkbox" ${marcado(tipo,id)?'checked':''} tabindex="-1"><span><b>${esc(nombre)}</b>${sub?`<span class="du-ci-sub">${esc(sub)}</span>`:''}</span></div>`;
+  drop.innerHTML=`<div class="du-ci-panel">
+    <input id="du-ci-q" class="du-inp" style="width:100%;margin-bottom:.35rem" placeholder="🔎 Buscar persona..." value="${esc(_duCiCtx.q||'')}" oninput="duCiSearch(this.value)" onmousedown="event.stopPropagation()">
+    <div class="du-ci-grp">Ejecutivos</div>
+    ${ejecs.map(e=>item('ejecutivo',e.key,e.display,'')).join('')||'<div class="du-ci-vacio">Sin resultados</div>'}
+    <div class="du-ci-grp">Contactos</div>
+    ${ctos.map(c=>item('contacto',c._id,((c.nombre||'')+' '+(c.apellidos||'')).trim()||'(sin nombre)',c.cuentaNombre||'')).join('')||'<div class="du-ci-vacio">Sin resultados</div>'}
+    <div class="du-ci-pie"><a href="javascript:void(0)" onmousedown="event.preventDefault();duCiCrearContacto()">＋ Crear contacto</a><a href="javascript:void(0)" onmousedown="event.preventDefault();duCiCerrar()">Listo</a></div>
+  </div>`;
 }
-function duEjecPick(bld,uid,key){
-  setTimeout(()=>{_duAcBlurGuard=false;},150);
+window.duCiCerrar=function(){const d=document.getElementById('du-ac-dropdown');if(d)d.style.display='none';_duCiCtx=null;};
+// Alta de contacto: se reutiliza el drawer que ya existe en Nexus.
+window.duCiCrearContacto=function(){
+  const ctx=_duCiCtx;if(!ctx||typeof openContactoDrawer!=='function')return;
+  openContactoDrawer('','',function(fullname,newId,data){
+    if(Array.isArray(_ctoDocs))_ctoDocs.push({...(data||{}),_id:newId});
+    _duCiCtx=ctx;duCiToggle('contacto',newId);
+  });
+};
+window.duCiToggle=function(tipo,id){
+  if(!_duCiCtx)return;
+  const {bld,uid}=_duCiCtx;
+  const u=(_unitDocs||[]).find(x=>x._id===uid);if(!u)return;
+  const list=_unitCiList(u).slice();
+  const i=list.findIndex(r=>r.tipo===tipo&&r.id===id);
+  if(i>=0)list.splice(i,1);else list.push({tipo,id});
+  _duCiGuardar(bld,uid,list);
+};
+function _duCiGuardar(bld,uid,list){
+  const u=(_unitDocs||[]).find(x=>x._id===uid);if(u){u.contactoInformacion=list;u.brokerAsignado=(list.find(r=>r.tipo==='ejecutivo')||{}).id||'';}
+  _duCiRender();
+  const celda=document.querySelector(`.du-ci-cell[data-bld="${bld}"][data-uid="${uid}"]`);
+  if(celda&&u){
+    const tmp=document.createElement('tbody');tmp.innerHTML='<tr>'+_ciCellHTML(bld,u)+'</tr>';
+    const nueva=tmp.querySelector('.du-ci-cell');if(nueva)celda.innerHTML=nueva.innerHTML;
+  }
   if(!db||!bld||!uid)return;
-  const el=document.querySelector(`.du-ejec-inp[data-bld="${bld}"][data-uid="${uid}"]`);
-  if(el)el.value=key?ejecDisplay(key):'';
-  const update={brokerAsignado:key,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
-  db.collection('buildings').doc(bld).collection('units').doc(uid).update(update)
-    .then(()=>{const u=_unitDocs.find(x=>x._id===uid);if(u)u.brokerAsignado=key;
-      if(el){el.style.borderColor='#16A34A';el.style.boxShadow='0 0 0 2px rgba(22,163,74,.12)';setTimeout(()=>{el.style.borderColor='';el.style.boxShadow='';},900);}})
+  db.collection('buildings').doc(bld).collection('units').doc(uid)
+    .update({contactoInformacion:list,brokerAsignado:(list.find(r=>r.tipo==='ejecutivo')||{}).id||'',updatedAt:firebase.firestore.FieldValue.serverTimestamp()})
     .catch(e=>showBldToast('❌ Error: '+e.message));
-  document.getElementById('du-ac-dropdown').style.display='none';
-}
-function duEjecBlur(inputEl){
-  if(_duAcBlurGuard)return;
-  // Sin texto libre: revierte al valor guardado (clave del catálogo → display).
-  const uid=inputEl.dataset.uid;const u=_unitDocs.find(x=>x._id===uid);
-  inputEl.value=u&&u.brokerAsignado?ejecDisplay(u.brokerAsignado):'';
 }
 
 document.addEventListener('click',function(e){
   const drop=document.getElementById('du-ac-dropdown');
-  if(drop&&!drop.contains(e.target)&&!e.target.classList.contains('du-ac-inp')&&!e.target.classList.contains('du-ejec-inp'))drop.style.display='none';
+  if(drop&&!drop.contains(e.target)&&!e.target.classList.contains('du-ac-inp')&&!e.target.closest('.du-ci-cell')){drop.style.display='none';_duCiCtx=null;}
 });
 
 /* ===== CRM LINKS MIGRATION ===== */
@@ -12818,7 +12889,7 @@ function renderDetailUnits(buildingId,filterQ=''){
     ${th('cocherasUnidad','Coch.')}
     ${th('vencimientoContrato','Vcto.')}
     <th>Obs.</th>
-    <th>Ejecutivo Comercial</th>
+    <th>Contacto de información</th>
     <th class="col-actions"></th>
   </tr></thead><tbody>`;
   filtered.forEach((u,i)=>{
@@ -12840,7 +12911,7 @@ function renderDetailUnits(buildingId,filterQ=''){
       <td><input class="du-inp" style="width:44px" type="number" value="${u.cocherasUnidad||''}" placeholder="0" onblur="saveUnitField('${buildingId}','${u._id}','cocherasUnidad',parseFloat(this.value)||0,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="width:100px" type="date" value="${esc(u.vencimientoContrato||'')}" title="${isNearVenc?'⚠ Próximo vencimiento':''}" style="width:100px;${isNearVenc?'border-color:#F59E0B;color:#F59E0B':''}" onblur="saveUnitField('${buildingId}','${u._id}','vencimientoContrato',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
       <td><input class="du-inp" style="min-width:100px" value="${esc(u.observaciones||'')}" onblur="saveUnitField('${buildingId}','${u._id}','observaciones',this.value,this)" onkeydown="if(event.key==='Enter')this.blur()"></td>
-      <td><input class="du-inp du-ejec-inp" style="width:130px" data-bld="${buildingId}" data-uid="${u._id}" value="${esc(ejecDisplay(u.brokerAsignado))}" placeholder="Asignar ejecutivo..." autocomplete="off" oninput="duEjecSearch(this)" onfocus="duEjecSearch(this)" onblur="duEjecBlur(this)" onkeydown="if(event.key==='Escape'){document.getElementById('du-ac-dropdown').style.display='none';this.blur()}if(event.key==='Enter')this.blur()"></td>
+      ${_ciCellHTML(buildingId,u)}
       <td class="col-actions"><div class="du-actions">
         <button class="du-btn dup" title="Duplicar" onclick="duplicateUnit('${buildingId}','${u._id}')">⧉</button>
         <button class="du-btn del" title="Eliminar" onclick="deleteUnit('${buildingId}','${u._id}',this.closest('tr'))">✕</button>

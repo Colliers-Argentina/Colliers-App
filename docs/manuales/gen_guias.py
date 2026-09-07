@@ -222,7 +222,7 @@ GUIAS["Guia_Retail"] = Guia(
 
 # ─────────────────────────── COMPONENTES ───────────────────────────
 GUIAS["Guia_Componentes"] = Guia(
-    "Componentes", "1.0", FECHA,
+    "Componentes", "1.1", "21/08/2026",
     "Los componentes son las unidades dentro de un inmueble (por ejemplo: los pisos o "
     "locales de un edificio). Se cargan desde la ficha del inmueble, en la solapa Componentes, "
     "completando una fila por cada unidad.",
@@ -240,7 +240,7 @@ GUIAS["Guia_Componentes"] = Guia(
         ("Cocheras", "Cantidad de cocheras de la unidad."),
         ("Vencimiento de contrato", "Fecha de vencimiento del contrato, si la unidad está ocupada."),
         ("Observaciones", "Comentarios sobre la unidad."),
-        ("Ejecutivo", "Ejecutivo comercial asignado a la unidad."),
+        ("Contacto de información", "Personas a las que hay que contactar para actualizar la información de esa unidad. Se pueden elegir varias, combinando ejecutivos comerciales de Colliers y contactos de la base de Nexus. Al hacer clic en la celda se abre el buscador, con los ejecutivos y los contactos separados; se tildan los que correspondan y se destildan para quitarlos. Si el contacto no existe todavía, se puede crear desde ahí mismo. En la celda se ve la primera persona y un +N con el resto."),
     ],
     [
         "La unidad queda cargada dentro del inmueble.",
