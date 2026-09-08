@@ -1795,6 +1795,13 @@ body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 .sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
 .sr-wiz-etapa-hd{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8898C0}
 .cdr-hint{font-size:10.5px;color:#8898C0;margin-top:.25rem;line-height:1.35}
+.bf-sec{margin-top:1.1rem;border:1px solid #E8EFF8;border-radius:12px;padding:1rem;background:#fff}
+.bf-sec-hd{font-size:13px;font-weight:800;color:#0A1B4D;margin-bottom:.2rem}
+.bf-sec-sub{font-size:11px;color:#8898C0;line-height:1.45;margin-bottom:.7rem}
+.bf-piso{display:flex;align-items:center;gap:.55rem;padding:.4rem .55rem;border:1px solid #E8EFF8;border-radius:8px;margin-bottom:.3rem;cursor:pointer;font-size:12.5px}
+.bf-piso:hover{background:#F8FAFF;border-color:#C7D7FF}
+.bf-piso-t{font-weight:700;color:#0A1B4D;min-width:96px}
+.bf-piso-d{color:#56648F;font-size:11.5px}
 .sr-fotos-grid{display:flex;flex-wrap:wrap;gap:.45rem}
 .sr-foto{position:relative;width:88px;height:66px;border:1px solid #E8EFF8;border-radius:8px;overflow:hidden;background:#F6F8FC;display:block}
 .sr-foto img{width:100%;height:100%;object-fit:cover;display:block}
@@ -18230,10 +18237,28 @@ function loadBldFicha(buildingId){
         <div style="font-size:12px"><span style="color:#94A3B8;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px">Foto de portada</span><span style="font-weight:600;color:${hasPhoto?'#16A34A':'#F59E0B'}">${hasPhoto?'✓ Disponible':'⚠ Sin foto (recomendado subir una)'}</span></div>
         <div style="font-size:12px"><span style="color:#94A3B8;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px">Fotos en documentos</span><span id="bld-ficha-doc-count" style="font-weight:600;color:#0A1B4D">Verificando…</span></div>
       </div>
+      <div class="bf-sec">
+        <div class="bf-sec-hd">Pisos que entran en la ficha</div>
+        <div class="bf-sec-sub">Elegí las unidades disponibles que querés mostrar en la sección Disponibilidad. Podés dejar afuera las que no correspondan.</div>
+        <div style="display:flex;gap:.5rem;margin-bottom:.5rem">
+          <button type="button" class="crm-action-btn" onclick="bfPisosTodos(true)">Seleccionar todos</button>
+          <button type="button" class="crm-action-btn" onclick="bfPisosTodos(false)">Ninguno</button>
+          <span id="bf-pisos-cnt" style="margin-left:auto;font-size:11px;font-weight:700;color:#56648F;align-self:center"></span>
+        </div>
+        <div id="bf-pisos-list"></div>
+      </div>
+      <div class="bf-sec">
+        <div class="bf-sec-hd">Características de la oficina <span style="font-weight:500;color:#8898C0">(opcional)</span></div>
+        <div class="bf-sec-sub">Una característica por línea: cada línea sale como viñeta en la ficha. Ej.: Cableado: piso ductos · Cielorraso acústico · Aire acondicionado: sistema fan coil.</div>
+        <textarea id="bf-caract-oficina" class="cdr-input" rows="5" style="resize:vertical;min-height:96px" placeholder="Cableado: piso ductos&#10;Cielorraso acústico&#10;Aire acondicionado: sistema fan coil&#10;2 baterías de baños generales, baño privado y office&#10;Luminarias">${esc(d.caracteristicasOficina||'')}</textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:.4rem"><button type="button" class="crm-action-btn" onclick="bfGuardarCaract('${buildingId}')">Guardar en el inmueble</button></div>
+      </div>
       <div style="margin-top:1rem;padding:.75rem 1rem;background:rgba(28,84,244,.05);border:1px solid rgba(28,84,244,.12);border-radius:8px;font-size:11.5px;color:#374151;line-height:1.6">
-        <strong style="color:#1C54F4">📋 Contenido del PPT:</strong> Portada con KPIs · Galería fotográfica · Tabla de disponibilidades · Características · Mapa de ubicación · Contacto
+        <strong style="color:#1C54F4">📋 Composición de la ficha:</strong> Portada (título, subtítulo, descripción, superficie disponible, valor y contacto) · Galería fotográfica · Plantas y disponibilidad de los pisos elegidos · Características del edificio y de la oficina · Contacto
       </div>
     </div>`;
+  _bfPisos=new Set(availUnits.map(u=>u._id));
+  _bfRenderPisos();
   if(db&&buildingId){
     const imgExts=['jpg','jpeg','png','webp'];
     db.collection('buildings').doc(buildingId).collection('documentos').get().then(snap=>{
@@ -18244,6 +18269,35 @@ function loadBldFicha(buildingId){
   }
 }
 
+// Selección de pisos para la ficha (paso previo a generarla).
+let _bfPisos=new Set();
+function _bfUnidadesDisp(){return _unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);}
+function _bfRenderPisos(){
+  const c=document.getElementById('bf-pisos-list');if(!c)return;
+  const list=_bfUnidadesDisp();
+  const n=v=>parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;
+  c.innerHTML=list.length?list.map(u=>`<label class="bf-piso"><input type="checkbox" ${_bfPisos.has(u._id)?'checked':''} onchange="bfPisoToggle('${u._id}',this.checked)"><span class="bf-piso-t">${esc(_bfPisoLabel(u))}</span><span class="bf-piso-d">${n(u.m2)?Math.round(n(u.m2)).toLocaleString('es-AR')+' m²':'– m²'}${u.askingRent?' · '+esc(u.askingRent):''}${n(u.cocherasUnidad)?' · '+n(u.cocherasUnidad)+' cocheras':''}</span></label>`).join('')
+    :'<div style="font-size:11.5px;color:#8898C0">Este inmueble no tiene unidades disponibles cargadas.</div>';
+  const cnt=document.getElementById('bf-pisos-cnt');
+  if(cnt)cnt.textContent=_bfPisos.size+' de '+list.length+' seleccionados';
+}
+function _bfPisoLabel(u){
+  const p=String(u.piso||'').trim();
+  const base=p?('Piso '+p+(/^\d+$/.test(p)?'°':'')):'Unidad';
+  return u.unidad?(base+' '+u.unidad):base;
+}
+window.bfPisoToggle=function(id,on){if(on)_bfPisos.add(id);else _bfPisos.delete(id);_bfRenderPisos();};
+window.bfPisosTodos=function(on){_bfPisos=on?new Set(_bfUnidadesDisp().map(u=>u._id)):new Set();_bfRenderPisos();};
+// Las características de la oficina se guardan en el inmueble para no volver a escribirlas.
+window.bfGuardarCaract=async function(buildingId){
+  const el=document.getElementById('bf-caract-oficina');if(!el||!db)return;
+  const v=(el.value||'').trim();
+  try{
+    await db.collection('buildings').doc(buildingId).update({caracteristicasOficina:v,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const b=_bldDocs.find(x=>x._id===buildingId);if(b)b.caracteristicasOficina=v;
+    showBldToast('✅ Características de la oficina guardadas');
+  }catch(e){showBldToast('❌ Error: '+e.message,4000);}
+};
 async function generateFichaComercial(buildingId){
   if(!buildingId){showBldToast('❌ Edificio no identificado',3000);return;}
   const d=_bldDocs.find(x=>x._id===buildingId);
@@ -18264,7 +18318,10 @@ async function generateFichaComercial(buildingId){
     if(d.imagenes)d.imagenes.forEach(u=>{if(u&&!photoUrls.includes(u))photoUrls.push(u);});
     photoUrls=photoUrls.slice(0,9);
 
-    const availUnits=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
+    // Sólo entran los pisos elegidos en el paso previo (si no se tocó nada, van todos los disponibles).
+    const _dispAll=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
+    const availUnits=_bfPisos.size?_dispAll.filter(u=>_bfPisos.has(u._id)):_dispAll;
+    if(!availUnits.length){showBldToast('⚠ Elegí al menos un piso para la ficha',4000);const b0=document.getElementById('btn-gen-ficha');if(b0){b0.disabled=false;b0.textContent='Generar Ficha (.pptx)';}return;}
     const _n=v=>parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;
     const totalM2=availUnits.reduce((s,u)=>s+_n(u.m2),0);
     const m2Vals=availUnits.map(u=>_n(u.m2)).filter(v=>v>0);
@@ -18286,6 +18343,7 @@ async function generateFichaComercial(buildingId){
     const brokerName=brokerObj?.name||d.broker||user?.displayName||'Colliers Argentina';
     const brokerEmail=brokerObj?.email||user?.email||'info@colliers.com';
 
+    const caractOficina=((document.getElementById('bf-caract-oficina')||{}).value||d.caracteristicasOficina||'').trim();
     showBldToast('📋 Cargando imágenes…',60000);
     const photoB64s=await Promise.all(photoUrls.map(u=>imgToBase64(u)));
     const vp=photoB64s.filter(Boolean);
@@ -18381,18 +18439,25 @@ async function generateFichaComercial(buildingId){
     s1.addText(supRangeStr,{x:10.03,y:2.46,w:3.0,h:0.42,fontSize:14,bold:true,color:NAVY,align:'center',valign:'middle',fontFace:'Open Sans'});
     s1.addShape(pptx.ShapeType.rect,{x:0,y:4.1,w:13.33,h:3.4,fill:{color:WHITE}});
     s1.addShape(pptx.ShapeType.rect,{x:0,y:4.1,w:0.06,h:3.4,fill:{color:NAVY}});
-    s1.addText(d.nombre||'Edificio',{x:0.22,y:4.18,w:8.55,h:0.72,fontSize:22,bold:true,color:NAVY,fontFace:'Open Sans',wrap:true});
-    s1.addText('Oficinas en '+ofStr+' · '+corredor,{x:0.22,y:4.94,w:8.55,h:0.3,fontSize:10.5,color:MGRAY,fontFace:'Open Sans'});
+    // Título (edificio + dirección), subtítulo y descripción, como en el modelo de ficha.
+    const titulo=[d.nombre||'Edificio',d.direccion].filter(Boolean).join(', ');
+    s1.addText(titulo,{x:0.22,y:4.18,w:8.55,h:0.72,fontSize:22,bold:true,color:NAVY,fontFace:'Open Sans',wrap:true});
+    s1.addText('Edificio de oficinas en '+ofStr+(corredor?' · '+corredor:''),{x:0.22,y:4.94,w:8.55,h:0.3,fontSize:10.5,color:MGRAY,fontFace:'Open Sans'});
     s1.addShape(pptx.ShapeType.line,{x:0.22,y:5.32,w:8.5,h:0,line:{color:'E2EAF4',width:0.75}});
-    const bItems=[];
-    if(d.categoria||d.cat)bItems.push('Categoría: '+(d.categoria||d.cat));
-    if(d.cantidadPisos)bItems.push('Pisos: '+d.cantidadPisos);
-    if(d.cocherasEdificio||d.cocheras)bItems.push('Cocheras: '+(d.cocherasEdificio||d.cocheras));
-    if(d.superficiePropia)bItems.push('Sup. propia: '+Math.round(d.superficiePropia).toLocaleString('es-AR')+' m²');
-    if(d.certificacion)bItems.push(d.certificacion);
-    if(d.anoConstruccion||d.anio)bItems.push('Año: '+(d.anoConstruccion||d.anio));
-    const bText=bItems.slice(0,9).map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}}));
-    if(bText.length)s1.addText(bText,{x:0.22,y:5.38,w:8.55,h:2.0,fontFace:'Open Sans',wrap:true});
+    const desc=(d.descripcion||'').trim();
+    if(desc){
+      s1.addText(desc,{x:0.22,y:5.38,w:8.55,h:1.7,fontSize:10,color:DGRAY,fontFace:'Open Sans',wrap:true,valign:'top'});
+    }else{
+      const bItems=[];
+      if(d.categoria||d.cat)bItems.push('Categoría: '+(d.categoria||d.cat));
+      if(d.cantidadPisos)bItems.push('Pisos: '+d.cantidadPisos);
+      if(d.cocherasEdificio||d.cocheras)bItems.push('Cocheras: '+(d.cocherasEdificio||d.cocheras));
+      if(d.superficiePropia)bItems.push('Sup. propia: '+Math.round(d.superficiePropia).toLocaleString('es-AR')+' m²');
+      if(d.certificacion)bItems.push(d.certificacion);
+      if(d.anoConstruccion||d.anio)bItems.push('Año: '+(d.anoConstruccion||d.anio));
+      const bText=bItems.slice(0,9).map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}}));
+      if(bText.length)s1.addText(bText,{x:0.22,y:5.38,w:8.55,h:2.0,fontFace:'Open Sans',wrap:true});
+    }
     s1.addShape(pptx.ShapeType.rect,{x:8.9,y:4.1,w:4.3,h:3.4,fill:{color:NAVY}});
     s1.addText(brokerName,{x:9.05,y:4.35,w:4.0,h:0.45,fontSize:14,bold:true,color:WHITE,fontFace:'Open Sans'});
     s1.addText(brokerEmail,{x:9.05,y:4.83,w:4.0,h:0.28,fontSize:9,color:'A5B4FC',fontFace:'Open Sans'});
@@ -18443,38 +18508,22 @@ async function generateFichaComercial(buildingId){
       }
       s3.addShape(pptx.ShapeType.rect,{x:0,y:4.2,w:13.33,h:0.52,fill:{color:NAVY}});
       s3.addText('Disponibilidad',{x:0.3,y:4.2,w:10,h:0.52,fontSize:15,bold:true,color:WHITE,valign:'middle',fontFace:'Open Sans'});
-      const HDR='E8EFF8',HDRTEXT='56648F',ROWALT='F5F7FF';
-      s3.addShape(pptx.ShapeType.rect,{x:0,y:4.72,w:13.33,h:0.38,fill:{color:HDR}});
-      const hCols=[
-        {x:0.18,w:3.2,lbl:'Edificio'},
-        {x:3.48,w:1.2,lbl:'Piso'},
-        {x:4.78,w:2.2,lbl:'Superficie (m²)'},
-        {x:7.08,w:2.4,lbl:'Tipo oferta'},
-        {x:9.58,w:2.5,lbl:'Asking Rent (USD/m²)'},
-        {x:12.18,w:1.0,lbl:'Coch.'},
-      ];
-      hCols.forEach(({x,w,lbl})=>{
-        s3.addText(lbl,{x,y:4.72,w,h:0.38,fontSize:8.5,bold:true,color:HDRTEXT,valign:'middle',fontFace:'Open Sans'});
+      // Una línea por piso elegido: Piso 2° - 3.357 m² - 19 USD/m² - 33 cocheras.
+      const divisible=_n(d.superficieMinima)>0?' (Con posibilidad de dividir en '+Math.round(_n(d.superficieMinima)).toLocaleString('es-AR')+' m²)':'';
+      if(divisible)s3.addText('Disponibilidad'+divisible,{x:0.3,y:4.8,w:12.7,h:0.3,fontSize:10.5,bold:true,color:NAVY,fontFace:'Open Sans'});
+      const lineas=availUnits.slice(0,10).map(u=>{
+        const partes=[_bfPisoLabel(u)];
+        if(_n(u.m2)>0)partes.push(Math.round(_n(u.m2)).toLocaleString('es-AR')+' m²');
+        if(_n(u.askingRent)>0)partes.push(Math.round(_n(u.askingRent)).toLocaleString('es-AR')+' USD/m²');
+        if(_n(u.cocherasUnidad)>0)partes.push(Math.round(_n(u.cocherasUnidad))+' cocheras');
+        return {text:partes.join(' - '),options:{fontSize:11,color:DGRAY,breakLine:true,fontFace:'Open Sans'}};
       });
-      const rowH=0.34;
-      availUnits.slice(0,8).forEach((u,i)=>{
-        const ry=5.1+i*rowH;
-        if(i%2===0)s3.addShape(pptx.ShapeType.rect,{x:0,y:ry,w:13.33,h:rowH,fill:{color:ROWALT}});
-        const ofBadgeText=u.tipoOferta==='Venta'?'VENTA':u.tipoOferta==='Alquiler o Venta'||u.tipoOferta==='Alquiler / Venta'?'ALQ+VTA':'ALQUILER';
-        const ofBadgeClr=u.tipoOferta==='Venta'?'059669':u.tipoOferta==='Alquiler o Venta'||u.tipoOferta==='Alquiler / Venta'?'6B21A8':'0072B9';
-        const rent=_n(u.askingRent)>0?'USD '+_n(u.askingRent).toLocaleString('es-AR'):'–';
-        s3.addText(d.nombre||'–',{x:0.18,y:ry,w:3.2,h:rowH,fontSize:8.5,color:DGRAY,valign:'middle',fontFace:'Open Sans'});
-        s3.addText(u.piso||'–',{x:3.48,y:ry,w:1.2,h:rowH,fontSize:8.5,color:DGRAY,valign:'middle',align:'center',fontFace:'Open Sans'});
-        s3.addText(_n(u.m2)>0?Math.round(_n(u.m2)).toLocaleString('es-AR'):'–',{x:4.78,y:ry,w:2.2,h:rowH,fontSize:8.5,color:DGRAY,valign:'middle',align:'center',fontFace:'Open Sans'});
-        s3.addShape(pptx.ShapeType.roundRect,{x:7.1,y:ry+0.06,w:1.6,h:0.22,fill:{color:ofBadgeClr},rectRadius:0.03});
-        s3.addText(ofBadgeText,{x:7.1,y:ry+0.06,w:1.6,h:0.22,fontSize:7.5,bold:true,color:WHITE,align:'center',valign:'middle',fontFace:'Open Sans'});
-        s3.addText(rent,{x:9.58,y:ry,w:2.5,h:rowH,fontSize:8.5,color:DGRAY,valign:'middle',align:'center',fontFace:'Open Sans'});
-        s3.addText(u.cocherasUnidad||'–',{x:12.18,y:ry,w:1.0,h:rowH,fontSize:8.5,color:DGRAY,valign:'middle',align:'center',fontFace:'Open Sans'});
-      });
-      const totalY=5.1+Math.min(availUnits.length,8)*rowH;
-      s3.addShape(pptx.ShapeType.rect,{x:0,y:totalY,w:13.33,h:rowH,fill:{color:'EEF3FF'}});
-      s3.addText('TOTAL',{x:0.18,y:totalY,w:3.2,h:rowH,fontSize:8.5,bold:true,color:NAVY,valign:'middle',fontFace:'Open Sans'});
-      s3.addText(totalM2>0?Math.round(totalM2).toLocaleString('es-AR')+' m²':'–',{x:4.78,y:totalY,w:2.2,h:rowH,fontSize:8.5,bold:true,color:NAVY,valign:'middle',align:'center',fontFace:'Open Sans'});
+      s3.addText(lineas.length?lineas:[{text:'Sin unidades seleccionadas.',options:{fontSize:10,color:MGRAY,fontFace:'Open Sans'}}],
+        {x:0.3,y:divisible?5.14:4.9,w:12.7,h:1.8,fontFace:'Open Sans',wrap:true,valign:'top'});
+      const resumen=[];
+      if(totalM2>0)resumen.push('Total disponible: '+Math.round(totalM2).toLocaleString('es-AR')+' m²');
+      if(supRangeStr&&supRangeStr!=='–')resumen.push('Superficies: '+supRangeStr);
+      if(resumen.length)s3.addText(resumen.join('   ·   '),{x:0.3,y:6.85,w:12.7,h:0.3,fontSize:10,bold:true,color:NAVY,fontFace:'Open Sans'});
       s3.addShape(pptx.ShapeType.rect,{x:0,y:7.2,w:13.33,h:0.3,fill:{color:NAVY}});
       s3.addText('Accelerating success.',{x:0.3,y:7.2,w:6,h:0.3,fontSize:9,italic:true,color:WHITE,valign:'middle',fontFace:'Merriweather'});
       s3.addText('Información confidencial — Colliers International Argentina',{x:6,y:7.2,w:7.1,h:0.3,fontSize:8,color:'A5B4FC',align:'right',valign:'middle',fontFace:'Open Sans'});
@@ -18487,23 +18536,20 @@ async function generateFichaComercial(buildingId){
       s4.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:0.65,fill:{color:NAVY}});
       s4.addText('Características',{x:0.3,y:0,w:10,h:0.65,fontSize:17,bold:true,color:WHITE,valign:'middle',fontFace:'Open Sans'});
       await addLogo(s4);
-      s4.addText('Características de las oficinas',{x:0.3,y:0.78,w:7.6,h:0.35,fontSize:11.5,bold:true,color:NAVY,fontFace:'Open Sans'});
-      const descLines=[];
-      if(d.descripcion)d.descripcion.split(/[\n;]/).map(s=>s.trim()).filter(s=>s.length>3).slice(0,8).forEach(s=>descLines.push(s));
-      if(descLines.length){
-        const descBullets=descLines.map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}}));
-        s4.addText(descBullets,{x:0.3,y:1.17,w:7.6,h:2.2,fontFace:'Open Sans',wrap:true});
+      // Características del edificio (amenities) y, debajo, las de la oficina si se cargaron.
+      const _vinetas=t=>String(t||'').split(/[\n;]/).map(x=>x.replace(/^[•\-*]\s*/,'').trim()).filter(x=>x.length>2);
+      const edLines=_vinetas(d.amenities).slice(0,10);
+      s4.addText('Características del edificio',{x:0.3,y:0.78,w:7.6,h:0.35,fontSize:11.5,bold:true,color:NAVY,fontFace:'Open Sans'});
+      if(edLines.length){
+        s4.addText(edLines.map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}})),{x:0.3,y:1.17,w:7.6,h:2.6,fontFace:'Open Sans',wrap:true});
       }else{
-        s4.addText('Sin descripción ingresada.',{x:0.3,y:1.17,w:7.6,h:0.4,fontSize:9.5,color:MGRAY,fontFace:'Open Sans'});
+        s4.addText('Sin características cargadas en el inmueble.',{x:0.3,y:1.17,w:7.6,h:0.4,fontSize:9.5,color:MGRAY,fontFace:'Open Sans'});
       }
-      if(d.amenities){
-        const aLines=d.amenities.split(/[\n;]/).map(s=>s.trim()).filter(s=>s.length>3).slice(0,8);
-        if(aLines.length){
-          s4.addShape(pptx.ShapeType.line,{x:0.3,y:3.45,w:7.6,h:0,line:{color:'E2EAF4',width:0.75}});
-          s4.addText('Amenities',{x:0.3,y:3.55,w:7.6,h:0.35,fontSize:11.5,bold:true,color:NAVY,fontFace:'Open Sans'});
-          const aBullets=aLines.map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}}));
-          s4.addText(aBullets,{x:0.3,y:3.95,w:7.6,h:2.5,fontFace:'Open Sans',wrap:true});
-        }
+      const ofLines=_vinetas(caractOficina).slice(0,10);
+      if(ofLines.length){
+        s4.addShape(pptx.ShapeType.line,{x:0.3,y:3.85,w:7.6,h:0,line:{color:'E2EAF4',width:0.75}});
+        s4.addText('Características de la oficina',{x:0.3,y:3.95,w:7.6,h:0.35,fontSize:11.5,bold:true,color:NAVY,fontFace:'Open Sans'});
+        s4.addText(ofLines.map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}})),{x:0.3,y:4.34,w:7.6,h:2.6,fontFace:'Open Sans',wrap:true});
       }
       const MX=8.25,MY=0.78,MW=4.9,MH=3.7;
       if(mapB64)s4.addImage({data:mapB64,x:MX,y:MY,w:MW,h:MH});
