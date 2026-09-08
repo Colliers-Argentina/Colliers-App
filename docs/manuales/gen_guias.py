@@ -340,7 +340,7 @@ GUIAS["Guia_Solicitudes"] = Guia(
 
 # ─────────────────────────── CARTEL (M&R) ───────────────────────────
 GUIAS["Guia_Cartel"] = Guia(
-    "Cartel", "1.2", "08/09/2026",
+    "Cartel", "1.3", "08/09/2026",
     "Solicitud para producir y colocar un cartel en un inmueble. Es una actividad de "
     "Actividades de Marketing & Research: primero se completa el Formulario Base (tipo de actividad, "
     "prioridad, cuenta/contacto, unidad de negocio) y al elegir 'Cartel' se abre este formulario, que se completa en tres pasos: 1) Ubicación, 2) Información general y 3) Contenido.",
@@ -353,6 +353,7 @@ GUIAS["Guia_Cartel"] = Guia(
         ("Indicaciones de colocación", "Qué ingresar: obligatorio. Cómo debe colocarse el cartel y todo lo necesario para instalarlo: lugar, altura, orientación, fachada, acceso, soporte, fijación o restricciones. Hasta 600 caracteres, con contador."),
         ("Fotos del lugar", "Qué ingresar: al menos una foto. Contexto general del inmueble y su entorno. Se pueden subir varias, ver las miniaturas y quitar las que no correspondan antes de guardar."),
         ("Fotos de dónde aplicar", "Qué ingresar: al menos una foto. El lugar exacto y la superficie donde se va a colocar el cartel. También admite varias fotos."),
+        ("Estilo del cartel", "Qué ingresar: opcional. Si ya tenés un modelo del cartel o una referencia de cómo lo querés, adjuntalo acá. Admite varias imágenes y también PDF; se pueden quitar antes de guardar."),
     ],
     [
         "Se crea la solicitud con su número de ticket y estado Pendiente, junto con los datos del Formulario Base.",
