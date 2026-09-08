@@ -12570,6 +12570,18 @@ function parsePisosToUnits(pisosStr,bld){
 }
 
 /** Normalise m² value entered by user: handles "1.234,56" and "1,234.56" → number */
+// Números en formato argentino: coma decimal y punto de miles.
+// "22,00" → 22 · "2.200" → 2200 · "1.234,50" → 1234.5 · "22.5" → 22.5
+function _numAR(v){
+  if(v===null||v===undefined)return 0;
+  let s=String(v).replace(/[^\d.,-]/g,'').trim();
+  if(!s)return 0;
+  const tienePunto=s.includes('.'),tieneComa=s.includes(',');
+  if(tienePunto&&tieneComa)s=s.replace(/\./g,'').replace(',','.');        // 1.234,50
+  else if(tieneComa)s=s.replace(/,/g,'.');                               // 22,00
+  else if(tienePunto&&/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,''); // 2.200 → miles
+  return parseFloat(s)||0;
+}
 function normalizeM2Input(v){
   if(v===null||v===undefined||v==='')return 0;
   const s=String(v).trim();
@@ -18214,7 +18226,7 @@ function loadBldFicha(buildingId){
   const d=_bldDocs.find(x=>x._id===buildingId);
   if(!d){body.innerHTML='<div class="det-unit-empty">Edificio no encontrado.</div>';return;}
   const availUnits=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
-  const _n=v=>parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;
+  const _n=_numAR;
   const totalM2=availUnits.reduce((s,u)=>s+_n(u.m2),0);
   const hasPhoto=!!(d.foto||(d.imagenes&&d.imagenes[0]));
   body.innerHTML=`
@@ -18370,7 +18382,7 @@ async function generateFichaComercial(buildingId){
     const _dispAll=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
     const availUnits=_bfPisos.size?_dispAll.filter(u=>_bfPisos.has(u._id)):_dispAll;
     if(!availUnits.length){showBldToast('⚠ Elegí al menos un piso para la ficha',4000);const b0=document.getElementById('btn-gen-ficha');if(b0){b0.disabled=false;b0.textContent='Generar Ficha (.pptx)';}return;}
-    const _n=v=>parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;
+    const _n=_numAR;
     const totalM2=availUnits.reduce((s,u)=>s+_n(u.m2),0);
     const m2Vals=availUnits.map(u=>_n(u.m2)).filter(v=>v>0);
     const minM2=m2Vals.length?Math.min(...m2Vals):0;
@@ -18382,7 +18394,8 @@ async function generateFichaComercial(buildingId){
     const rentVals=rentUs.map(u=>_n(u.askingRent)).filter(v=>v>0);
     const minRent=rentVals.length?Math.min(...rentVals):null;
     const maxRent=rentVals.length?Math.max(...rentVals):null;
-    const rentRangeStr=!minRent?null:minRent===maxRent?'USD '+Math.round(minRent).toLocaleString('es-AR')+'/m²':'USD '+Math.round(minRent).toLocaleString('es-AR')+' – '+Math.round(maxRent).toLocaleString('es-AR')+'/m²';
+    const _usd=v=>v.toLocaleString('es-AR',{maximumFractionDigits:2});
+    const rentRangeStr=!minRent?null:minRent===maxRent?'USD '+_usd(minRent)+'/m²':'USD '+_usd(minRent)+' – '+_usd(maxRent)+'/m²';
     const hasVenta=availUnits.some(u=>u.tipoOferta==='Venta'||u.tipoOferta==='Alquiler o Venta'||u.tipoOferta==='Alquiler / Venta');
     const hasAlq=availUnits.some(u=>!u.tipoOferta||u.tipoOferta==='Alquiler'||u.tipoOferta==='Alquiler o Venta'||u.tipoOferta==='Alquiler / Venta');
     const ofLbl=hasAlq&&hasVenta?'ALQ + VTA':hasVenta?'VENTA':'ALQUILER';
@@ -18568,7 +18581,7 @@ async function generateFichaComercial(buildingId){
       const lineas=availUnits.slice(0,10).map(u=>{
         const partes=[_bfPisoLabel(u)];
         if(_n(u.m2)>0)partes.push(Math.round(_n(u.m2)).toLocaleString('es-AR')+' m²');
-        if(_n(u.askingRent)>0)partes.push(Math.round(_n(u.askingRent)).toLocaleString('es-AR')+' USD/m²');
+        if(_n(u.askingRent)>0)partes.push(_n(u.askingRent).toLocaleString('es-AR',{maximumFractionDigits:2})+' USD/m²');
         if(_n(u.cocherasUnidad)>0)partes.push(Math.round(_n(u.cocherasUnidad))+' cocheras');
         return {text:partes.join(' - '),options:{fontSize:11,color:DGRAY,breakLine:true,fontFace:'Open Sans'}};
       });
