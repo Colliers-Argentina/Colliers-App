@@ -15729,8 +15729,8 @@ const SR_SERVICES=[
        {k:'urlMaps',label:'URL de Google Maps',type:'maps'},
      ]},
      {step:2,title:'Información general',fields:[
-       {k:'ancho',label:'Ancho (m)',type:'number',req:true,ph:'Ej.: 2,00'},
-       {k:'alto',label:'Alto (m)',type:'number',req:true,ph:'Ej.: 1,50'},
+       {k:'ancho',label:'Ancho (cm)',type:'number',req:true,ph:'Ej.: 200'},
+       {k:'alto',label:'Alto (cm)',type:'number',req:true,ph:'Ej.: 150'},
        {k:'material',label:'Material',type:'select',req:true,opts:CARTEL_MATERIALES},
        {k:'materialOtro',label:'Especificar material',type:'text',req:true,showIf:{k:'material',vals:['Otro']}},
        {k:'indicaciones',label:'Indicaciones de colocación',type:'textarea',req:true,max:600,hint:'Indicanos cómo debe colocarse el cartel y cualquier detalle necesario para su instalación.',ph:'Ej.: Colocar sobre la fachada principal, a la derecha del acceso al edificio, aproximadamente a 4 metros de altura. Orientación horizontal. Fijar sobre estructura existente.'},
