@@ -340,14 +340,14 @@ GUIAS["Guia_Solicitudes"] = Guia(
 
 # ─────────────────────────── CARTEL (M&R) ───────────────────────────
 GUIAS["Guia_Cartel"] = Guia(
-    "Cartel", "1.0", "21/08/2026",
+    "Cartel", "1.1", "21/08/2026",
     "Solicitud para producir y colocar un cartel en un inmueble. Es una actividad de "
     "Actividades de Marketing & Research: primero se completa el Formulario Base (tipo de actividad, "
-    "prioridad, cuenta/contacto, unidad de negocio) y al elegir 'Cartel' se abre este formulario.",
+    "prioridad, cuenta/contacto, unidad de negocio) y al elegir 'Cartel' se abre este formulario, que se completa en tres pasos: 1) Ubicación, 2) Información general y 3) Contenido.",
     [
         ("Inmueble", "Qué ingresar: buscar el inmueble en Nexus. Es obligatorio y tiene que estar registrado: desde este formulario no se puede crear. Si no aparece, primero hay que registrarlo en Nexus."),
         ("Dirección", "No se carga: se completa sola con la dirección del inmueble elegido y se muestra como información de solo lectura. Si se cambia el inmueble, se actualiza."),
-        ("Link de Google Maps", "Se genera solo a partir del inmueble y se muestra como 'Ver ubicación en Google Maps', que abre el mapa en una pestaña nueva. Si el inmueble no tiene dirección suficiente, se avisa y no se genera un enlace incorrecto."),
+        ("URL de Google Maps", "Se genera sola a partir del inmueble y se muestra como 'Ver ubicación en Google Maps', que abre el mapa en una pestaña nueva. Si el inmueble no tiene dirección suficiente, se avisa y no se genera un enlace incorrecto."),
         ("Ancho y Alto", "Qué ingresar: el tamaño del cartel en metros. Los dos son obligatorios y tienen que ser mayores a cero."),
         ("Material", "Qué ingresar: elegir el material del cartel de la lista. Es obligatorio. Si se elige 'Otro', aparece 'Especificar material', que pasa a ser obligatorio."),
         ("Indicaciones de colocación", "Qué ingresar: obligatorio. Cómo debe colocarse el cartel y todo lo necesario para instalarlo: lugar, altura, orientación, fachada, acceso, soporte, fijación o restricciones. Hasta 600 caracteres, con contador."),

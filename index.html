@@ -15717,27 +15717,27 @@ const SR_SERVICES=[
   {key:'cartel',label:'Cartel',icon:'🪧',responsable:'Marketing & Research',responsableEmail:'',
    sub:'Completá la información necesaria para solicitar el cartel.',
    wizSteps:[
-     {n:1,label:'Información del inmueble',etapa:'CARTEL'},
-     {n:2,label:'Características del cartel',etapa:'CARTEL'},
-     {n:3,label:'Fotos y ubicación',etapa:'CARTEL'},
+     {n:1,label:'Ubicación',etapa:'CARTEL'},
+     {n:2,label:'Información general',etapa:'CARTEL'},
+     {n:3,label:'Contenido',etapa:'CARTEL'},
      {n:4,label:'Revisión',etapa:''},
    ],
    form:[
-     {step:1,title:'Información del inmueble',fields:[
+     {step:1,title:'Ubicación',fields:[
        {k:'inmueble',label:'Inmueble',type:'inmueble',req:true,noCrear:true,hint:'El inmueble tiene que estar registrado en Nexus para poder pedir el cartel.'},
        {k:'direccion',label:'Dirección',type:'text',ro:true,hint:'Se completa con la dirección del inmueble seleccionado.'},
-       {k:'urlMaps',label:'Link de Google Maps',type:'maps'},
+       {k:'urlMaps',label:'URL de Google Maps',type:'maps'},
      ]},
-     {step:2,title:'Características del cartel',fields:[
+     {step:2,title:'Información general',fields:[
        {k:'ancho',label:'Ancho (m)',type:'number',req:true,ph:'Ej.: 2,00'},
        {k:'alto',label:'Alto (m)',type:'number',req:true,ph:'Ej.: 1,50'},
        {k:'material',label:'Material',type:'select',req:true,opts:CARTEL_MATERIALES},
        {k:'materialOtro',label:'Especificar material',type:'text',req:true,showIf:{k:'material',vals:['Otro']}},
        {k:'indicaciones',label:'Indicaciones de colocación',type:'textarea',req:true,max:600,hint:'Indicanos cómo debe colocarse el cartel y cualquier detalle necesario para su instalación.',ph:'Ej.: Colocar sobre la fachada principal, a la derecha del acceso al edificio, aproximadamente a 4 metros de altura. Orientación horizontal. Fijar sobre estructura existente.'},
      ]},
-     {step:3,title:'Fotos y ubicación',fields:[
+     {step:3,title:'Contenido',fields:[
        {k:'fotosLugar',label:'Fotos del lugar',type:'fotos',req:true,hint:'Subí fotos del lugar donde se colocará el cartel.'},
-       {k:'fotosAplicacion',label:'Fotos de dónde aplicar',type:'fotos',req:true,hint:'Mostrá el lugar exacto donde se aplicará el cartel. Podés señalar o mostrar claramente la superficie de colocación.'},
+       {k:'fotosAplicacion',label:'Fotos de dónde aplicar',type:'fotos',req:true,hint:'Mostrá el lugar exacto donde se aplicará el cartel.'},
      ]},
    ]},
 ];
