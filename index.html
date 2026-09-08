@@ -18248,6 +18248,11 @@ function loadBldFicha(buildingId){
         <div id="bf-pisos-list"></div>
       </div>
       <div class="bf-sec">
+        <div class="bf-sec-hd">Ejecutivos comerciales en la ficha</div>
+        <div class="bf-sec-sub">Elegí quién figura como contacto en la portada y en la última página. Se pueden seleccionar hasta 2.</div>
+        <div id="bf-ejec-list"></div>
+      </div>
+      <div class="bf-sec">
         <div class="bf-sec-hd">Características de la oficina <span style="font-weight:500;color:#8898C0">(opcional)</span></div>
         <div class="bf-sec-sub">Una característica por línea: cada línea sale como viñeta en la ficha. Ej.: Cableado: piso ductos · Cielorraso acústico · Aire acondicionado: sistema fan coil.</div>
         <textarea id="bf-caract-oficina" class="cdr-input" rows="5" style="resize:vertical;min-height:96px" placeholder="Cableado: piso ductos&#10;Cielorraso acústico&#10;Aire acondicionado: sistema fan coil&#10;2 baterías de baños generales, baño privado y office&#10;Luminarias">${esc(d.caracteristicasOficina||'')}</textarea>
@@ -18259,6 +18264,8 @@ function loadBldFicha(buildingId){
     </div>`;
   _bfPisos=new Set(availUnits.map(u=>u._id));
   _bfRenderPisos();
+  _bfEjecs=new Set(_bfEjecsPorDefecto(d));
+  _bfRenderEjecs();
   if(db&&buildingId){
     const imgExts=['jpg','jpeg','png','webp'];
     db.collection('buildings').doc(buildingId).collection('documentos').get().then(snap=>{
@@ -18288,6 +18295,47 @@ function _bfPisoLabel(u){
 }
 window.bfPisoToggle=function(id,on){if(on)_bfPisos.add(id);else _bfPisos.delete(id);_bfRenderPisos();};
 window.bfPisosTodos=function(on){_bfPisos=on?new Set(_bfUnidadesDisp().map(u=>u._id)):new Set();_bfRenderPisos();};
+// Ejecutivos comerciales que figuran como contacto en la ficha (máximo 2).
+let _bfEjecs=new Set();
+const BF_EJEC_MAX=2;
+function _bfEjecsPorDefecto(d){
+  const claves=[];
+  const porTexto=v=>{const t=String(v||'').toLowerCase();return EJECUTIVOS_CATALOG.find(e=>t&&(t===e.key.toLowerCase()||t.includes(e.key.toLowerCase())));};
+  const delEdificio=porTexto(d&&(d.broker||d.brokerAsignado||d.ejecutivoComercial));
+  if(delEdificio)claves.push(delEdificio.key);
+  if(!claves.length){
+    const em=(user?.email||'').toLowerCase();
+    const b=BROKERS.find(x=>(x.email||'').toLowerCase()===em);
+    const mio=b?porTexto(b.displayName||b.name):null;
+    if(mio)claves.push(mio.key);
+  }
+  return claves;
+}
+function _bfRenderEjecs(){
+  const c=document.getElementById('bf-ejec-list');if(!c)return;
+  c.innerHTML=EJECUTIVOS_CATALOG.map(e=>{
+    const b=BROKERS.find(x=>(x.displayName||x.name||'').includes(e.key))||{};
+    const sel=_bfEjecs.has(e.key);
+    return `<label class="bf-piso"><input type="checkbox" ${sel?'checked':''} onchange="bfEjecToggle('${e.key}',this.checked)"><span class="bf-piso-t" style="min-width:150px">${esc(e.display)}</span><span class="bf-piso-d">${esc(b.email||'')}</span></label>`;
+  }).join('')+`<div style="font-size:11px;color:#8898C0;margin-top:.3rem">${_bfEjecs.size} seleccionado${_bfEjecs.size===1?'':'s'} (máx. ${BF_EJEC_MAX})</div>`;
+}
+window.bfEjecToggle=function(key,on){
+  if(on){
+    if(_bfEjecs.size>=BF_EJEC_MAX){showBldToast('⚠ Podés elegir hasta '+BF_EJEC_MAX+' ejecutivos para la ficha',3500);_bfRenderEjecs();return;}
+    _bfEjecs.add(key);
+  }else _bfEjecs.delete(key);
+  _bfRenderEjecs();
+};
+// Datos de contacto de los ejecutivos elegidos; si no se eligió ninguno, cae al responsable del edificio.
+function _bfContactos(d){
+  const out=[...(_bfEjecs||[])].map(k=>{
+    const b=BROKERS.find(x=>(x.displayName||x.name||'').includes(k))||{};
+    return {nombre:b.name||ejecDisplay(k),email:b.email||'',telefono:b.telefono||''};
+  }).filter(x=>x.nombre);
+  if(out.length)return out;
+  const bo=BROKERS.find(b=>b.email===d.broker)||BROKERS.find(b=>b.name===d.broker)||BROKERS.find(b=>b.email===user?.email);
+  return [{nombre:bo?.name||d.broker||user?.displayName||'Colliers Argentina',email:bo?.email||user?.email||'info@colliers.com',telefono:bo?.telefono||''}];
+}
 // Las características de la oficina se guardan en el inmueble para no volver a escribirlas.
 window.bfGuardarCaract=async function(buildingId){
   const el=document.getElementById('bf-caract-oficina');if(!el||!db)return;
@@ -18339,9 +18387,8 @@ async function generateFichaComercial(buildingId){
     const ofColor=hasAlq&&hasVenta?'6B21A8':hasVenta?'059669':'0072B9';
     const ofStr=hasAlq&&hasVenta?'alquiler / venta':hasVenta?'venta':'alquiler';
 
-    const brokerObj=BROKERS.find(b=>b.email===d.broker)||BROKERS.find(b=>b.name===d.broker)||BROKERS.find(b=>b.email===user?.email);
-    const brokerName=brokerObj?.name||d.broker||user?.displayName||'Colliers Argentina';
-    const brokerEmail=brokerObj?.email||user?.email||'info@colliers.com';
+    const contactos=_bfContactos(d);
+    const brokerName=contactos[0].nombre,brokerEmail=contactos[0].email;
 
     const caractOficina=((document.getElementById('bf-caract-oficina')||{}).value||d.caracteristicasOficina||'').trim();
     showBldToast('📋 Cargando imágenes…',60000);
@@ -18459,8 +18506,13 @@ async function generateFichaComercial(buildingId){
       if(bText.length)s1.addText(bText,{x:0.22,y:5.38,w:8.55,h:2.0,fontFace:'Open Sans',wrap:true});
     }
     s1.addShape(pptx.ShapeType.rect,{x:8.9,y:4.1,w:4.3,h:3.4,fill:{color:NAVY}});
-    s1.addText(brokerName,{x:9.05,y:4.35,w:4.0,h:0.45,fontSize:14,bold:true,color:WHITE,fontFace:'Open Sans'});
-    s1.addText(brokerEmail,{x:9.05,y:4.83,w:4.0,h:0.28,fontSize:9,color:'A5B4FC',fontFace:'Open Sans'});
+    s1.addText('Contacto',{x:9.05,y:4.2,w:4.0,h:0.22,fontSize:8,color:'A5B4FC',fontFace:'Open Sans'});
+    contactos.slice(0,2).forEach((c,i)=>{
+      const cy=4.42+i*0.62;
+      s1.addText(c.nombre,{x:9.05,y:cy,w:4.0,h:0.3,fontSize:contactos.length>1?11.5:13,bold:true,color:WHITE,fontFace:'Open Sans'});
+      const det=[c.telefono?'Tel: '+c.telefono:'',c.email].filter(Boolean).join('  ·  ');
+      if(det)s1.addText(det,{x:9.05,y:cy+0.28,w:4.0,h:0.26,fontSize:8.5,color:'A5B4FC',fontFace:'Open Sans'});
+    });
     s1.addShape(pptx.ShapeType.line,{x:9.05,y:5.28,w:3.9,h:0,line:{color:WHITE,width:0.5,transparency:65}});
     s1.addText('Colliers International',{x:9.05,y:5.42,w:4.0,h:0.35,fontSize:11,bold:true,color:WHITE,fontFace:'Open Sans'});
     s1.addText('www.colliers.com/es-ar',{x:9.05,y:5.8,w:4.0,h:0.28,fontSize:9,color:'A5B4FC',fontFace:'Open Sans'});
@@ -18537,7 +18589,12 @@ async function generateFichaComercial(buildingId){
       s4.addText('Características',{x:0.3,y:0,w:10,h:0.65,fontSize:17,bold:true,color:WHITE,valign:'middle',fontFace:'Open Sans'});
       await addLogo(s4);
       // Características del edificio (amenities) y, debajo, las de la oficina si se cargaron.
-      const _vinetas=t=>String(t||'').split(/[\n;]/).map(x=>x.replace(/^[•\-*]\s*/,'').trim()).filter(x=>x.length>2);
+      // Una línea por viñeta. Si viene todo en una sola línea separado por comas, se corta ahí.
+      const _vinetas=t=>{
+        const raw=String(t||'').trim();if(!raw)return [];
+        const sep=/[\n;]/.test(raw)?/[\n;]/:/,/;
+        return raw.split(sep).map(x=>x.replace(/^[•\-*]\s*/,'').trim()).filter(x=>x.length>2);
+      };
       const edLines=_vinetas(d.amenities).slice(0,10);
       s4.addText('Características del edificio',{x:0.3,y:0.78,w:7.6,h:0.35,fontSize:11.5,bold:true,color:NAVY,fontFace:'Open Sans'});
       if(edLines.length){
@@ -18560,8 +18617,12 @@ async function generateFichaComercial(buildingId){
       s4.addText(d.direccion||'',{x:MX,y:MY+MH+0.05,w:MW,h:0.28,fontSize:8.5,color:MGRAY,align:'center',fontFace:'Open Sans'});
       const CX=8.25,CY=4.82,CW=4.9,CH=2.12;
       s4.addShape(pptx.ShapeType.rect,{x:CX,y:CY,w:CW,h:CH,fill:{color:NAVY}});
-      s4.addText(brokerName,{x:CX+0.2,y:CY+0.2,w:CW-0.4,h:0.42,fontSize:14,bold:true,color:WHITE,fontFace:'Open Sans'});
-      s4.addText(brokerEmail,{x:CX+0.2,y:CY+0.65,w:CW-0.4,h:0.28,fontSize:9.5,color:'A5B4FC',fontFace:'Open Sans'});
+      contactos.slice(0,2).forEach((c,i)=>{
+        const cy=CY+0.2+i*0.62;
+        s4.addText(c.nombre,{x:CX+0.2,y:cy,w:CW-0.4,h:0.32,fontSize:contactos.length>1?11.5:14,bold:true,color:WHITE,fontFace:'Open Sans'});
+        const det=[c.telefono?'Tel: '+c.telefono:'',c.email].filter(Boolean).join('  ·  ');
+        if(det)s4.addText(det,{x:CX+0.2,y:cy+0.3,w:CW-0.4,h:0.26,fontSize:8.5,color:'A5B4FC',fontFace:'Open Sans'});
+      });
       s4.addShape(pptx.ShapeType.line,{x:CX+0.2,y:CY+1.05,w:CW-0.4,h:0,line:{color:WHITE,width:0.5,transparency:65}});
       s4.addText('Colliers International Argentina',{x:CX+0.2,y:CY+1.15,w:CW-0.4,h:0.32,fontSize:9.5,bold:true,color:WHITE,fontFace:'Open Sans'});
       s4.addText('www.colliers.com/es-ar',{x:CX+0.2,y:CY+1.5,w:CW-0.4,h:0.28,fontSize:9,color:'A5B4FC',fontFace:'Open Sans'});

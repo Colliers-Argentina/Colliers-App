@@ -340,14 +340,15 @@ GUIAS["Guia_Solicitudes"] = Guia(
 
 # ─────────────────────────── FICHA DEL INMUEBLE ───────────────────────────
 GUIAS["Guia_Ficha_Inmueble"] = Guia(
-    "Generador de Ficha del Inmueble", "1.0", "08/09/2026",
+    "Generador de Ficha del Inmueble", "1.1", "08/09/2026",
     "Genera automáticamente la ficha comercial del inmueble en PowerPoint, con los datos que ya "
     "están cargados en Nexus. Se abre desde la ficha del inmueble, en la solapa Ficha, y antes de "
     "generarla se eligen los pisos que se quieren mostrar.",
     [
         ("Pisos que entran en la ficha", "Qué elegir: tildar las unidades disponibles que se quieren mostrar en la sección Disponibilidad. Vienen todas marcadas; se pueden destildar las que no correspondan o usar 'Seleccionar todos' / 'Ninguno'. Si no queda ninguna, el sistema avisa y no genera la ficha."),
+        ("Ejecutivos comerciales en la ficha", "Qué elegir: quién figura como contacto en la portada y en la última página. Viene marcado el responsable del inmueble (o el usuario logueado) y se pueden elegir hasta 2. Se muestran con su nombre y su correo."),
         ("Características de la oficina (opcional)", "Qué ingresar: una característica por línea; cada línea sale como viñeta en la ficha. Por ejemplo: cableado, cielorraso, aire acondicionado, baños, luminarias. Con 'Guardar en el inmueble' queda cargado para las próximas fichas."),
-        ("Datos que se toman solos", "El resto sale del inmueble: nombre y dirección (título), descripción (cuerpo de la portada), amenities (características del edificio), superficie disponible, asking rent y el ejecutivo de contacto. Si falta algo, conviene completarlo en la ficha del inmueble antes de generar."),
+        ("Datos que se toman solos", "El resto sale del inmueble: nombre y dirección (título), descripción (cuerpo de la portada), amenities (características del edificio), superficie disponible y asking rent. Las características del edificio salen en viñetas: si están escritas en una sola línea separadas por comas, el sistema las separa solo. Si falta algo, conviene completarlo en la ficha del inmueble antes de generar."),
         ("Verificaciones previas", "El panel avisa si el inmueble no tiene foto de portada y cuántas imágenes hay cargadas en Documentos."),
     ],
     [
