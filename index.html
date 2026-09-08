@@ -1795,6 +1795,10 @@ body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 .sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
 .sr-wiz-etapa-hd{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8898C0}
 .cdr-hint{font-size:10.5px;color:#8898C0;margin-top:.25rem;line-height:1.35}
+.sr-fotos-grid{display:flex;flex-wrap:wrap;gap:.45rem}
+.sr-foto{position:relative;width:88px;height:66px;border:1px solid #E8EFF8;border-radius:8px;overflow:hidden;background:#F6F8FC;display:block}
+.sr-foto img{width:100%;height:100%;object-fit:cover;display:block}
+.sr-foto-x{position:absolute;top:2px;right:2px;width:18px;height:18px;border:none;border-radius:50%;background:rgba(10,27,77,.72);color:#fff;font-size:10px;line-height:1;cursor:pointer}
 .du-ci-cell{display:flex;align-items:center;gap:3px;flex-wrap:wrap;min-width:120px;min-height:24px;cursor:pointer;padding:2px 3px;border:1px solid transparent;border-radius:6px}
 .du-ci-cell:hover{border-color:#C7D7FF;background:#F8FAFF}
 .du-ci-chip{display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;font-weight:700;color:#1C54F4;background:#EEF3FF;border:1px solid #DBE5FF;border-radius:999px;padding:1px 7px}
@@ -15606,6 +15610,8 @@ function validarSuperficieTotalCubierta(total,cubierta,opts){
   if(hasT&&hasC&&t<c)return {ok:false,msg:'La Superficie Total debe ser mayor o igual a la Superficie Cubierta.'};
   return {ok:true,msg:''};
 }
+// Catálogo de materiales del cartel: se administra desde acá, el formulario lo toma tal cual.
+const CARTEL_MATERIALES=['Lona vinílica','PVC','Acrílico','Chapa galvanizada','Chapa de aluminio','Aluminio compuesto (ACM)','Cartón / Cartulina','Vinilo autoadhesivo','Policarbonato','Otro','A definir'];
 const SR_ESTADOS=['Pendiente','En proceso','Finalizada'];
 // Indicador de prioridad tipo semáforo (círculo sólido + tooltip). Reutilizable en todas las vistas.
 const SR_PRIO_COLOR={'Baja':'#16A34A','Media':'#EAB308','Alta':'#F97316','Urgente':'#DC2626'};
@@ -15703,6 +15709,35 @@ const SR_SERVICES=[
      // ══ PUBLICACIÓN · Paso 5 — Comentarios (opcional) ══
      {step:5,title:'Comentarios',fields:[
        {k:'comentarios',label:'Comentarios',type:'textarea',ph:'¿Querés agregar algún comentario o información adicional?'},
+     ]},
+   ]},
+  // ── CARTEL ────────────────────────────────────────────────────────────────
+  // Mismo motor y mismos componentes que Ficha y Publicación (inmueble, dirección y Maps
+  // automáticos, uploader de imágenes). El inmueble tiene que existir: no se crea desde acá.
+  {key:'cartel',label:'Cartel',icon:'🪧',responsable:'Marketing & Research',responsableEmail:'',
+   sub:'Completá la información necesaria para solicitar el cartel.',
+   wizSteps:[
+     {n:1,label:'Información del inmueble',etapa:'CARTEL'},
+     {n:2,label:'Características del cartel',etapa:'CARTEL'},
+     {n:3,label:'Fotos y ubicación',etapa:'CARTEL'},
+     {n:4,label:'Revisión',etapa:''},
+   ],
+   form:[
+     {step:1,title:'Información del inmueble',fields:[
+       {k:'inmueble',label:'Inmueble',type:'inmueble',req:true,noCrear:true,hint:'El inmueble tiene que estar registrado en Nexus para poder pedir el cartel.'},
+       {k:'direccion',label:'Dirección',type:'text',ro:true,hint:'Se completa con la dirección del inmueble seleccionado.'},
+       {k:'urlMaps',label:'Link de Google Maps',type:'maps'},
+     ]},
+     {step:2,title:'Características del cartel',fields:[
+       {k:'ancho',label:'Ancho (m)',type:'number',req:true,ph:'Ej.: 2,00'},
+       {k:'alto',label:'Alto (m)',type:'number',req:true,ph:'Ej.: 1,50'},
+       {k:'material',label:'Material',type:'select',req:true,opts:CARTEL_MATERIALES},
+       {k:'materialOtro',label:'Especificar material',type:'text',req:true,showIf:{k:'material',vals:['Otro']}},
+       {k:'indicaciones',label:'Indicaciones de colocación',type:'textarea',req:true,max:600,hint:'Indicanos cómo debe colocarse el cartel y cualquier detalle necesario para su instalación.',ph:'Ej.: Colocar sobre la fachada principal, a la derecha del acceso al edificio, aproximadamente a 4 metros de altura. Orientación horizontal. Fijar sobre estructura existente.'},
+     ]},
+     {step:3,title:'Fotos y ubicación',fields:[
+       {k:'fotosLugar',label:'Fotos del lugar',type:'fotos',req:true,hint:'Subí fotos del lugar donde se colocará el cartel.'},
+       {k:'fotosAplicacion',label:'Fotos de dónde aplicar',type:'fotos',req:true,hint:'Mostrá el lugar exacto donde se aplicará el cartel. Podés señalar o mostrar claramente la superficie de colocación.'},
      ]},
    ]},
 ];
@@ -16373,7 +16408,8 @@ const SR_CATALOG=[
      {key:'retail',label:'Retail',icon:'🛍️',serviceKey:'ficha-retail',ready:false},
      {key:'industria',label:'Industria y Logística',icon:'🏭',serviceKey:'ficha-industria',ready:false},
    ]},
-  {key:'marketing',label:'Marketing',icon:'📣',responsable:'Marketing',ready:false,categorias:[]},
+  {key:'marketing',label:'Marketing',icon:'📣',responsable:'Marketing & Research',ready:true,
+   categorias:[{key:'cartel',label:'Cartel',icon:'🪧',serviceKey:'cartel',ready:true}]},
   {key:'research',label:'Research',icon:'📊',responsable:'Research',ready:false,categorias:[]},
   {key:'sistemas',label:'Sistemas',icon:'💻',responsable:'Sistemas',ready:false,categorias:[]},
   {key:'rrhh',label:'RR. HH.',icon:'👥',responsable:'RR. HH.',ready:false,categorias:[]},
@@ -16589,11 +16625,19 @@ const SR_WIZ_STEPS=[
   {n:6,label:'Revisión',etapa:''},
 ];
 const SR_WIZ_LAST=5, SR_WIZ_REVIEW=6, SR_WIZ_CONFIRM=7;
+// El wizard se arma con los pasos del servicio (SR_WIZ_STEPS es el de Ficha y Publicación).
+let _srSteps=SR_WIZ_STEPS,_srLast=SR_WIZ_LAST,_srReview=SR_WIZ_REVIEW,_srConfirm=SR_WIZ_CONFIRM;
+function _srSetSteps(svc){
+  _srSteps=(svc&&svc.wizSteps)||SR_WIZ_STEPS;
+  _srLast=_srSteps.filter(x=>x.etapa).length;
+  _srReview=_srLast+1;_srConfirm=_srLast+2;
+}
 let _srWizStep=1,_srAlcance='publicacion';
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
-  _srFormService=svc;_srDocList=[];_srDispList=[];Object.keys(_srAuto).forEach(k=>delete _srAuto[k]);_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;_srAlcance='publicacion';
-  document.getElementById('sr-form-title').textContent=svc.label;
+  _srFormService=svc;_srSetSteps(svc);_srDocList=[];_srDispList=[];_srFotos={};Object.keys(_srAuto).forEach(k=>delete _srAuto[k]);_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;_srAlcance='publicacion';
+  const ttlEl=document.getElementById('sr-form-title');
+  if(ttlEl)ttlEl.innerHTML=esc(svc.label)+(svc.sub?`<div style="font-size:12px;font-weight:500;color:#56648F;margin-top:.15rem">${esc(svc.sub)}</div>`:'');
   // El bloque "Automático" (Solicitante/Broker/Tipo/Fecha/Responsable) ya no se muestra en la
   // carga: esos datos se siguen generando y guardando automáticamente en submitSolicitud
   // (base de datos, PDF, timeline, auditoría, correos y detalle).
@@ -16613,26 +16657,27 @@ function openSolicitudForm(key){
   let steps='';
   // Marcador visual de etapa dentro del formulario: hasta dónde completar según lo que se pida.
   const etapaHd=n=>{
-    const st=SR_WIZ_STEPS.find(x=>x.n===n);
+    const st=_srSteps.find(x=>x.n===n);
     if(!st||!st.etapa)return '';
-    const primero=SR_WIZ_STEPS.filter(x=>x.etapa===st.etapa)[0].n===n;
+    const primero=_srSteps.filter(x=>x.etapa===st.etapa)[0].n===n;
     if(!primero)return '';
     const sub=st.etapa==='FICHA'?'Pasos 1 a 3 — con esto alcanza para solicitar la Ficha'
                                 :'Pasos 4 a 6 — información adicional para solicitar también la Publicación';
     return `<div class="sr-etapa-banner"><span class="sr-etapa-banner-t">${esc(st.etapa)}</span><span class="sr-etapa-banner-s">${esc(sub)}</span></div>`;
   };
-  for(let n=1;n<=SR_WIZ_LAST;n++){
+  for(let n=1;n<=_srLast;n++){
     const cards=svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
     steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${etapaHd(n)}${cards}</div>`;
   }
-  steps+=`<div class="sr-wiz-step" data-step="${SR_WIZ_REVIEW}" id="sr-wiz-review" style="display:none"></div>`;
-  steps+=`<div class="sr-wiz-step" data-step="${SR_WIZ_CONFIRM}" id="sr-wiz-confirm" style="display:none"></div>`;
+  steps+=`<div class="sr-wiz-step" data-step="${_srReview}" id="sr-wiz-review" style="display:none"></div>`;
+  steps+=`<div class="sr-wiz-step" data-step="${_srConfirm}" id="sr-wiz-confirm" style="display:none"></div>`;
   const nodo=st=>`<div class="sr-wiz-node" data-node="${st.n}"><div class="sr-wiz-dot">${st.n}</div><div class="sr-wiz-lbl">${esc(st.label)}</div></div>`;
   const etapa=(nombre,pasos)=>`<div class="sr-wiz-etapa"><div class="sr-wiz-etapa-hd">${esc(nombre)}</div><div class="sr-wiz-progress">${pasos.map((st,i)=>nodo(st)+(i<pasos.length-1?'<div class="sr-wiz-line"></div>':'')).join('')}</div></div>`;
+  const etiquetas={'FICHA':'Ficha','PUBLICACIÓN':'Publicación'};
+  const grupos=[...new Set(_srSteps.filter(x=>x.etapa).map(x=>x.etapa))];
   const progress=`<div id="sr-wiz-progress" class="sr-wiz-etapas">`
-    +etapa('Ficha',SR_WIZ_STEPS.filter(x=>x.etapa==='FICHA'))
-    +etapa('Publicación',SR_WIZ_STEPS.filter(x=>x.etapa==='PUBLICACIÓN'))
-    +`<div class="sr-wiz-etapa"><div class="sr-wiz-etapa-hd">&nbsp;</div><div class="sr-wiz-progress">${nodo(SR_WIZ_STEPS[SR_WIZ_REVIEW-1])}</div></div></div>`;
+    +grupos.map(gp=>etapa(etiquetas[gp]||gp.charAt(0)+gp.slice(1).toLowerCase(),_srSteps.filter(x=>x.etapa===gp))).join('')
+    +`<div class="sr-wiz-etapa"><div class="sr-wiz-etapa-hd">&nbsp;</div><div class="sr-wiz-progress">${nodo(_srSteps[_srReview-1])}</div></div></div>`;
   const footer=`<div class="sr-wiz-footer" id="sr-wiz-footer">
     <button type="button" class="crm-action-btn" id="sr-wiz-back" onclick="srWizPrev()" style="visibility:hidden">← Atrás</button>
     <div style="flex:1"></div>
@@ -16644,6 +16689,7 @@ function openSolicitudForm(key){
   loadClientesParaSelector();
   _srRenderEjecChips();
   _srDispRender();
+  svc.form.forEach(c=>c.fields.forEach(f=>{if(f.type==='fotos')_srFotosRender(f.k);}));
   _srApplyConditionals();
   ['srf-supTotal','srf-supCubierta'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',_srValidateSuperficies);});
   const btn=document.getElementById('sr-form-save');if(btn)btn.style.display='none';
@@ -16655,35 +16701,35 @@ function openSolicitudForm(key){
 function srWizGoto(n){
   _srWizStep=n;
   document.querySelectorAll('#sr-form-body .sr-wiz-step').forEach(el=>el.style.display=(+el.dataset.step===n)?'':'none');
-  if(n===SR_WIZ_REVIEW)_srWizRenderReview();
+  if(n===_srReview)_srWizRenderReview();
   // Progreso (6 nodos visibles; el paso 7 es confirmación).
-  document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===SR_WIZ_CONFIRM);});
+  document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===_srConfirm);});
   const back=document.getElementById('sr-wiz-back'),next=document.getElementById('sr-wiz-next'),foot=document.getElementById('sr-wiz-footer');
-  if(n===SR_WIZ_CONFIRM){if(foot)foot.style.display='none';return;}
+  if(n===_srConfirm){if(foot)foot.style.display='none';return;}
   if(foot)foot.style.display='flex';
   if(back)back.style.visibility=n>1?'visible':'hidden';
-  if(next)next.textContent=n===SR_WIZ_REVIEW?'Finalizar ✓':'Siguiente →';
+  if(next)next.textContent=n===_srReview?'Finalizar ✓':'Siguiente →';
   // Al cerrar el Paso 3 se completa toda la información de la Ficha: se ofrece terminar ahí
   // (solicitud de ficha) o continuar con los pasos de Publicación.
   const fich=document.getElementById('sr-wiz-ficha');
-  if(fich)fich.style.display=(n===3)?'':'none';
+  if(fich)fich.style.display=(n===3&&_srSteps===SR_WIZ_STEPS)?'':'none';
   const body=document.querySelector('#sr-form-view [class*="overflow-y"]')||document.getElementById('sr-form-view');if(body&&body.scrollTo)body.scrollTo({top:0,behavior:'smooth'});
 }
 window.srWizPrev=function(){if(_srWizStep>1)srWizGoto(_srWizStep-1);};
 window.srWizNext=function(){
-  if(_srWizStep<=SR_WIZ_LAST){
+  if(_srWizStep<=_srLast){
     if(!_srWizValidateStep(_srWizStep))return;
     if(_srWizStep===3)_srAlcance='publicacion';   // pasar del paso 3 = seguir con la Publicación
     srWizGoto(_srWizStep+1);
   }
-  else if(_srWizStep===SR_WIZ_REVIEW){submitSolicitud();}
+  else if(_srWizStep===_srReview){submitSolicitud();}
 };
 // Solicitud de SOLO FICHA: valida hasta el paso 3 y va directo a la revisión, sin exigir
 // los pasos de Contenido/Publicación. Marca el alcance en la solicitud (sin campos nuevos por paso).
 window.srWizSoloFicha=function(){
   for(let n=1;n<=3;n++){if(!_srWizValidateStep(n)){srWizGoto(n);return;}}
   _srAlcance='ficha';
-  srWizGoto(SR_WIZ_REVIEW);
+  srWizGoto(_srReview);
 };
 function _srWizValidateStep(n){
   const svc=_srFormService;if(!svc)return true;
@@ -16734,7 +16780,7 @@ function _srWizRenderReview(){
   const svc=_srFormService;const el=document.getElementById('sr-wiz-review');if(!svc||!el)return;
   const data=_srReadForm(svc);
   const pseudo={servicio:svc.key,data,cuentaNombre:data.cuentaNombre||(_srBase&&_srBase.cuentaNombre)||'',inmuebleId:data.inmuebleId,inmuebleNombre:data.inmuebleNombre,propietarioNombre:data.propietarioNombre||(_srBase&&_srBase.contactoNombre)||''};
-  const jumps=SR_WIZ_STEPS.slice(0,SR_WIZ_LAST).map(st=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${st.n})">✏️ ${esc(st.label)}</button>`).join('');
+  const jumps=_srSteps.slice(0,_srLast).map(st=>`<button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srWizGoto(${st.n})">✏️ ${esc(st.label)}</button>`).join('');
   el.innerHTML=`<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Revisión</div><div style="font-size:12.5px;color:#56648F;line-height:1.5">Revisá la información antes de enviar. Podés volver a cualquier paso para corregir.</div><div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem">${jumps}</div></div>${_srRenderData(pseudo)}`;
 }
 function _srFieldHTML(f){
@@ -16744,13 +16790,18 @@ function _srFieldHTML(f){
   const w=(inner,extra)=>`<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}${extra||''}>${lbl}${inner}${hint}</div>`;
   if(f.type==='text'||f.type==='number'||f.type==='url'){
     const cnt=f.max?`<div class="cdr-hint" id="${id}-cnt">0/${f.max}</div>`:'';
-    return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"${f.max?` maxlength="${f.max}" oninput="srCharCount('${f.k}',${f.max})"`:''}${f.ph?` placeholder="${esc(f.ph)}"`:''}>${cnt}`);
+    return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"${f.type==='number'?' min="0" step="0.01"':''}${f.ro?' readonly style="background:#F6F8FC;color:#56648F"':''}${f.max?` maxlength="${f.max}" oninput="srCharCount('${f.k}',${f.max})"`:''}${f.ph?` placeholder="${esc(f.ph)}"`:''}>${cnt}`);
   }
+  // Galería: varias imágenes con miniatura y borrado, subidas con el uploader de Nexus.
+  if(f.type==='fotos')return w(`<div id="${id}-grid" class="sr-fotos-grid"></div><input id="${id}-file" type="file" accept="image/*" multiple class="cdr-input" style="margin-top:.4rem;padding:.35rem" onchange="srFotosAdd('${f.k}',this)">`);
   // Disponibilidad: una fila por piso (piso · m² · cocheras), reutilizando el estilo de chips/inputs.
   if(f.type==='disponibilidad')return w(`<div id="${id}-rows"></div><button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF;margin-top:.4rem" onclick="srDispAdd()">＋ Agregar piso</button>`);
   // Link o archivo adjunto (reutiliza el mismo uploader que las actividades).
   if(f.type==='linkfile')return w(`<input id="${id}" class="cdr-input" type="text" placeholder="https://... (link del plano)"><input id="${id}-file" type="file" class="cdr-input" style="margin-top:.4rem;padding:.35rem">`);
-  if(f.type==='textarea')return w(`<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"${f.ph?` placeholder="${esc(f.ph)}"`:''}></textarea>`);
+  if(f.type==='textarea'){
+    const cnt=f.max?`<div class="cdr-hint" id="${id}-cnt">0/${f.max}</div>`:'';
+    return w(`<textarea id="${id}" class="cdr-input" rows="3" style="resize:vertical;min-height:64px"${f.max?` maxlength="${f.max}" oninput="srCharCount('${f.k}',${f.max})"`:''}${f.ph?` placeholder="${esc(f.ph)}"`:''}></textarea>${cnt}`);
+  }
   if(f.type==='date')return w(`<input id="${id}" class="cdr-input" type="date">`);
   if(f.type==='select')return w(`<select id="${id}" class="cdr-select" onchange="_srApplyConditionals()"><option value="">— Seleccionar —</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`);
   if(f.type==='cuenta')return w(`<input id="srf-cuenta" class="cdr-input" placeholder="Buscar cuenta..." autocomplete="off" oninput="ctaPickerInput('sr',this.value)" onfocus="ctaPickerInput('sr',this.value)" onblur="ctaPickerBlur('sr')"><div id="srf-cuenta-drop" class="cdr-ms-drop" style="display:none"></div><div id="srf-cuenta-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-cuentaId" type="hidden"><input id="srf-cuentaNombre" type="hidden">`,' style="position:relative"');
@@ -16780,6 +16831,8 @@ function _srCampoVacio(f,data){
   if(f.type==='contacto')return !data.propietarioId;
   if(f.type==='inmueble')return !data.inmuebleId;
   if(f.type==='sino'){const v=data[f.k]||{};return (f.opts||[]).some(o=>!v[o]);}
+  if(f.type==='fotos')return !((_srFotos[f.k]||[]).length);
+  if(f.type==='number'){const n=parseFloat(String(data[f.k]||'').replace(',','.'));return !(n>0);}
   return !String(data[f.k]||'').trim();
 }
 function _srFieldConValor(f,data){
@@ -16870,6 +16923,11 @@ function _srAutoFromBld(b){
   _srAutoSet('minimoDivisible',min?String(min):'');
 }
 window.srInmFaltaModal=function(){
+  if(_srInmSinAlta()){
+    const msg='No encontramos el inmueble. Para solicitar un cartel, primero debés registrar el inmueble en Nexus.';
+    if(typeof showBldToast==='function')showBldToast('⚠ '+msg,5000); else alert(msg);
+    return;
+  }
   let ov=document.getElementById('sr-inm-falta-ov');
   if(!ov){
     ov=document.createElement('div');ov.id='sr-inm-falta-ov';ov.className='actm-ov';
@@ -16887,7 +16945,16 @@ window.srInmFaltaModal=function(){
 };
 window.srInmFaltaClose=function(){const ov=document.getElementById('sr-inm-falta-ov');if(ov)ov.classList.remove('open');};
 window.srInmFaltaCrear=function(){srInmFaltaClose();srInmCreateStart();};
+function _srInmSinAlta(){
+  const f=(_srFormService&&_srFormService.form||[]).flatMap(c=>c.fields).find(x=>x.type==='inmueble');
+  return !!(f&&f.noCrear);
+}
 window.srInmCreateStart=function(){
+  if(_srInmSinAlta()){
+    const msg='No encontramos el inmueble. Para solicitar un cartel, primero debés registrar el inmueble en Nexus.';
+    if(typeof showBldToast==='function')showBldToast('⚠ '+msg,5000); else alert(msg);
+    return;
+  }
   const list=document.getElementById('srf-inm-list');if(list)list.style.display='none';
   const box=document.getElementById('srf-inm-create');if(!box)return;
   const pre=(document.getElementById('srf-inmueble').value||'').replace(/"/g,'&quot;');
@@ -16989,6 +17056,32 @@ window.srPropCreateSave=async function(){
   }catch(e){alert('Error al crear el contacto: '+e.message);}
 };
 let _srDispList=[];
+// Fotos por campo: {nombre,url} ya subidas o {nombre,file,preview} pendientes de subir.
+let _srFotos={};
+window.srFotosAdd=function(k,input){
+  const files=Array.from((input&&input.files)||[]);
+  if(!files.length)return;
+  _srFotos[k]=(_srFotos[k]||[]).concat(files.map(f=>({nombre:f.name,file:f,preview:(typeof URL!=='undefined'&&URL.createObjectURL)?URL.createObjectURL(f):''})));
+  input.value='';
+  _srFotosRender(k);
+};
+window.srFotosDel=function(k,i){(_srFotos[k]||[]).splice(i,1);_srFotosRender(k);};
+function _srFotosRender(k){
+  const c=document.getElementById('srf-'+k+'-grid');if(!c)return;
+  const list=_srFotos[k]||[];
+  c.innerHTML=list.length?list.map((f,i)=>`<div class="sr-foto"><img src="${esc(f.url||f.preview||'')}" alt="${esc(f.nombre||'')}" loading="lazy"><button type="button" class="sr-foto-x" title="Quitar" onclick="srFotosDel('${k}',${i})">✕</button></div>`).join('')
+    :'<div style="font-size:11px;color:#8898C0">Sin fotos cargadas.</div>';
+}
+// Sube lo pendiente con el mismo uploader que ya usa Nexus y devuelve las referencias.
+async function _srFotosSubir(k){
+  const list=_srFotos[k]||[];const out=[];
+  for(const f of list){
+    if(f.url){out.push({nombre:f.nombre,url:f.url});continue;}
+    const up=await _actUpload(f.file);
+    if(up)out.push({nombre:up.nombre||f.nombre,url:up.url,storageRef:up.storageRef||''});
+  }
+  return out;
+}
 window.srDispAdd=function(piso,m2,coch){_srDispList.push({piso:piso||'',m2:m2||'',cocheras:coch||''});_srDispRender();};
 window.srDispDel=function(i){_srDispList.splice(i,1);_srDispRender();};
 window.srDispSet=function(i,campo,v){if(_srDispList[i])_srDispList[i][campo]=v;};
@@ -17018,15 +17111,17 @@ function _srReadForm(svc){
     else if(f.type==='contacto'){data.propietarioId=gv('srf-propId');data.propietarioNombre=gv('srf-propNombre');}
     else if(f.type==='inmueble'){data.inmuebleId=gv('srf-inmuebleId');data.inmuebleNombre=gv('srf-inmuebleNombre');}
     else if(f.type==='disponibilidad')data[f.k]=_srDispList.slice();
+    else if(f.type==='fotos')data[f.k]=(_srFotos[f.k]||[]).map(x=>({nombre:x.nombre,url:x.url||''}));
     else if(f.type==='linkfile')data[f.k]={link:gv('srf-'+f.k),archivo:(data[f.k]&&data[f.k].archivo)||''};
     else if(f.type==='ejecutivos'){data.ejecutivosCreador=_srCreadorNombre();data.ejecutivosExtra=_srEjecExtra.slice();data[f.k]=[_srCreadorNombre(),..._srEjecExtra.map(ejecDisplay)];}
     else if(f.type==='checks'){data[f.k]=[...document.querySelectorAll('#'+id+' input:checked')].map(x=>x.value);}
     else if(f.type==='sino'){const o={};f.opts.forEach((opt,i)=>{const sel=document.querySelector('#'+id+' input[name="'+id+'-'+i+'"]:checked');if(sel)o[opt]=sel.value;});data[f.k]=o;}
     else if(f.type==='multi'){data[f.k]=[...document.querySelectorAll('#'+id+' .cto-pref-chip.active')].map(x=>x.dataset.v);}
     else if(f.type==='docs'){data[f.k]=_srDocList.slice();}
-    else if(_srFieldVisible(f,{tipoTransaccion:gv('srf-tipoTransaccion')})){data[f.k]=gv(id);}
-    else data[f.k]='';
+    else data[f.k]=gv(id);
   }));
+  // Un campo oculto por su condición no aporta valor (la condición se evalúa sobre los datos ya leídos).
+  svc.form.forEach(card=>card.fields.forEach(f=>{if(f.showIf&&!_srFieldVisible(f,data))data[f.k]='';}));
   return data;
 }
 window.submitSolicitud=async function(){
@@ -17051,6 +17146,9 @@ window.submitSolicitud=async function(){
   if(!db){alert('Firebase no disponible.');return;}
   const btn=document.getElementById('sr-wiz-next')||document.getElementById('sr-form-save');if(btn){btn.textContent='Enviando...';btn.disabled=true;}
   try{
+    for(const card of svc.form)for(const f of card.fields){
+      if(f.type==='fotos')data[f.k]=await _srFotosSubir(f.k);
+    }
     const planoFile=(document.getElementById('srf-plano-file')||{}).files;
     if(planoFile&&planoFile[0]&&typeof _actUpload==='function'){
       const up=await _actUpload(planoFile[0]);
@@ -17155,6 +17253,7 @@ function _srRenderData(d){
     if(f.type==='sino')return (v&&Object.keys(v).length)?Object.keys(v).map(k=>`<div style="font-size:12px"><b>${esc(k)}:</b> ${esc(v[k])}</div>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='checks'||f.type==='multi')return (Array.isArray(v)&&v.length)?v.map(x=>`<span class="crm-tag">${esc(x)}</span>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='docs')return (Array.isArray(v)&&v.length)?v.map(x=>`<div style="font-size:12px"><b>${esc(x.tipo)}:</b> <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:#1C54F4;word-break:break-all">${esc(x.url)}</a></div>`).join(''):'<span style="color:#8898C0">–</span>';
+    if(f.type==='fotos')return (Array.isArray(v)&&v.length)?`<div class="sr-fotos-grid">${v.map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener" class="sr-foto"><img src="${esc(x.url)}" alt="${esc(x.nombre||'')}" loading="lazy"></a>`).join('')}</div>`:'<span style="color:#8898C0">–</span>';
     if(f.type==='disponibilidad')return (Array.isArray(v)&&v.length)?v.map(d=>`<div style="font-size:12px">Piso <b>${esc(d.piso||'–')}</b> · ${esc(d.m2||'–')} m² · ${esc(d.cocheras||'0')} cocheras</div>`).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='linkfile'){const l=(v&&v.link)||'',a=(v&&v.archivo)||'';if(!l&&!a)return '<span style="color:#8898C0">–</span>';
       return [l?`<a href="${esc(l)}" target="_blank" rel="noopener" style="color:#1C54F4">Link</a>`:'',a?`<a href="${esc(a)}" target="_blank" rel="noopener" style="color:#1C54F4">Archivo adjunto</a>`:''].filter(Boolean).join(' · ');}
@@ -17210,6 +17309,7 @@ function _srBuildHTML(d){
   const cell=(f)=>{const v=data[f.k];
     if(f.type==='cuenta')return e(d.cuentaNombre||'');if(f.type==='contacto')return e(d.propietarioNombre||'');
     if(f.type==='inmueble')return e(d.inmuebleNombre||'');
+    if(f.type==='fotos')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>${e(x.nombre||x.url)}</li>`).join('')}</ul>`:'';
     if(f.type==='disponibilidad')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>Piso ${e(x.piso||'–')}: ${e(x.m2||'–')} m² · ${e(x.cocheras||'0')} cocheras</li>`).join('')}</ul>`:'';
     if(f.type==='linkfile')return [e((v&&v.link)||''),e((v&&v.archivo)||'')].filter(Boolean).join(' · ');
     if(f.type==='sino'){if(!v||!Object.keys(v).length)return '';return `<ul class="pdf-list">${Object.keys(v).map(k=>`<li>${e(k)}: <b>${e(v[k])}</b></li>`).join('')}</ul>`;}
