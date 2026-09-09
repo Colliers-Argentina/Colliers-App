@@ -5451,11 +5451,34 @@ async function imgToBase64(url) {
 }
 
 let _logoB64=null;
-async function addLogo(slide,grande=false){
+// Medidas reales del asset (se cachean): permiten derivar un lado a partir del otro.
+let _logoDim=null;
+function _logoMedidas(b64){
+  if(_logoDim)return Promise.resolve(_logoDim);
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{_logoDim={w:img.naturalWidth||1,h:img.naturalHeight||1};res(_logoDim);};
+    img.onerror=()=>{_logoDim={w:1,h:1};res(_logoDim);};
+    img.src=b64;
+  });
+}
+// Inserta el logo dentro de la caja indicada SIN deformarlo: se calcula la escala que lo
+// contiene y se derivan ancho y alto de la proporción original del archivo.
+async function addColliersLogo(slide,{x,y,w,h,align='right',valign='middle',placa=null,pad=0.14}={}){
   if(!_logoB64)_logoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png');
-  if(_logoB64){
-    slide.addImage({data:_logoB64,x:11.7,y:0.1,w:1.5,h:0.45,sizing:{type:'contain',w:1.5,h:0.45}});
-  }
+  if(!_logoB64)return null;
+  const dim=await _logoMedidas(_logoB64);
+  const k=Math.min(w/dim.w,h/dim.h);                 // escala que lo contiene, sin deformar
+  const fw=dim.w*k,fh=dim.h*k;                       // ambos lados salen de la proporción real
+  const fx=align==='right'?(x+w-fw):align==='center'?(x+(w-fw)/2):x;
+  const fy=valign==='middle'?(y+(h-fh)/2):valign==='bottom'?(y+h-fh):y;
+  // La placa se ajusta al logo ya medido (se dibuja antes para quedar detrás).
+  if(placa)slide.addShape(slide._pptxShapeRect||'rect',{x:fx-pad,y:fy-pad,w:fw+pad*2,h:fh+pad*2,fill:{color:placa}});
+  slide.addImage({data:_logoB64,x:fx,y:fy,w:fw,h:fh});
+  return {x:fx,y:fy,w:fw,h:fh};
+}
+async function addLogo(slide){
+  return addColliersLogo(slide,{x:13.33-0.5-1.6,y:0.26,w:1.6,h:0.5});
 }
 
 const STEPS=[
@@ -18293,8 +18316,8 @@ let _bfPisos=new Set();
 function _bfUnidadesDisp(){return _unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);}
 function _bfRenderPisos(){
   const c=document.getElementById('bf-pisos-list');if(!c)return;
-  const list=_bfUnidadesDisp();
-  const n=v=>parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0;
+  const list=_bfOrdenarPisos(_bfUnidadesDisp());
+  const n=_numAR;
   c.innerHTML=list.length?list.map(u=>`<label class="bf-piso"><input type="checkbox" ${_bfPisos.has(u._id)?'checked':''} onchange="bfPisoToggle('${u._id}',this.checked)"><span class="bf-piso-t">${esc(_bfPisoLabel(u))}</span><span class="bf-piso-d">${n(u.m2)?Math.round(n(u.m2)).toLocaleString('es-AR')+' m²':'– m²'}${u.askingRent?' · '+esc(u.askingRent):''}${n(u.cocherasUnidad)?' · '+n(u.cocherasUnidad)+' cocheras':''}</span></label>`).join('')
     :'<div style="font-size:11.5px;color:#8898C0">Este inmueble no tiene unidades disponibles cargadas.</div>';
   const cnt=document.getElementById('bf-pisos-cnt');
@@ -18304,6 +18327,24 @@ function _bfPisoLabel(u){
   const p=String(u.piso||'').trim();
   const base=p?('Piso '+p+(/^\d+$/.test(p)?'°':'')):'Unidad';
   return u.unidad?(base+' '+u.unidad):base;
+}
+// Orden por piso: subsuelos primero (negativos), PB en 0, y después los pisos por su número.
+function _bfPisoOrden(u){
+  const t=String((u&&u.piso)||'').trim().toUpperCase();
+  if(!t)return 9999;
+  if(/^(SS|SUBSUELO|S)\s*-?\s*(\d+)?/.test(t)){
+    const m=t.match(/(\d+)/);return -100+(m?-parseInt(m[1],10):-1);
+  }
+  if(/^(PB|P\.?B\.?|PLANTA BAJA|BAJA)$/.test(t))return 0;
+  const m=t.match(/(-?\d+)/);
+  if(m)return parseInt(m[1],10);
+  return 9000+t.charCodeAt(0);
+}
+function _bfOrdenarPisos(list){
+  return list.slice().sort((a,b)=>{
+    const d=_bfPisoOrden(a)-_bfPisoOrden(b);
+    return d!==0?d:String(a.unidad||'').localeCompare(String(b.unidad||''),'es');
+  });
 }
 window.bfPisoToggle=function(id,on){if(on)_bfPisos.add(id);else _bfPisos.delete(id);_bfRenderPisos();};
 window.bfPisosTodos=function(on){_bfPisos=on?new Set(_bfUnidadesDisp().map(u=>u._id)):new Set();_bfRenderPisos();};
@@ -18365,13 +18406,16 @@ async function generateFichaComercial(buildingId){
   const btn=document.getElementById('btn-gen-ficha');
   if(btn){btn.disabled=true;btn.textContent='Generando…';}
   try{
-    let photoUrls=[];
+    let photoUrls=[],planoUrls=[];
     try{
       const snap=await db.collection('buildings').doc(buildingId).collection('documentos').orderBy('fecha','desc').get();
       const imgExts=['jpg','jpeg','png','webp'];
-      photoUrls=snap.docs.map(dd=>dd.data())
-        .filter(dd=>imgExts.includes((dd.ext||'').toLowerCase())||(dd.nombre||'').match(/\.(jpg|jpeg|png|webp)$/i))
-        .map(dd=>dd.url).filter(Boolean);
+      const imgs=snap.docs.map(dd=>dd.data())
+        .filter(dd=>imgExts.includes((dd.ext||'').toLowerCase())||(dd.nombre||'').match(/\.(jpg|jpeg|png|webp)$/i));
+      // Los planos van a la página "Plantas"; el resto, a la galería.
+      const esPlano=dd=>dd.categoria==='Plano'||/plano|planta/i.test(dd.nombre||'');
+      planoUrls=imgs.filter(esPlano).map(dd=>dd.url).filter(Boolean).slice(0,2);
+      photoUrls=imgs.filter(dd=>!esPlano(dd)).map(dd=>dd.url).filter(Boolean);
     }catch(e){console.warn('[Ficha]',e);}
     const bf=d.foto||(d.imagenes&&d.imagenes[0])||null;
     if(bf&&!photoUrls.includes(bf))photoUrls.unshift(bf);
@@ -18380,7 +18424,8 @@ async function generateFichaComercial(buildingId){
 
     // Sólo entran los pisos elegidos en el paso previo (si no se tocó nada, van todos los disponibles).
     const _dispAll=_unitDocs.filter(u=>u.estado==='Disponible'||!u.estado);
-    const availUnits=_bfPisos.size?_dispAll.filter(u=>_bfPisos.has(u._id)):_dispAll;
+    // Se ordena sólo para la ficha; no altera lo guardado en Firestore.
+    const availUnits=_bfOrdenarPisos(_bfPisos.size?_dispAll.filter(u=>_bfPisos.has(u._id)):_dispAll);
     if(!availUnits.length){showBldToast('⚠ Elegí al menos un piso para la ficha',4000);const b0=document.getElementById('btn-gen-ficha');if(b0){b0.disabled=false;b0.textContent='Generar Ficha (.pptx)';}return;}
     const _n=_numAR;
     const totalM2=availUnits.reduce((s,u)=>s+_n(u.m2),0);
@@ -18408,6 +18453,7 @@ async function generateFichaComercial(buildingId){
     const caractOficina=((document.getElementById('bf-caract-oficina')||{}).value||d.caracteristicasOficina||'').trim();
     showBldToast('📋 Cargando imágenes…',60000);
     const photoB64s=await Promise.all(photoUrls.map(u=>imgToBase64(u)));
+    const planoB64s=(await Promise.all(planoUrls.map(u=>imgToBase64(u)))).filter(Boolean);
     const vp=photoB64s.filter(Boolean);
 
     const _geocode=async dir=>{
@@ -18478,169 +18524,234 @@ async function generateFichaComercial(buildingId){
 
     const pptx=new window.PptxGenJS();
     pptx.layout='LAYOUT_WIDE';
-    const NAVY='002060',WHITE='FFFFFF',DGRAY='1F2937',MGRAY='6B7280',LGRAY='F5F7FA';
+    // ═══ Sistema de diseño de la ficha (grilla editorial, misma lógica del modelo impreso) ═══
+    const NAVY='00285A',AZUL='0072B9',WHITE='FFFFFF',DGRAY='1F2937',MGRAY='6B7280',LGRAY='F5F7FA',AZCLARO='A5C8E8';
+    const F='Open Sans';
+    const W=13.33,H=7.5,M=0.5;                       // lienzo y margen exterior
     const corredor=d.corredor||d.zona||d.submercado||'Buenos Aires';
 
-    // Slide 1: Portada
+    // Chip de sección (como los recuadros azules del modelo).
+    const chip=(sl,texto,{x=0,y=0.32,w=4.6,h=0.95,align='left'}={})=>{
+      sl.addShape(pptx.ShapeType.rect,{x,y,w,h,fill:{color:NAVY}});
+      sl.addText(texto,{x:x+(align==='left'?0.55:0),y,w:w-(align==='left'?0.75:0.55),h,fontSize:20,color:WHITE,valign:'middle',align,fontFace:F});
+    };
+    // Pie institucional.
+    const pie=(sl,anchoMax)=>{
+      sl.addShape(pptx.ShapeType.line,{x:M,y:H-0.42,w:2.1,h:0,line:{color:NAVY,width:0.75}});
+      sl.addText('Accelerating success.',{x:M+2.3,y:H-0.62,w:3.4,h:0.4,fontSize:9.5,color:NAVY,valign:'middle',fontFace:'Merriweather'});
+      sl.addShape(pptx.ShapeType.line,{x:M+5.9,y:H-0.42,w:(anchoMax||W-M)-M-5.9,h:0,line:{color:NAVY,width:0.75}});
+    };
+    // Bloque de contacto reutilizable: siempre vertical, alto dinámico, oculta lo que falta.
+    const altoContacto=(lista,titulo)=>(titulo?0.34:0)+(lista||[]).reduce((a,c)=>a+0.28+(c.telefono?0.24:0)+(c.email?0.24:0)+0.14,0);
+    const bloqueContacto=(sl,{x,y,w,lista,hDisp,color=WHITE,sub=AZCLARO,align='right',titulo='Contacto:'})=>{
+      const nat=altoContacto(lista,titulo);
+      const k=(hDisp&&nat>hDisp)?Math.max(hDisp/nat,0.72):1;   // comprime antes que desbordar
+      let cy=y;
+      if(titulo){sl.addText(titulo,{x,y:cy,w,h:0.26*k,fontSize:10*k,bold:true,color,align,valign:'middle',fontFace:F});cy+=0.34*k;}
+      (lista||[]).forEach(c=>{
+        sl.addText(c.nombre,{x,y:cy,w,h:0.28*k,fontSize:11.5*k,bold:true,color,align,valign:'middle',fontFace:F});cy+=0.28*k;
+        if(c.telefono){sl.addText('Tel: '+c.telefono,{x,y:cy,w,h:0.24*k,fontSize:9*k,color:sub,align,valign:'middle',fontFace:F});cy+=0.24*k;}
+        if(c.email){sl.addText(c.email,{x,y:cy,w,h:0.24*k,fontSize:9*k,color:sub,align,valign:'middle',fontFace:F});cy+=0.24*k;}
+        cy+=0.14*k;
+      });
+      return cy-y;
+    };
+    // Ajusta el cuerpo de texto al alto disponible en vez de recortarlo.
+    const tamCuerpo=(texto,alto,ancho)=>{
+      const chars=String(texto||'').length;
+      const cap=alto*ancho*26;                        // caracteres que entran a 10.5pt
+      if(chars<=cap)return 10.5;
+      if(chars<=cap*1.3)return 9.5;
+      if(chars<=cap*1.7)return 8.5;
+      return 8;
+    };
+
+    // ═══ Página 1 — Portada ═══
     const s1=pptx.addSlide();
-    const heroB64=vp[0]?await _crop(vp[0],13.33,4.1):null;
-    if(heroB64)s1.addImage({data:heroB64,x:0,y:0,w:13.33,h:4.1});
-    else{s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:4.1,fill:{color:'DBE5FF'}});s1.addText('Sin imagen de portada',{x:4,y:1.8,w:5.33,h:0.5,fontSize:13,color:MGRAY,align:'center',fontFace:'Open Sans'});}
-    await addLogo(s1);
-    s1.addShape(pptx.ShapeType.rect,{x:9.88,y:0.68,w:3.3,h:3.18,fill:{color:WHITE,transparency:8}});
-    s1.addShape(pptx.ShapeType.roundRect,{x:10.03,y:0.8,w:3.0,h:0.36,fill:{color:ofColor},rectRadius:0.04});
-    s1.addText(ofLbl,{x:10.03,y:0.8,w:3.0,h:0.36,fontSize:11,bold:true,color:WHITE,align:'center',valign:'middle',fontFace:'Open Sans'});
-    s1.addText('Asking Rent',{x:10.03,y:1.24,w:3.0,h:0.22,fontSize:8,color:MGRAY,align:'center',fontFace:'Open Sans'});
-    if(rentRangeStr){
-      s1.addText(rentRangeStr,{x:10.03,y:1.48,w:3.0,h:0.42,fontSize:14,bold:true,color:NAVY,align:'center',valign:'middle',fontFace:'Open Sans'});
-      s1.addText('+IVA',{x:10.03,y:1.92,w:3.0,h:0.22,fontSize:8.5,color:MGRAY,align:'center',fontFace:'Open Sans'});
-    }else{
-      s1.addText('–',{x:10.03,y:1.48,w:3.0,h:0.42,fontSize:14,color:MGRAY,align:'center',valign:'middle',fontFace:'Open Sans'});
+    s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:W,h:H,fill:{color:WHITE}});
+    const HERO_H=3.62;
+    const heroB64=vp[0]?await _crop(vp[0],W,HERO_H):null;
+    if(heroB64)s1.addImage({data:heroB64,x:0,y:0,w:W,h:HERO_H});
+    else{
+      s1.addShape(pptx.ShapeType.rect,{x:0,y:0,w:W,h:HERO_H,fill:{color:'DBE5FF'}});
+      s1.addText('Sin imagen de portada',{x:W/2-2.5,y:HERO_H/2-0.25,w:5,h:0.5,fontSize:13,color:MGRAY,align:'center',fontFace:F});
     }
-    s1.addText('Superficie disponible',{x:10.03,y:2.22,w:3.0,h:0.22,fontSize:8,color:MGRAY,align:'center',fontFace:'Open Sans'});
-    s1.addText(supRangeStr,{x:10.03,y:2.46,w:3.0,h:0.42,fontSize:14,bold:true,color:NAVY,align:'center',valign:'middle',fontFace:'Open Sans'});
-    s1.addShape(pptx.ShapeType.rect,{x:0,y:4.1,w:13.33,h:3.4,fill:{color:WHITE}});
-    s1.addShape(pptx.ShapeType.rect,{x:0,y:4.1,w:0.06,h:3.4,fill:{color:NAVY}});
-    // Título (edificio + dirección), subtítulo y descripción, como en el modelo de ficha.
-    const titulo=[d.nombre||'Edificio',d.direccion].filter(Boolean).join(', ');
-    s1.addText(titulo,{x:0.22,y:4.18,w:8.55,h:0.72,fontSize:22,bold:true,color:NAVY,fontFace:'Open Sans',wrap:true});
-    s1.addText('Edificio de oficinas en '+ofStr+(corredor?' · '+corredor:''),{x:0.22,y:4.94,w:8.55,h:0.3,fontSize:10.5,color:MGRAY,fontFace:'Open Sans'});
-    s1.addShape(pptx.ShapeType.line,{x:0.22,y:5.32,w:8.5,h:0,line:{color:'E2EAF4',width:0.75}});
-    const desc=(d.descripcion||'').trim();
-    if(desc){
-      s1.addText(desc,{x:0.22,y:5.38,w:8.55,h:1.7,fontSize:10,color:DGRAY,fontFace:'Open Sans',wrap:true,valign:'top'});
+    // Logo sobre placa blanca, arriba a la derecha (proporción intacta).
+    if(!_logoB64)_logoB64=await imgToBase64('https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo.png');
+    s1._pptxShapeRect=pptx.ShapeType.rect;
+    await addColliersLogo(s1,{x:W-M-1.85,y:0.3,w:1.85,h:0.86,align:'right',valign:'top',placa:WHITE,pad:0.16});
+
+    // Columna azul de datos comerciales + contacto (arranca sobre la foto, como en el modelo).
+    const PX=8.62,PW=W-PX,PY=2.35;
+    s1.addShape(pptx.ShapeType.rect,{x:PX,y:PY,w:PW,h:H-PY,fill:{color:NAVY}});
+    s1.addShape(pptx.ShapeType.rect,{x:PX,y:PY-0.44,w:2.05,h:0.44,fill:{color:AZUL}});
+    s1.addText(ofLbl,{x:PX,y:PY-0.44,w:2.05,h:0.44,fontSize:11.5,bold:true,color:WHITE,align:'center',valign:'middle',fontFace:F});
+    const PIN=PX+0.32,PWI=PW-0.64;
+    s1.addText('Superficie disponible',{x:PIN,y:PY+0.18,w:PWI,h:0.24,fontSize:9.5,color:AZCLARO,align:'right',valign:'middle',fontFace:F});
+    s1.addText(supRangeStr,{x:PIN,y:PY+0.42,w:PWI,h:0.46,fontSize:20,bold:true,color:WHITE,align:'right',valign:'middle',fontFace:F});
+    s1.addText('Valor',{x:PIN,y:PY+0.98,w:PWI,h:0.24,fontSize:9.5,color:AZCLARO,align:'right',valign:'middle',fontFace:F});
+    s1.addText(rentRangeStr||'A consultar',{x:PIN,y:PY+1.22,w:PWI,h:0.46,fontSize:20,bold:true,color:WHITE,align:'right',valign:'middle',fontFace:F});
+    if(rentRangeStr)s1.addText('+ IVA',{x:PIN,y:PY+1.68,w:PWI,h:0.22,fontSize:8.5,color:AZCLARO,align:'right',valign:'middle',fontFace:F});
+    s1.addShape(pptx.ShapeType.line,{x:PIN,y:PY+2.02,w:PWI,h:0,line:{color:WHITE,width:0.75,transparency:60}});
+    const INST_Y=H-1.12,CTO_Y=PY+2.18;
+    bloqueContacto(s1,{x:PIN,y:CTO_Y,w:PWI,lista:contactos,hDisp:INST_Y-CTO_Y-0.14});
+    s1.addText('Colliers International',{x:PIN,y:INST_Y,w:PWI,h:0.26,fontSize:10,bold:true,color:WHITE,align:'right',valign:'middle',fontFace:F});
+    s1.addText('Av. del Libertador 101, Vicente López\nwww.colliers.com/es-ar',{x:PIN,y:INST_Y+0.26,w:PWI,h:0.5,fontSize:8.5,color:AZCLARO,align:'right',valign:'top',fontFace:F});
+
+    // Título, subtítulo y descripción (columna izquierda).
+    const CX=M,CW=PX-M-0.5;
+    const titulo=[d.nombre||'Edificio',d.direccion].filter(Boolean).join(',\n');
+    s1.addText(titulo,{x:CX,y:HERO_H+0.16,w:CW,h:0.98,fontSize:24,bold:true,color:NAVY,valign:'top',fontFace:F,wrap:true,lineSpacingMultiple:0.95});
+    s1.addText('Edificio de oficinas en '+ofStr+(corredor?' · '+corredor:''),{x:CX,y:HERO_H+1.2,w:CW,h:0.34,fontSize:13,color:NAVY,valign:'middle',fontFace:'Merriweather'});
+    s1.addShape(pptx.ShapeType.line,{x:CX,y:HERO_H+1.6,w:CW,h:0,line:{color:'D5DEEC',width:0.75}});
+    const descTxt=(d.descripcion||'').trim();
+    const DESC_Y=HERO_H+1.74,DESC_H=H-0.8-DESC_Y;
+    if(descTxt){
+      s1.addText(descTxt,{x:CX,y:DESC_Y,w:CW,h:DESC_H,fontSize:tamCuerpo(descTxt,DESC_H,CW),color:DGRAY,valign:'top',fontFace:F,wrap:true,lineSpacingMultiple:1.15});
     }else{
       const bItems=[];
       if(d.categoria||d.cat)bItems.push('Categoría: '+(d.categoria||d.cat));
       if(d.cantidadPisos)bItems.push('Pisos: '+d.cantidadPisos);
-      if(d.cocherasEdificio||d.cocheras)bItems.push('Cocheras: '+(d.cocherasEdificio||d.cocheras));
-      if(d.superficiePropia)bItems.push('Sup. propia: '+Math.round(d.superficiePropia).toLocaleString('es-AR')+' m²');
+      if(d.superficiePropia)bItems.push('Sup. propia: '+Math.round(_n(d.superficiePropia)).toLocaleString('es-AR')+' m²');
       if(d.certificacion)bItems.push(d.certificacion);
-      if(d.anoConstruccion||d.anio)bItems.push('Año: '+(d.anoConstruccion||d.anio));
-      const bText=bItems.slice(0,9).map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}}));
-      if(bText.length)s1.addText(bText,{x:0.22,y:5.38,w:8.55,h:2.0,fontFace:'Open Sans',wrap:true});
+      if(bItems.length)s1.addText(bItems.map(t=>({text:'• '+t,options:{fontSize:10.5,color:DGRAY,breakLine:true,fontFace:F}})),{x:CX,y:DESC_Y,w:CW,h:DESC_H,fontFace:F,wrap:true});
     }
-    s1.addShape(pptx.ShapeType.rect,{x:8.9,y:4.1,w:4.3,h:3.4,fill:{color:NAVY}});
-    s1.addText('Contacto',{x:9.05,y:4.2,w:4.0,h:0.22,fontSize:8,color:'A5B4FC',fontFace:'Open Sans'});
-    contactos.slice(0,2).forEach((c,i)=>{
-      const cy=4.42+i*0.62;
-      s1.addText(c.nombre,{x:9.05,y:cy,w:4.0,h:0.3,fontSize:contactos.length>1?11.5:13,bold:true,color:WHITE,fontFace:'Open Sans'});
-      const det=[c.telefono?'Tel: '+c.telefono:'',c.email].filter(Boolean).join('  ·  ');
-      if(det)s1.addText(det,{x:9.05,y:cy+0.28,w:4.0,h:0.26,fontSize:8.5,color:'A5B4FC',fontFace:'Open Sans'});
-    });
-    s1.addShape(pptx.ShapeType.line,{x:9.05,y:5.28,w:3.9,h:0,line:{color:WHITE,width:0.5,transparency:65}});
-    s1.addText('Colliers International',{x:9.05,y:5.42,w:4.0,h:0.35,fontSize:11,bold:true,color:WHITE,fontFace:'Open Sans'});
-    s1.addText('www.colliers.com/es-ar',{x:9.05,y:5.8,w:4.0,h:0.28,fontSize:9,color:'A5B4FC',fontFace:'Open Sans'});
-    s1.addShape(pptx.ShapeType.rect,{x:0,y:7.2,w:13.33,h:0.3,fill:{color:NAVY}});
-    s1.addText('Accelerating success.',{x:0.3,y:7.2,w:6,h:0.3,fontSize:9,italic:true,color:WHITE,valign:'middle',fontFace:'Merriweather'});
-    s1.addText('Información confidencial — Colliers International Argentina',{x:6,y:7.2,w:7.1,h:0.3,fontSize:8,color:'A5B4FC',align:'right',valign:'middle',fontFace:'Open Sans'});
+    pie(s1,PX-0.25);
 
-    // Slide 2: Galería
-    if(vp.length>0){
+    // ═══ Página 2 — Galería fotográfica ═══
+    const galeria=vp.slice(1);
+    if(galeria.length){
       const s2=pptx.addSlide();
-      s2.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:'F8FAFD'}});
-      s2.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:0.68,fill:{color:NAVY}});
-      s2.addText('Galería fotográfica',{x:0.3,y:0,w:10,h:0.68,fontSize:17,bold:true,color:WHITE,valign:'middle',fontFace:'Open Sans'});
+      s2.addShape(pptx.ShapeType.rect,{x:0,y:0,w:W,h:H,fill:{color:WHITE}});
+      chip(s2,'Galería fotográfica',{x:0,y:0.3,w:5.0,h:0.95});
       await addLogo(s2);
-      const GAP=0.1;
-      const ph=[
-        {x:GAP,    y:0.78, w:6.56,  h:2.7 },
-        {x:6.76,   y:0.78, w:6.45,  h:2.7 },
-        {x:GAP,    y:3.58, w:13.12, h:2.1 },
-        {x:GAP,    y:5.78, w:6.56,  h:1.62},
-        {x:6.76,   y:5.78, w:6.45,  h:1.62},
-      ];
-      for(let i=0;i<Math.min(vp.length,ph.length);i++){
-        const {x,y,w,h}=ph[i];
-        const cb=await _crop(vp[i],w,h);
+      // Grilla editorial que se adapta a la cantidad de fotos disponibles.
+      const GX=M,GY=1.55,GW=W-M*2,GH=H-GY-0.75,g=0.14;
+      const grillas={
+        1:[[0,0,1,1]],
+        2:[[0,0,.5,1],[.5,0,.5,1]],
+        3:[[0,0,.5,.55],[.5,0,.5,.55],[0,.55,1,.45]],
+        4:[[0,0,.5,.5],[.5,0,.5,.5],[0,.5,.5,.5],[.5,.5,.5,.5]],
+        5:[[0,0,.5,.35],[.5,0,.5,.35],[0,.35,1,.32],[0,.67,.5,.33],[.5,.67,.5,.33]],
+        6:[[0,0,1/3,.5],[1/3,0,1/3,.5],[2/3,0,1/3,.5],[0,.5,1/3,.5],[1/3,.5,1/3,.5],[2/3,.5,1/3,.5]],
+        7:[[0,0,.5,.34],[.5,0,.5,.34],[0,.34,1,.32],[0,.66,.25,.34],[.25,.66,.25,.34],[.5,.66,.25,.34],[.75,.66,.25,.34]],
+        8:[[0,0,.25,.5],[.25,0,.25,.5],[.5,0,.25,.5],[.75,0,.25,.5],[0,.5,.25,.5],[.25,.5,.25,.5],[.5,.5,.25,.5],[.75,.5,.25,.5]],
+      };
+      const cel=grillas[Math.min(galeria.length,8)]||grillas[8];
+      for(let i=0;i<cel.length&&i<galeria.length;i++){
+        const [fx,fy,fw,fh]=cel[i];
+        const x=GX+fx*GW+(fx>0?g/2:0),y=GY+fy*GH+(fy>0?g/2:0);
+        const w=fw*GW-(fx>0?g/2:0)-(fx+fw<1?g/2:0),h=fh*GH-(fy>0?g/2:0)-(fy+fh<1?g/2:0);
+        const cb=await _crop(galeria[i],w,h);
         if(cb)s2.addImage({data:cb,x,y,w,h});
-        else s2.addShape(pptx.ShapeType.rect,{x,y,w,h,fill:{color:'DBE5FF'}});
+        else s2.addShape(pptx.ShapeType.rect,{x,y,w,h,fill:{color:'EEF3FF'}});
       }
+      pie(s2);
     }
 
-    // Slide 3: Disponibilidades
+    // ═══ Página 3 — Plantas y disponibilidad ═══
     {
       const s3=pptx.addSlide();
-      s3.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:'F8FAFD'}});
-      const ph2=[
-        {x:0.1,y:0.1,w:6.55,h:2.0},{x:6.75,y:0.1,w:6.48,h:2.0},
-        {x:0.1,y:2.2, w:6.55,h:1.9},{x:6.75,y:2.2, w:6.48,h:1.9},
-      ];
-      const photoOffset=vp.length>4?4:1;
-      for(let i=0;i<4;i++){
-        const src=vp[photoOffset+i]||null;
-        const {x,y,w,h}=ph2[i];
-        if(src){const cb=await _crop(src,w,h);if(cb)s3.addImage({data:cb,x,y,w,h});else s3.addShape(pptx.ShapeType.rect,{x,y,w,h,fill:{color:'DBE5FF'}});}
-        else s3.addShape(pptx.ShapeType.rect,{x,y,w,h,fill:{color:'EEF3FF'}});
-      }
-      s3.addShape(pptx.ShapeType.rect,{x:0,y:4.2,w:13.33,h:0.52,fill:{color:NAVY}});
-      s3.addText('Disponibilidad',{x:0.3,y:4.2,w:10,h:0.52,fontSize:15,bold:true,color:WHITE,valign:'middle',fontFace:'Open Sans'});
-      // Una línea por piso elegido: Piso 2° - 3.357 m² - 19 USD/m² - 33 cocheras.
-      const divisible=_n(d.superficieMinima)>0?' (Con posibilidad de dividir en '+Math.round(_n(d.superficieMinima)).toLocaleString('es-AR')+' m²)':'';
-      if(divisible)s3.addText('Disponibilidad'+divisible,{x:0.3,y:4.8,w:12.7,h:0.3,fontSize:10.5,bold:true,color:NAVY,fontFace:'Open Sans'});
-      const lineas=availUnits.slice(0,10).map(u=>{
+      s3.addShape(pptx.ShapeType.rect,{x:0,y:0,w:W,h:H,fill:{color:WHITE}});
+      chip(s3,'Plantas',{x:W-M-3.6,y:0.3,w:3.6,h:0.95,align:'center'});
+      // La lista de disponibilidad se mide primero: las plantas ceden el alto que haga falta.
+      const items=availUnits.slice(0,16).map(u=>{
         const partes=[_bfPisoLabel(u)];
         if(_n(u.m2)>0)partes.push(Math.round(_n(u.m2)).toLocaleString('es-AR')+' m²');
         if(_n(u.askingRent)>0)partes.push(_n(u.askingRent).toLocaleString('es-AR',{maximumFractionDigits:2})+' USD/m²');
         if(_n(u.cocherasUnidad)>0)partes.push(Math.round(_n(u.cocherasUnidad))+' cocheras');
-        return {text:partes.join(' - '),options:{fontSize:11,color:DGRAY,breakLine:true,fontFace:'Open Sans'}};
+        return partes.join(' — ');
       });
-      s3.addText(lineas.length?lineas:[{text:'Sin unidades seleccionadas.',options:{fontSize:10,color:MGRAY,fontFace:'Open Sans'}}],
-        {x:0.3,y:divisible?5.14:4.9,w:12.7,h:1.8,fontFace:'Open Sans',wrap:true,valign:'top'});
-      if(supRangeStr&&supRangeStr!=='–')s3.addText('Superficie disponible: '+supRangeStr,{x:0.3,y:6.85,w:12.7,h:0.3,fontSize:10,bold:true,color:NAVY,fontFace:'Open Sans'});
-      s3.addShape(pptx.ShapeType.rect,{x:0,y:7.2,w:13.33,h:0.3,fill:{color:NAVY}});
-      s3.addText('Accelerating success.',{x:0.3,y:7.2,w:6,h:0.3,fontSize:9,italic:true,color:WHITE,valign:'middle',fontFace:'Merriweather'});
-      s3.addText('Información confidencial — Colliers International Argentina',{x:6,y:7.2,w:7.1,h:0.3,fontSize:8,color:'A5B4FC',align:'right',valign:'middle',fontFace:'Open Sans'});
+      const dosCol=items.length>5;
+      const colW=dosCol?(W-M*2-0.5)/2:(W-M*2);
+      const fs=items.length>10?10:11.5;
+      const filas=Math.ceil(items.length/(dosCol?2:1));
+      const altoLista=filas*(fs>10?0.23:0.2)+0.12;
+      const DEST_Y=H-1.1;                                   // franja "Superficie disponible"
+      const PLY=1.55;
+      const PLH=Math.max(DEST_Y-0.22-altoLista-0.42-0.42-PLY,1.5);
+      const PLW=W-M*2;
+      // Se usan los planos cargados; si no hay, fotos del inmueble como apoyo visual.
+      const laminas=(planoUrls.length?planoB64s:galeria.slice(0,2)).filter(Boolean);
+      if(laminas.length){
+        const n=Math.min(laminas.length,2),gg=0.2,cw=(PLW-(n-1)*gg)/n;
+        for(let i=0;i<n;i++){
+          const x=M+i*(cw+gg);
+          s3.addShape(pptx.ShapeType.rect,{x,y:PLY,w:cw,h:PLH,fill:{color:LGRAY},line:{color:'E2EAF4',width:0.75}});
+          s3.addImage({data:laminas[i],x:x+0.1,y:PLY+0.1,w:cw-0.2,h:PLH-0.2,sizing:{type:'contain',w:cw-0.2,h:PLH-0.2}});
+        }
+      }else{
+        s3.addShape(pptx.ShapeType.rect,{x:M,y:PLY,w:PLW,h:PLH,fill:{color:LGRAY},line:{color:'E2EAF4',width:0.75}});
+        s3.addText('Sin planos cargados para este inmueble.',{x:M,y:PLY+PLH/2-0.2,w:PLW,h:0.4,fontSize:11,color:MGRAY,align:'center',valign:'middle',fontFace:F});
+      }
+      const DY=PLY+PLH+0.42;
+      const divis=_n(d.superficieMinima)>0?' (Con posibilidad de dividir en '+Math.round(_n(d.superficieMinima)).toLocaleString('es-AR')+' m²)':'';
+      s3.addText('Disponibilidad'+divis,{x:M,y:DY,w:W-M*2,h:0.34,fontSize:13,bold:true,color:AZUL,valign:'middle',fontFace:F});
+      const mitad=Math.ceil(items.length/(dosCol?2:1));
+      const bloques=dosCol?[items.slice(0,mitad),items.slice(mitad)]:[items];
+      bloques.forEach((col,ci)=>{
+        if(!col.length)return;
+        s3.addText(col.map(t=>({text:t,options:{fontSize:fs,color:DGRAY,breakLine:true,bullet:true,fontFace:F}})),
+          {x:M+ci*(colW+0.5),y:DY+0.42,w:colW,h:altoLista,valign:'top',fontFace:F,wrap:true});
+      });
+      if(supRangeStr&&supRangeStr!=='–'){
+        const SY=H-1.1;
+        s3.addShape(pptx.ShapeType.rect,{x:M,y:SY,w:W-M*2,h:0.5,fill:{color:LGRAY}});
+        s3.addText('Superficie disponible',{x:M+0.28,y:SY,w:3.2,h:0.5,fontSize:10,color:MGRAY,valign:'middle',fontFace:F});
+        s3.addText(supRangeStr,{x:M+3.4,y:SY,w:W-M*2-3.7,h:0.5,fontSize:15,bold:true,color:NAVY,valign:'middle',fontFace:F});
+      }
+      pie(s3);
     }
 
-    // Slide 4: Características + Mapa + Contacto
+    // ═══ Página 4 — Características, mapa y contacto ═══
     {
       const s4=pptx.addSlide();
-      s4.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:7.5,fill:{color:WHITE}});
-      s4.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.33,h:0.65,fill:{color:NAVY}});
-      s4.addText('Características',{x:0.3,y:0,w:10,h:0.65,fontSize:17,bold:true,color:WHITE,valign:'middle',fontFace:'Open Sans'});
-      await addLogo(s4);
-      // Características del edificio (amenities) y, debajo, las de la oficina si se cargaron.
+      s4.addShape(pptx.ShapeType.rect,{x:0,y:0,w:W,h:H,fill:{color:WHITE}});
+      chip(s4,'Características',{x:0,y:0.3,w:5.0,h:0.95});
       // Una línea por viñeta. Si viene todo en una sola línea separado por comas, se corta ahí.
       const _vinetas=t=>{
         const raw=String(t||'').trim();if(!raw)return [];
         const sep=/[\n;]/.test(raw)?/[\n;]/:/,/;
         return raw.split(sep).map(x=>x.replace(/^[•\-*]\s*/,'').trim()).filter(x=>x.length>2);
       };
-      const edLines=_vinetas(d.amenities).slice(0,10);
-      s4.addText('Características del edificio',{x:0.3,y:0.78,w:7.6,h:0.35,fontSize:11.5,bold:true,color:NAVY,fontFace:'Open Sans'});
+      const edLines=_vinetas(d.amenities).slice(0,12),ofLines=_vinetas(caractOficina).slice(0,10);
+      const LX=M,LW=7.35;
+      let ly=1.55;
+      const listaFS=(edLines.length+ofLines.length)>16?9:10;
+      s4.addText('Características del edificio',{x:LX,y:ly,w:LW,h:0.34,fontSize:13,bold:true,color:NAVY,valign:'middle',fontFace:F});
+      ly+=0.42;
       if(edLines.length){
-        s4.addText(edLines.map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}})),{x:0.3,y:1.17,w:7.6,h:2.6,fontFace:'Open Sans',wrap:true});
+        const hh=Math.min(edLines.length*0.2+0.1,3.0);
+        s4.addText(edLines.map(t=>({text:t,options:{fontSize:listaFS,color:DGRAY,breakLine:true,bullet:true,fontFace:F}})),{x:LX,y:ly,w:LW,h:hh,valign:'top',fontFace:F,wrap:true});
+        ly+=hh+0.24;
       }else{
-        s4.addText('Sin características cargadas en el inmueble.',{x:0.3,y:1.17,w:7.6,h:0.4,fontSize:9.5,color:MGRAY,fontFace:'Open Sans'});
+        s4.addText('Sin características cargadas en el inmueble.',{x:LX,y:ly,w:LW,h:0.32,fontSize:10,color:MGRAY,fontFace:F});
+        ly+=0.5;
       }
-      const ofLines=_vinetas(caractOficina).slice(0,10);
       if(ofLines.length){
-        s4.addShape(pptx.ShapeType.line,{x:0.3,y:3.85,w:7.6,h:0,line:{color:'E2EAF4',width:0.75}});
-        s4.addText('Características de la oficina',{x:0.3,y:3.95,w:7.6,h:0.35,fontSize:11.5,bold:true,color:NAVY,fontFace:'Open Sans'});
-        s4.addText(ofLines.map(t=>({text:'• '+t,options:{fontSize:9.5,color:DGRAY,breakLine:true,fontFace:'Open Sans'}})),{x:0.3,y:4.34,w:7.6,h:2.6,fontFace:'Open Sans',wrap:true});
+        s4.addShape(pptx.ShapeType.line,{x:LX,y:ly-0.12,w:LW,h:0,line:{color:'E2EAF4',width:0.75}});
+        s4.addText('Características de la oficina',{x:LX,y:ly,w:LW,h:0.34,fontSize:13,bold:true,color:NAVY,valign:'middle',fontFace:F});
+        ly+=0.42;
+        const hh=Math.min(ofLines.length*0.2+0.1,H-0.9-ly);
+        s4.addText(ofLines.map(t=>({text:t,options:{fontSize:listaFS,color:DGRAY,breakLine:true,bullet:true,fontFace:F}})),{x:LX,y:ly,w:LW,h:hh,valign:'top',fontFace:F,wrap:true});
       }
-      const MX=8.25,MY=0.78,MW=4.9,MH=3.7;
-      if(mapB64)s4.addImage({data:mapB64,x:MX,y:MY,w:MW,h:MH});
+      // Columna derecha: mapa arriba, panel de contacto abajo.
+      const RX=LX+LW+0.5,RW=W-RX-M;
+      const PIE_A=0.86;                                   // bloque institucional del panel
+      const CH=Math.min(Math.max(altoContacto(contactos,'Contacto:')+PIE_A+0.44,1.9),2.9);
+      const CY=H-0.9-CH, MAPH=CY-0.34-1.55;
+      if(mapB64)s4.addImage({data:mapB64,x:RX,y:1.55,w:RW,h:MAPH,sizing:{type:'cover',w:RW,h:MAPH}});
       else{
-        s4.addShape(pptx.ShapeType.rect,{x:MX,y:MY,w:MW,h:MH,fill:{color:'DBE5FF'}});
-        s4.addText(d.direccion||'',{x:MX+0.2,y:MY+MH/2-0.2,w:MW-0.4,h:0.4,fontSize:9,color:MGRAY,align:'center',fontFace:'Open Sans'});
+        s4.addShape(pptx.ShapeType.rect,{x:RX,y:1.55,w:RW,h:MAPH,fill:{color:'DBE5FF'}});
+        s4.addText('Ubicación',{x:RX,y:1.55+MAPH/2-0.2,w:RW,h:0.4,fontSize:10,color:MGRAY,align:'center',valign:'middle',fontFace:F});
       }
-      s4.addText(d.direccion||'',{x:MX,y:MY+MH+0.05,w:MW,h:0.28,fontSize:8.5,color:MGRAY,align:'center',fontFace:'Open Sans'});
-      const CX=8.25,CY=4.82,CW=4.9,CH=2.12;
-      s4.addShape(pptx.ShapeType.rect,{x:CX,y:CY,w:CW,h:CH,fill:{color:NAVY}});
-      contactos.slice(0,2).forEach((c,i)=>{
-        const cy=CY+0.2+i*0.62;
-        s4.addText(c.nombre,{x:CX+0.2,y:cy,w:CW-0.4,h:0.32,fontSize:contactos.length>1?11.5:14,bold:true,color:WHITE,fontFace:'Open Sans'});
-        const det=[c.telefono?'Tel: '+c.telefono:'',c.email].filter(Boolean).join('  ·  ');
-        if(det)s4.addText(det,{x:CX+0.2,y:cy+0.3,w:CW-0.4,h:0.26,fontSize:8.5,color:'A5B4FC',fontFace:'Open Sans'});
-      });
-      s4.addShape(pptx.ShapeType.line,{x:CX+0.2,y:CY+1.05,w:CW-0.4,h:0,line:{color:WHITE,width:0.5,transparency:65}});
-      s4.addText('Colliers International Argentina',{x:CX+0.2,y:CY+1.15,w:CW-0.4,h:0.32,fontSize:9.5,bold:true,color:WHITE,fontFace:'Open Sans'});
-      s4.addText('www.colliers.com/es-ar',{x:CX+0.2,y:CY+1.5,w:CW-0.4,h:0.28,fontSize:9,color:'A5B4FC',fontFace:'Open Sans'});
-      s4.addShape(pptx.ShapeType.rect,{x:0,y:7.2,w:13.33,h:0.3,fill:{color:NAVY}});
-      s4.addText('Accelerating success.',{x:0.3,y:7.2,w:6,h:0.3,fontSize:9,italic:true,color:WHITE,valign:'middle',fontFace:'Merriweather'});
-      s4.addText('Información confidencial — Colliers International Argentina',{x:6,y:7.2,w:7.1,h:0.3,fontSize:8,color:'A5B4FC',align:'right',valign:'middle',fontFace:'Open Sans'});
+      s4.addText(d.direccion||'',{x:RX,y:CY-0.32,w:RW,h:0.28,fontSize:9,color:MGRAY,align:'center',valign:'middle',fontFace:F});
+      s4.addShape(pptx.ShapeType.rect,{x:RX,y:CY,w:RW,h:CH,fill:{color:NAVY}});
+      bloqueContacto(s4,{x:RX+0.28,y:CY+0.24,w:RW-0.56,lista:contactos,hDisp:CH-PIE_A-0.4});
+      s4.addShape(pptx.ShapeType.line,{x:RX+0.28,y:CY+CH-PIE_A,w:RW-0.56,h:0,line:{color:WHITE,width:0.5,transparency:65}});
+      s4.addText('Colliers International',{x:RX+0.28,y:CY+CH-PIE_A+0.08,w:RW-0.56,h:0.26,fontSize:10,bold:true,color:WHITE,align:'right',valign:'middle',fontFace:F});
+      s4.addText('Av. del Libertador 101, Vicente López\nTel: 7700 9500',{x:RX+0.28,y:CY+CH-PIE_A+0.34,w:RW-0.56,h:0.46,fontSize:8.5,color:AZCLARO,align:'right',valign:'top',fontFace:F});
+      pie(s4);
     }
 
     const safeNombre=(d.nombre||'edificio').replace(/[^a-zA-Z0-9À-ɏ ]/g,'_').trim();

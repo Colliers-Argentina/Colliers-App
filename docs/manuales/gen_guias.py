@@ -340,19 +340,20 @@ GUIAS["Guia_Solicitudes"] = Guia(
 
 # ─────────────────────────── FICHA DEL INMUEBLE ───────────────────────────
 GUIAS["Guia_Ficha_Inmueble"] = Guia(
-    "Generador de Ficha del Inmueble", "1.2", "08/09/2026",
+    "Generador de Ficha del Inmueble", "2.0", "09/09/2026",
     "Genera automáticamente la ficha comercial del inmueble en PowerPoint, con los datos que ya "
     "están cargados en Nexus. Se abre desde la ficha del inmueble, en la solapa Ficha, y antes de "
     "generarla se eligen los pisos que se quieren mostrar.",
     [
-        ("Pisos que entran en la ficha", "Qué elegir: tildar las unidades disponibles que se quieren mostrar en la sección Disponibilidad. Vienen todas marcadas; se pueden destildar las que no correspondan o usar 'Seleccionar todos' / 'Ninguno'. Si no queda ninguna, el sistema avisa y no genera la ficha."),
+        ("Pisos que entran en la ficha", "Qué elegir: tildar las unidades disponibles (se ordenan solas de menor a mayor piso, con subsuelos y planta baja primero) que se quieren mostrar en la sección Disponibilidad. Vienen todas marcadas; se pueden destildar las que no correspondan o usar 'Seleccionar todos' / 'Ninguno'. Si no queda ninguna, el sistema avisa y no genera la ficha."),
         ("Ejecutivos comerciales en la ficha", "Qué elegir: quién figura como contacto en la portada y en la última página. Viene marcado el responsable del inmueble (o el usuario logueado) y se pueden elegir hasta 2. Se muestran con su nombre y su correo."),
         ("Características de la oficina (opcional)", "Qué ingresar: una característica por línea; cada línea sale como viñeta en la ficha. Por ejemplo: cableado, cielorraso, aire acondicionado, baños, luminarias. Con 'Guardar en el inmueble' queda cargado para las próximas fichas."),
         ("Datos que se toman solos", "El resto sale del inmueble: nombre y dirección (título), descripción (cuerpo de la portada), amenities (características del edificio), superficie disponible (del piso más chico al total disponible, por ejemplo 986 – 3.944 m²) y asking rent. Las características del edificio salen en viñetas: si están escritas en una sola línea separadas por comas, el sistema las separa solo. Si falta algo, conviene completarlo en la ficha del inmueble antes de generar."),
         ("Verificaciones previas", "El panel avisa si el inmueble no tiene foto de portada y cuántas imágenes hay cargadas en Documentos."),
     ],
     [
-        "Se descarga un PPTX con: portada (título, subtítulo, descripción, superficie disponible, valor y contacto), galería fotográfica, plantas con la disponibilidad de los pisos elegidos, y características del edificio y de la oficina.",
+        "Se descarga un PPTX de 4 páginas: portada (foto, título, subtítulo, descripción, superficie disponible, valor y contacto), galería fotográfica, plantas con la disponibilidad de los pisos elegidos, y características del edificio y de la oficina con el mapa y el contacto.",
+        "Los documentos cargados con categoría Plano se usan en la página de Plantas; el resto de las imágenes van a la galería.",
         "La disponibilidad se lista por piso: Piso 2° - 3.357 m² - 19 USD/m² - 33 cocheras.",
         "Si el inmueble tiene superficie mínima divisible, se aclara en la ficha.",
         "La descarga queda registrada en el historial de Nexus.",
