@@ -340,16 +340,19 @@ GUIAS["Guia_Solicitudes"] = Guia(
 
 # ─────────────────────────── FICHA DEL INMUEBLE ───────────────────────────
 GUIAS["Guia_Ficha_Inmueble"] = Guia(
-    "Generador de Ficha del Inmueble", "2.0", "09/09/2026",
+    "Generador de Ficha del Inmueble", "3.0", "09/09/2026",
     "Genera automáticamente la ficha comercial del inmueble en PowerPoint, con los datos que ya "
-    "están cargados en Nexus. Se abre desde la ficha del inmueble, en la solapa Ficha, y antes de "
-    "generarla se eligen los pisos que se quieren mostrar.",
+    "están cargados en Nexus. Se abre desde la ficha del inmueble, en la solapa Ficha: a la izquierda "
+    "se configura la ficha y a la derecha se ve una vista previa en vivo, idéntica a lo que se va a "
+    "descargar, que se actualiza sola con cada cambio.",
     [
-        ("Pisos que entran en la ficha", "Qué elegir: tildar las unidades disponibles (se ordenan solas de menor a mayor piso, con subsuelos y planta baja primero) que se quieren mostrar en la sección Disponibilidad. Vienen todas marcadas; se pueden destildar las que no correspondan o usar 'Seleccionar todos' / 'Ninguno'. Si no queda ninguna, el sistema avisa y no genera la ficha."),
-        ("Ejecutivos comerciales en la ficha", "Qué elegir: quién figura como contacto en la portada y en la última página. Viene marcado el responsable del inmueble (o el usuario logueado) y se pueden elegir hasta 2. Se muestran con su nombre y su correo."),
-        ("Características de la oficina (opcional)", "Qué ingresar: una característica por línea; cada línea sale como viñeta en la ficha. Por ejemplo: cableado, cielorraso, aire acondicionado, baños, luminarias. Con 'Guardar en el inmueble' queda cargado para las próximas fichas."),
+        ("Vista previa", "A la derecha se ve la ficha tal como va a salir en el PPT, con sus 4 páginas: Portada, Galería, Plantas y Características. Con las pestañas [1] [2] [3] [4] se navega entre ellas, y con los botones − / + / Ajustar se acerca o aleja. Cualquier cambio en la configuración (pisos, ejecutivos, características) se refleja ahí al instante, sin necesidad de descargar nada."),
+        ("Pisos que entran en la ficha", "Qué elegir: tildar las unidades disponibles (se ordenan solas de menor a mayor piso, con subsuelos y planta baja primero) que se quieren mostrar en la sección Disponibilidad. Vienen todas marcadas; se pueden destildar las que no correspondan o usar 'Seleccionar todos' / 'Ninguno'. La vista previa y el conteo se actualizan al tildar cada una. Si no queda ninguna, la vista previa avisa y el botón de generar queda deshabilitado."),
+        ("Ejecutivos comerciales en la ficha", "Qué elegir: quién figura como contacto en la portada y en la última página. Viene marcado el responsable del inmueble (o el usuario logueado) y se pueden elegir hasta 2. Se muestran con su nombre y su correo, y el cambio se ve enseguida en la vista previa."),
+        ("Características de la oficina (opcional)", "Qué ingresar: una característica por línea; cada línea sale como viñeta en la ficha. Por ejemplo: cableado, cielorraso, aire acondicionado, baños, luminarias. Se refleja en la vista previa a medida que se escribe. Con 'Guardar en el inmueble' queda cargado para las próximas fichas."),
         ("Datos que se toman solos", "El resto sale del inmueble: nombre y dirección (título), descripción (cuerpo de la portada), amenities (características del edificio), superficie disponible (del piso más chico al total disponible, por ejemplo 986 – 3.944 m²) y asking rent. Las características del edificio salen en viñetas: si están escritas en una sola línea separadas por comas, el sistema las separa solo. Si falta algo, conviene completarlo en la ficha del inmueble antes de generar."),
         ("Verificaciones previas", "El panel avisa si el inmueble no tiene foto de portada y cuántas imágenes hay cargadas en Documentos."),
+        ("Generar Ficha", "El botón queda junto a la vista previa. Al presionarlo se descarga el PPTX con exactamente lo que se veía en la preview."),
     ],
     [
         "Se descarga un PPTX de 4 páginas: portada (foto, título, subtítulo, descripción, superficie disponible, valor y contacto), galería fotográfica, plantas con la disponibilidad de los pisos elegidos, y características del edificio y de la oficina con el mapa y el contacto.",
