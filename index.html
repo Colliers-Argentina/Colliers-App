@@ -1820,6 +1820,28 @@ label.sr-comp-row:hover{background:#F8FAFF}
 .sr-disp-inp:focus{outline:none;border-color:#1C54F4}
 @media(max-width:640px){.sr-comp-row{grid-template-columns:18px 1fr 1fr;row-gap:.15rem}.sr-comp-row span:nth-child(4),.sr-comp-row span:nth-child(5),.sr-comp-row span:nth-child(6){grid-column:2/4;font-size:10.5px;color:#8898C0}
 .sr-disp-edit-row{grid-template-columns:1fr 1fr;row-gap:.3rem}.sr-disp-edit-row.sr-disp-edit-hd{display:none}.sr-disp-edit-row>span{grid-column:1/3}}
+.sr-fp-hint{font-size:12.5px;color:#56648F;margin-bottom:.9rem;text-align:center}
+.sr-fp-card{max-width:640px;margin:0 auto;border:1px solid #E8EFF8;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 2px 14px rgba(10,27,77,.06)}
+.sr-fp-hero{position:relative;height:220px;background:#0A1B4D linear-gradient(135deg,#0A1B4D,#1C3E8C);background-size:cover;background-position:center;display:flex;align-items:flex-start;justify-content:flex-end;padding:.9rem}
+.sr-fp-hero-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;color:rgba(255,255,255,.55);font-size:12px;font-weight:600}
+.sr-fp-hero-ph span{font-size:28px}
+.sr-fp-logo{height:24px;filter:brightness(0) invert(1);opacity:.95}
+.sr-fp-body{padding:1.1rem 1.3rem 1.3rem}
+.sr-fp-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:.6rem;flex-wrap:wrap;border-bottom:1px solid #EEF1F8;padding-bottom:.8rem;margin-bottom:.8rem}
+.sr-fp-titulo{font-size:17px;font-weight:800;color:#0A1B4D;line-height:1.25}
+.sr-fp-dir{font-size:12.5px;color:#56648F;margin-top:.2rem}
+.sr-fp-tag{background:#EEF3FF;color:#1C54F4;border:1px solid #C7D7FF;border-radius:20px;padding:.25rem .7rem;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+.sr-fp-kpis{display:flex;gap:1.4rem;flex-wrap:wrap;margin-bottom:.9rem}
+.sr-fp-kpi{display:flex;flex-direction:column;gap:.15rem}
+.sr-fp-kpi-l{font-size:10px;font-weight:800;color:#8898C0;text-transform:uppercase;letter-spacing:.04em}
+.sr-fp-kpi-v{font-size:14px;font-weight:800;color:#0A1B4D}
+.sr-fp-sec{margin-top:.9rem}
+.sr-fp-sec-t{font-size:11px;font-weight:800;color:#56648F;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.3rem}
+.sr-fp-sec-txt{font-size:12.5px;color:#353E59;line-height:1.5;white-space:pre-wrap}
+.sr-fp-disp-row{font-size:12.5px;color:#353E59;padding:.15rem 0}
+.sr-fp-empty{font-size:12px;color:#B45309}
+.sr-fp-note{max-width:640px;margin:.8rem auto 0;font-size:11px;color:#8898C0;text-align:center;font-style:italic}
+@media(max-width:640px){.sr-fp-hero{height:160px}.sr-fp-body{padding:.9rem 1rem 1.1rem}.sr-fp-titulo{font-size:15px}.sr-fp-kpis{gap:1rem}}
 .sr-wiz-progress{display:flex;align-items:flex-start;justify-content:center;margin-bottom:0;padding:0 .2rem}
 .sr-wiz-etapas{display:flex;align-items:flex-start;justify-content:center;flex-wrap:wrap;gap:.9rem;margin-bottom:1.4rem}
 .sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
@@ -15735,11 +15757,8 @@ const SR_SERVICES=[
      ]},
      // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
      {step:1,title:'Características del edificio',fields:[
-       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Completar con información hard del edificio (superficie, cantidad de pisos, ascensores, grupo electrógeno, climatización, seguridad, etc.). Se completa con los amenities del edificio como punto de partida; podés editarlo. No modifica la ficha del inmueble.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Completar con información hard del edificio (cantidad de pisos, ascensores, grupo electrógeno, climatización, seguridad, amenities y etc.). No modifica la ficha del inmueble.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
        {k:'especificacionesOficina',label:'Información de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
-     ]},
-     {step:1,title:'Comentarios',fields:[
-       {k:'comentariosComerciales',label:'Comentarios (opcional)',type:'textarea',ph:'Agregá cualquier aclaración adicional para Marketing & Research.'},
      ]},
      {step:1,title:'Responsables',fields:[
        {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
@@ -15776,17 +15795,18 @@ const SR_SERVICES=[
        {k:'linkMultimedia',label:'Link para multimedia',type:'url',req:true,ph:'https://...',hint:'Link al material multimedia (fotos, video, tour virtual).'},
        {k:'plano',label:'Plano (opcional)',type:'linkfile',hint:'Pegá el link del plano o adjuntá el archivo.'},
      ]},
-     // ══ PUBLICACIÓN · Paso 4 — Publicación ══
+     // ══ FICHA · Paso 4 — Revisión (preview, sin campos propios) ══
+     // ══ PUBLICACIÓN · Paso 5 — Publicación ══
      // "Características de la publicación" es una agrupación de campos dentro de este mismo
      // paso (no un paso aparte): acá viven las Superficies y Dimensiones de la publicación.
-     {step:4,title:'Características de la publicación',fields:[
+     {step:5,title:'Características de la publicación',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true,hint:'Esto incluye sup. cubierta, descubierta y semicubierta.'},
        {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
        {k:'supPropia',label:'Superficie propia (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number',req:true},
        {k:'banos',label:'Baños',type:'number',req:true,hint:'¿Cuántos inodoros?'},
      ]},
-     {step:4,title:'Distribución de la Unidad',fields:[
+     {step:5,title:'Distribución de la Unidad',fields:[
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
        {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
@@ -15794,22 +15814,22 @@ const SR_SERVICES=[
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
        {k:'pisoDestacado',label:'¿De qué piso o de cuántos m² querés que sea la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
      ]},
-     {step:4,title:'Características Particulares',fields:[
+     {step:5,title:'Características Particulares',fields:[
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
        {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
-     {step:4,title:'Equipamiento y Servicios',fields:[
+     {step:5,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',req:true,opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
      // Documentación y acciones de marketing: ya no se piden; se conservan para el histórico.
-     {step:4,title:'Documentación y Difusión',fields:[
+     {step:5,title:'Documentación y Difusión',fields:[
        {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',legacy:true,opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
        {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',legacy:true,opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
      ]},
-     // ══ PUBLICACIÓN · Paso 5 — Comentarios (opcional) ══
-     {step:5,title:'Comentarios',fields:[
+     // ══ PUBLICACIÓN · Paso 6 — Comentarios (opcional) ══
+     {step:6,title:'Comentarios',fields:[
        {k:'comentarios',label:'Comentarios',type:'textarea',ph:'¿Querés agregar algún comentario o información adicional?'},
      ]},
    ]},
@@ -16666,11 +16686,12 @@ const SR_WIZ_STEPS=[
   {n:1,label:'Información General',etapa:'FICHA'},
   {n:2,label:'Información Comercial',etapa:'FICHA'},
   {n:3,label:'Contenido',etapa:'FICHA'},
-  {n:4,label:'Características',etapa:'PUBLICACIÓN'},
-  {n:5,label:'Comentarios',etapa:'PUBLICACIÓN'},
-  {n:6,label:'Revisión',etapa:''},
+  {n:4,label:'Revisión',etapa:'FICHA',preview:true},
+  {n:5,label:'Características',etapa:'PUBLICACIÓN'},
+  {n:6,label:'Comentarios',etapa:'PUBLICACIÓN'},
+  {n:7,label:'Revisión final',etapa:''},
 ];
-const SR_WIZ_LAST=5, SR_WIZ_REVIEW=6, SR_WIZ_CONFIRM=7;
+const SR_WIZ_LAST=6, SR_WIZ_REVIEW=7, SR_WIZ_CONFIRM=8;
 // El wizard se arma con los pasos del servicio (SR_WIZ_STEPS es el de Ficha y Publicación).
 let _srSteps=SR_WIZ_STEPS,_srLast=SR_WIZ_LAST,_srReview=SR_WIZ_REVIEW,_srConfirm=SR_WIZ_CONFIRM;
 function _srSetSteps(svc){
@@ -16717,14 +16738,18 @@ function openSolicitudForm(key){
   const etapaHd=n=>{
     const st=_srSteps.find(x=>x.n===n);
     if(!st||!st.etapa)return '';
-    const primero=_srSteps.filter(x=>x.etapa===st.etapa)[0].n===n;
+    const pasosEtapa=_srSteps.filter(x=>x.etapa===st.etapa);
+    const primero=pasosEtapa[0].n===n;
     if(!primero)return '';
-    const sub=st.etapa==='FICHA'?'Pasos 1 a 3 — con esto alcanza para solicitar la Ficha'
-                                :'Pasos 4 a 6 — información adicional para solicitar también la Publicación';
+    const rango=pasosEtapa.length>1?`Pasos ${pasosEtapa[0].n} a ${pasosEtapa[pasosEtapa.length-1].n}`:`Paso ${pasosEtapa[0].n}`;
+    const sub=st.etapa==='FICHA'?rango+' — con esto alcanza para solicitar la Ficha'
+                                :rango+' — información adicional para solicitar también la Publicación';
     return `<div class="sr-etapa-banner"><span class="sr-etapa-banner-t">${esc(st.etapa)}</span><span class="sr-etapa-banner-s">${esc(sub)}</span></div>`;
   };
   for(let n=1;n<=_srLast;n++){
-    const cards=svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
+    const st=_srSteps.find(x=>x.n===n);
+    // Paso de revisión (preview): sin cards propias, se renderiza al entrar (srWizGoto).
+    const cards=(st&&st.preview)?'<div id="sr-ficha-preview"></div>':svc.form.filter(c=>(c.step||1)===n).map(cardHTML).join('');
     steps+=`<div class="sr-wiz-step" data-step="${n}"${n===1?'':' style="display:none"'}>${etapaHd(n)}${cards}</div>`;
   }
   steps+=`<div class="sr-wiz-step" data-step="${_srReview}" id="sr-wiz-review" style="display:none"></div>`;
@@ -16760,6 +16785,8 @@ function srWizGoto(n){
   _srWizStep=n;
   document.querySelectorAll('#sr-form-body .sr-wiz-step').forEach(el=>el.style.display=(+el.dataset.step===n)?'':'none');
   if(n===_srReview)_srWizRenderReview();
+  const stCur=_srSteps.find(x=>x.n===n);
+  if(stCur&&stCur.preview)_srRenderFichaPreview();
   // Progreso (6 nodos visibles; el paso 7 es confirmación).
   document.querySelectorAll('#sr-wiz-progress .sr-wiz-node').forEach(el=>{const s=+el.dataset.node;el.classList.toggle('active',s===n);el.classList.toggle('done',s<n||n===_srConfirm);});
   const back=document.getElementById('sr-wiz-back'),next=document.getElementById('sr-wiz-next'),foot=document.getElementById('sr-wiz-footer');
@@ -16812,7 +16839,7 @@ function _srWizValidateStep(n){
       faltan.push('Link para multimedia (debe ser una URL válida)');
     }
   }
-  if(n===4&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
+  if(n===5&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
   // Paso 1: sin inmueble no se puede generar una Ficha/Publicación → cartel con acción para crearlo.
   if(n===1&&!data.inmuebleId){
     ok=false;
@@ -17244,6 +17271,63 @@ function _srSyncDisponibilidad(){
     <div class="sr-disp-review-sum">Superficie: <b>${esc(supRange)}</b>${rentRange?' · Asking rent: <b>'+esc(rentRange)+'</b>':''}</div>
     <button type="button" class="crm-action-btn" style="margin-top:.6rem" onclick="srWizGoto(1)">✏️ Modificar selección</button>`;
   _srAutoSet('resumenDisponibilidad',supRange==='–'?'':supRange);
+}
+// ── Paso "Revisión" (preview editorial simplificada de la Ficha) ──────────────────────────
+// Lee el estado ACTUAL del formulario (nada cacheado): campos ya cargados/editados + la
+// selección de Componentes con sus overrides de Disponibilidad aplicados (misma fuente que
+// usa el resto del formulario: _srUnidadesSeleccionadas/_calcSupRentRange). No genera PPT ni
+// duplica reglas de negocio; sólo reutiliza los mismos datos y helpers ya existentes.
+function _srRenderFichaPreview(){
+  const host=document.getElementById('sr-ficha-preview');if(!host)return;
+  const gv=id=>{const el=document.getElementById(id);return el?String(el.value||'').trim():'';};
+  const bld=(_bldDocs||[]).find(b=>b._id===gv('srf-inmuebleId'));
+  const titulo=gv('srf-titulo')||(bld&&bld.nombre)||'Sin título';
+  const direccion=gv('srf-direccion')||(bld&&bld.direccion)||'';
+  const tipoOp=gv('srf-tipoTransaccion')||'';
+  const descripcion=gv('srf-descripcion');
+  const especificaciones=gv('srf-especificaciones');
+  const resumen=gv('srf-resumenDisponibilidad');
+  const minDiv=gv('srf-minimoDivisible');
+  const n=_numAR;
+  const sel=_srUnidadesSeleccionadas();   // ya con overrides de Disponibilidad aplicados
+  const {rentRange}=_calcSupRentRange(sel);
+  const filas=sel.map(u=>{
+    const p=[_bfPisoLabel(u)];
+    if(n(u.m2)>0)p.push(Math.round(n(u.m2)).toLocaleString('es-AR')+' m²');
+    p.push(u.tipoOferta||'Alquiler');
+    if(n(u.askingRent)>0)p.push('USD '+n(u.askingRent).toLocaleString('es-AR',{maximumFractionDigits:2})+'/m²');
+    return p.join(' — ');
+  });
+  const img=bld?(getBldFoto(bld)||''):'';
+  host.innerHTML=`
+    <div class="sr-fp-hint">Revisá cómo quedará la información de la Ficha antes de continuar.</div>
+    <div class="sr-fp-card">
+      <div class="sr-fp-hero"${img?` style="background-image:url('${esc(img)}')"`:''}>
+        ${img?'':'<div class="sr-fp-hero-ph"><span>🖼️</span>Sin imagen de portada</div>'}
+        <img class="sr-fp-logo" src="https://raw.githubusercontent.com/mazaretto-wq/colliers-fotos/main/colliers-logo-transparent.png" alt="Colliers">
+      </div>
+      <div class="sr-fp-body">
+        <div class="sr-fp-hd">
+          <div>
+            <div class="sr-fp-titulo">${esc(titulo)}</div>
+            <div class="sr-fp-dir">${esc(direccion||'Sin dirección')}</div>
+          </div>
+          ${tipoOp?`<div class="sr-fp-tag">${esc(tipoOp)}</div>`:''}
+        </div>
+        <div class="sr-fp-kpis">
+          <div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Superficie</span><span class="sr-fp-kpi-v">${esc(resumen||'–')}</span></div>
+          <div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Asking rent</span><span class="sr-fp-kpi-v">${esc(rentRange||'–')}</span></div>
+          ${minDiv?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Mínimo divisible</span><span class="sr-fp-kpi-v">${esc(minDiv)} m²</span></div>`:''}
+        </div>
+        ${descripcion?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Descripción</div><div class="sr-fp-sec-txt">${esc(descripcion)}</div></div>`:''}
+        ${especificaciones?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Características del edificio</div><div class="sr-fp-sec-txt">${esc(especificaciones)}</div></div>`:''}
+        <div class="sr-fp-sec">
+          <div class="sr-fp-sec-t">Disponibilidad</div>
+          ${filas.length?`<div class="sr-fp-disp">${filas.map(f=>`<div class="sr-fp-disp-row">• ${esc(f)}</div>`).join('')}</div>`:'<div class="sr-fp-empty">Todavía no seleccionaste componentes en Información General.</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="sr-fp-note">Esta vista es una referencia visual. La pieza final se generará con el diseño definitivo.</div>`;
 }
 // Marca en verde (con tilde) cada servicio ya respondido, así se ve qué falta completar.
 window.srSinoMark=function(id,i){
