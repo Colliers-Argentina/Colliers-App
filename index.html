@@ -1811,7 +1811,15 @@ label.sr-comp-row:hover{background:#F8FAFF}
 .sr-disp-review{border:1px solid #E8EFF8;border-radius:8px;padding:.7rem .85rem}
 .sr-disp-review-row{font-size:12px;color:#353E59;padding:.2rem 0}
 .sr-disp-review-sum{margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF1F8;font-size:11.5px;color:#56648F}
-@media(max-width:640px){.sr-comp-row{grid-template-columns:18px 1fr 1fr;row-gap:.15rem}.sr-comp-row span:nth-child(4),.sr-comp-row span:nth-child(5),.sr-comp-row span:nth-child(6){grid-column:2/4;font-size:10.5px;color:#8898C0}}
+.sr-disp-edit-list{max-height:260px;overflow-y:auto;border:1px solid #E8EFF8;border-radius:8px}
+.sr-disp-edit-row{display:grid;grid-template-columns:1fr 1fr 1.2fr 1.3fr 1.2fr;gap:.4rem;align-items:center;padding:.35rem .5rem;font-size:11.5px;border-bottom:1px solid #F1F4FA}
+.sr-disp-edit-row:last-child{border-bottom:none}
+.sr-disp-edit-row.sr-disp-edit-hd{position:sticky;top:0;background:#F8FAFF;font-size:10px;font-weight:800;color:#8898C0;text-transform:uppercase;letter-spacing:.04em;z-index:1;padding:.4rem .5rem}
+.sr-disp-edit-row>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:#353E59}
+.sr-disp-inp{width:100%;box-sizing:border-box;border:1px solid #E4E9F5;border-radius:6px;padding:.3rem .4rem;font-size:11.5px;color:#1B2340;background:#fff}
+.sr-disp-inp:focus{outline:none;border-color:#1C54F4}
+@media(max-width:640px){.sr-comp-row{grid-template-columns:18px 1fr 1fr;row-gap:.15rem}.sr-comp-row span:nth-child(4),.sr-comp-row span:nth-child(5),.sr-comp-row span:nth-child(6){grid-column:2/4;font-size:10.5px;color:#8898C0}
+.sr-disp-edit-row{grid-template-columns:1fr 1fr;row-gap:.3rem}.sr-disp-edit-row.sr-disp-edit-hd{display:none}.sr-disp-edit-row>span{grid-column:1/3}}
 .sr-wiz-progress{display:flex;align-items:flex-start;justify-content:center;margin-bottom:0;padding:0 .2rem}
 .sr-wiz-etapas{display:flex;align-items:flex-start;justify-content:center;flex-wrap:wrap;gap:.9rem;margin-bottom:1.4rem}
 .sr-wiz-etapa{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.5rem .7rem;border:1px solid #E8EFF8;border-radius:12px;background:#FBFCFF}
@@ -15733,9 +15741,7 @@ const SR_SERVICES=[
      {step:1,title:'Comentarios',fields:[
        {k:'comentariosComerciales',label:'Comentarios (opcional)',type:'textarea',ph:'Agregá cualquier aclaración adicional para Marketing & Research.'},
      ]},
-     {step:1,title:'Cuenta y Responsables',fields:[
-       {k:'cuenta',label:'Cuenta / Cliente (opcional)',type:'cuenta'},
-       {k:'propietario',label:'Contacto (opcional)',type:'contacto'},
+     {step:1,title:'Responsables',fields:[
        {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
      ]},
      // ══ FICHA · Paso 2 — Información Comercial ══
@@ -15753,31 +15759,34 @@ const SR_SERVICES=[
        {k:'precioTotal',label:'Precio total',type:'text',legacy:true},
        {k:'precioM2',label:'Precio por m²',type:'text',legacy:true},
      ]},
-     // Los pisos ya se eligieron en Información General: acá sólo se revisan, no se vuelven
-     // a seleccionar. Superficie y asking rent se calculan con la misma lógica del Generador
-     // de Ficha, únicamente sobre los componentes seleccionados.
+     // Los pisos ya se eligieron en Información General: acá no se vuelven a seleccionar, pero
+     // sus datos (m², tipo de operación, asking rent, propietario) se pueden editar puntualmente
+     // para esta Ficha/Publicación, como overrides que no tocan el inmueble ni sus componentes.
+     // Superficie y asking rent se calculan con la misma lógica del Generador de Ficha, sobre
+     // los valores efectivos (con overrides) de los componentes seleccionados.
      {step:2,title:'Disponibilidad',fields:[
-       {k:'disponibilidad',label:'Pisos seleccionados',type:'disponibilidad',hint:'Es la selección que hiciste en Información General → Inmueble Asociado → Componentes. Para modificarla, volvé a ese paso.'},
-       {k:'minimoDivisible',label:'Mínimo divisible (m²)',type:'text',hint:'Se completa con el dato del inmueble si está cargado; podés editarlo.'},
-       {k:'resumenDisponibilidad',label:'Resumen de disponibilidad',type:'text',ph:'Ej.: 300 - 1.000 m²',hint:'Rango de m² que se muestra en la Ficha: del componente más chico a la suma de todos los seleccionados. Se calcula solo; podés editarlo.'},
+       {k:'disponibilidad',label:'Pisos seleccionados',type:'disponibilidad',hint:'Son los pisos elegidos en Información General → Inmueble Asociado → Componentes. Podés editar sus datos acá para esta publicación, sin modificar el inmueble. Para agregar o quitar pisos, usá "Modificar selección".'},
+       {k:'minimoDivisible',label:'Mínimo divisible (m²)',type:'text',hint:'Se completa con el dato del inmueble si está cargado; podés editarlo para esta publicación sin modificar el inmueble.'},
+       {k:'resumenDisponibilidad',label:'Resumen de disponibilidad',type:'text',ph:'Ej.: 300 - 1.000 m²',hint:'Rango de m² que se muestra en la Ficha: del componente más chico a la suma de todos los seleccionados, usando los valores editados en Disponibilidad. Se calcula solo; podés editarlo.'},
        // El detalle por piso reemplaza a este texto; se conserva para las solicitudes que ya lo tienen.
        {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',legacy:true},
      ]},
-     // ══ FICHA · Paso 3 — Características de la publicación ══
-     {step:3,title:'Características de la publicación',fields:[
+     // ══ FICHA · Paso 3 — Contenido (material multimedia) ══
+     {step:3,title:'Contenido',fields:[
+       {k:'linkMultimedia',label:'Link para multimedia',type:'url',req:true,ph:'https://...',hint:'Link al material multimedia (fotos, video, tour virtual).'},
+       {k:'plano',label:'Plano (opcional)',type:'linkfile',hint:'Pegá el link del plano o adjuntá el archivo.'},
+     ]},
+     // ══ PUBLICACIÓN · Paso 4 — Publicación ══
+     // "Características de la publicación" es una agrupación de campos dentro de este mismo
+     // paso (no un paso aparte): acá viven las Superficies y Dimensiones de la publicación.
+     {step:4,title:'Características de la publicación',fields:[
        {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true,hint:'Esto incluye sup. cubierta, descubierta y semicubierta.'},
        {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
        {k:'supPropia',label:'Superficie propia (m²)',type:'number'},
        {k:'cocheras',label:'Cocheras',type:'number',req:true},
        {k:'banos',label:'Baños',type:'number',req:true,hint:'¿Cuántos inodoros?'},
      ]},
-     // ══ FICHA · Paso 4 — Contenido (material multimedia) ══
-     {step:4,title:'Contenido',fields:[
-       {k:'linkMultimedia',label:'Link para multimedia',type:'url',req:true,ph:'https://...',hint:'Link al material multimedia (fotos, video, tour virtual).'},
-       {k:'plano',label:'Plano (opcional)',type:'linkfile',hint:'Pegá el link del plano o adjuntá el archivo.'},
-     ]},
-     // ══ PUBLICACIÓN · Paso 5 — Características ══
-     {step:5,title:'Distribución de la Unidad',fields:[
+     {step:4,title:'Distribución de la Unidad',fields:[
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
        {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
@@ -15785,22 +15794,22 @@ const SR_SERVICES=[
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
        {k:'pisoDestacado',label:'¿De qué piso o de cuántos m² querés que sea la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
      ]},
-     {step:5,title:'Características Particulares',fields:[
+     {step:4,title:'Características Particulares',fields:[
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
        {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
        {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
      ]},
-     {step:5,title:'Equipamiento y Servicios',fields:[
+     {step:4,title:'Equipamiento y Servicios',fields:[
        {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',req:true,opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
      ]},
      // Documentación y acciones de marketing: ya no se piden; se conservan para el histórico.
-     {step:5,title:'Documentación y Difusión',fields:[
+     {step:4,title:'Documentación y Difusión',fields:[
        {k:'documentacion',label:'Documentación (agregar todos los elementos necesarios)',type:'docs',legacy:true,opts:['Fotografías','Planos','Brochure','Video','Tour Virtual','Render','Otro']},
        {k:'marketing',label:'Acciones de marketing autorizadas',type:'multi',legacy:true,opts:['Ficha técnica','Portales','Campaña de email','Redes Sociales','Cartelería','Video','Tour Virtual','Otro']},
      ]},
-     // ══ PUBLICACIÓN · Paso 6 — Comentarios (opcional) ══
-     {step:6,title:'Comentarios',fields:[
+     // ══ PUBLICACIÓN · Paso 5 — Comentarios (opcional) ══
+     {step:5,title:'Comentarios',fields:[
        {k:'comentarios',label:'Comentarios',type:'textarea',ph:'¿Querés agregar algún comentario o información adicional?'},
      ]},
    ]},
@@ -16656,13 +16665,12 @@ window.startSolicitud=function(serviceKey){if(!_srService(serviceKey))return;clo
 const SR_WIZ_STEPS=[
   {n:1,label:'Información General',etapa:'FICHA'},
   {n:2,label:'Información Comercial',etapa:'FICHA'},
-  {n:3,label:'Características de la publicación',etapa:'FICHA'},
-  {n:4,label:'Contenido',etapa:'FICHA'},
-  {n:5,label:'Características',etapa:'PUBLICACIÓN'},
-  {n:6,label:'Comentarios',etapa:'PUBLICACIÓN'},
-  {n:7,label:'Revisión',etapa:''},
+  {n:3,label:'Contenido',etapa:'FICHA'},
+  {n:4,label:'Características',etapa:'PUBLICACIÓN'},
+  {n:5,label:'Comentarios',etapa:'PUBLICACIÓN'},
+  {n:6,label:'Revisión',etapa:''},
 ];
-const SR_WIZ_LAST=6, SR_WIZ_REVIEW=7, SR_WIZ_CONFIRM=8;
+const SR_WIZ_LAST=5, SR_WIZ_REVIEW=6, SR_WIZ_CONFIRM=7;
 // El wizard se arma con los pasos del servicio (SR_WIZ_STEPS es el de Ficha y Publicación).
 let _srSteps=SR_WIZ_STEPS,_srLast=SR_WIZ_LAST,_srReview=SR_WIZ_REVIEW,_srConfirm=SR_WIZ_CONFIRM;
 function _srSetSteps(svc){
@@ -16679,7 +16687,7 @@ function _srEtapaUltimoPaso(etapa){
 let _srWizStep=1,_srAlcance='publicacion';
 function openSolicitudForm(key){
   const svc=_srService(key);if(!svc)return;
-  _srFormService=svc;_srSetSteps(svc);_srDocList=[];_srUnits=[];_srPisosSel=new Set();_srFotos={};Object.keys(_srAuto).forEach(k=>delete _srAuto[k]);_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;_srAlcance='publicacion';
+  _srFormService=svc;_srSetSteps(svc);_srDocList=[];_srUnits=[];_srPisosSel=new Set();_srCompOverrides={};_srFotos={};Object.keys(_srAuto).forEach(k=>delete _srAuto[k]);_srEjecExtra=[];_srNewBldId='';_srNewContactId='';_srWizStep=1;_srAlcance='publicacion';
   const ttlEl=document.getElementById('sr-form-title');
   if(ttlEl)ttlEl.innerHTML=esc(svc.label)+(svc.sub?`<div style="font-size:12px;font-weight:500;color:#56648F;margin-top:.15rem">${esc(svc.sub)}</div>`:'');
   // El bloque "Automático" (Solicitante/Broker/Tipo/Fecha/Responsable) ya no se muestra en la
@@ -16804,7 +16812,7 @@ function _srWizValidateStep(n){
       faltan.push('Link para multimedia (debe ser una URL válida)');
     }
   }
-  if(n===3&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
+  if(n===4&&!_srValidateSuperficies()){ok=false;if(!first)first=document.getElementById('srf-supTotal');}
   // Paso 1: sin inmueble no se puede generar una Ficha/Publicación → cartel con acción para crearlo.
   if(n===1&&!data.inmuebleId){
     ok=false;
@@ -16914,7 +16922,7 @@ window.srInmSearch=function(q){
   const list=document.getElementById('srf-inm-list');if(!list)return;
   document.getElementById('srf-inmuebleId').value='';document.getElementById('srf-inmuebleNombre').value='';
   _srSetMaps(null);
-  _srUnits=[];_srPisosSel=new Set();_srRenderComponentes();
+  _srUnits=[];_srPisosSel=new Set();_srCompOverrides={};_srRenderComponentes();
   document.getElementById('srf-inm-tag').style.display='none';_srNewBldId='';
   const create=document.getElementById('srf-inm-create');if(create){create.style.display='none';create.innerHTML='';}
   if((!Array.isArray(_bldDocs)||!_bldDocs.length)&&db){db.collection('buildings').get().then(s=>{_bldDocs=s.docs.map(d=>({...d.data(),_id:d.id}));const cur=document.getElementById('srf-inmueble');if(cur&&(cur.value||'').trim())srInmSearch(cur.value);}).catch(()=>{});}
@@ -17143,8 +17151,12 @@ async function _srFotosSubir(k){
 // ── Componentes del inmueble: selección única, fuente de verdad para Disponibilidad ──
 // (misma lógica de orden/selección que usa el Generador de Ficha, reutilizada acá).
 let _srUnits=[],_srPisosSel=new Set();
+// Overrides puntuales para esta Ficha/Publicación (m2, tipoOferta, askingRent, propietario),
+// por unidad._id. Nunca se escriben en el inmueble/Firestore: sólo se leen acá y se usan al
+// generar la Ficha/Publicación. Se reinician cada vez que se elige otro inmueble.
+let _srCompOverrides={};
 async function _srCargarComponentes(buildingId){
-  _srUnits=[];_srPisosSel=new Set();_srRenderComponentes();
+  _srUnits=[];_srPisosSel=new Set();_srCompOverrides={};_srRenderComponentes();
   if(!db||!buildingId)return;
   try{
     const snap=await db.collection('buildings').doc(buildingId).collection('units').get();
@@ -17173,32 +17185,62 @@ function _srRenderComponentes(){
 }
 window.srPisoToggle=function(id,on){if(on)_srPisosSel.add(id);else _srPisosSel.delete(id);_srRenderComponentes();};
 window.srPisosTodos=function(on){_srPisosSel=on?new Set(_srUnits.map(u=>u._id)):new Set();_srRenderComponentes();};
-// Componentes seleccionados, ya ordenados: fuente de verdad para Disponibilidad, su resumen,
-// la superficie y el asking rent (misma lógica que el Generador de Ficha).
-function _srUnidadesSeleccionadas(){return _bfOrdenarPisos(_srUnits.filter(u=>_srPisosSel.has(u._id)));}
+// Unidad "efectiva": el dato original del inmueble con los overrides de esta publicación
+// aplicados encima. El objeto _srUnits nunca se modifica.
+function _srUnidadEfectiva(u){
+  const o=_srCompOverrides[u._id];if(!o)return u;
+  const eff={...u};
+  if(o.m2!==undefined)eff.m2=o.m2;
+  if(o.tipoOferta!==undefined)eff.tipoOferta=o.tipoOferta;
+  if(o.askingRent!==undefined)eff.askingRent=o.askingRent;
+  if(o.propietario!==undefined){eff.ownerAccountName='';eff.ownerContactName='';eff.propietario=o.propietario;}
+  return eff;
+}
+// Componentes seleccionados, ya ordenados y con los overrides de esta publicación aplicados:
+// fuente de verdad para Disponibilidad, su resumen, la superficie y el asking rent (misma
+// lógica que el Generador de Ficha, pero sobre los valores efectivos de esta publicación).
+function _srUnidadesSeleccionadas(){return _bfOrdenarPisos(_srUnits.filter(u=>_srPisosSel.has(u._id))).map(_srUnidadEfectiva);}
+// Edición puntual de un dato de Disponibilidad para esta Ficha/Publicación: se guarda como
+// override (no toca el inmueble ni Firestore) y recalcula el resumen con el valor efectivo.
+window.srDispOverride=function(id,field,value){
+  const o=_srCompOverrides[id]||(_srCompOverrides[id]={});
+  o[field]=value;
+  _srSyncDisponibilidad();
+};
+const SR_DISP_TIPO_OPTS=['Alquiler','Venta','Alquiler o Venta'];
 function _srSyncDisponibilidad(){
   const rev=document.getElementById('srf-disponibilidad-review');if(!rev)return;
   const n=_numAR;
-  const sel=_srUnidadesSeleccionadas();
+  const raw=_bfOrdenarPisos(_srUnits.filter(u=>_srPisosSel.has(u._id)));   // sin overrides, para precargar los inputs
   if(!(document.getElementById('srf-inmuebleId')||{}).value){
     rev.innerHTML='<div style="font-size:11.5px;color:#8898C0">Seleccioná un inmueble en Información General para ver la disponibilidad.</div>';
     return;
   }
-  if(!sel.length){
+  if(!raw.length){
     rev.innerHTML=`<div style="font-size:11.5px;color:#B45309">⚠ No hay componentes seleccionados. Volvé a Información General para elegir al menos uno.</div>
       <button type="button" class="crm-action-btn" style="margin-top:.5rem" onclick="srWizGoto(1)">← Volver a Información General</button>`;
     _srAutoSet('resumenDisponibilidad','');
     return;
   }
-  const filas=sel.map(u=>{
-    const p=[_bfPisoLabel(u)];
-    if(n(u.m2)>0)p.push(Math.round(n(u.m2)).toLocaleString('es-AR')+' m²');
-    p.push(u.tipoOferta||'Alquiler');
-    if(n(u.askingRent)>0)p.push('USD '+n(u.askingRent).toLocaleString('es-AR',{maximumFractionDigits:2})+'/m²');
-    return `<div class="sr-disp-review-row">• ${esc(p.join(' — '))}</div>`;
-  }).join('');
+  const fila=u=>{
+    const o=_srCompOverrides[u._id]||{};
+    const m2v=o.m2!==undefined?o.m2:(n(u.m2)?Math.round(n(u.m2)):'');
+    const tipoV=o.tipoOferta!==undefined?o.tipoOferta:(u.tipoOferta||'Alquiler');
+    const rentV=o.askingRent!==undefined?o.askingRent:(n(u.askingRent)?n(u.askingRent):'');
+    const propV=o.propietario!==undefined?o.propietario:(u.ownerAccountName||u.ownerContactName||u.propietario||'');
+    return `<div class="sr-disp-edit-row">
+      <span title="${esc(_bfPisoLabel(u))}">${esc(_bfPisoLabel(u))}</span>
+      <input class="sr-disp-inp" type="text" inputmode="decimal" value="${esc(String(m2v))}" placeholder="m²" oninput="srDispOverride('${u._id}','m2',this.value)">
+      <select class="sr-disp-inp" onchange="srDispOverride('${u._id}','tipoOferta',this.value)">${SR_DISP_TIPO_OPTS.map(o2=>`<option${o2===tipoV?' selected':''}>${esc(o2)}</option>`).join('')}</select>
+      <input class="sr-disp-inp" type="text" value="${esc(String(rentV))}" placeholder="USD/m²" oninput="srDispOverride('${u._id}','askingRent',this.value)">
+      <input class="sr-disp-inp" type="text" value="${esc(propV)}" placeholder="Propietario" oninput="srDispOverride('${u._id}','propietario',this.value)">
+    </div>`;
+  };
+  const hd='<div class="sr-disp-edit-row sr-disp-edit-hd"><span>Piso</span><span>M²</span><span>Tipo</span><span>Asking rent</span><span>Propietario</span></div>';
+  const sel=_srUnidadesSeleccionadas();   // con overrides aplicados, para el cálculo
   const {supRange,rentRange}=_calcSupRentRange(sel);
-  rev.innerHTML=`<div style="font-size:11px;font-weight:700;color:#56648F;margin-bottom:.3rem">Pisos seleccionados:</div>${filas}
+  rev.innerHTML=`<div style="font-size:11px;font-weight:700;color:#56648F;margin-bottom:.3rem">Pisos seleccionados (podés editar los datos para esta publicación):</div>
+    <div class="sr-disp-edit-list">${hd}${raw.map(fila).join('')}</div>
     <div class="sr-disp-review-sum">Superficie: <b>${esc(supRange)}</b>${rentRange?' · Asking rent: <b>'+esc(rentRange)+'</b>':''}</div>
     <button type="button" class="crm-action-btn" style="margin-top:.6rem" onclick="srWizGoto(1)">✏️ Modificar selección</button>`;
   _srAutoSet('resumenDisponibilidad',supRange==='–'?'':supRange);
@@ -17220,10 +17262,11 @@ function _srReadForm(svc){
     else if(f.type==='contacto'){data.propietarioId=gv('srf-propId');data.propietarioNombre=gv('srf-propNombre');}
     else if(f.type==='inmueble'){data.inmuebleId=gv('srf-inmuebleId');data.inmuebleNombre=gv('srf-inmuebleNombre');}
     // Disponibilidad se guarda con la enriquecida selección de componentes (piso/m²/tipo/rent/
-    // cocheras): la fuente es la selección hecha en Información General, no un listado manual.
+    // cocheras/propietario): la fuente es la selección hecha en Información General, con los
+    // overrides puntuales editados en Disponibilidad (_srUnidadEfectiva) ya aplicados.
     else if(f.type==='disponibilidad'){
       const n=_numAR;
-      data[f.k]=_srUnidadesSeleccionadas().map(u=>({piso:_bfPisoLabel(u),m2:n(u.m2)?Math.round(n(u.m2)):'',cocheras:n(u.cocherasUnidad)||0,tipo:u.tipoOferta||'Alquiler',rent:n(u.askingRent)?n(u.askingRent):''}));
+      data[f.k]=_srUnidadesSeleccionadas().map(u=>({piso:_bfPisoLabel(u),m2:n(u.m2)?Math.round(n(u.m2)):'',cocheras:n(u.cocherasUnidad)||0,tipo:u.tipoOferta||'Alquiler',rent:n(u.askingRent)?n(u.askingRent):'',propietario:u.ownerAccountName||u.ownerContactName||u.propietario||''}));
     }
     else if(f.type==='componentes')data[f.k]=[..._srPisosSel];
     else if(f.type==='fotos')data[f.k]=(_srFotos[f.k]||[]).map(x=>({nombre:x.nombre,url:x.url||''}));
@@ -17370,7 +17413,7 @@ function _srRenderData(d){
       ?`<a href="${esc(x.url)}" target="_blank" rel="noopener" class="sr-foto"><img src="${esc(x.url)}" alt="${esc(x.nombre||'')}" loading="lazy"></a>`
       :`<a href="${esc(x.url)}" target="_blank" rel="noopener" class="sr-foto"><span class="sr-foto-doc" title="${esc(x.nombre||'')}">📄<span>${esc((x.nombre||'').slice(0,18))}</span></span></a>`).join('')}</div>`:'<span style="color:#8898C0">–</span>';
     if(f.type==='disponibilidad')return (Array.isArray(v)&&v.length)?v.map(d=>{
-      const extra=[d.tipo?esc(d.tipo):'',d.rent?'USD '+esc(d.rent)+'/m²':'',(d.cocheras?esc(d.cocheras)+' cocheras':'')].filter(Boolean).join(' · ');
+      const extra=[d.tipo?esc(d.tipo):'',d.rent?'USD '+esc(d.rent)+'/m²':'',(d.cocheras?esc(d.cocheras)+' cocheras':''),d.propietario?esc(d.propietario):''].filter(Boolean).join(' · ');
       return `<div style="font-size:12px">Piso <b>${esc(d.piso||'–')}</b> · ${esc(d.m2||'–')} m²${extra?' · '+extra:''}</div>`;
     }).join(''):'<span style="color:#8898C0">–</span>';
     if(f.type==='linkfile'){const l=(v&&v.link)||'',a=(v&&v.archivo)||'';if(!l&&!a)return '<span style="color:#8898C0">–</span>';
@@ -17430,7 +17473,7 @@ function _srBuildHTML(d){
     if(f.type==='inmueble')return e(d.inmuebleNombre||'');
     if(f.type==='fotos')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>`<li>${e(x.nombre||x.url)}</li>`).join('')}</ul>`:'';
     if(f.type==='disponibilidad')return (Array.isArray(v)&&v.length)?`<ul class="pdf-list">${v.map(x=>{
-      const extra=[x.tipo?e(x.tipo):'',x.rent?'USD '+e(x.rent)+'/m²':'',(x.cocheras?e(x.cocheras)+' cocheras':'')].filter(Boolean).join(' · ');
+      const extra=[x.tipo?e(x.tipo):'',x.rent?'USD '+e(x.rent)+'/m²':'',(x.cocheras?e(x.cocheras)+' cocheras':''),x.propietario?e(x.propietario):''].filter(Boolean).join(' · ');
       return `<li>Piso ${e(x.piso||'–')}: ${e(x.m2||'–')} m²${extra?' · '+extra:''}</li>`;
     }).join('')}</ul>`:'';
     if(f.type==='componentes')return '';   // ya se ve en Disponibilidad; no se repite en el PDF
