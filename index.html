@@ -1854,6 +1854,15 @@ label.sr-comp-row:hover{background:#F8FAFF}
 .bf-piso:hover{background:#F8FAFF;border-color:#C7D7FF}
 .bf-piso-t{font-weight:700;color:#0A1B4D;min-width:96px}
 .bf-piso-d{color:#56648F;font-size:11.5px}
+.bf-fotosel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:.55rem}
+.bf-fotosel-row{border:1px solid #E8EFF8;border-radius:8px;padding:.4rem;opacity:.55;transition:opacity .15s,border-color .15s}
+.bf-fotosel-row.on{opacity:1;border-color:#C7D7FF}
+.bf-fotosel-chk{display:block;cursor:pointer}
+.bf-fotosel-chk input{margin-bottom:.3rem}
+.bf-fotosel-chk img{width:100%;height:64px;object-fit:cover;border-radius:6px;display:block;background:#F1F4FA}
+.bf-fotosel-ord{display:flex;align-items:center;justify-content:center;gap:.3rem;margin-top:.35rem;font-size:11px;color:#56648F;font-weight:700}
+.bf-fotosel-ord button{border:1px solid #E4E9F5;background:#fff;border-radius:5px;width:20px;height:20px;line-height:1;cursor:pointer;font-size:11px;color:#1C54F4}
+.bf-fotosel-ord button:disabled{opacity:.3;cursor:default}
 .bf-wrap{display:grid;grid-template-columns:minmax(320px,540px) minmax(420px,1fr);gap:1.4rem;align-items:start}
 .bf-config{min-width:0}
 .bf-preview-panel{position:sticky;top:0;min-width:0;background:#fff;border:1px solid #E8EFF8;border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.7rem}
@@ -2117,6 +2126,11 @@ body.dark .bld-docs-cat-btn.active{background:#1C54F4;color:#fff}
 body.dark .bld-doc-card{background:rgba(0,5,30,.4);border-color:rgba(77,147,255,.1)}
 .bld-doc-card:hover{box-shadow:0 2px 12px rgba(28,84,244,.1)}
 .bld-doc-icon{font-size:28px;margin-bottom:.5rem}
+.bld-doc-thumb{width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:.5rem;background:#F1F4FA}
+.bld-doc-tipo-sel{width:100%;box-sizing:border-box;margin:.4rem 0;border:1px solid #E4E9F5;border-radius:6px;padding:.25rem .35rem;font-size:11px;color:#56648F;background:#fff}
+.bld-docs-section{margin-bottom:1.3rem}
+.bld-docs-section-hd{font-size:11.5px;font-weight:800;color:#56648F;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.6rem}
+.bld-docs-section-cnt{background:#EEF3FF;color:#1C54F4;border-radius:10px;padding:.05rem .5rem;font-size:10.5px;font-weight:800}
 .bld-doc-name{font-size:12.5px;font-weight:700;color:#0A1B4D;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
 body.dark .bld-doc-name{color:#C3E6FF}
 .bld-doc-meta{font-size:10.5px;color:#8A9AC0;margin-bottom:.75rem}
@@ -4430,6 +4444,12 @@ body.dark .tx-form-sel option{background:#0A1530;color:#C3E6FF}
             <option value="">Todas las categorías</option>
             <option>Ficha Técnica</option><option>Brochure</option><option>Plano</option>
             <option>Contrato</option><option>Imágenes</option><option>Renders</option><option>Otros</option>
+          </select>
+          <select class="bld-docs-cat-sel" id="bld-docs-tipo-sel" title="Tipo de archivo a subir">
+            <option value="">Tipo: automático</option>
+            <option value="Foto">Foto</option>
+            <option value="Plano">Plano</option>
+            <option value="Documento">Documento</option>
           </select>
           <button class="bld-docs-upload-btn" onclick="triggerBldDocUpload()">+ Subir documento</button>
           <input type="file" id="bld-doc-file-inp" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx" onchange="uploadBldDocs(this.files)">
@@ -18115,6 +18135,16 @@ function _bldTlRelTime(ts){
 
 // ===================== PHASE 2: CENTRO DOCUMENTAL =====================
 let _bldDocsList=[], _bldDocsFilter='';
+// Clasificación Fotos / Planos / Documentos. Los archivos ya cargados no tienen tipoArchivo
+// (compatibilidad hacia atrás): se derivan de su categoría/extensión sin migrar nada, así
+// nunca desaparecen de la interfaz hasta que alguien los reclasifique a mano.
+function _bldDocTipo(d){
+  if(d.tipoArchivo)return d.tipoArchivo;
+  if(d.categoria==='Plano'||/plano|planta/i.test(d.nombre||''))return 'Plano';
+  const imgExts=['jpg','jpeg','png','webp'];
+  if(imgExts.includes((d.ext||'').toLowerCase())||/\.(jpg|jpeg|png|webp)$/i.test(d.nombre||''))return 'Foto';
+  return 'Documento';
+}
 
 function setBldDocsCat(btn,cat){
   _bldDocsFilter=cat;
@@ -18134,6 +18164,8 @@ async function uploadBldDocs(files){
   const btn=document.querySelector('.bld-docs-upload-btn');
   if(btn){btn.disabled=true;btn.textContent='Subiendo...';}
   try{
+    const tipoSel=document.getElementById('bld-docs-tipo-sel');
+    const tipoElegido=tipoSel?.value||'';
     for(const file of Array.from(files)){
       const catSel=document.getElementById('bld-docs-cat-filter');
       const categoria=catSel?.value||'Otros';
@@ -18146,6 +18178,9 @@ async function uploadBldDocs(files){
         nombre:file.name,
         url,storageRef:ref.fullPath,
         categoria,ext,
+        // Tipo explícito si se eligió uno; si no, se deriva automáticamente (_bldDocTipo)
+        // igual que con los archivos ya existentes, sin forzar una clasificación.
+        ...(tipoElegido?{tipoArchivo:tipoElegido}:{}),
         tamaño:file.size,
         usuario:user?.displayName||user?.email||'',
         userEmail:user?.email||'',
@@ -18180,24 +18215,46 @@ function renderBldDocs(){
   const docs=cat?_bldDocsList.filter(d=>d.categoria===cat):_bldDocsList;
   if(!docs.length){list.innerHTML='<div class="det-unit-empty">Sin documentos'+(cat?' en esta categoría':'.')+(!cat?' Subí el primero con el botón de arriba.':'')+'</div>';return;}
   const icons={pdf:'📄',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',docx:'📝',xlsx:'📊',doc:'📝',xls:'📊'};
-  list.innerHTML='<div class="bld-docs-grid">'+docs.map(d=>{
+  const tipoOpts=['Foto','Plano','Documento'];
+  const card=d=>{
     const icon=icons[d.ext?.toLowerCase()]||'📎';
     const fecha=_tsToDate(d.fecha);
     const fechaStr=fecha?fecha.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}):'';
     const size=d.tamaño?_bldFmtSize(d.tamaño):'';
+    const tipo=_bldDocTipo(d);
     return `<div class="bld-doc-card">
       <div class="bld-doc-cat-tag">${esc(d.categoria||'')}</div>
-      <div class="bld-doc-icon">${icon}</div>
+      ${tipo==='Foto'&&d.url?`<img class="bld-doc-thumb" src="${esc(d.url)}" alt="${esc(d.nombre||'')}" loading="lazy">`:`<div class="bld-doc-icon">${icon}</div>`}
       <div class="bld-doc-name" title="${esc(d.nombre||'')}">${esc(d.nombre||'Sin nombre')}</div>
       <div class="bld-doc-meta">${fechaStr}${size?' · '+size:''}<br>${esc(d.usuario||'')}</div>
+      <select class="bld-doc-tipo-sel" onchange="setBldDocTipo('${d._id}',this.value)" title="Reclasificar">
+        ${tipoOpts.map(t=>`<option value="${t}"${t===tipo?' selected':''}>${t}</option>`).join('')}
+      </select>
       <div class="bld-doc-actions">
         ${d.url?`<button class="bld-doc-btn" onclick="window.open('${d.url}','_blank')">Ver</button>`:''}
         ${d.url?`<a class="bld-doc-btn" href="${d.url}" download="${esc(d.nombre||'doc')}" style="display:inline-flex;align-items:center;text-decoration:none">Descargar</a>`:''}
         <button class="bld-doc-btn del" onclick="deleteBldDoc('${d._id}','${d.storageRef||''}')">Eliminar</button>
       </div>
     </div>`;
-  }).join('')+'</div>';
+  };
+  // Secciones separadas (no se mezclan): Fotos comerciales, Planos y el resto de Documentos.
+  const grupos=[['Foto','Fotos'],['Plano','Planos'],['Documento','Documentos']];
+  list.innerHTML=grupos.map(([tipo,label])=>{
+    const items=docs.filter(d=>_bldDocTipo(d)===tipo);
+    if(!items.length)return '';
+    return `<div class="bld-docs-section"><div class="bld-docs-section-hd">${esc(label)} <span class="bld-docs-section-cnt">${items.length}</span></div>
+      <div class="bld-docs-grid">${items.map(card).join('')}</div></div>`;
+  }).join('')||'<div class="det-unit-empty">Sin documentos'+(cat?' en esta categoría':'.')+'</div>';
 }
+window.setBldDocTipo=async function(docId,tipo){
+  const buildingId=window._bldEditId;if(!buildingId)return;
+  try{
+    await db.collection('buildings').doc(buildingId).collection('documentos').doc(docId).update({tipoArchivo:tipo});
+    const d=_bldDocsList.find(x=>x._id===docId);if(d)d.tipoArchivo=tipo;
+    renderBldDocs();
+    showBldToast('✅ Reclasificado como '+tipo);
+  }catch(e){showBldToast('❌ Error: '+e.message,3500);}
+};
 
 function _bldFmtSize(b){
   if(b<1024)return b+'B';
@@ -18483,6 +18540,9 @@ function loadBldFicha(buildingId){
           <div id="bf-pisos-list"></div>
         </div>
         <div class="bf-sec">
+          <div id="bld-ficha-fotosel"></div>
+        </div>
+        <div class="bf-sec">
           <div class="bf-sec-hd">Ejecutivos comerciales en la ficha</div>
           <div class="bf-sec-sub">Elegí quién figura como contacto en la portada y en la última página. Se pueden seleccionar hasta 2.</div>
           <div id="bf-ejec-list"></div>
@@ -18577,7 +18637,11 @@ function _fichaModelo(d,extra){
     edLines:vinetas(d.amenities).slice(0,12),
     ofLines:vinetas(caractOf).slice(0,10),
     contactos:_bfContactos(d),
-    fotos:extra.fotos||[],planos:extra.planos||[],mapa:extra.mapa||null,
+    fotos:extra.fotos||[],
+    // Galería: subconjunto/orden elegido por el usuario (independiente de la portada). Si no
+    // se pasa explícitamente, cae al comportamiento anterior (todas las fotos salvo la portada).
+    galeria:extra.galeria||(extra.fotos||[]).slice(1),
+    planos:extra.planos||[],mapa:extra.mapa||null,
     bItems:(()=>{const b=[];
       if(d.categoria||d.cat)b.push('Categoría: '+(d.categoria||d.cat));
       if(d.cantidadPisos)b.push('Pisos: '+d.cantidadPisos);
@@ -18660,34 +18724,36 @@ function _fichaPaginas(m){
     paginas.push(o);
   }
 
-  // ── 2 · Galería ──
+  // ── 2..N · Galería (4 fotos por lámina, grilla 2×2 fija; una lámina más por cada
+  // 4 fotos adicionales — no hay límite artificial de una sola lámina) ──
   {
-    const o=[];const g=m.fotos.slice(1);
-    o.push({t:'rect',x:0,y:0,w:W,h:H,fill:C.WHITE});
-    chip(o,'Galería fotográfica');
-    o.push({t:'logo',x:W-M-1.6,y:0.26,w:1.6,h:0.5,align:'right',valign:'middle'});
-    const GX=M,GY=1.55,GW=W-M*2,GH=H-GY-0.75,gap=0.14;
-    const grillas={1:[[0,0,1,1]],2:[[0,0,.5,1],[.5,0,.5,1]],
-      3:[[0,0,.5,.55],[.5,0,.5,.55],[0,.55,1,.45]],
-      4:[[0,0,.5,.5],[.5,0,.5,.5],[0,.5,.5,.5],[.5,.5,.5,.5]],
-      5:[[0,0,.5,.35],[.5,0,.5,.35],[0,.35,1,.32],[0,.67,.5,.33],[.5,.67,.5,.33]],
-      6:[[0,0,1/3,.5],[1/3,0,1/3,.5],[2/3,0,1/3,.5],[0,.5,1/3,.5],[1/3,.5,1/3,.5],[2/3,.5,1/3,.5]],
-      7:[[0,0,.5,.34],[.5,0,.5,.34],[0,.34,1,.32],[0,.66,.25,.34],[.25,.66,.25,.34],[.5,.66,.25,.34],[.75,.66,.25,.34]],
-      8:[[0,0,.25,.5],[.25,0,.25,.5],[.5,0,.25,.5],[.75,0,.25,.5],[0,.5,.25,.5],[.25,.5,.25,.5],[.5,.5,.25,.5],[.75,.5,.25,.5]]};
-    if(!g.length){
-      o.push({t:'rect',x:GX,y:GY,w:GW,h:GH,fill:C.LGRAY});
-      o.push({t:'txt',x:GX,y:GY+GH/2-0.2,w:GW,h:0.4,txt:'Sin fotos cargadas en Documentos.',size:11,color:C.MGRAY,align:'center',valign:'middle'});
-    }else{
-      const cel=grillas[Math.min(g.length,8)]||grillas[8];
-      for(let i=0;i<cel.length&&i<g.length;i++){
-        const [fx,fy,fw,fh]=cel[i];
-        const x=GX+fx*GW+(fx>0?gap/2:0),y=GY+fy*GH+(fy>0?gap/2:0);
-        const w=fw*GW-(fx>0?gap/2:0)-(fx+fw<1?gap/2:0),h=fh*GH-(fy>0?gap/2:0)-(fy+fh<1?gap/2:0);
-        o.push({t:'img',x,y,w,h,fit:'cover',...g[i]});
+    const g=m.galeria&&m.galeria.length?m.galeria:m.fotos.slice(1);
+    const porLamina=4;
+    const totalLaminas=Math.max(1,Math.ceil(g.length/porLamina));
+    for(let li=0;li<totalLaminas;li++){
+      const o=[];
+      o.push({t:'rect',x:0,y:0,w:W,h:H,fill:C.WHITE});
+      chip(o,'Galería fotográfica'+(totalLaminas>1?` (${li+1}/${totalLaminas})`:''));
+      o.push({t:'logo',x:W-M-1.6,y:0.26,w:1.6,h:0.5,align:'right',valign:'middle'});
+      const GX=M,GY=1.55,GW=W-M*2,GH=H-GY-0.75,gap=0.16;
+      const chunk=g.slice(li*porLamina,li*porLamina+porLamina);
+      if(!chunk.length){
+        o.push({t:'rect',x:GX,y:GY,w:GW,h:GH,fill:C.LGRAY});
+        o.push({t:'txt',x:GX,y:GY+GH/2-0.2,w:GW,h:0.4,txt:'Sin fotos cargadas en Documentos.',size:11,color:C.MGRAY,align:'center',valign:'middle'});
+      }else{
+        const cw=(GW-gap)/2,ch=(GH-gap)/2;
+        const celdas=[[0,0],[1,0],[0,1],[1,1]];
+        chunk.forEach((foto,i)=>{
+          const [cx,cy]=celdas[i];
+          const x=GX+cx*(cw+gap),y=GY+cy*(ch+gap);
+          // 'cover' mantiene la proporción de cada foto (nunca se deforma/estira), recortando
+          // lo mínimo necesario para llenar su celda de la grilla 2×2.
+          o.push({t:'img',x,y,w:cw,h:ch,fit:'cover',...foto});
+        });
       }
+      pie(o);
+      paginas.push(o);
     }
-    pie(o);
-    paginas.push(o);
   }
 
   // ── 3 · Plantas y disponibilidad ──
@@ -18982,29 +19048,34 @@ function _fichaCrop(b64,wIn,hIn){
 // ═══ Assets de la ficha (fotos, planos, mapa): se cargan UNA vez por inmueble y alimentan
 // tanto la preview en vivo como la exportación a PPTX — no se vuelven a pedir en cada cambio. ═══
 let _bfAssets={buildingId:null,fotos:[],planos:[],mapaUrl:null,loading:false};
+// Fotos elegidas (y su orden) para la galería, subconjunto de _bfAssets.fotos sin la portada.
+// Por defecto entran todas, en el mismo orden en que se cargaron; el usuario las puede
+// destildar y reordenar con ↑/↓ antes de generar.
+let _bfFotoSel=[];
 async function _bfCargarAssets(buildingId,d){
   _bfAssets={buildingId,fotos:[],planos:[],mapaUrl:null,loading:true};
+  _bfFotoSel=[];
   _bfPreviewRender();
   try{
     let photoUrls=[],planoUrls=[];
     if(db){
       const snap=await db.collection('buildings').doc(buildingId).collection('documentos').orderBy('fecha','desc').get();
-      const imgExts=['jpg','jpeg','png','webp'];
-      const imgs=snap.docs.map(dd=>dd.data())
-        .filter(dd=>imgExts.includes((dd.ext||'').toLowerCase())||(dd.nombre||'').match(/\.(jpg|jpeg|png|webp)$/i));
-      const esPlano=dd=>dd.categoria==='Plano'||/plano|planta/i.test(dd.nombre||'');
-      planoUrls=imgs.filter(esPlano).map(dd=>dd.url).filter(Boolean).slice(0,2);
-      photoUrls=imgs.filter(dd=>!esPlano(dd)).map(dd=>dd.url).filter(Boolean);
+      const docs=snap.docs.map(dd=>dd.data());
+      // Clasificación Fotos/Planos/Documentos (_bldDocTipo, con compatibilidad hacia atrás para
+      // archivos sin tipoArchivo): la galería sólo usa Fotos, nunca planos ni documentos.
+      planoUrls=docs.filter(dd=>_bldDocTipo(dd)==='Plano').map(dd=>dd.url).filter(Boolean).slice(0,2);
+      photoUrls=docs.filter(dd=>_bldDocTipo(dd)==='Foto').map(dd=>dd.url).filter(Boolean);
     }
     const bf=d.foto||(d.imagenes&&d.imagenes[0])||null;
     if(bf&&!photoUrls.includes(bf))photoUrls.unshift(bf);
     if(d.imagenes)d.imagenes.forEach(u=>{if(u&&!photoUrls.includes(u))photoUrls.push(u);});
-    photoUrls=photoUrls.slice(0,9);
     if(_bfAssets.buildingId!==buildingId)return;      // el usuario ya cambió de inmueble
     _bfAssets.fotos=photoUrls.map(u=>({url:u}));
     _bfAssets.planos=planoUrls.map(u=>({url:u}));
+    _bfFotoSel=photoUrls.slice(1);   // todas seleccionadas por defecto, sin la portada (fotoUrls[0])
     const cnt=document.getElementById('bld-ficha-doc-count');
     if(cnt)cnt.textContent=photoUrls.length?photoUrls.length+' imagen'+(photoUrls.length!==1?'es':'')+' cargadas':'Sin imágenes (podés subirlas en Documentos)';
+    _bfRenderFotoSel();
     if(d.direccion&&d.direccion!=='–'){
       const coords=await _fichaGeocode(d.direccion);
       if(coords&&_bfAssets.buildingId===buildingId){
@@ -19014,14 +19085,46 @@ async function _bfCargarAssets(buildingId,d){
   }catch(e){console.warn('[Ficha assets]',e);}
   if(_bfAssets.buildingId===buildingId){_bfAssets.loading=false;_bfPreviewRender();}
 }
+// Panel de selección/orden de la galería: independiente de la portada (que siempre es
+// _bfAssets.fotos[0]), para que el usuario tenga control de qué fotos entran y en qué orden.
+function _bfRenderFotoSel(){
+  const host=document.getElementById('bld-ficha-fotosel');if(!host)return;
+  const disponibles=_bfAssets.fotos.slice(1);   // sin portada
+  if(!disponibles.length){host.innerHTML='';return;}
+  const fila=f=>{
+    const pos=_bfFotoSel.indexOf(f.url),on=pos>-1;
+    return `<div class="bf-fotosel-row${on?' on':''}">
+      <label class="bf-fotosel-chk"><input type="checkbox" ${on?'checked':''} onchange="bfFotoToggle('${f.url}',this.checked)"><img src="${esc(f.url)}" loading="lazy"></label>
+      ${on?`<div class="bf-fotosel-ord"><button type="button" onclick="bfFotoMover('${f.url}',-1)" ${pos===0?'disabled':''}>↑</button><span>${pos+1}</span><button type="button" onclick="bfFotoMover('${f.url}',1)" ${pos===_bfFotoSel.length-1?'disabled':''}>↓</button></div>`:''}
+    </div>`;
+  };
+  host.innerHTML=`<div class="bf-sec-hd">Fotos de la galería</div>
+    <div class="bf-sec-sub">Elegí cuáles incluir y en qué orden (no afecta a la portada). Se agrupan de a 4 por lámina.</div>
+    <div class="bf-fotosel-grid">${disponibles.map(fila).join('')}</div>`;
+}
+window.bfFotoToggle=function(url,on){
+  if(on){if(!_bfFotoSel.includes(url))_bfFotoSel.push(url);}
+  else _bfFotoSel=_bfFotoSel.filter(u=>u!==url);
+  _bfRenderFotoSel();_bfPreviewRender();
+};
+window.bfFotoMover=function(url,dir){
+  const i=_bfFotoSel.indexOf(url);if(i<0)return;
+  const j=i+dir;if(j<0||j>=_bfFotoSel.length)return;
+  [_bfFotoSel[i],_bfFotoSel[j]]=[_bfFotoSel[j],_bfFotoSel[i]];
+  _bfRenderFotoSel();_bfPreviewRender();
+};
 // Convierte a base64 (embebido en el PPT) sólo al momento de exportar; reutiliza lo ya cargado.
 async function _bfAssetsParaExportar(){
   const fotoB64s=await Promise.all(_bfAssets.fotos.map(f=>imgToBase64(f.url)));
+  const fotosB64ByUrl={};
+  _bfAssets.fotos.forEach((f,i)=>{if(fotoB64s[i])fotosB64ByUrl[f.url]=fotoB64s[i];});
   const fotos=_bfAssets.fotos.map((f,i)=>({url:f.url,b64:fotoB64s[i]})).filter(f=>f.b64);
+  // Galería: sólo lo tildado en "Fotos de la galería", en el orden elegido por el usuario.
+  const galeria=_bfFotoSel.map(u=>fotosB64ByUrl[u]?{url:u,b64:fotosB64ByUrl[u]}:null).filter(Boolean);
   const planoB64s=await Promise.all(_bfAssets.planos.map(f=>imgToBase64(f.url)));
   const planos=_bfAssets.planos.map((f,i)=>({url:f.url,b64:planoB64s[i]})).filter(f=>f.b64);
   const mapa=_bfAssets.mapaUrl?{url:_bfAssets.mapaUrl,b64:_bfAssets.mapaUrl}:null;
-  return {fotos,planos,mapa};
+  return {fotos,galeria,planos,mapa};
 }
 
 // ═══ Preview en vivo: mismos modelo/layout que el PPT, renderizados a HTML ═══
@@ -19036,13 +19139,15 @@ function _bfPreviewRender(){
   const slide=document.getElementById('bf-preview-slide'),stage=document.getElementById('bf-preview-stage'),tabsEl=document.getElementById('bf-preview-tabs');
   if(!d||!slide||!stage)return;
   const caractOficina=(document.getElementById('bf-caract-oficina')||{}).value||'';
-  const m=_fichaModelo(d,{caractOficina,fotos:_bfAssets.fotos,planos:_bfAssets.planos,mapa:_bfAssets.mapaUrl?{url:_bfAssets.mapaUrl}:null});
+  const galeriaPreview=_bfFotoSel.map(u=>({url:u}));
+  const m=_fichaModelo(d,{caractOficina,fotos:_bfAssets.fotos,galeria:galeriaPreview,planos:_bfAssets.planos,mapa:_bfAssets.mapaUrl?{url:_bfAssets.mapaUrl}:null});
   const paginas=_fichaPaginas(m);
   _bfPreviewPaginas=paginas;
   const px=_bfPreviewScale();
   stage.style.width=(FICHA.W*px)+'px';stage.style.height=(FICHA.H*px)+'px';
   slide.style.width=(FICHA.W*px)+'px';slide.style.height=(FICHA.H*px)+'px';
-  const labels=['Portada','Galería','Plantas','Características'];
+  const nGaleria=Math.max(1,Math.ceil((m.galeria&&m.galeria.length?m.galeria.length:Math.max(0,m.fotos.length-1))/4));
+  const labels=['Portada',...Array.from({length:nGaleria},(_,i)=>nGaleria>1?`Galería ${i+1}/${nGaleria}`:'Galería'),'Plantas','Características'];
   if(tabsEl)tabsEl.innerHTML=paginas.map((_,i)=>`<button type="button" class="bf-tab${i+1===_bfPreviewPagina?' active':''}" onclick="bfPreviewGoto(${i+1})">${i+1}. ${labels[i]||''}</button>`).join('');
   const btn=document.getElementById('btn-gen-ficha');
   if(!m.units.length){
@@ -19077,9 +19182,9 @@ async function generateFichaComercial(buildingId){
     showBldToast('📋 Cargando imágenes…',60000);
     // Si los assets (fotos/planos/mapa) no están cargados para este inmueble, se esperan acá.
     if(_bfAssets.buildingId!==buildingId||_bfAssets.loading)await _bfCargarAssets(buildingId,d);
-    const {fotos,planos,mapa}=await _bfAssetsParaExportar();
+    const {fotos,galeria,planos,mapa}=await _bfAssetsParaExportar();
     // Mismo modelo y mismo layout que usa la preview: PPT y preview no pueden divergir.
-    const m=_fichaModelo(d,{caractOficina,fotos,planos,mapa});
+    const m=_fichaModelo(d,{caractOficina,fotos,galeria,planos,mapa});
     const paginas=_fichaPaginas(m);
     const pptx=new window.PptxGenJS();
     pptx.layout='LAYOUT_WIDE';
