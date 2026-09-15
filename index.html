@@ -1808,6 +1808,9 @@ body.dark .sr-zebra-row{background:rgba(255,255,255,.035)}
 label.sr-comp-row{cursor:pointer}
 label.sr-comp-row:hover{background:#F8FAFF}
 .sr-comp-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr-comp-row-disabled{opacity:.5;cursor:not-allowed}
+label.sr-comp-row-disabled:hover{background:transparent}
+.sr-comp-row-disabled span:last-child{font-style:italic;color:#B45309}
 .sr-disp-review{border:1px solid #E8EFF8;border-radius:8px;padding:.7rem .85rem}
 .sr-disp-review-row{font-size:12px;color:#353E59;padding:.2rem 0}
 .sr-disp-review-sum{margin-top:.5rem;padding-top:.5rem;border-top:1px solid #EEF1F8;font-size:11.5px;color:#56648F}
@@ -15761,6 +15764,12 @@ const SR_SERVICES=[
   {key:'ficha-oficinas',label:'Ficha y Publicación',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
    form:[
      // ══ FICHA · Paso 1 — Información General ══
+     // Autorización y Exclusividad son propias de esta solicitud de Ficha (no del formulario
+     // base, que es compartido por todas las actividades de Marketing & Research).
+     {step:1,title:'Autorización y Exclusividad',fields:[
+       {k:'autorizacionPublicar',label:'¿Autorización para publicar?',type:'select',opts:['Sí','No']},
+       {k:'exclusividad',label:'¿Exclusividad?',type:'select',opts:['Sí','No']},
+     ]},
      // Un único card "Inmueble Asociado" en dos columnas: inmueble + componentes a la
      // izquierda, ubicación (dirección + Google Maps) a la derecha. La selección de
      // componentes hecha acá es la fuente de verdad para Disponibilidad y sus cálculos.
@@ -15770,24 +15779,34 @@ const SR_SERVICES=[
        {k:'direccion',label:'Ubicación',type:'text',req:true,hint:'Se completa con la dirección del inmueble; podés ajustarla.',col:'r'},
        {k:'urlMaps',label:'URL Google Maps',type:'maps',col:'r'},
      ]},
+     {step:1,title:'Textos de la Ficha',fields:[
+       {k:'titulo',label:'Título',type:'text',req:true,hint:'Se arma con el nombre del edificio y la dirección; podés editarlo.'},
+       {k:'subtitulo',label:'Subtítulo',type:'text',max:80,hint:'Sugerencia comercial breve.'},
+       {k:'descripcion',label:'Descripción del entorno y del edificio/complejo',type:'textarea',req:true,hint:'Descripción soft de carácter comercial, empezando con la descripción del inmueble así como ubicación, accesos, transporte, amenities, servicios, etc. sin entrar en detalles técnicos. Podés editarla. No modifica el formulario del inmueble.'},
+     ]},
+     // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
+     {step:1,title:'Características del edificio',fields:[
+       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Información hard del edificio (cantidad de pisos, ascensores, grupo electrógeno, climatización, seguridad, etc.). Podés editarla. No modifica el formulario del inmueble.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+       {k:'especificacionesOficina',label:'Información de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
+     ]},
      {step:1,title:'Responsables',fields:[
        {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
      ]},
      // ══ FICHA · Paso 2 — Información Comercial ══
-     {step:2,title:'Datos Generales',fields:[
-       {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
-     ]},
-     // Según el tipo de operación se piden los precios que correspondan; con "Alquiler y Venta"
-     // se abren los dos juegos de campos. Sólo Precio total: el precio por m² se retiró de esta
-     // interfaz (queda como legacy para las solicitudes que ya lo tenían cargado).
+     // Tipo de operación y Precio m² van en la misma tarjeta/fila (sr-grid2 los ubica uno al
+     // lado del otro). Precio m² se calcula solo como intervalo del Asking Rent de los
+     // componentes seleccionados (misma lógica que Resumen de disponibilidad), con overrides
+     // de Disponibilidad ya aplicados; queda editable por si hace falta ajustarlo.
      {step:2,title:'Condiciones Comerciales',fields:[
-       {k:'precioAlquiler',label:'Precio total de alquiler (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
-       {k:'precioVenta',label:'Precio total de venta (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
-       // Precio por m² y precios genéricos anteriores: ya no se piden, se siguen mostrando si la solicitud los tiene.
+       {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
+       {k:'precioM2',label:'Precio m²',type:'text',ph:'Ej.: USD 22 – 25/m²',hint:'Se calcula solo a partir del Asking Rent de los componentes seleccionados en Disponibilidad; podés editarlo.'},
+       // Precio total y precios genéricos anteriores: ya no se piden en esta sección, se siguen
+       // mostrando si la solicitud ya los tenía cargados.
+       {k:'precioAlquiler',label:'Precio total de alquiler',type:'text',legacy:true},
+       {k:'precioVenta',label:'Precio total de venta',type:'text',legacy:true},
        {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',legacy:true},
        {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',legacy:true},
        {k:'precioTotal',label:'Precio total',type:'text',legacy:true},
-       {k:'precioM2',label:'Precio por m²',type:'text',legacy:true},
      ]},
      // Los pisos ya se eligieron en Información General: acá no se vuelven a seleccionar, pero
      // sus datos (m², tipo de operación, asking rent, cocheras) se pueden editar puntualmente
@@ -15803,16 +15822,8 @@ const SR_SERVICES=[
        {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',legacy:true},
      ]},
      // ══ FICHA · Paso 3 — Contenido ══
-     {step:3,title:'Textos de la Ficha',fields:[
-       {k:'titulo',label:'Título',type:'text',req:true,hint:'Se arma con el nombre del edificio y la dirección; podés editarlo.'},
-       {k:'subtitulo',label:'Subtítulo',type:'text',max:80,hint:'Sugerencia comercial breve.'},
-       {k:'descripcion',label:'Descripción del entorno y del edificio/complejo',type:'textarea',req:true,hint:'Descripción soft de carácter comercial, empezando con la descripción del inmueble así como ubicación, accesos, transporte, amenities, servicios, etc. sin entrar en detalles técnicos. Podés editarla. No modifica el formulario del inmueble.'},
-     ]},
-     // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
-     {step:3,title:'Características del edificio',fields:[
-       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Información hard del edificio (cantidad de pisos, ascensores, grupo electrógeno, climatización, seguridad, etc.). Podés editarla. No modifica el formulario del inmueble.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
-       {k:'especificacionesOficina',label:'Información de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
-     ]},
+     // Título/Subtítulo/Descripción/Características del edificio viven en Información General
+     // (Paso 1): acá sólo el material multimedia y el plano.
      {step:3,title:'Contenido',fields:[
        {k:'linkMultimedia',label:'Link para multimedia',type:'url',req:true,ph:'https://...',hint:'Link al material multimedia (fotos, video, tour virtual).'},
        {k:'plano',label:'Plano (opcional)',type:'linkfile',hint:'Pegá el link del plano o adjuntá el archivo.'},
@@ -16643,12 +16654,6 @@ window.openSolicitudBase=function(){
       <div class="cdr-field"><div class="cdr-lbl">Solicitada por</div>
         <div class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">${esc(user?.displayName||user?.email||'—')}</div></div>
     </div></div>
-    <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Inmueble</div><div class="sr-grid2">
-      <div class="cdr-field"><div class="cdr-lbl">¿Autorización del propietario?</div>
-        <select id="srb-autorizacion" class="cdr-select"><option value="">Seleccionar</option><option>Sí</option><option>No</option></select></div>
-      <div class="cdr-field"><div class="cdr-lbl">¿Exclusividad?</div>
-        <select id="srb-exclusividad" class="cdr-select"><option value="">Seleccionar</option><option>Sí</option><option>No</option></select></div>
-    </div></div>
     <div class="nx-card"><div class="nx-card-title">Comentarios</div>
       <textarea id="srb-comentarios" class="cdr-input" rows="3" style="resize:vertical;min-height:64px" placeholder="Agregá cualquier comentario o información adicional para Marketing & Research."></textarea></div>`;
   // Las unidades de negocio del usuario pueden inferirse de sus oportunidades: al llegar, se recalculan.
@@ -16689,7 +16694,6 @@ window.srBaseContinuar=function(){
   _srBase={
     servicio:tipo,tipoLabel:(_srTiposActividad().find(t=>t.key===tipo)||{}).label||'',
     prioridad:prio,unidadNegocio:bu,
-    autorizacionPropietario:gv('srb-autorizacion'),exclusividad:gv('srb-exclusividad'),
     comentarios:(gv('srb-comentarios')||'').trim(),
     fechaSolicitud:gv('srb-fecha'),fechaVencimiento:venc,
     solicitanteId:user?.sub||user?.email||'',solicitanteNombre:user?.displayName||user?.email||'',
@@ -16969,7 +16973,7 @@ function _srCampoVacio(f,data){
   if(f.type==='sino'){const v=data[f.k]||{};return (f.opts||[]).some(o=>!v[o]);}
   if(f.type==='fotos')return !((_srFotos[f.k]||[]).length);
   // Sólo exige selección cuando el inmueble efectivamente tiene componentes para elegir.
-  if(f.type==='componentes')return _srUnits.length>0&&_srPisosSel.size===0;
+  if(f.type==='componentes')return _srUnits.filter(_srTienePropietario).length>0&&_srPisosSel.size===0;
   if(f.type==='number'){const n=parseFloat(String(data[f.k]||'').replace(',','.'));return !(n>0);}
   return !String(data[f.k]||'').trim();
 }
@@ -17236,29 +17240,39 @@ async function _srCargarComponentes(buildingId){
     const snap=await db.collection('buildings').doc(buildingId).collection('units').get();
     if((document.getElementById('srf-inmuebleId')||{}).value!==buildingId)return;   // cambió de inmueble mientras cargaba
     _srUnits=snap.docs.map(d=>({...d.data(),_id:d.id})).filter(u=>u.estado==='Disponible'||!u.estado);
-    _srPisosSel=new Set(_srUnits.map(u=>u._id));   // por defecto, todos los disponibles
+    _srPisosSel=new Set(_srUnits.filter(_srTienePropietario).map(u=>u._id));   // por defecto, todos los que tienen propietario informado
     _srRenderComponentes();
   }catch(e){console.warn('[Solicitud componentes]',e);}
 }
+// Un componente sin propietario informado no puede seleccionarse para la Ficha: no se inventa
+// ni se completa con otro propietario, se lo deja directamente fuera de la selección.
+function _srTienePropietario(u){return !!(u.ownerAccountName||u.ownerContactName||u.propietario);}
 function _srRenderComponentes(){
   const list=document.getElementById('srf-componentes-list');if(!list)return;
   const n=_numAR;
   const ordered=_bfOrdenarPisos(_srUnits);
+  const seleccionables=ordered.filter(_srTienePropietario);
   const fila=u=>{
     const rent=n(u.askingRent)>0?('USD '+n(u.askingRent).toLocaleString('es-AR',{maximumFractionDigits:2})+'/m²'):'–';
-    const prop=u.ownerAccountName||u.ownerContactName||u.propietario||'–';
-    return `<label class="sr-comp-row"><input type="checkbox" ${_srPisosSel.has(u._id)?'checked':''} onchange="srPisoToggle('${u._id}',this.checked)"><span>${esc(_bfPisoLabel(u))}</span><span>${n(u.m2)?Math.round(n(u.m2)).toLocaleString('es-AR')+' m²':'–'}</span><span>${esc(u.tipoOferta||'Alquiler')}</span><span>${esc(rent)}</span><span>${esc(prop)}</span></label>`;
+    const prop=u.ownerAccountName||u.ownerContactName||u.propietario||'';
+    const puede=_srTienePropietario(u);
+    return `<label class="sr-comp-row${puede?'':' sr-comp-row-disabled'}" title="${puede?'':'Sin propietario informado — no disponible para selección'}"><input type="checkbox" ${_srPisosSel.has(u._id)?'checked':''} ${puede?'':'disabled'} onchange="srPisoToggle('${u._id}',this.checked)"><span>${esc(_bfPisoLabel(u))}</span><span>${n(u.m2)?Math.round(n(u.m2)).toLocaleString('es-AR')+' m²':'–'}</span><span>${esc(u.tipoOferta||'Alquiler')}</span><span>${esc(rent)}</span><span>${puede?esc(prop):'Sin propietario informado — no disponible para selección'}</span></label>`;
   };
   const hd='<div class="sr-comp-row sr-comp-hd"><span></span><span>Piso</span><span>M²</span><span>Tipo</span><span>Asking rent</span><span>Propietario</span></div>';
   list.innerHTML=ordered.length?hd+ordered.map(fila).join(''):'<div style="padding:.6rem;font-size:11.5px;color:#8898C0">Este inmueble no tiene componentes cargados.</div>';
   const cnt=document.getElementById('srf-pisos-cnt');
-  if(cnt)cnt.textContent=_srPisosSel.size+' de '+ordered.length+' seleccionados';
+  if(cnt)cnt.textContent=_srPisosSel.size+' de '+seleccionables.length+' seleccionados';
   const wrap=document.getElementById('srf-pisosSeleccionados-wrap');
-  if(wrap)wrap.style.borderColor=(ordered.length&&!_srPisosSel.size)?'#ED1B34':'transparent';
+  if(wrap)wrap.style.borderColor=(seleccionables.length&&!_srPisosSel.size)?'#ED1B34':'transparent';
   _srSyncDisponibilidad();
 }
-window.srPisoToggle=function(id,on){if(on)_srPisosSel.add(id);else _srPisosSel.delete(id);_srRenderComponentes();};
-window.srPisosTodos=function(on){_srPisosSel=on?new Set(_srUnits.map(u=>u._id)):new Set();_srRenderComponentes();};
+window.srPisoToggle=function(id,on){
+  const u=_srUnits.find(x=>x._id===id);
+  if(on&&(!u||!_srTienePropietario(u)))return;   // nunca se selecciona un componente sin propietario
+  if(on)_srPisosSel.add(id);else _srPisosSel.delete(id);
+  _srRenderComponentes();
+};
+window.srPisosTodos=function(on){_srPisosSel=on?new Set(_srUnits.filter(_srTienePropietario).map(u=>u._id)):new Set();_srRenderComponentes();};
 // Unidad "efectiva": el dato original del inmueble con los overrides de esta publicación
 // aplicados encima. El objeto _srUnits nunca se modifica.
 function _srUnidadEfectiva(u){
@@ -17295,6 +17309,7 @@ function _srSyncDisponibilidad(){
     rev.innerHTML=`<div style="font-size:11.5px;color:#B45309">⚠ No hay componentes seleccionados. Volvé a Información General para elegir al menos uno.</div>
       <button type="button" class="crm-action-btn" style="margin-top:.5rem" onclick="srWizGoto(1)">← Volver a Información General</button>`;
     _srAutoSet('resumenDisponibilidad','');
+    _srAutoSet('precioM2','');
     return;
   }
   // Sin Propietario en esta vista (item 12): no se muestra acá, aunque el dato se conserve en
@@ -17315,10 +17330,13 @@ function _srSyncDisponibilidad(){
   };
   const hd='<div class="sr-disp-edit-row sr-disp-edit-hd"><span>Piso</span><span>M²</span><span>Tipo</span><span>Asking rent</span><span>Cocheras</span></div>';
   const sel=_srUnidadesSeleccionadas();   // con overrides aplicados, para el cálculo
-  const {supRange}=_calcSupRentRange(sel);
+  const {supRange,rentRange}=_calcSupRentRange(sel);
   rev.innerHTML=`<div class="sr-disp-edit-list">${hd}${raw.map(fila).join('')}</div>
     <button type="button" class="crm-action-btn" style="margin-top:.6rem" onclick="srWizGoto(1)">✏️ Modificar selección</button>`;
   _srAutoSet('resumenDisponibilidad',supRange==='–'?'':supRange);
+  // Precio m² (Condiciones Comerciales) usa la misma lógica de intervalo que el Asking Rent de
+  // Disponibilidad, con los overrides ya aplicados: nunca vuelve a los valores originales.
+  _srAutoSet('precioM2',rentRange||'');
 }
 // ── Paso "Revisión" (preview editorial simplificada de la Ficha) ──────────────────────────
 // Lee el estado ACTUAL del formulario (nada cacheado): campos ya cargados/editados + la
@@ -17355,8 +17373,8 @@ function _srRenderFichaPreview(){
     return p.join(' — ');
   });
   const img=bld?(getBldFoto(bld)||''):'';
-  const autoriz=(_srBase&&_srBase.autorizacionPropietario)||'';
-  const exclus=(_srBase&&_srBase.exclusividad)||'';
+  const autoriz=gv('srf-autorizacionPublicar');
+  const exclus=gv('srf-exclusividad');
   host.innerHTML=`
     <div class="sr-fp-hint">Revisá cómo quedará la información de la Ficha antes de continuar.</div>
     <div class="sr-fp-card">
@@ -17372,7 +17390,7 @@ function _srRenderFichaPreview(){
         <div class="sr-fp-kpis">
           <div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Superficie</span><span class="sr-fp-kpi-v">${esc(resumen||'–')}</span></div>
           <div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Asking rent</span><span class="sr-fp-kpi-v">${esc(rentRange||'–')}</span></div>
-          ${autoriz?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Autorización del propietario</span><span class="sr-fp-kpi-v">${esc(autoriz)}</span></div>`:''}
+          ${autoriz?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Autorización para publicar</span><span class="sr-fp-kpi-v">${esc(autoriz)}</span></div>`:''}
           ${exclus?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Exclusividad</span><span class="sr-fp-kpi-v">${esc(exclus)}</span></div>`:''}
         </div>
         ${especificaciones?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Características del edificio</div><div class="sr-fp-bullets">${_srVinetas(especificaciones).map(x=>`<div class="sr-fp-bullet">• ${esc(x)}</div>`).join('')}</div></div>`:''}
@@ -17471,7 +17489,6 @@ window.submitSolicitud=async function(){
       ...(_srBase?{
         prioridadBase:_srBase.prioridad,unidadNegocio:_srBase.unidadNegocio,comentariosBase:_srBase.comentarios||'',
         fechaSolicitud:_srBase.fechaSolicitud||'',fechaVencimiento:_srBase.fechaVencimiento||'',
-        autorizacionPropietario:_srBase.autorizacionPropietario||'',exclusividad:_srBase.exclusividad||'',
         solicitanteId:_srBase.solicitanteId||'',
         tipoActividad:_srBase.servicio||'',tipoActividadLabel:_srBase.tipoLabel||'',
       }:{}),
