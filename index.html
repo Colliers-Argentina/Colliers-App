@@ -15849,17 +15849,6 @@ const SR_SERVICES=[
      // ══ PUBLICACIÓN · Paso 5 — Publicación ══
      // "Características de la publicación" es una agrupación de campos dentro de este mismo
      // paso (no un paso aparte): acá viven las Superficies y Dimensiones de la publicación.
-     {step:5,title:'Otras características',sub:'Agregá más detalles del inmueble para que los interesados lo conozcan mejor.',fields:[
-       {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',req:true,
-        groups:[
-          {title:'Servicios',opts:['Acceso a internet','Agua corriente','Gas natural','Línea telefónica','Luz eléctrica']},
-          {title:'Comodidades y equipamiento',opts:['Aire acondicionado','Calefacción','Ascensor','Estacionamiento para visitantes','Gimnasio','Grupo electrógeno']},
-          {title:'Ambientes',opts:['Cocina','Comedor']},
-          {title:'Espacios comunes',opts:['Recepción','Sala de reuniones','Área de comedor','Áreas verdes','Lobby']},
-          {title:'Seguridad',opts:['Seguridad','Sistema contra incendio']},
-        ],
-        opts:['Acceso a internet','Agua corriente','Gas natural','Línea telefónica','Luz eléctrica','Aire acondicionado','Calefacción','Ascensor','Estacionamiento para visitantes','Gimnasio','Grupo electrógeno','Cocina','Comedor','Recepción','Sala de reuniones','Área de comedor','Áreas verdes','Lobby','Seguridad','Sistema contra incendio']},
-     ]},
      // Mismo orden/formato que "Características secundarias" (superficie con sufijo m², pares en
      // la misma fila, Sí/No como pill). supPropia y pisoDestacado se conservan al final: no están
      // en ese diseño de referencia, pero no correspondía perder el dato/funcionalidad.
@@ -15880,6 +15869,17 @@ const SR_SERVICES=[
        {k:'codigoPropiedad',label:'Código de la propiedad',type:'text'},
        {k:'supPropia',label:'Superficie propia',type:'number',unit:'m²'},
        {k:'pisoDestacado',label:'¿De qué piso o de cuántos m² querés que sea la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
+     ]},
+     {step:5,title:'Otras características',sub:'Agregá más detalles del inmueble para que los interesados lo conozcan mejor.',fields:[
+       {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',req:true,
+        groups:[
+          {title:'Servicios',opts:['Acceso a internet','Agua corriente','Gas natural','Línea telefónica','Luz eléctrica']},
+          {title:'Comodidades y equipamiento',opts:['Aire acondicionado','Calefacción','Ascensor','Estacionamiento para visitantes','Gimnasio','Grupo electrógeno']},
+          {title:'Ambientes',opts:['Cocina','Comedor']},
+          {title:'Espacios comunes',opts:['Recepción','Sala de reuniones','Área de comedor','Áreas verdes','Lobby']},
+          {title:'Seguridad',opts:['Seguridad','Sistema contra incendio']},
+        ],
+        opts:['Acceso a internet','Agua corriente','Gas natural','Línea telefónica','Luz eléctrica','Aire acondicionado','Calefacción','Ascensor','Estacionamiento para visitantes','Gimnasio','Grupo electrógeno','Cocina','Comedor','Recepción','Sala de reuniones','Área de comedor','Áreas verdes','Lobby','Seguridad','Sistema contra incendio']},
      ]},
      // Documentación y acciones de marketing: ya no se piden; se conservan para el histórico.
      {step:5,title:'Documentación y Difusión',fields:[
