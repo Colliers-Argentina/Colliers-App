@@ -1838,6 +1838,9 @@ label.sr-comp-row:hover{background:#F8FAFF}
 .sr-fp-sec{margin-top:.9rem}
 .sr-fp-sec-t{font-size:11px;font-weight:800;color:#56648F;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.3rem}
 .sr-fp-sec-txt{font-size:12.5px;color:#353E59;line-height:1.5;white-space:pre-wrap}
+.sr-fp-bullets{display:grid;grid-template-columns:1fr 1fr;gap:.1rem .8rem}
+.sr-fp-bullet{font-size:12.5px;color:#353E59;padding:.15rem 0}
+@media(max-width:560px){.sr-fp-bullets{grid-template-columns:1fr}}
 .sr-fp-disp-row{font-size:12.5px;color:#353E59;padding:.15rem 0}
 .sr-fp-empty{font-size:12px;color:#B45309}
 .sr-fp-note{max-width:640px;margin:.8rem auto 0;font-size:11px;color:#8898C0;text-align:center;font-style:italic}
@@ -15758,9 +15761,6 @@ const SR_SERVICES=[
   {key:'ficha-oficinas',label:'Ficha y Publicación',icon:'🏢',responsable:'Marketing & Research',responsableEmail:'',
    form:[
      // ══ FICHA · Paso 1 — Información General ══
-     {step:1,title:'Fecha de entrega',fields:[
-       {k:'fechaRequerimiento',label:'Fecha de entrega (mín. 3 días de plazo)',type:'date'},
-     ]},
      // Un único card "Inmueble Asociado" en dos columnas: inmueble + componentes a la
      // izquierda, ubicación (dirección + Google Maps) a la derecha. La selección de
      // componentes hecha acá es la fuente de verdad para Disponibilidad y sus cálculos.
@@ -15770,16 +15770,6 @@ const SR_SERVICES=[
        {k:'direccion',label:'Ubicación',type:'text',req:true,hint:'Se completa con la dirección del inmueble; podés ajustarla.',col:'r'},
        {k:'urlMaps',label:'URL Google Maps',type:'maps',col:'r'},
      ]},
-     {step:1,title:'Textos de la Ficha',fields:[
-       {k:'titulo',label:'Título',type:'text',req:true,hint:'Se arma con el nombre del edificio y la dirección; podés editarlo.'},
-       {k:'subtitulo',label:'Subtítulo',type:'text',max:80,hint:'Sugerencia comercial breve; podés editarla.'},
-       {k:'descripcion',label:'Descripción del entorno y del edificio/complejo',type:'textarea',req:true,hint:'Se sugiere hacer una descripción soft describiendo la ubicación, accesos, transporte y amenities, sin entrar en detalles técnicos. Se completa con la descripción del inmueble como punto de partida; podés editarla. No modifica la ficha del inmueble.'},
-     ]},
-     // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
-     {step:1,title:'Características del edificio',fields:[
-       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Completar con información hard del edificio (cantidad de pisos, ascensores, grupo electrógeno, climatización, seguridad, amenities y etc.). No modifica la ficha del inmueble.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
-       {k:'especificacionesOficina',label:'Información de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
-     ]},
      {step:1,title:'Responsables',fields:[
        {k:'ejecutivos',label:'Ejecutivo(s) Comercial(es) a cargo',type:'ejecutivos'},
      ]},
@@ -15788,29 +15778,41 @@ const SR_SERVICES=[
        {k:'tipoTransaccion',label:'Tipo de operación',type:'select',opts:['Alquiler','Venta','Alquiler y Venta'],req:true},
      ]},
      // Según el tipo de operación se piden los precios que correspondan; con "Alquiler y Venta"
-     // se abren los dos juegos de campos. Precio total opcional, precio por m² obligatorio.
+     // se abren los dos juegos de campos. Sólo Precio total: el precio por m² se retiró de esta
+     // interfaz (queda como legacy para las solicitudes que ya lo tenían cargado).
      {step:2,title:'Condiciones Comerciales',fields:[
        {k:'precioAlquiler',label:'Precio total de alquiler (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
-       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Alquiler','Alquiler y Venta']}},
        {k:'precioVenta',label:'Precio total de venta (opcional)',type:'text',showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
-       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',req:true,showIf:{k:'tipoTransaccion',vals:['Venta','Alquiler y Venta']}},
-       // Precios genéricos anteriores: ya no se piden, se siguen mostrando si la solicitud los tiene.
+       // Precio por m² y precios genéricos anteriores: ya no se piden, se siguen mostrando si la solicitud los tiene.
+       {k:'precioM2Alquiler',label:'Precio por m² de alquiler',type:'text',legacy:true},
+       {k:'precioM2Venta',label:'Precio por m² de venta',type:'text',legacy:true},
        {k:'precioTotal',label:'Precio total',type:'text',legacy:true},
        {k:'precioM2',label:'Precio por m²',type:'text',legacy:true},
      ]},
      // Los pisos ya se eligieron en Información General: acá no se vuelven a seleccionar, pero
-     // sus datos (m², tipo de operación, asking rent, propietario) se pueden editar puntualmente
+     // sus datos (m², tipo de operación, asking rent, cocheras) se pueden editar puntualmente
      // para esta Ficha/Publicación, como overrides que no tocan el inmueble ni sus componentes.
      // Superficie y asking rent se calculan con la misma lógica del Generador de Ficha, sobre
      // los valores efectivos (con overrides) de los componentes seleccionados.
      {step:2,title:'Disponibilidad',fields:[
-       {k:'disponibilidad',label:'Pisos seleccionados',type:'disponibilidad',hint:'Son los pisos elegidos en Información General → Inmueble Asociado → Componentes. Podés editar sus datos acá para esta publicación, sin modificar el inmueble. Para agregar o quitar pisos, usá "Modificar selección".'},
-       {k:'minimoDivisible',label:'Mínimo divisible (m²)',type:'text',hint:'Se completa con el dato del inmueble si está cargado; podés editarlo para esta publicación sin modificar el inmueble.'},
+       {k:'disponibilidad',label:'Pisos seleccionados',type:'disponibilidad',hint:'Podés editarla. No modifica el formulario del inmueble.'},
        {k:'resumenDisponibilidad',label:'Resumen de disponibilidad',type:'text',ph:'Ej.: 300 - 1.000 m²',hint:'Rango de m² que se muestra en la Ficha: del componente más chico a la suma de todos los seleccionados, usando los valores editados en Disponibilidad. Se calcula solo; podés editarlo.'},
+       // Mínimo divisible: se retiró de esta interfaz (legacy para las solicitudes que ya lo tenían).
+       {k:'minimoDivisible',label:'Mínimo divisible (m²)',type:'text',legacy:true},
        // El detalle por piso reemplaza a este texto; se conserva para las solicitudes que ya lo tienen.
        {k:'especificacionPisos',label:'Especificación de pisos y m²',type:'textarea',legacy:true},
      ]},
-     // ══ FICHA · Paso 3 — Contenido (material multimedia) ══
+     // ══ FICHA · Paso 3 — Contenido ══
+     {step:3,title:'Textos de la Ficha',fields:[
+       {k:'titulo',label:'Título',type:'text',req:true,hint:'Se arma con el nombre del edificio y la dirección; podés editarlo.'},
+       {k:'subtitulo',label:'Subtítulo',type:'text',max:80,hint:'Sugerencia comercial breve.'},
+       {k:'descripcion',label:'Descripción del entorno y del edificio/complejo',type:'textarea',req:true,hint:'Descripción soft de carácter comercial, empezando con la descripción del inmueble así como ubicación, accesos, transporte, amenities, servicios, etc. sin entrar en detalles técnicos. Podés editarla. No modifica el formulario del inmueble.'},
+     ]},
+     // Edificio (amenities) vs. unidad: dos campos distintos, no se mezclan.
+     {step:3,title:'Características del edificio',fields:[
+       {k:'especificaciones',label:'Características del edificio',type:'textarea',req:true,hint:'Información hard del edificio (cantidad de pisos, ascensores, grupo electrógeno, climatización, seguridad, etc.). Podés editarla. No modifica el formulario del inmueble.',ph:'Ejemplo: Sistema de aire acondicionado VRV frío/calor, grupo electrógeno para áreas comunes, CCTV con monitoreo 24 hs, control de acceso mediante tarjetas magnéticas, 4 ascensores de alta velocidad.'},
+       {k:'especificacionesOficina',label:'Información de la oficina (opcional)',type:'textarea',hint:'Características propias de la unidad: distribución, estado, equipamiento específico, observaciones.',ph:'Ej.: Planta libre con 4 privados y sala de reuniones, pisos flotantes, cocina equipada, estado a estrenar.'},
+     ]},
      {step:3,title:'Contenido',fields:[
        {k:'linkMultimedia',label:'Link para multimedia',type:'url',req:true,ph:'https://...',hint:'Link al material multimedia (fotos, video, tour virtual).'},
        {k:'plano',label:'Plano (opcional)',type:'linkfile',hint:'Pegá el link del plano o adjuntá el archivo.'},
@@ -16636,10 +16638,16 @@ window.openSolicitudBase=function(){
         <div class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">${hoy.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
         <input id="srb-fecha" type="hidden" value="${_srISO(hoy)}"></div>
       <div class="cdr-field"><div class="cdr-lbl">Fecha de vencimiento</div>
-        <div id="srb-venc-lbl" class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">Según el tipo de actividad</div>
-        <input id="srb-venc" type="hidden"></div>
+        <input id="srb-venc" type="date" class="cdr-select" min="${_srVencMinISO('')}" value="${_srVencMinISO('')}">
+        <div id="srb-venc-hint" class="cdr-hint">Los primeros 3 días hábiles desde la fecha de solicitud no están disponibles.</div></div>
       <div class="cdr-field"><div class="cdr-lbl">Solicitada por</div>
         <div class="cdr-select" style="display:flex;align-items:center;background:#F6F8FC;color:#56648F;pointer-events:none">${esc(user?.displayName||user?.email||'—')}</div></div>
+    </div></div>
+    <div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">Inmueble</div><div class="sr-grid2">
+      <div class="cdr-field"><div class="cdr-lbl">¿Autorización del propietario?</div>
+        <select id="srb-autorizacion" class="cdr-select"><option value="">Seleccionar</option><option>Sí</option><option>No</option></select></div>
+      <div class="cdr-field"><div class="cdr-lbl">¿Exclusividad?</div>
+        <select id="srb-exclusividad" class="cdr-select"><option value="">Seleccionar</option><option>Sí</option><option>No</option></select></div>
     </div></div>
     <div class="nx-card"><div class="nx-card-title">Comentarios</div>
       <textarea id="srb-comentarios" class="cdr-input" rows="3" style="resize:vertical;min-height:64px" placeholder="Agregá cualquier comentario o información adicional para Marketing & Research."></textarea></div>`;
@@ -16651,27 +16659,39 @@ window.openSolicitudBase=function(){
   document.getElementById('sr-form-view').style.display='none';
   const bv=document.getElementById('sr-base-view');bv.style.display='flex';bv.style.flexDirection='column';
 };
-// La fecha de vencimiento se recalcula al elegir el tipo de actividad (SLA en días hábiles).
+// La fecha de vencimiento mínima seleccionable (primeros N días hábiles bloqueados desde la
+// fecha de solicitud; N = el SLA de la actividad, con un piso de 3 días hábiles siempre).
+function _srVencMinISO(tipo){
+  const sla=SR_SLA[tipo];
+  const bloqueo=Math.max(3,sla||0);   // días hábiles bloqueados desde la fecha de solicitud
+  return _srISO(_srAddHabiles(new Date(),bloqueo+1));   // primer día hábil YA DISPONIBLE
+}
+// El mínimo permitido se recalcula al elegir el tipo de actividad (SLA en días hábiles, piso de 3).
 window.srBaseTipoChange=function(){
   const k=(document.getElementById('srb-tipo')||{}).value||'';
-  const sla=SR_SLA[k];
-  const lbl=document.getElementById('srb-venc-lbl'),hid=document.getElementById('srb-venc');
-  if(sla==null){if(lbl)lbl.textContent=k?'Sin plazo definido para esta actividad':'Según el tipo de actividad';if(hid)hid.value='';return;}
-  const d=_srAddHabiles(new Date(),sla);
-  if(hid)hid.value=_srISO(d);
-  if(lbl)lbl.textContent=d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})+`  (${sla} días hábiles)`;
+  const venc=document.getElementById('srb-venc');if(!venc)return;
+  const minISO=_srVencMinISO(k);
+  venc.min=minISO;
+  if(!venc.value||venc.value<minISO)venc.value=minISO;
 };
 window.srBaseContinuar=function(){
   const gv=id=>(document.getElementById(id)||{}).value||'';
-  const tipo=gv('srb-tipo'),prio=gv('srb-prioridad'),bu=gv('srb-bu');
+  const tipo=gv('srb-tipo'),prio=gv('srb-prioridad'),bu=gv('srb-bu'),venc=gv('srb-venc');
   let ok=true;
   [['srb-tipo',tipo],['srb-prioridad',prio],['srb-bu',bu]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.style.borderColor=v?'':'#ED1B34';if(!v)ok=false;});
   if(!ok){alert('Completá Tipo de actividad, Prioridad y Unidad de negocio.');return;}
+  const vencMin=_srVencMinISO(tipo);
+  if(venc&&venc<vencMin){
+    const el=document.getElementById('srb-venc');if(el)el.style.borderColor='#ED1B34';
+    alert('La fecha de vencimiento no puede caer dentro de los primeros 3 días hábiles desde la fecha de solicitud.');
+    return;
+  }
   _srBase={
     servicio:tipo,tipoLabel:(_srTiposActividad().find(t=>t.key===tipo)||{}).label||'',
     prioridad:prio,unidadNegocio:bu,
+    autorizacionPropietario:gv('srb-autorizacion'),exclusividad:gv('srb-exclusividad'),
     comentarios:(gv('srb-comentarios')||'').trim(),
-    fechaSolicitud:gv('srb-fecha'),fechaVencimiento:gv('srb-venc'),
+    fechaSolicitud:gv('srb-fecha'),fechaVencimiento:venc,
     solicitanteId:user?.sub||user?.email||'',solicitanteNombre:user?.displayName||user?.email||'',
   };
   document.getElementById('sr-base-view').style.display='none';
@@ -16831,10 +16851,12 @@ window.srWizNext=function(){
 };
 // Solicitud de SOLO FICHA: valida hasta el paso 3 y va directo a la revisión, sin exigir
 // los pasos de Contenido/Publicación. Marca el alcance en la solicitud (sin campos nuevos por paso).
+// "Generar solicitud de ficha" finaliza ahí mismo: genera la solicitud y cierra el formulario,
+// sin pasar por una revisión final adicional ni por los pasos de Publicación.
 window.srWizSoloFicha=function(){
   for(let n=1;n<=_srEtapaUltimoPaso('FICHA');n++){if(!_srWizValidateStep(n)){srWizGoto(n);return;}}
   _srAlcance='ficha';
-  srWizGoto(_srReview);
+  submitSolicitud();
 };
 function _srWizValidateStep(n){
   const svc=_srFormService;if(!svc)return true;
@@ -16887,8 +16909,13 @@ function _srFieldHTML(f){
   const hint=f.hint?`<div class="cdr-hint">${esc(f.hint)}</div>`:'';
   const w=(inner,extra)=>`<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}${extra||''}>${lbl}${inner}${hint}</div>`;
   if(f.type==='text'||f.type==='number'||f.type==='url'){
-    const cnt=f.max?`<div class="cdr-hint" id="${id}-cnt">0/${f.max}</div>`:'';
-    return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"${f.type==='number'?' min="0" step="0.01"':''}${f.ro?' readonly style="background:#F6F8FC;color:#56648F"':''}${f.max?` maxlength="${f.max}" oninput="srCharCount('${f.k}',${f.max})"`:''}${f.ph?` placeholder="${esc(f.ph)}"`:''}>${cnt}`);
+    // Con contador de caracteres (f.max), va en el MISMO renglón que la ayuda gris, no en una
+    // línea aparte: se arma un único ".cdr-hint" con ambos, en vez de usar el wrapper genérico.
+    if(f.max){
+      const hintLine=`<div class="cdr-hint">${f.hint?esc(f.hint)+' · ':''}<span id="${id}-cnt">0/${f.max}</span></div>`;
+      return `<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}>${lbl}<input id="${id}" class="cdr-input" type="text" maxlength="${f.max}" oninput="srCharCount('${f.k}',${f.max})"${f.ph?` placeholder="${esc(f.ph)}"`:''}>${hintLine}</div>`;
+    }
+    return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"${f.type==='number'?' min="0" step="0.01"':''}${f.ro?' readonly style="background:#F6F8FC;color:#56648F"':''}${f.ph?` placeholder="${esc(f.ph)}"`:''}>`);
   }
   // Galería: varias imágenes con miniatura y borrado, subidas con el uploader de Nexus.
   if(f.type==='fotos')return w(`<div id="${id}-grid" class="sr-fotos-grid"></div><input id="${id}-file" type="file" accept="${esc(f.accept||'image/*')}" multiple class="cdr-input" style="margin-top:.4rem;padding:.35rem" onchange="srFotosAdd('${f.k}',this)">`);
@@ -17240,6 +17267,7 @@ function _srUnidadEfectiva(u){
   if(o.m2!==undefined)eff.m2=o.m2;
   if(o.tipoOferta!==undefined)eff.tipoOferta=o.tipoOferta;
   if(o.askingRent!==undefined)eff.askingRent=o.askingRent;
+  if(o.cocherasUnidad!==undefined)eff.cocherasUnidad=o.cocherasUnidad;
   if(o.propietario!==undefined){eff.ownerAccountName='';eff.ownerContactName='';eff.propietario=o.propietario;}
   return eff;
 }
@@ -17269,26 +17297,26 @@ function _srSyncDisponibilidad(){
     _srAutoSet('resumenDisponibilidad','');
     return;
   }
+  // Sin Propietario en esta vista (item 12): no se muestra acá, aunque el dato se conserve en
+  // el modelo (_srUnidadEfectiva) para quien lo siga usando en otro lugar.
   const fila=u=>{
     const o=_srCompOverrides[u._id]||{};
     const m2v=o.m2!==undefined?o.m2:(n(u.m2)?Math.round(n(u.m2)):'');
     const tipoV=o.tipoOferta!==undefined?o.tipoOferta:(u.tipoOferta||'Alquiler');
     const rentV=o.askingRent!==undefined?o.askingRent:(n(u.askingRent)?n(u.askingRent):'');
-    const propV=o.propietario!==undefined?o.propietario:(u.ownerAccountName||u.ownerContactName||u.propietario||'');
+    const cochV=o.cocherasUnidad!==undefined?o.cocherasUnidad:(n(u.cocherasUnidad)?Math.round(n(u.cocherasUnidad)):'');
     return `<div class="sr-disp-edit-row">
       <span title="${esc(_bfPisoLabel(u))}">${esc(_bfPisoLabel(u))}</span>
       <input class="sr-disp-inp" type="text" inputmode="decimal" value="${esc(String(m2v))}" placeholder="m²" oninput="srDispOverride('${u._id}','m2',this.value)">
       <select class="sr-disp-inp" onchange="srDispOverride('${u._id}','tipoOferta',this.value)">${SR_DISP_TIPO_OPTS.map(o2=>`<option${o2===tipoV?' selected':''}>${esc(o2)}</option>`).join('')}</select>
       <input class="sr-disp-inp" type="text" value="${esc(String(rentV))}" placeholder="USD/m²" oninput="srDispOverride('${u._id}','askingRent',this.value)">
-      <input class="sr-disp-inp" type="text" value="${esc(propV)}" placeholder="Propietario" oninput="srDispOverride('${u._id}','propietario',this.value)">
+      <input class="sr-disp-inp" type="text" inputmode="numeric" value="${esc(String(cochV))}" placeholder="Cocheras" oninput="srDispOverride('${u._id}','cocherasUnidad',this.value)">
     </div>`;
   };
-  const hd='<div class="sr-disp-edit-row sr-disp-edit-hd"><span>Piso</span><span>M²</span><span>Tipo</span><span>Asking rent</span><span>Propietario</span></div>';
+  const hd='<div class="sr-disp-edit-row sr-disp-edit-hd"><span>Piso</span><span>M²</span><span>Tipo</span><span>Asking rent</span><span>Cocheras</span></div>';
   const sel=_srUnidadesSeleccionadas();   // con overrides aplicados, para el cálculo
-  const {supRange,rentRange}=_calcSupRentRange(sel);
-  rev.innerHTML=`<div style="font-size:11px;font-weight:700;color:#56648F;margin-bottom:.3rem">Pisos seleccionados (podés editar los datos para esta publicación):</div>
-    <div class="sr-disp-edit-list">${hd}${raw.map(fila).join('')}</div>
-    <div class="sr-disp-review-sum">Superficie: <b>${esc(supRange)}</b>${rentRange?' · Asking rent: <b>'+esc(rentRange)+'</b>':''}</div>
+  const {supRange}=_calcSupRentRange(sel);
+  rev.innerHTML=`<div class="sr-disp-edit-list">${hd}${raw.map(fila).join('')}</div>
     <button type="button" class="crm-action-btn" style="margin-top:.6rem" onclick="srWizGoto(1)">✏️ Modificar selección</button>`;
   _srAutoSet('resumenDisponibilidad',supRange==='–'?'':supRange);
 }
@@ -17297,17 +17325,24 @@ function _srSyncDisponibilidad(){
 // selección de Componentes con sus overrides de Disponibilidad aplicados (misma fuente que
 // usa el resto del formulario: _srUnidadesSeleccionadas/_calcSupRentRange). No genera PPT ni
 // duplica reglas de negocio; sólo reutiliza los mismos datos y helpers ya existentes.
+// Separa un texto en viñetas por línea (o por ';'/',' si viene en un único renglón). Misma
+// normalización que usa el Generador de Ficha (_fichaModelo → vinetas), para no duplicar reglas.
+function _srVinetas(t){
+  const raw=String(t||'').trim();if(!raw)return [];
+  const sep=/[\n;]/.test(raw)?/[\n;]/:/,/;
+  return raw.split(sep).map(x=>x.replace(/^[•\-*]\s*/,'').trim()).filter(x=>x.length>2);
+}
+// No muestra Título ni Descripción (son propios del contenido de la Ficha, no de esta revisión
+// visual), ni "Información de la oficina" ni "Mínimo divisible": esta preview es específicamente
+// comercial/editorial, con las Características del edificio en viñetas.
 function _srRenderFichaPreview(){
   const host=document.getElementById('sr-ficha-preview');if(!host)return;
   const gv=id=>{const el=document.getElementById(id);return el?String(el.value||'').trim():'';};
   const bld=(_bldDocs||[]).find(b=>b._id===gv('srf-inmuebleId'));
-  const titulo=gv('srf-titulo')||(bld&&bld.nombre)||'Sin título';
   const direccion=gv('srf-direccion')||(bld&&bld.direccion)||'';
   const tipoOp=gv('srf-tipoTransaccion')||'';
-  const descripcion=gv('srf-descripcion');
   const especificaciones=gv('srf-especificaciones');
   const resumen=gv('srf-resumenDisponibilidad');
-  const minDiv=gv('srf-minimoDivisible');
   const n=_numAR;
   const sel=_srUnidadesSeleccionadas();   // ya con overrides de Disponibilidad aplicados
   const {rentRange}=_calcSupRentRange(sel);
@@ -17316,9 +17351,12 @@ function _srRenderFichaPreview(){
     if(n(u.m2)>0)p.push(Math.round(n(u.m2)).toLocaleString('es-AR')+' m²');
     p.push(u.tipoOferta||'Alquiler');
     if(n(u.askingRent)>0)p.push('USD '+n(u.askingRent).toLocaleString('es-AR',{maximumFractionDigits:2})+'/m²');
+    if(n(u.cocherasUnidad)>0)p.push(Math.round(n(u.cocherasUnidad))+' cocheras');
     return p.join(' — ');
   });
   const img=bld?(getBldFoto(bld)||''):'';
+  const autoriz=(_srBase&&_srBase.autorizacionPropietario)||'';
+  const exclus=(_srBase&&_srBase.exclusividad)||'';
   host.innerHTML=`
     <div class="sr-fp-hint">Revisá cómo quedará la información de la Ficha antes de continuar.</div>
     <div class="sr-fp-card">
@@ -17328,19 +17366,16 @@ function _srRenderFichaPreview(){
       </div>
       <div class="sr-fp-body">
         <div class="sr-fp-hd">
-          <div>
-            <div class="sr-fp-titulo">${esc(titulo)}</div>
-            <div class="sr-fp-dir">${esc(direccion||'Sin dirección')}</div>
-          </div>
+          <div class="sr-fp-dir">${esc(direccion||'Sin dirección')}</div>
           ${tipoOp?`<div class="sr-fp-tag">${esc(tipoOp)}</div>`:''}
         </div>
         <div class="sr-fp-kpis">
           <div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Superficie</span><span class="sr-fp-kpi-v">${esc(resumen||'–')}</span></div>
           <div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Asking rent</span><span class="sr-fp-kpi-v">${esc(rentRange||'–')}</span></div>
-          ${minDiv?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Mínimo divisible</span><span class="sr-fp-kpi-v">${esc(minDiv)} m²</span></div>`:''}
+          ${autoriz?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Autorización del propietario</span><span class="sr-fp-kpi-v">${esc(autoriz)}</span></div>`:''}
+          ${exclus?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Exclusividad</span><span class="sr-fp-kpi-v">${esc(exclus)}</span></div>`:''}
         </div>
-        ${descripcion?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Descripción</div><div class="sr-fp-sec-txt">${esc(descripcion)}</div></div>`:''}
-        ${especificaciones?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Características del edificio</div><div class="sr-fp-sec-txt">${esc(especificaciones)}</div></div>`:''}
+        ${especificaciones?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Características del edificio</div><div class="sr-fp-bullets">${_srVinetas(especificaciones).map(x=>`<div class="sr-fp-bullet">• ${esc(x)}</div>`).join('')}</div></div>`:''}
         <div class="sr-fp-sec">
           <div class="sr-fp-sec-t">Disponibilidad</div>
           ${filas.length?`<div class="sr-fp-disp">${filas.map(f=>`<div class="sr-fp-disp-row">• ${esc(f)}</div>`).join('')}</div>`:'<div class="sr-fp-empty">Todavía no seleccionaste componentes en Información General.</div>'}
@@ -17384,6 +17419,10 @@ function _srReadForm(svc){
   }));
   // Un campo oculto por su condición no aporta valor (la condición se evalúa sobre los datos ya leídos).
   svc.form.forEach(card=>card.fields.forEach(f=>{if(f.showIf&&!_srFieldVisible(f,data))data[f.k]='';}));
+  // "Fecha de entrega" ya no es un campo visible en Paso 1 (se retiró de la UI), pero la alerta de
+  // "Vencida" y las urgencias de Analytics siguen leyendo data.fechaRequerimiento: se sigue
+  // completando internamente con la Fecha de vencimiento del formulario base.
+  if(!data.fechaRequerimiento)data.fechaRequerimiento=(_srBase&&_srBase.fechaVencimiento)||'';
   return data;
 }
 window.submitSolicitud=async function(){
@@ -17432,6 +17471,7 @@ window.submitSolicitud=async function(){
       ...(_srBase?{
         prioridadBase:_srBase.prioridad,unidadNegocio:_srBase.unidadNegocio,comentariosBase:_srBase.comentarios||'',
         fechaSolicitud:_srBase.fechaSolicitud||'',fechaVencimiento:_srBase.fechaVencimiento||'',
+        autorizacionPropietario:_srBase.autorizacionPropietario||'',exclusividad:_srBase.exclusividad||'',
         solicitanteId:_srBase.solicitanteId||'',
         tipoActividad:_srBase.servicio||'',tipoActividadLabel:_srBase.tipoLabel||'',
       }:{}),
@@ -17454,7 +17494,7 @@ window.submitSolicitud=async function(){
           <button type="button" class="cdr-save" onclick="srCloseForm();srOpenDetail('${ref.id}')">Ver solicitud</button>
           <button type="button" class="crm-action-btn" onclick="srCloseForm()">Volver al listado</button>
         </div></div>`;
-      srWizGoto(6);
+      srWizGoto(_srConfirm);
     } else { srCloseForm(); srOpenDetail(ref.id); }
     if(newCto&&confirm('¿Deseás continuar completando la información del contacto?')){
       showModule('crm');
