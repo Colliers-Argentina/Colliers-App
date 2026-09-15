@@ -1914,6 +1914,22 @@ label.sr-comp-row-disabled:hover{background:transparent}
 .sr-sino-row.answered{background:#F0FDF4;border-color:#16A34A}
 .sr-sino-lbl{display:flex;align-items:center;gap:.4rem}
 .sr-sino-tick{color:#16A34A;font-weight:800;font-size:12px;opacity:0;transition:opacity .15s}
+.sr-sino2-grp{margin-bottom:1.1rem}
+.sr-sino2-grp:last-child{margin-bottom:0}
+.sr-sino2-grp-hd{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:800;color:#0A1B4D;padding:.5rem 0;border-bottom:1px solid #EEF1F8;margin-bottom:.8rem;cursor:pointer;user-select:none}
+.sr-sino2-chev{width:16px;height:16px;color:#8898C0;transition:transform .2s;flex-shrink:0}
+.sr-sino2-grp.collapsed .sr-sino2-chev{transform:rotate(180deg)}
+.sr-sino2-grp.collapsed .sr-sino2-grid{display:none}
+.sr-sino2-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem 1.4rem;margin-bottom:.2rem}
+.sr-sino2-item{display:flex;flex-direction:column;gap:.4rem}
+.sr-sino2-lbl{font-size:12.5px;color:#353E59;display:flex;align-items:center;gap:.35rem}
+.sr-sino2-btns{display:flex;gap:.5rem}
+.sr-sino2-btn{border:1px solid #DDE5F2;border-radius:7px;padding:.35rem 0;flex:1;text-align:center;font-size:12px;font-weight:600;color:#56648F;cursor:pointer;transition:all .15s;position:relative}
+.sr-sino2-btn input{position:absolute;opacity:0;pointer-events:none}
+.sr-sino2-btn:has(input:checked),.sr-sino2-btn.active{background:#1C54F4;border-color:#1C54F4;color:#fff}
+@media(max-width:640px){.sr-sino2-grid{grid-template-columns:1fr}}
+.sr-unit-wrap{display:flex;align-items:stretch}
+.sr-unit-suffix{display:flex;align-items:center;padding:0 .7rem;background:#F6F8FC;border:1px solid #DDE5F2;border-left:none;border-top-right-radius:8px;border-bottom-right-radius:8px;font-size:12px;color:#56648F;font-weight:600}
 .sr-etapa-banner{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;padding:.55rem .9rem;margin-bottom:.9rem;border-left:3px solid #1C54F4;background:#F4F7FF;border-radius:0 10px 10px 0}
 .sr-etapa-banner-t{font-size:12px;font-weight:800;letter-spacing:.08em;color:#0A1B4D}
 .sr-etapa-banner-s{font-size:11px;color:#56648F}
@@ -2624,6 +2640,7 @@ body.dark .cta-sec-title{color:#e0eaff}
 .nx-card{background:#fff;border:1px solid #E7EDF7;border-radius:14px;padding:.9rem 1.15rem 1rem}
 body.dark .nx-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)}
 .nx-card-title{font-size:10.5px;font-weight:800;color:#0A1B4D;text-transform:uppercase;letter-spacing:.08em;padding-bottom:.55rem;border-bottom:2px solid #EEF3FF;margin-bottom:.2rem}
+.sr-card-sub{font-size:11.5px;color:#8898C0;margin:.5rem 0 1rem}
 body.dark .nx-card-title{color:#e0eaff;border-color:rgba(255,255,255,.08)}
 .nx-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.6rem 0;border-bottom:1px solid #F3F6FC;min-height:34px}
 .nx-row:last-child{border-bottom:none}
@@ -15832,29 +15849,37 @@ const SR_SERVICES=[
      // ══ PUBLICACIÓN · Paso 5 — Publicación ══
      // "Características de la publicación" es una agrupación de campos dentro de este mismo
      // paso (no un paso aparte): acá viven las Superficies y Dimensiones de la publicación.
-     {step:5,title:'Características de la publicación',fields:[
-       {k:'supTotal',label:'Superficie total (m²)',type:'number',req:true,hint:'Esto incluye sup. cubierta, descubierta y semicubierta.'},
-       {k:'supCubierta',label:'Superficie cubierta (m²)',type:'number'},
-       {k:'supPropia',label:'Superficie propia (m²)',type:'number'},
+     {step:5,title:'Otras características',sub:'Agregá más detalles del inmueble para que los interesados lo conozcan mejor.',fields:[
+       {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',req:true,
+        groups:[
+          {title:'Servicios',opts:['Acceso a internet','Agua corriente','Gas natural','Línea telefónica','Luz eléctrica']},
+          {title:'Comodidades y equipamiento',opts:['Aire acondicionado','Calefacción','Ascensor','Estacionamiento para visitantes','Gimnasio','Grupo electrógeno']},
+          {title:'Ambientes',opts:['Cocina','Comedor']},
+          {title:'Espacios comunes',opts:['Recepción','Sala de reuniones','Área de comedor','Áreas verdes','Lobby']},
+          {title:'Seguridad',opts:['Seguridad','Sistema contra incendio']},
+        ],
+        opts:['Acceso a internet','Agua corriente','Gas natural','Línea telefónica','Luz eléctrica','Aire acondicionado','Calefacción','Ascensor','Estacionamiento para visitantes','Gimnasio','Grupo electrógeno','Cocina','Comedor','Recepción','Sala de reuniones','Área de comedor','Áreas verdes','Lobby','Seguridad','Sistema contra incendio']},
+     ]},
+     // Mismo orden/formato que "Características secundarias" (superficie con sufijo m², pares en
+     // la misma fila, Sí/No como pill). supPropia y pisoDestacado se conservan al final: no están
+     // en ese diseño de referencia, pero no correspondía perder el dato/funcionalidad.
+     {step:5,title:'Características secundarias',sub:'Sumá más información sobre tu inmueble para complementar las características principales.',fields:[
+       {k:'supTotal',label:'Superficie total',type:'number',req:true,unit:'m²',hint:'Esto incluye sup. cubierta, descubierta y semicubierta.'},
+       {k:'supCubierta',label:'Superficie cubierta',type:'number',unit:'m²'},
        {k:'cocheras',label:'Cocheras',type:'number',req:true},
        {k:'banos',label:'Baños',type:'number',req:true,hint:'¿Cuántos inodoros?'},
-     ]},
-     {step:5,title:'Distribución de la Unidad',fields:[
        {k:'banosPorPiso',label:'Baños por piso',type:'number'},
-       {k:'bauleras',label:'Bauleras',type:'select',opts:['Sí','No']},
+       {k:'bauleras',label:'Bauleras',type:'toggle2'},
        {k:'numOficinas',label:'Número de oficinas',type:'number'},
-       {k:'oficinasPorPiso',label:'Oficinas por piso',type:'number'},
        {k:'pisoUnidad',label:'Número de piso de la unidad',type:'number',req:true},
-       {k:'pisoDestacado',label:'¿De qué piso o de cuántos m² querés que sea la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
-     ]},
-     {step:5,title:'Características Particulares',fields:[
+       {k:'oficinasPorPiso',label:'Oficinas por piso',type:'number'},
        {k:'orientacion',label:'Orientación (opcional)',type:'select',opts:['Norte','Sur','Este','Oeste']},
        {k:'disposicion',label:'Disposición (opcional)',type:'select',opts:['Frente','Contrafrente','Interno']},
        {k:'antiguedad',label:'Antigüedad (años)',type:'number',req:true},
-       {k:'terraza',label:'Terraza',type:'select',opts:['Sí','No']},
-     ]},
-     {step:5,title:'Equipamiento y Servicios',fields:[
-       {k:'equipamiento',label:'Indicar si el edificio cuenta con cada servicio',type:'sino',req:true,opts:['Acceso a internet','Aire acondicionado','Calefacción','Ascensor','Grupo electrógeno','Sala de reuniones','Sistema contra incendio','Gimnasio','Áreas verdes','Recepción','Cocina','Área de comedor','Seguridad']},
+       {k:'terraza',label:'Terraza',type:'toggle2'},
+       {k:'codigoPropiedad',label:'Código de la propiedad',type:'text'},
+       {k:'supPropia',label:'Superficie propia',type:'number',unit:'m²'},
+       {k:'pisoDestacado',label:'¿De qué piso o de cuántos m² querés que sea la publicación?',type:'textarea',ph:'Ej.: Piso 3 completo — 750 m²  ·  Ej.: 500 m² del piso 2'},
      ]},
      // Documentación y acciones de marketing: ya no se piden; se conservan para el histórico.
      {step:5,title:'Documentación y Difusión',fields:[
@@ -16766,14 +16791,15 @@ function openSolicitudForm(key){
   const cardHTML=card=>{
     const visibles=card.fields.filter(f=>!omitir(f.k)&&!f.legacy);
     if(!visibles.length)return '';
+    const subHTML=card.sub?`<div class="sr-card-sub">${esc(card.sub)}</div>`:'';
     // Card de dos columnas explícitas (p. ej. "Inmueble Asociado"): cada campo se ubica en
     // col:'l' o col:'r'; una sola sección visual, sin sub-cards separados.
     if(card.cols){
       const lado=c=>visibles.filter(f=>f.col===c).map(f=>_srFieldHTML(f)).join('');
-      return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div><div class="sr-card-2col"><div class="sr-card-2col-l">${lado('l')}</div><div class="sr-card-2col-r">${lado('r')}</div></div></div>`;
+      return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div>${subHTML}<div class="sr-card-2col"><div class="sr-card-2col-l">${lado('l')}</div><div class="sr-card-2col-r">${lado('r')}</div></div></div>`;
     }
     const fields=visibles.map(f=>{let html=_srFieldHTML(f);if(SR_FULL_TYPES.includes(f.type))html=html.replace('class="cdr-field"','class="cdr-field sr-col-full"');return html;}).join('');
-    return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div><div class="sr-grid2">${fields}</div></div>`;
+    return `<div class="nx-card" style="margin-bottom:.9rem"><div class="nx-card-title">${esc(card.title)}</div>${subHTML}<div class="sr-grid2">${fields}</div></div>`;
   };
   // Un contenedor por paso (1-5 con campos, 6 revisión, 7 confirmación). Todos los campos quedan
   // siempre en el DOM (solo se ocultan) → no se pierde información al navegar y _srReadForm los lee.
@@ -16919,7 +16945,9 @@ function _srFieldHTML(f){
       const hintLine=`<div class="cdr-hint">${f.hint?esc(f.hint)+' · ':''}<span id="${id}-cnt">0/${f.max}</span></div>`;
       return `<div class="cdr-field" id="srfw-${f.k}"${f.showIf?' style="display:none"':''}>${lbl}<input id="${id}" class="cdr-input" type="text" maxlength="${f.max}" oninput="srCharCount('${f.k}',${f.max})"${f.ph?` placeholder="${esc(f.ph)}"`:''}>${hintLine}</div>`;
     }
-    return w(`<input id="${id}" class="cdr-input" type="${f.type==='number'?'number':'text'}"${f.type==='number'?' min="0" step="0.01"':''}${f.ro?' readonly style="background:#F6F8FC;color:#56648F"':''}${f.ph?` placeholder="${esc(f.ph)}"`:''}>`);
+    const inp=`<input id="${id}" class="cdr-input"${f.unit?' style="border-top-right-radius:0;border-bottom-right-radius:0"':''} type="${f.type==='number'?'number':'text'}"${f.type==='number'?' min="0" step="0.01"':''}${f.ro?' readonly style="background:#F6F8FC;color:#56648F"':''}${f.ph?` placeholder="${esc(f.ph)}"`:''}>`;
+    // Sufijo de unidad (p. ej. "m²"), sólo visual: no agrega una lógica de conversión nueva.
+    return w(f.unit?`<div class="sr-unit-wrap">${inp}<span class="sr-unit-suffix">${esc(f.unit)}</span></div>`:inp);
   }
   // Galería: varias imágenes con miniatura y borrado, subidas con el uploader de Nexus.
   if(f.type==='fotos')return w(`<div id="${id}-grid" class="sr-fotos-grid"></div><input id="${id}-file" type="file" accept="${esc(f.accept||'image/*')}" multiple class="cdr-input" style="margin-top:.4rem;padding:.35rem" onchange="srFotosAdd('${f.k}',this)">`);
@@ -16948,7 +16976,32 @@ function _srFieldHTML(f){
   if(f.type==='contacto')return w(`<input id="srf-propietario" class="cdr-input" placeholder="Buscar contacto (propietario)..." autocomplete="off" oninput="srPropSearch(this.value)" onblur="srPropBlur()"><div id="srf-prop-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-prop-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-prop-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-propId" type="hidden"><input id="srf-propNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='inmueble')return w(`<input id="srf-inmueble" class="cdr-input" placeholder="Buscar inmueble por nombre o dirección..." autocomplete="off" oninput="srInmSearch(this.value)" onblur="srInmBlur()"><div id="srf-inm-list" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #DBE5FF;border-radius:8px;z-index:600;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,7,89,.12)"></div><div id="srf-inm-create" style="display:none;margin-top:.5rem;padding:.7rem;border:1px dashed #C7D7FF;border-radius:10px;background:#F8FAFF"></div><div id="srf-inm-tag" style="display:none;font-size:10.5px;font-weight:700;color:#16A34A;margin-top:.3rem"></div><input id="srf-inmuebleId" type="hidden"><input id="srf-inmuebleNombre" type="hidden">`,' style="position:relative"');
   if(f.type==='maps')return w(`<div id="srf-maps-view" style="font-size:12px;color:#8898C0">Se completa automáticamente al seleccionar el inmueble.</div><input id="${id}" type="hidden">`);
-  if(f.type==='sino')return w(`<div id="${id}">${f.opts.map((o,i)=>`<div class="sr-sino-row" id="${id}-row-${i}"><span class="sr-sino-lbl"><span class="sr-sino-tick" id="${id}-tick-${i}">✓</span><span style="font-size:12.5px;color:#353E59">${esc(o)}</span></span><span style="display:flex;gap:1rem" data-item="${esc(o)}"><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="Sí" onchange="srSinoMark('${id}',${i})"> Sí</label><label style="font-size:12px;display:flex;align-items:center;gap:.3rem;cursor:pointer"><input type="radio" name="${id}-${i}" value="No" onchange="srSinoMark('${id}',${i})"> No</label></span></div>`).join('')}</div>`);
+  // Cada ítem: label arriba, botones "Sí"/"No" tipo pill debajo (mismo formato visual pedido).
+  // Si el campo trae "groups", se organiza en secciones colapsables (Servicios, Ambientes, etc.);
+  // el índice de cada ítem sigue viniendo de f.opts (flat) para no tocar lectura/validación.
+  if(f.type==='sino'){
+    const fila=(o,i)=>`<div class="sr-sino2-item" id="${id}-row-${i}">
+      <div class="sr-sino2-lbl"><span class="sr-sino-tick" id="${id}-tick-${i}">✓</span>${esc(o)}</div>
+      <div class="sr-sino2-btns" data-item="${esc(o)}">
+        <label class="sr-sino2-btn"><input type="radio" name="${id}-${i}" value="Sí" onchange="srSinoMark('${id}',${i})"><span>Sí</span></label>
+        <label class="sr-sino2-btn"><input type="radio" name="${id}-${i}" value="No" onchange="srSinoMark('${id}',${i})"><span>No</span></label>
+      </div>
+    </div>`;
+    if(f.groups){
+      const body=f.groups.map(g=>`<div class="sr-sino2-grp">
+        <div class="sr-sino2-grp-hd" onclick="this.closest('.sr-sino2-grp').classList.toggle('collapsed')">${esc(g.title)}<svg class="sr-sino2-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="sr-sino2-grid">${g.opts.map(o=>fila(o,f.opts.indexOf(o))).join('')}</div>
+      </div>`).join('');
+      return w(`<div id="${id}">${body}</div>`);
+    }
+    return w(`<div id="${id}" class="sr-sino2-grid">${f.opts.map(fila).join('')}</div>`);
+  }
+  // Sí/No único como par de botones pill (mismo estilo que "sino"), para reemplazar los <select>
+  // Sí/No sueltos (Bauleras, Terraza) sin cambiar cómo se lee/valida: guarda en un input oculto.
+  if(f.type==='toggle2'){
+    const btn=v=>`onclick="document.getElementById('${id}').value='${v}';this.parentElement.querySelectorAll('.sr-sino2-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"`;
+    return w(`<input type="hidden" id="${id}"><div class="sr-sino2-btns" style="max-width:220px"><div class="sr-sino2-btn" ${btn('Sí')}>Sí</div><div class="sr-sino2-btn" ${btn('No')}>No</div></div>`);
+  }
   if(f.type==='ejecutivos')return w(`<div id="srf-ejec-chips" class="cdr-ms-chips"></div><input id="srf-ejec-q" class="cdr-input" placeholder="Agregar ejecutivo (hasta 2 adicionales)..." autocomplete="off" oninput="srEjecSearch(this.value)" onblur="srEjecBlur()" style="margin-top:.4rem"><div id="srf-ejec-drop" class="cdr-ms-drop" style="display:none"></div>`,' style="position:relative"');
   if(f.type==='multi')return w(`<div id="${id}" class="cdr-toggle-group" style="flex-wrap:wrap;border-radius:8px">${f.opts.map(o=>`<button type="button" class="cto-pref-chip" data-v="${esc(o)}" onclick="this.classList.toggle('active')">${esc(o)}</button>`).join('')}</div>`);
   if(f.type==='docs'){const tipos=f.opts||['Foto','PDF','Plano','DWG','URL SharePoint'];return w(`<div style="display:flex;gap:.4rem;flex-wrap:wrap"><select id="srf-doc-tipo" class="cdr-select" style="max-width:160px">${tipos.map(t=>`<option>${esc(t)}</option>`).join('')}</select><input id="srf-doc-url" class="cdr-input" placeholder="URL o ruta del archivo..." style="flex:1;min-width:180px"><button type="button" class="crm-action-btn" style="background:#EEF3FF;color:#1C54F4;border-color:#C7D7FF" onclick="srAddDoc()">Agregar</button></div><div id="srf-doc-list" class="cdr-ms-chips" style="margin-top:.4rem"></div>`);}
