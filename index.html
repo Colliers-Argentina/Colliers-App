@@ -17351,8 +17351,8 @@ function _srVinetas(t){
   return raw.split(sep).map(x=>x.replace(/^[•\-*]\s*/,'').trim()).filter(x=>x.length>2);
 }
 // No muestra Título ni Descripción (son propios del contenido de la Ficha, no de esta revisión
-// visual), ni "Información de la oficina" ni "Mínimo divisible": esta preview es específicamente
-// comercial/editorial, con las Características del edificio en viñetas.
+// visual) ni "Mínimo divisible". Características del edificio y Características de la oficina
+// se muestran como bloques independientes en viñetas, sin mezclarse entre sí.
 function _srRenderFichaPreview(){
   const host=document.getElementById('sr-ficha-preview');if(!host)return;
   const gv=id=>{const el=document.getElementById(id);return el?String(el.value||'').trim():'';};
@@ -17360,6 +17360,7 @@ function _srRenderFichaPreview(){
   const direccion=gv('srf-direccion')||(bld&&bld.direccion)||'';
   const tipoOp=gv('srf-tipoTransaccion')||'';
   const especificaciones=gv('srf-especificaciones');
+  const especificacionesOficina=gv('srf-especificacionesOficina');
   const resumen=gv('srf-resumenDisponibilidad');
   const n=_numAR;
   const sel=_srUnidadesSeleccionadas();   // ya con overrides de Disponibilidad aplicados
@@ -17394,6 +17395,7 @@ function _srRenderFichaPreview(){
           ${exclus?`<div class="sr-fp-kpi"><span class="sr-fp-kpi-l">Exclusividad</span><span class="sr-fp-kpi-v">${esc(exclus)}</span></div>`:''}
         </div>
         ${especificaciones?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Características del edificio</div><div class="sr-fp-bullets">${_srVinetas(especificaciones).map(x=>`<div class="sr-fp-bullet">• ${esc(x)}</div>`).join('')}</div></div>`:''}
+        ${especificacionesOficina?`<div class="sr-fp-sec"><div class="sr-fp-sec-t">Características de la oficina</div><div class="sr-fp-bullets">${_srVinetas(especificacionesOficina).map(x=>`<div class="sr-fp-bullet">• ${esc(x)}</div>`).join('')}</div></div>`:''}
         <div class="sr-fp-sec">
           <div class="sr-fp-sec-t">Disponibilidad</div>
           ${filas.length?`<div class="sr-fp-disp">${filas.map(f=>`<div class="sr-fp-disp-row">• ${esc(f)}</div>`).join('')}</div>`:'<div class="sr-fp-empty">Todavía no seleccionaste componentes en Información General.</div>'}
